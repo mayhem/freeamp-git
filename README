@@ -1,6 +1,24 @@
 This documents how to get you up, running and using FreeAmp.  It also
 explains a bit about where we are coming from.
 
+FreeAmp Win32 Preview (11-3-98) Usage:
+  This is a preview release of the new FreeAmp UI.  I works properly, but lacks
+  some features.  The basic usage is:
+
+  * drag a file onto the Player to add it to the playlist
+    (the first file dragged on will automatically begin playing)
+  * move between files in the playlist using the |< and >| buttons
+  * pause/play again by pressing the > button
+  * stop by pressing the [] buton
+  * adjust the volume by clicking-and-dragging on the dial to the left of the display
+  * seek in the current file by clicking-and-dragging on the dial to the right of the
+    display.  This is a 'jog' mechanism in that the dial adjusts the rate of change of
+    the seeking (move it a little bit vertically, and the position of the song increments 
+    slowly.  move it a lot vertically, and the position of the song increments quickly.)
+    let up the mouse button to move to the selected point in the song.
+  * clicking on the display cycles through total time, current time and time remaining.
+
+
 INSTALLATION:
 
   See the document INSTALL
