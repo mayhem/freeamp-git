@@ -291,6 +291,17 @@ SOURCE=..\..\..\ui\src\uiregistry.cpp
 # Begin Source File
 
 SOURCE=..\res\freeamp.rc
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
