@@ -46,7 +46,7 @@ Registry::
 Add(RegistryItem* info)
 {
     if (info) {
-	    m_elements->Insert(info);
+	    m_elements->AddItem(info);
     }
 }
 
@@ -54,14 +54,14 @@ RegistryItem*
 Registry::
 GetItem(int32 index)
 {
-    return m_elements->ElementAt(index);
+    return m_elements->ItemAt(index);
 }
 
 int32 
 Registry::
 GetNumItems()
 {
-    return m_elements->NumElements();
+    return m_elements->CountItems();
 }
 
 RegistryItem::

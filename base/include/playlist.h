@@ -240,7 +240,7 @@ class PlayListManager {
     void SetPrev(bool bUserAction = false);
 
     int32 Current() const {return m_current;}
-    int32 Total() const {return m_pOrderList->NumElements();}
+    int32 Total() const {return m_pOrderList->CountItems();}
 
     void SetShuffle(ShuffleMode oop);
     void SetRepeat(RepeatMode rp);

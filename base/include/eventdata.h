@@ -99,7 +99,7 @@ class MediaInfoEvent : public Event {
     }
     void AddChildEvent(Event *pE) {
 	if (pE) {
-	    m_childEvents->Insert(pE);
+	    m_childEvents->AddItem(pE);
 	}
     }
 };

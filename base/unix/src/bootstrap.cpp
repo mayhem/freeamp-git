@@ -139,25 +139,25 @@ void testList() {
     char *p2 = "Yo dude!";
     char *p3 = "And, the fourth.";
     char *p4 = "third :)";
-    pVect->Insert(p1);
-    pVect->Insert(p2);
-    pVect->Insert(p3);
-    pVect->InsertAt(2,p4);
+    pVect->AddItem(p1);
+    pVect->AddItem(p2);
+    pVect->AddItem(p3);
+    pVect->AddItem(p4,2);
     
-    cout << pVect->ElementAt(0) << endl;
-    cout << pVect->ElementAt(1) << endl;
-    cout << pVect->ElementAt(2) << endl;
-    cout << pVect->ElementAt(3) << endl;
+    cout << pVect->ItemAt(0) << endl;
+    cout << pVect->ItemAt(1) << endl;
+    cout << pVect->ItemAt(2) << endl;
+    cout << pVect->ItemAt(3) << endl;
 
-    pVect->RemoveElementAt(1);
+    pVect->RemoveItemAt(1);
 
-    cout << pVect->ElementAt(0) << endl;
-    cout << pVect->ElementAt(1) << endl;
-    cout << pVect->ElementAt(2) << endl;
+    cout << pVect->ItemAt(0) << endl;
+    cout << pVect->ItemAt(1) << endl;
+    cout << pVect->ItemAt(2) << endl;
 
     pVect->RemoveAll();
 
-    if (pVect->ElementAt(0) != NULL) {
+    if (pVect->ItemAt(0) != NULL) {
 	cout << "Final Test failed!!" << endl;
     }
     cout << "Ending testList..." << endl;

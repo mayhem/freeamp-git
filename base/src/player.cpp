@@ -198,10 +198,10 @@ SetArgs(int32 argc, char **argv)
    }
    // sprintf(m_argUI,"%s",pBegin);
    strcpy(argUI, pBegin);
-   m_argUIList->Insert(argUI);
+   m_argUIList->AddItem(argUI);
    justGotArgvZero = true;
 #endif
-   argList.Insert(argv[0]);
+   argList.AddItem(argv[0]);
    for (int32 i = 1; i < argc; i++)
    {
       arg = argv[i];
@@ -214,7 +214,7 @@ SetArgs(int32 argc, char **argv)
             if (!strcmp(&(arg[2]), "help"))
             {
                Usage(argv[0]);
-               argList.Insert(argv[i]);
+               argList.AddItem(argv[i]);
             }
             break;
          case 'u':
@@ -240,14 +240,14 @@ SetArgs(int32 argc, char **argv)
                      m_argUIList->DeleteAll();
                      justGotArgvZero = false;
                   }
-                  m_argUIList->Insert(argUI);
+                  m_argUIList->AddItem(argUI);
                }
                break;
             }
          case 'h':
          case 'H':
             Usage(argv[0]);
-            argList.Insert(argv[i]);
+            argList.AddItem(argv[i]);
             break;
          case 'p':
             if (!strcmp(&(arg[2]), "rop"))
@@ -283,25 +283,25 @@ SetArgs(int32 argc, char **argv)
             }
             else
             {
-               argList.Insert(argv[i]);
+               argList.AddItem(argv[i]);
             }
             break;
          default:
-            argList.Insert(argv[i]);
+            argList.AddItem(argv[i]);
          }
       }
       else
       {
-         argList.Insert(argv[i]);
+         argList.AddItem(argv[i]);
       }
    }
-   m_argc = argList.NumElements();
+   m_argc = argList.CountItems();
    if (m_argc)
    {
       m_argv = new pchar[m_argc];
       for (int f = 0; f < m_argc; f++)
       {
-         m_argv[f] = argList.ElementAt(f);
+         m_argv[f] = argList.ItemAt(f);
          // cerr << "Adding argument (" << f << "): " << m_argv[f] << endl;
       }
    }
@@ -386,7 +386,7 @@ Run()
    int32     uisActivated = 0;
 
    // which ui should we instantiate first??
-   if (m_argUIList->NumElements() == 0)
+   if (m_argUIList->CountItems() == 0)
    {
       name = new char[len];
 
@@ -407,7 +407,7 @@ Run()
    {
       name = new char[1024];
 
-      strcpy(name, m_argUIList->ElementAt(uiListIndex));
+      strcpy(name, m_argUIList->ItemAt(uiListIndex));
    }
 
    if (IsntError(error))
@@ -443,7 +443,7 @@ Run()
                break;
             }
          }
-         char     *p = m_argUIList->ElementAt(++uiListIndex);
+         char     *p = m_argUIList->ItemAt(++uiListIndex);
 
          if (p)
          {
@@ -508,7 +508,7 @@ RegisterActiveUI(UserInterface * ui)
    GetUIManipLock();
    if (m_uiList && ui)
    {
-      m_uiList->Insert(ui);
+      m_uiList->AddItem(ui);
       ReleaseUIManipLock();
       return 0;
    }
@@ -1008,7 +1008,7 @@ int Player::Quit(Event *pEvent)
    // 2) Get CIO/COO manipulation lock
    GetUIManipLock();
    // 3) Count CIO/COO, put into m_quitWaitingFor.
-   m_quitWaitingFor = m_uiList->NumElements();
+   m_quitWaitingFor = m_uiList->CountItems();
    // 4) Send CMD_Cleanup event to all CIO/COOs
 
    pe = new Event(CMD_Cleanup);
@@ -1072,9 +1072,9 @@ void Player::HandleMediaInfo(Event *pEvent)
 
    SendToUI(pEvent);
 
-   for (int foobar = 0; foobar < pmvi->m_childEvents->NumElements(); foobar++)
+   for (int foobar = 0; foobar < pmvi->m_childEvents->CountItems(); foobar++)
    {
-      pe = pmvi->m_childEvents->ElementAt(foobar);
+      pe = pmvi->m_childEvents->ItemAt(foobar);
       SendToUI(pe);
    }
 
@@ -1276,9 +1276,9 @@ SendToUI(Event * pe)
 {
    int32     i;
 
-   for (i = 0; i < m_uiList->NumElements(); i++)
+   for (i = 0; i < m_uiList->CountItems(); i++)
    {
-      m_uiList->ElementAt(i)->AcceptEvent(pe);
+      m_uiList->ItemAt(i)->AcceptEvent(pe);
    }
 }
 

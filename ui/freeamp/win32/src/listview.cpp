@@ -445,7 +445,7 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
                         plm->RemoveItem(playlistItem);
 
                         //item->Select(); // remove deselects
-                        selectList->InsertAt(0, item);
+                        selectList->AddItem(item, 0);
                     }
 	            }
 
@@ -456,7 +456,7 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
 
                 i = 0;
 
-                while(item = selectList->ElementAt(i++))
+                while(item = selectList->ItemAt(i++))
                 {
                     PlayListItem* playlistItem;     
                     playlistItem = (PlayListItem*)item->UserValue();
@@ -626,7 +626,7 @@ AddItem(ListItem* item)
 {
     bool result = false;
 
-    if(m_list->Insert(item))
+    if(m_list->AddItem(item))
     {
 		result = true;
         UpdateScrollBar();
@@ -642,7 +642,7 @@ AddItem(ListItem* item, int32 index)
 {
     bool result = false;
 
-    if(m_list->InsertAt(index, item))
+    if(m_list->AddItem(item, index))
     {
 		result = true;
 
@@ -683,11 +683,11 @@ AddList(List<ListItem*>* items, int32 index)
 {
     bool result = false;
 
-    result = m_list->AddListAt(*items, index);
+    result = m_list->AddList(*items, index);
 
     if(result)
     {
-        int32 count = items->NumElements();
+        int32 count = items->CountItems();
 
         // adjust selection range if need be
 	    if(m_firstSelected != -1 && 
@@ -736,7 +736,7 @@ RemoveItem(int32 index)
 		    Deselect(index);
         }
 
-        if(result && m_list->RemoveElementAt(index)) 
+        if(result && m_list->RemoveItem(index)) 
         {
 
 		    if(m_firstSelected != -1 && 
@@ -809,7 +809,7 @@ ItemAt(int32 index) const
 {
     ListItem* result = NULL;
 
-    result = m_list->ElementAt(index);
+    result = m_list->ItemAt(index);
 
     return result;
 }
@@ -868,7 +868,7 @@ FirstItem() const
 {
     ListItem* result = NULL;
 
-    result = m_list->FirstElement();
+    result = m_list->FirstItem();
 
     return result;
 }
@@ -879,7 +879,7 @@ LastItem() const
 {
     ListItem* result = NULL;
 
-    result = m_list->LastElement();
+    result = m_list->LastItem();
 
     return result;
 }
@@ -890,7 +890,7 @@ HasItem(ListItem* item) const
 {
     bool result = false;
 
-    result = m_list->HasElement(item);
+    result = m_list->HasItem(item);
 
     return result;
 }
@@ -901,7 +901,7 @@ CountItems() const
 {
     int32 result = 0;
 
-    result = m_list->NumElements();
+    result = m_list->CountItems();
 
     return result;
 }
@@ -932,7 +932,7 @@ DoForEach(bool (*func)(ListItem*))
 
 	for(int32 i = 0; i < count; i++)
     {
-		if((*func)((ListItem *) m_list->ElementAt(i)))
+		if((*func)((ListItem *) m_list->ItemAt(i)))
         {
 			break;
         }
@@ -947,7 +947,7 @@ DoForEach(bool (*func)(ListItem*, void*), void* cookie)
 
 	for(int32 i = 0; i < count; i++)
     {
-		if((*func)((ListItem *) m_list->ElementAt(i), cookie))
+		if((*func)((ListItem *) m_list->ItemAt(i), cookie))
         {
 			break;
         }
@@ -958,7 +958,7 @@ const ListItem**
 ListView::
 Items() const
 {
-    return (const ListItem**)(m_list->Elements());
+    return (const ListItem**)(m_list->Items());
 }
 
 void        
@@ -1098,7 +1098,7 @@ IsItemSelected(int32 index) const
 {
     bool result = false;
 
-    ListItem* item = m_list->ElementAt(index);
+    ListItem* item = m_list->ItemAt(index);
 	result = item ? item->IsSelected() : false;
 
     return result;

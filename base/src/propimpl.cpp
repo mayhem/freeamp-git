@@ -59,22 +59,22 @@ Error PropertiesImpl::SetProperty(const char *pProp, PropValue *pVal) {
     if (m_props) {
 	if (pProp) {
 	    PropElem *ppe = m_props->Value(pProp);
-	    bool needToInsert = false;
+	    bool needToAddItem = false;
 	    if (!ppe) {
 		ppe = new PropElem();
-		needToInsert = true;
+		needToAddItem = true;
 	    }
 	    if (ppe) {
 		if (ppe->m_val) {
 		    delete ppe->m_val;
 		}
 		ppe->m_val = pVal;
-		if (needToInsert) {
+		if (needToAddItem) {
 		    m_props->Insert(pProp, ppe);
 		}
 		PropertyWatcher *pw = NULL;
-		for(int i = 0;i<ppe->m_propWatchers.NumElements();i++) {
-		    pw = ppe->m_propWatchers.ElementAt(i);
+		for(int i = 0;i<ppe->m_propWatchers.CountItems();i++) {
+		    pw = ppe->m_propWatchers.ItemAt(i);
 		    if (pw) {
 			pw->PropertyChange(pProp, pVal);
 		    }
@@ -96,7 +96,7 @@ Error PropertiesImpl::RegisterPropertyWatcher(const char *pProp, PropertyWatcher
 	if (pProp) {
 	    PropElem *ppe = m_props->Value(pProp);
 	    if (ppe) {
-		ppe->m_propWatchers.Insert(pw);
+		ppe->m_propWatchers.AddItem(pw);
 		rtn = kError_NoErr;
 	    }
 	}
@@ -114,10 +114,10 @@ Error PropertiesImpl::RemovePropertyWatcher(const char *pProp, PropertyWatcher *
 	if (pProp) {
 	    PropElem *ppe = m_props->Value(pProp);
 	    if (ppe) {
-		int32 endNum = ppe->m_propWatchers.NumElements();
+		int32 endNum = ppe->m_propWatchers.CountItems();
 		for (int i = 0; i < endNum ; i++) {
-		    if (pw == ppe->m_propWatchers.ElementAt(i)) {
-			ppe->m_propWatchers.RemoveElementAt(i);
+		    if (pw == ppe->m_propWatchers.ItemAt(i)) {
+			ppe->m_propWatchers.RemoveItem(i);
 			endNum--;
 		    }
 		}
