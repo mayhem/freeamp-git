@@ -636,25 +636,38 @@ void MusicBrowserUI::EmptyDBCheck(void)
 
 void MusicBrowserUI::EditPlaylistEvent(void)
 {
-    TV_ITEM   sItem;
-    
-    sItem.mask = TVIF_PARAM;
-    sItem.hItem = TreeView_GetSelection(GetDlgItem(m_hWnd, IDC_MUSICTREE));
-    if (sItem.hItem != m_hPlaylistItem &&
-        sItem.hItem != m_hCatalogItem &&
-        sItem.hItem != m_hAllItem &&
-        sItem.hItem != m_hUncatItem)
+    TV_ITEM tv_item;
+
+    // get the first playlist item
+    tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+    tv_item.mask = TVIF_STATE|TVIF_PARAM;
+    tv_item.stateMask = TVIS_SELECTED;
+    tv_item.state = 0;
+
+    // skip the "Create New Playlist..." item
+    tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+
+
+    if(tv_item.hItem)
     {
-       TreeView_GetItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sItem);
-       
-       if (sItem.lParam < 0)
-       { 
-           const vector<string> *p;
-           int                   i = -sItem.lParam;
-           
-           p = m_context->browser->m_catalog->GetPlaylists();
-           EditPlaylist((*p)[(-sItem.lParam) - 1]);
-       }    
+        BOOL result = FALSE;
+
+        do
+        {
+            result = TreeView_GetItem(m_hMusicCatalog, &tv_item);
+
+            if(result && (tv_item.state & TVIS_SELECTED))
+            {
+                string playlistPath;
+
+                playlistPath = m_oTreeIndex.Data(tv_item.lParam).m_oPlaylistPath;
+
+                EditPlaylist(playlistPath);
+            }
+            
+        }while(result && 
+               (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
+                                                        tv_item.hItem)));
     }
 }
 

@@ -301,7 +301,12 @@ void MusicBrowserUI::OpenPlaylist(void)
       
     if (GetOpenFileName(&sOpen))
     {
-        string playlist = sOpen.lpstrFile;
+        char   url[MAX_PATH + 8];
+        uint32 len = sizeof(url);
+
+        FilePathToURL(sOpen.lpstrFile, url, &len);
+
+        string playlist = url;
         
         EditPlaylist(playlist);
     }
