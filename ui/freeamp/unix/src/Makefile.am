@@ -40,8 +40,8 @@ all-local:
 endif
 
 cmdline-local: freeamp.o
-	gcc -shared -Wl,-soname,freeampgui-@target_os@.ui -o freeampgui-@target_os@.ui freeamp.o windowhash.o fawindow.o -L/usr/X11R6/lib -lX11 -lXext -lXpm
-	cp freeampgui-@target_os@.ui @top_srcdir@/plugins
+	gcc -shared -Wl,-soname,freeamp-@target_os@.ui -o freeamp-@target_os@.ui freeamp.o windowhash.o fawindow.o -L/usr/X11R6/lib -lX11 -lXext -lXpm
+	cp freeamp-@target_os@.ui @top_srcdir@/plugins
 
 if AM_HAVE_LINUXTHREADS
 REENT = -D_REENTRANT

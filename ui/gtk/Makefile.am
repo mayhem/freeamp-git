@@ -54,3 +54,7 @@ libfauicmdline_a_SOURCES = $(FILES)
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include `gtk-config --cflags`
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
 
+
+
+
+

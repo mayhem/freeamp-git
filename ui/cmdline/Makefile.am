@@ -49,5 +49,5 @@ CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
 all-local: cmdline-local
 
 cmdline-local: cmdlineUI.o
-	gcc -shared -Wl,-soname,freeamp-@target_os@.ui -o freeamp-@target_os@.ui cmdlineUI.o
-	cp freeamp-@target_os@.ui @top_srcdir@/plugins
+	gcc -shared -Wl,-soname,freeampcmd-@target_os@.ui -o freeampcmd-@target_os@.ui cmdlineUI.o
+	cp freeampcmd-@target_os@.ui @top_srcdir@/plugins

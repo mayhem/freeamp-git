@@ -56,8 +56,17 @@ else
    cmdline="true"
 fi
 
-gtk="true"
+gtk="false"
 
+AC_ARG_ENABLE(gtk,
+	      [  --enable-gtk     Build GTK+ version of FreeAmp],
+              [case "${enableval}" in
+		yes) gtk="true" ;;
+		no)  gtk="false" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-gtk) ;;
+	      esac])
+
+if test "$gtk" = "true"; then
 dnl ****
 dnl Check for GTK+
 dnl ****
@@ -66,8 +75,9 @@ dnl                   AC_MSG_ERROR(GTK+ distribution not found.)
 gtk="false"
 echo GTK+ compilation disabled
 )
+fi
 
-
+AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
 
 dnl *****
 dnl Check for LinuxThreads or MIT pthreads
@@ -142,16 +152,7 @@ AC_ARG_ENABLE(cmdline,
 	      esac])
 AM_CONDITIONAL(AM_ENABLE_CMDLINE, test "$cmdline" = "true")
 
-AC_ARG_ENABLE(gtk,
-	      [  --enable-gtk     Build GTK+ version of FreeAmp],
-              [case "${enableval}" in
-		yes) gtk="true" ;;
-		no)  gtk="false" ;;
-		*) AC_MSG_ERROR(bad value ${enableval} for --enable-gtk) ;;
-	      esac])
-AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
-
-x11="false"
+x11="true"
 
 AC_ARG_ENABLE(x11,
 		[  --enable-x11   Build the FreeAmp X11 GUI],

@@ -121,6 +121,9 @@ class FALcdWindow : public FAWindow {
 	SmallFont
     };
     char *m_text;
+    int32 m_mainTextWiggleBegin;
+    bool m_mainTextWiggleDrewAll;
+    bool m_wiggleLeft;
     int *m_smallFontWidth;
     Pixmap m_smallFontPixmap;
     int *m_largeFontWidth;
@@ -143,8 +146,9 @@ class FALcdWindow : public FAWindow {
 
     int32 m_totalHours, m_totalMinutes, m_totalSeconds;
     int32 m_currHours, m_currMinutes, m_currSeconds;
+    int32 m_seekHours, m_seekMinutes, m_seekSeconds;
 
-    void BlitText(Drawable d, GC gc, int32 x, int32 y, const char *text, int32 font);
+    bool BlitText(Drawable d, GC gc, int32 x, int32 y, const char *text, int32 font);
     void SetState(int32);
     void DrawIntroState(int32);
     void DrawVolumeState(int32);
@@ -189,8 +193,10 @@ class FALcdWindow : public FAWindow {
     void SetLargeFontPixmap(Pixmap);
     void SetLargeFontWidth(int *);
     void SetMainText(const char *);
+    bool WiggleMainText();
     void SetCurrentTime(int32 h, int32 m, int32 s);
     void SetTotalTime(int32 h, int32 m, int32 s);
+    void SetSeekTime(int32 h, int32 m, int32 s);
     void SetIcon(int32);
     void ClearIcon(int32);
     void SetDisplayState(int32);
@@ -199,7 +205,7 @@ class FALcdWindow : public FAWindow {
     virtual void Draw(int32);
 };
 
-typedef void (*dial_motion_function)(void *,int32);
+typedef void (*dial_motion_function)(void *,int32,int32,int32);
 
 class FADialWindow : public FAWindow {
  private:

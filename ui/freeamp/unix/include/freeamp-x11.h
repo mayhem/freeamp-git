@@ -51,6 +51,7 @@ class FreeAmpUI : public UserInterface {
     virtual void Init();
     virtual void SetPlayListManager(PlayListManager *);
     static void x11ServiceFunction(void *);
+    static void TimerEventFunction(void *);
     virtual ~FreeAmpUI();
 
     EventQueue *m_playerEQ;
@@ -58,12 +59,22 @@ class FreeAmpUI : public UserInterface {
     bool m_initialized;
     int32 m_oldLcdState;
     int32 m_volume;
+    int32 m_mixerFd;
+    bool m_timerContinue;
+    bool m_needsWiggling;
+    Thread *m_timerThread;
+
+    int32 m_totalSeconds;
+    int32 m_currSeconds;
+    int32 m_seekSeconds;
+    float m_secondsPerFrame;
 
     FAMainWindow *m_mainWindow;
     FADialWindow *m_volumeWindow;
-    static void VolumeDialFunction(void *,int32);
+    static void VolumeDialFunction(void *,int32,int32,int32);
     FADialWindow *m_seekWindow;
-    static void SeekDialFunction(void *,int32);
+    static void SeekDialFunction(void *,int32,int32,int32);
+    void SeekAction(); // called by timer thread
     FADumbWindow *m_lcdUpperWindow;
     FALcdWindow *m_lcdWindow;
     FADumbWindow *m_playListDrawerWindow;

@@ -30,8 +30,11 @@ ____________________________________________________________________________*/
 
 #include <X11/extensions/shape.h>
 
+#include <linux/soundcard.h>
+#include <sys/ioctl.h>
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include "config.h"
 #include "event.h"
@@ -58,11 +61,18 @@ FreeAmpUI::FreeAmpUI() {
     m_windowHash = new WindowHash();
     m_done = false;
     m_initialized = false;
+    m_needsWiggling = true;
 }
 FreeAmpUI::~FreeAmpUI() {
     if (m_windowHash) {
 	delete m_windowHash;
 	m_windowHash = NULL;
+    }
+    if (m_timerThread) {
+	m_timerContinue = false;
+	m_timerThread->Join();
+	delete m_timerThread;
+	m_timerThread = NULL;
     }
     XFreeGC(m_display, m_gc);
     XCloseDisplay(m_display);
@@ -450,7 +460,10 @@ void FreeAmpUI::Init()
 
     gtkListenThread = Thread::CreateThread();
     gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
-    
+
+    m_timerContinue = true;
+    m_timerThread = Thread::CreateThread();
+    m_timerThread->Create(FreeAmpUI::TimerEventFunction,this);
 
 }
 
@@ -529,6 +542,7 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    break;
 	case INFO_Stopped:
 	    m_lcdWindow->SetCurrentTime(0,0,0);
+	    m_currSeconds = 0;
 	    m_pauseButton->ClearActivated();
 	    XLockDisplay(m_display);
 	    m_pauseButton->Draw(0);
@@ -542,6 +556,8 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    char *pFoo = strrchr(info->m_filename,'/');
 	    pFoo = (pFoo ? ++pFoo : info->m_filename);
 	    m_lcdWindow->SetMainText(pFoo);
+	    m_needsWiggling = true;
+	    m_totalSeconds = (int32)info->m_totalSeconds;
 	    int32 s = (int32)info->m_totalSeconds;
 	    int32 h = s / 3600;
 	    int32 m = (s % 3600) / 60;
@@ -556,10 +572,15 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	case INFO_MediaTimeInfo: {
 	    MediaTimeInfoEvent *info = (MediaTimeInfoEvent *)e;
 	    m_lcdWindow->SetCurrentTime(info->m_hours,info->m_minutes,info->m_seconds);
+	    m_currSeconds = (info->m_hours * 3600) + (info->m_minutes * 60) + info->m_seconds;
 	    XLockDisplay(m_display);
 	    m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    XUnlockDisplay(m_display);
 	    break;
+	}
+	case INFO_MPEGInfo: {
+	    MpegInfoEvent *info = (MpegInfoEvent *)e;
+	    m_secondsPerFrame = info->GetSecondsPerFrame();
 	}
 	case INFO_PlayListRepeat: {
 	    PlayListRepeatEvent *plre = (PlayListRepeatEvent *)e;
@@ -617,7 +638,7 @@ void FreeAmpUI::SetArgs(int argc, char **argv) {
 
 
 void FreeAmpUI::playFunction(void *p) {
-    cerr << "play" << endl;
+    //cerr << "play" << endl;
     //((FreeAmpUI *)p)->m_stopButton->MapWindow();
     //((FreeAmpUI *)p)->m_playButton->UnMapWindow();
     ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_Play));
@@ -625,14 +646,14 @@ void FreeAmpUI::playFunction(void *p) {
 }
 
 void FreeAmpUI::stopFunction(void *p) {
-    cerr << "stop" << endl;
+    //cerr << "stop" << endl;
     //((FreeAmpUI *)p)->m_playButton->MapWindow();
     //((FreeAmpUI *)p)->m_stopButton->UnMapWindow();
     ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_Stop));
 }
 
 void FreeAmpUI::pauseFunction(void *p) {
-    cerr << "pause" << endl;
+    //cerr << "pause" << endl;
     if (((FreeAmpUI *)p)->m_playButton->IsMapped()) {
 	((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_PlayPaused));
 	((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState(FALcdWindow::CurrentTimeState);
@@ -642,69 +663,85 @@ void FreeAmpUI::pauseFunction(void *p) {
 }
 
 void FreeAmpUI::prevFunction(void *p) {
-    cerr << "prev" << endl;
+    //cerr << "prev" << endl;
     ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_PrevMediaPiece));
 }
 
 void FreeAmpUI::nextFunction(void *p) {
-    cerr << "next" << endl;
+    //cerr << "next" << endl;
     ((FreeAmpUI *)p)->m_playerEQ->AcceptEvent(new Event(CMD_NextMediaPiece));
 }
 
 void FreeAmpUI::switchModeFunction(void *p) {
-    cerr << "switch mode" << endl;
+    //cerr << "switch mode" << endl;
 }
 
 void FreeAmpUI::minimizeFunction(void *p) {
-    cerr << "minimize" << endl;
+    //cerr << "minimize" << endl;
     XIconifyWindow(((FreeAmpUI *)p)->m_display,
 		   ((FreeAmpUI *)p)->m_mainWindow->GetWindow(),
 		   ((FreeAmpUI *)p)->m_screenNum);
 }
 
 void FreeAmpUI::closeFunction(void *p) {
-    cerr << "close" << endl;
+    //cerr << "close" << endl;
     ((FreeAmpUI *)p)->m_done = true;
 }
 
 void FreeAmpUI::repeatFunction(void *p) {
-    cerr << "repeat" << endl;
+    //cerr << "repeat" << endl;
     ((FreeAmpUI *)p)->m_plm->ToggleRepeat();
 }
 
 void FreeAmpUI::shuffleFunction(void *p) {
-    cerr << "shuffle" << endl;
+    //cerr << "shuffle" << endl;
     ((FreeAmpUI *)p)->m_plm->ToggleShuffle();
 }
 
 void FreeAmpUI::openFunction(void *p) {
-    cerr << "open" << endl;
+    //cerr << "open" << endl;
 }
 
+
+#define VOL_MAX 100
 // 0 = off
 // 1 = on
 // 2 = up
 // 3 = down
 // 5 = no change
-void FreeAmpUI::VolumeDialFunction(void *p, int32 y) {
-    cout << "volume y: " << y << endl;
-    switch (y) {
+void FreeAmpUI::VolumeDialFunction(void *p, int32 c,int32 x, int32 y) {
+    //cout << "volume y: " << c << endl;
+    switch (c) {
 	case 0:
 	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState( ((FreeAmpUI *)p)->m_oldLcdState);
+	    if ( ((FreeAmpUI *)p)->m_mixerFd != -1 )
+		close( ((FreeAmpUI *)p)->m_mixerFd);
 	    break;
 	case 1:
 	    ((FreeAmpUI *)p)->m_oldLcdState = ((FreeAmpUI *)p)->m_lcdWindow->GetDisplayState();
+
+	    ((FreeAmpUI *)p)->m_mixerFd = open("/dev/mixer",O_RDWR);
+	    ioctl( ((FreeAmpUI *)p)->m_mixerFd, SOUND_MIXER_READ_VOLUME, &( ((FreeAmpUI *)p)->m_volume ));
+	    ((FreeAmpUI *)p)->m_volume &= 0xFF;
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( ((FreeAmpUI *)p)->m_volume );
+    
 	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState(FALcdWindow::VolumeState);
+    
 	    break;
 	case 2: {
 	    int foo = ((FreeAmpUI *)p)->m_volume;
 	    foo++;
-	    if ( foo > 100) {
-		foo = 100;
+	    if ( foo > VOL_MAX) {
+		foo = VOL_MAX;
 	    }
-	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( foo );
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( (foo*100)/VOL_MAX );
 	    ((FreeAmpUI *)p)->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    ((FreeAmpUI *)p)->m_volume = foo;
+	    
+	    foo |= (foo << 8);
+
+	    ioctl( ((FreeAmpUI *)p)->m_mixerFd, SOUND_MIXER_WRITE_VOLUME, &foo);
+
 	    break; }
 	case 3: {
 	    int foo = ((FreeAmpUI *)p)->m_volume;
@@ -712,27 +749,80 @@ void FreeAmpUI::VolumeDialFunction(void *p, int32 y) {
 	    if ( foo < 0) {
 		foo= 0;
 	    }
-	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( foo );
+	    ((FreeAmpUI *)p)->m_lcdWindow->SetVolume( (foo*100)/VOL_MAX );
 	    ((FreeAmpUI *)p)->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
 	    ((FreeAmpUI *)p)->m_volume = foo;
+
+	    foo |= (foo << 8);
+
+	    ioctl( ((FreeAmpUI *)p)->m_mixerFd, SOUND_MIXER_WRITE_VOLUME, &foo);
+	    
 	    break; }
     }
 }
 
-void FreeAmpUI::SeekDialFunction(void *p, int32 y) {
-    cout << "seek y: " << y << endl;
-    switch (y) {
+void FreeAmpUI::SeekDialFunction(void *p, int32 c,int32 x,int32 y) {
+    FreeAmpUI *pMe = (FreeAmpUI *)p;
+    //cout << "seek c: " << c << endl;
+    switch (c) {
 	case 0:
-	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState( ((FreeAmpUI *)p)->m_oldLcdState);
+	    pMe->m_lcdWindow->SetDisplayState( pMe->m_oldLcdState);
+	    pMe->m_playerEQ->AcceptEvent(new ChangePositionEvent( pMe->m_seekSeconds / pMe->m_secondsPerFrame ));
+
 	    break;
-	case 1:
-	    ((FreeAmpUI *)p)->m_oldLcdState = ((FreeAmpUI *)p)->m_lcdWindow->GetDisplayState();
-	    ((FreeAmpUI *)p)->m_lcdWindow->SetDisplayState(FALcdWindow::SeekTimeState);
-	    break;
-	case 2:
-	    break;
-	case 3:
-	    break;
+	case 1: {
+	    pMe->m_oldLcdState = pMe->m_lcdWindow->GetDisplayState();
+	    pMe->m_seekSeconds = pMe->m_currSeconds;
+	    int32 s = pMe->m_seekSeconds;
+	    int32 h = s / 3600;
+	    int32 m = (s % 3600) / 60;
+	    s = ((s % 3600) % 60);
+	    pMe->m_lcdWindow->SetSeekTime(h,m,s);
+	    pMe->m_lcdWindow->SetDisplayState(FALcdWindow::SeekTimeState);
+
+	    break; }
+	case 2: {
+	    pMe->m_seekSeconds++;
+	    if (pMe->m_seekSeconds > pMe->m_totalSeconds) {
+		pMe->m_seekSeconds = pMe->m_totalSeconds;
+	    }
+	    int32 s = pMe->m_seekSeconds;
+	    int32 h = s / 3600;
+	    int32 m = (s % 3600) / 60;
+	    s = ((s % 3600) % 60);
+	    pMe->m_lcdWindow->SetSeekTime(h,m,s);
+	    pMe->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+	    break; }
+	case 3: {
+	    pMe->m_seekSeconds--;
+	    if (pMe->m_seekSeconds < 0) {
+		pMe->m_seekSeconds = 0;
+	    }
+	    int32 s = pMe->m_seekSeconds;
+	    int32 h = s / 3600;
+	    int32 m = (s % 3600) / 60;
+	    s = ((s % 3600) % 60);
+	    pMe->m_lcdWindow->SetSeekTime(h,m,s);
+	    pMe->m_lcdWindow->Draw(FALcdWindow::TimeOnly);
+	    break; }
+    }
+}
+
+void FreeAmpUI::SeekAction() {
+    
+}
+
+void FreeAmpUI::TimerEventFunction(void *p) {
+    FreeAmpUI *pMe = (FreeAmpUI *)p;
+
+    while (pMe->m_timerContinue) {
+	if (pMe->m_needsWiggling) {
+	    XLockDisplay(pMe->m_display);
+	    pMe->m_needsWiggling = pMe->m_lcdWindow->WiggleMainText();
+	    XUnlockDisplay(pMe->m_display);
+	}
+	pMe->SeekAction();
+	usleep(170000);
     }
 }
 

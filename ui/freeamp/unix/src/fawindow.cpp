@@ -315,6 +315,8 @@ FALcdWindow::FALcdWindow(Display *display, int32 screen_num,GC gc, Window parent
 
     m_text = new char[19];
     strcpy(m_text,"Welcome to FreeAmp");
+    m_mainTextWiggleBegin = 0;
+    m_wiggleLeft = false;
     m_displayState = TotalTimeState;
     m_totalHours = m_totalMinutes = m_totalSeconds = m_currHours = m_currMinutes = m_currSeconds = 0;
 };
@@ -361,6 +363,41 @@ void FALcdWindow::SetMainText(const char *pText) {
     int32 l = strlen(pText);
     m_text = new char[l+1];
     memcpy(m_text,pText,l*sizeof(char));
+    m_text[l] = '\0';
+    m_mainTextWiggleBegin = 0;
+    m_mainTextWiggleDrewAll = true;
+}
+
+// returns false if it didn't need to wiggle the text
+bool FALcdWindow::WiggleMainText() {
+    bool rtn = true;
+    if (m_mainTextWiggleDrewAll && (m_mainTextWiggleBegin == 0)) {
+	// no wiggling required: we drew all the text beginning with the first character
+	rtn = false;
+    } else {
+	// some wiggling required.
+	if (m_wiggleLeft) {
+	    // wiggle it left some more.
+	    m_mainTextWiggleBegin--;
+	    if (m_mainTextWiggleBegin < 0) {
+		// we wiggled all the way, lets go back
+		m_mainTextWiggleBegin = 1;
+		m_wiggleLeft = false;
+	    }
+	    Draw(FullRedraw);
+	} else {
+	    // wiggle it right some more.
+	    if (m_mainTextWiggleDrewAll) {
+		// we were able to draw the last time, lets go back.
+		m_wiggleLeft = true;
+		m_mainTextWiggleBegin--;
+	    } else {
+		m_mainTextWiggleBegin++;
+	    }
+	    Draw(FullRedraw);
+	}
+    }
+    return rtn;
 }
 
 void FALcdWindow::SetSmallFontPixmap(Pixmap p) {
@@ -391,6 +428,12 @@ void FALcdWindow::SetTotalTime(int32 h, int32 m, int32 s) {
     m_totalSeconds = s;
 }
 
+void FALcdWindow::SetSeekTime(int32 h, int32 m, int32 s) {
+    m_seekHours = h;
+    m_seekMinutes = m;
+    m_seekSeconds = s;
+}
+
 void FALcdWindow::SetDisplayState(int32 s) {
     SetState(s);
 }
@@ -419,7 +462,7 @@ void FALcdWindow::DrawIntroState(int32 type) {
     switch (type) {
 	case FullRedraw:
 	    XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_gc,0,0,m_width,m_height,0,0);
-	    BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,"Welcome To FreeAmp",SmallFont);
+	    m_mainTextWiggleDrewAll = BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,"Welcome To FreeAmp",SmallFont);
 	    BlitIcons(m_doubleBufferPixmap);
 	case TimeOnly:
 	    break;
@@ -445,7 +488,7 @@ void FALcdWindow::DrawVolumeState(int32 type) {
     switch (type) {
 	case FullRedraw:
 	    XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_gc,0,0,m_width,m_height,0,0);
-	    BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    m_mainTextWiggleDrewAll = BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,&(m_text[m_mainTextWiggleBegin]),SmallFont);
 	    BlitText(m_doubleBufferPixmap,m_gc,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"volume",SmallFont);
 	    BlitIcons(m_doubleBufferPixmap);
 	case TimeOnly: {
@@ -475,7 +518,7 @@ void FALcdWindow::DrawCurrentTimeState(int32 type) {
     switch (type) {
 	case FullRedraw:
 	    XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_gc,0,0,m_width,m_height,0,0);
-	    BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    m_mainTextWiggleDrewAll = BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,&(m_text[m_mainTextWiggleBegin]),SmallFont);
 	    BlitText(m_doubleBufferPixmap,m_gc,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"current time",SmallFont);
 	    BlitIcons(m_doubleBufferPixmap);
 	case TimeOnly:
@@ -511,10 +554,20 @@ void FALcdWindow::DrawSeekTimeState(int32 type) {
     switch (type) {
 	case FullRedraw:
 	    XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_gc,0,0,m_width,m_height,0,0);
-	    BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    m_mainTextWiggleDrewAll = BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,&(m_text[m_mainTextWiggleBegin]),SmallFont);
 	    BlitText(m_doubleBufferPixmap,m_gc,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"seek time",SmallFont);
 	    BlitIcons(m_doubleBufferPixmap);
 	case TimeOnly:
+	    XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_timeGC,TIME_CLIP_X,TIME_CLIP_Y,TIME_CLIP_WIDTH,TIME_CLIP_HEIGHT,TIME_CLIP_X,TIME_CLIP_Y);
+	    if (m_seekHours) {
+		char foo[16];
+		sprintf(foo,"%d:%.02d:%.02d",m_seekHours,m_seekMinutes,m_seekSeconds);
+		BlitText(m_doubleBufferPixmap,m_timeGC,75,DESCRIPTION_TEXT_Y - 1,foo,LargeFont);
+	    } else {
+		char foo[16];
+		sprintf(foo,"%.02d:%.02d",m_seekMinutes,m_seekSeconds);
+		BlitText(m_doubleBufferPixmap,m_timeGC,85,DESCRIPTION_TEXT_Y - 1, foo, LargeFont);
+	    }
 	    break;
 	case IconsOnly:
 	    BlitIcons(m_doubleBufferPixmap);
@@ -538,7 +591,7 @@ void FALcdWindow::DrawRemainingTimeState(int32 type) {
     switch (type) {
 	case FullRedraw:
 	    XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_gc,0,0,m_width,m_height,0,0);
-	    BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    m_mainTextWiggleDrewAll = BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,&(m_text[m_mainTextWiggleBegin]),SmallFont);
 	    BlitText(m_doubleBufferPixmap,m_gc,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"remaining time",SmallFont);
 	    BlitIcons(m_doubleBufferPixmap);
 	case TimeOnly: {
@@ -588,7 +641,7 @@ void FALcdWindow::DrawTotalTimeState(int32 type) {
     switch (type) {
 	case FullRedraw:
 	    XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_gc,0,0,m_width,m_height,0,0);
-	    BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,m_text,SmallFont);
+	    m_mainTextWiggleDrewAll = BlitText(m_doubleBufferPixmap,m_gc,UPPER_LEFT_X,UPPER_LEFT_Y,&(m_text[m_mainTextWiggleBegin]),SmallFont);
 	    BlitText(m_doubleBufferPixmap,m_gc,DESCRIPTION_TEXT_X,DESCRIPTION_TEXT_Y,"total time",SmallFont);
 	    BlitIcons(m_doubleBufferPixmap);
 	case TimeOnly:
@@ -649,11 +702,15 @@ void FALcdWindow::Draw(int32 t) {
     XFlush(m_display);
 }
 
-void FALcdWindow::BlitText(Drawable d, GC gc,int32 x, int32 y, const char *text, int32 font) {
+// returns true if it could write all the text, false if it couldn't
+
+bool FALcdWindow::BlitText(Drawable d, GC gc,int32 x, int32 y, const char *text, int32 font) {
+    bool rtn = false;
+    int i = 0;
     switch (font) {
 	case LargeFont: {
 	    int32 offset = x;
-	    for (int i=0;text[i];i++) {
+	    for (i=0;text[i];i++) {
 		if ((offset + m_largeFontWidth[text[i] - 32]) > RIGHT_SIDE_CLIP)
 		    break;
 		XCopyArea(m_display,m_largeFontPixmap,d,gc,
@@ -662,11 +719,12 @@ void FALcdWindow::BlitText(Drawable d, GC gc,int32 x, int32 y, const char *text,
 			  offset, y);
 		offset += m_largeFontWidth[text[i] - 32];
 	    }
+//	    cout << "text[i]: " << (int)(text[i]) << endl;
 	    break;
 	}
 	case SmallFont: {
 	    int32 offset = x;
-	    for (int i=0;text[i];i++) {
+	    for (i=0;text[i];i++) {
 		if ((offset + m_smallFontWidth[text[i] - 32]) > RIGHT_SIDE_CLIP)
 		    break;
 		XCopyArea(m_display,m_smallFontPixmap,d,gc,
@@ -675,9 +733,13 @@ void FALcdWindow::BlitText(Drawable d, GC gc,int32 x, int32 y, const char *text,
 			  offset, y);
 		offset += m_smallFontWidth[text[i] - 32];
 	    }
+//	    cout << "text[i]: " << (int)(text[i]) << endl;
 	    break;
 	}
     }
+    if (!text[i])
+	rtn = true;
+    return rtn;
 }
 
 void FALcdWindow::SetIcon(int32 s) {
@@ -722,11 +784,11 @@ void FADialWindow::DoEvent(XEvent e) {
 		    m_currentDial = tmpInt * -1;
 		}
 		if (m_prevY < e.xmotion.y_root) {
-		    m_func(m_cookie,3);
+		    m_func(m_cookie,3,e.xmotion.x_root,e.xmotion.y_root);
 		} else if (m_prevY == e.xmotion.y_root) {
-		    m_func(m_cookie,5);
+		    m_func(m_cookie,5,e.xmotion.x_root,e.xmotion.y_root);
 		} else {
-		    m_func(m_cookie,2);
+		    m_func(m_cookie,2,e.xmotion.x_root,e.xmotion.y_root);
 		}
 		m_prevY = e.xmotion.y_root;
 		Draw(0);
@@ -738,13 +800,13 @@ void FADialWindow::DoEvent(XEvent e) {
 	    Draw(0);
 	    break;
 	case ButtonPress:
-	    m_func(m_cookie,1);
 	    m_buttonClickSpotX = e.xbutton.x_root;
 	    m_buttonClickSpotY = e.xbutton.y_root;
 	    m_prevY = e.xbutton.y_root;
+	    m_func(m_cookie,1,0,0);
 	    break;
 	case ButtonRelease:
-	    m_func(m_cookie,0);
+	    m_func(m_cookie,0,0,0);
     }
 }
 

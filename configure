@@ -12,6 +12,8 @@ ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
 ac_help="$ac_help
+  --enable-gtk     Build GTK+ version of FreeAmp"
+ac_help="$ac_help
   --with-gtk-prefix=PFX   Prefix where GTK is installed (optional)"
 ac_help="$ac_help
   --with-gtk-exec-prefix=PFX Exec prefix where GTK is installed (optional)"
@@ -19,8 +21,6 @@ ac_help="$ac_help
   --disable-gtktest       Do not try to compile and run a test GTK program"
 ac_help="$ac_help
   --enable-cmdline     Build command line freeamp"
-ac_help="$ac_help
-  --enable-gtk     Build GTK+ version of FreeAmp"
 ac_help="$ac_help
   --enable-x11   Build the FreeAmp X11 GUI"
 
@@ -1485,8 +1485,20 @@ else
    cmdline="true"
 fi
 
-gtk="true"
+gtk="false"
 
+# Check whether --enable-gtk or --disable-gtk was given.
+if test "${enable_gtk+set}" = set; then
+  enableval="$enable_gtk"
+  case "${enableval}" in
+		yes) gtk="true" ;;
+		no)  gtk="false" ;;
+		*) { echo "configure: error: bad value ${enableval} for --enable-gtk" 1>&2; exit 1; } ;;
+	      esac
+fi
+
+
+if test "$gtk" = "true"; then
 # Check whether --with-gtk-prefix or --without-gtk-prefix was given.
 if test "${with_gtk_prefix+set}" = set; then
   withval="$with_gtk_prefix"
@@ -1528,7 +1540,7 @@ fi
   # Extract the first word of "gtk-config", so it can be a program name with args.
 set dummy gtk-config; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1532: checking for $ac_word" >&5
+echo "configure:1544: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_GTK_CONFIG'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1559,7 +1571,7 @@ fi
 
   min_gtk_version=1.0.6	
   echo $ac_n "checking for GTK - version >= $min_gtk_version""... $ac_c" 1>&6
-echo "configure:1563: checking for GTK - version >= $min_gtk_version" >&5
+echo "configure:1575: checking for GTK - version >= $min_gtk_version" >&5
   no_gtk=""
   if test "$GTK_CONFIG" = "no" ; then
     no_gtk=yes
@@ -1582,7 +1594,7 @@ echo "configure:1563: checking for GTK - version >= $min_gtk_version" >&5
   echo $ac_n "cross compiling; assumed OK... $ac_c"
 else
   cat > conftest.$ac_ext <<EOF
-#line 1586 "configure"
+#line 1598 "configure"
 #include "confdefs.h"
 
 #include <gtk/gtk.h>
@@ -1647,7 +1659,7 @@ main ()
 }
 
 EOF
-if { (eval echo configure:1651: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:1663: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
 then
   :
 else
@@ -1684,7 +1696,7 @@ fi
           CFLAGS="$CFLAGS $GTK_CFLAGS"
           LIBS="$LIBS $GTK_LIBS"
           cat > conftest.$ac_ext <<EOF
-#line 1688 "configure"
+#line 1700 "configure"
 #include "confdefs.h"
 
 #include <gtk/gtk.h>
@@ -1694,7 +1706,7 @@ int main() {
  return ((gtk_major_version) || (gtk_minor_version) || (gtk_micro_version)); 
 ; return 0; }
 EOF
-if { (eval echo configure:1698: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1710: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
    echo " "
 	  echo "*** Disregard this message if you do not want GTK+ plugins compiled."
@@ -1740,17 +1752,26 @@ echo GTK+ compilation disabled
   
   rm -f conf.gtktest
 
+fi
 
 
+
+if test "$gtk" = "true"; then
+  AM_ENABLE_GTK_TRUE=
+  AM_ENABLE_GTK_FALSE='#'
+else
+  AM_ENABLE_GTK_TRUE='#'
+  AM_ENABLE_GTK_FALSE=
+fi
 
 
 mitpth="false"
 ltr="false"
 
 echo $ac_n "checking for MIT PThreads""... $ac_c" 1>&6
-echo "configure:1752: checking for MIT PThreads" >&5
+echo "configure:1773: checking for MIT PThreads" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1754 "configure"
+#line 1775 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -1771,9 +1792,9 @@ rm -f conftest*
 
 
 echo $ac_n "checking for Base LinuxThreads""... $ac_c" 1>&6
-echo "configure:1775: checking for Base LinuxThreads" >&5
+echo "configure:1796: checking for Base LinuxThreads" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1777 "configure"
+#line 1798 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -1796,9 +1817,9 @@ rm -f conftest*
 
 
 echo $ac_n "checking for LinuxThreads w/ErrorCheck Mutex""... $ac_c" 1>&6
-echo "configure:1800: checking for LinuxThreads w/ErrorCheck Mutex" >&5
+echo "configure:1821: checking for LinuxThreads w/ErrorCheck Mutex" >&5
 cat > conftest.$ac_ext <<EOF
-#line 1802 "configure"
+#line 1823 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 EOF
@@ -1822,13 +1843,13 @@ rm -f conftest*
 if test "$mitpth" = "false"; then
     if test "$ltr" = "false"; then
 	echo $ac_n "checking for broken Slackware MIT PThreads header (Obj C stub) and implementation""... $ac_c" 1>&6
-echo "configure:1826: checking for broken Slackware MIT PThreads header (Obj C stub) and implementation" >&5
+echo "configure:1847: checking for broken Slackware MIT PThreads header (Obj C stub) and implementation" >&5
 	if test "$cross_compiling" = yes; then
   echo "$ac_t""assuming no" 1>&6
 	
 else
   cat > conftest.$ac_ext <<EOF
-#line 1832 "configure"
+#line 1853 "configure"
 #include "confdefs.h"
 
 	    #define _MIT_POSIX_THREADS 1
@@ -1840,7 +1861,7 @@ else
             }
 	    
 EOF
-if { (eval echo configure:1844: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:1865: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
 then
   cat >> confdefs.h <<\EOF
 #define HAVE_BROKENMITPTHREADS 1
@@ -1904,27 +1925,7 @@ else
   AM_ENABLE_CMDLINE_FALSE=
 fi
 
-# Check whether --enable-gtk or --disable-gtk was given.
-if test "${enable_gtk+set}" = set; then
-  enableval="$enable_gtk"
-  case "${enableval}" in
-		yes) gtk="true" ;;
-		no)  gtk="false" ;;
-		*) { echo "configure: error: bad value ${enableval} for --enable-gtk" 1>&2; exit 1; } ;;
-	      esac
-fi
-
-
-
-if test "$gtk" = "true"; then
-  AM_ENABLE_GTK_TRUE=
-  AM_ENABLE_GTK_FALSE='#'
-else
-  AM_ENABLE_GTK_TRUE='#'
-  AM_ENABLE_GTK_FALSE=
-fi
-
-x11="false"
+x11="true"
 
 # Check whether --enable-x11 or --disable-x11 was given.
 if test "${enable_x11+set}" = set; then
@@ -2136,12 +2137,12 @@ s%@CPP@%$CPP%g
 s%@GTK_CONFIG@%$GTK_CONFIG%g
 s%@GTK_CFLAGS@%$GTK_CFLAGS%g
 s%@GTK_LIBS@%$GTK_LIBS%g
+s%@AM_ENABLE_GTK_TRUE@%$AM_ENABLE_GTK_TRUE%g
+s%@AM_ENABLE_GTK_FALSE@%$AM_ENABLE_GTK_FALSE%g
 s%@AM_HAVE_LINUXTHREADS_TRUE@%$AM_HAVE_LINUXTHREADS_TRUE%g
 s%@AM_HAVE_LINUXTHREADS_FALSE@%$AM_HAVE_LINUXTHREADS_FALSE%g
 s%@AM_ENABLE_CMDLINE_TRUE@%$AM_ENABLE_CMDLINE_TRUE%g
 s%@AM_ENABLE_CMDLINE_FALSE@%$AM_ENABLE_CMDLINE_FALSE%g
-s%@AM_ENABLE_GTK_TRUE@%$AM_ENABLE_GTK_TRUE%g
-s%@AM_ENABLE_GTK_FALSE@%$AM_ENABLE_GTK_FALSE%g
 s%@AM_ENABLE_X11_TRUE@%$AM_ENABLE_X11_TRUE%g
 s%@AM_ENABLE_X11_FALSE@%$AM_ENABLE_X11_FALSE%g
 s%@AM_HAVE_WIN32_TRUE@%$AM_HAVE_WIN32_TRUE%g

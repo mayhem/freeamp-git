@@ -313,8 +313,8 @@ include @top_srcdir@/config/Makefile.header
 @AM_ENABLE_X11_FALSE@	@true
 
 cmdline-local: freeamp.o
-	gcc -shared -Wl,-soname,freeampgui-@target_os@.ui -o freeampgui-@target_os@.ui freeamp.o windowhash.o fawindow.o -L/usr/X11R6/lib -lX11 -lXext -lXpm
-	cp freeampgui-@target_os@.ui @top_srcdir@/plugins
+	gcc -shared -Wl,-soname,freeamp-@target_os@.ui -o freeamp-@target_os@.ui freeamp.o windowhash.o fawindow.o -L/usr/X11R6/lib -lX11 -lXext -lXpm
+	cp freeamp-@target_os@.ui @top_srcdir@/plugins
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
