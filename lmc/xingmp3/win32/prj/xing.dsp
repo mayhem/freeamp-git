@@ -342,7 +342,7 @@ InputPath=..\..\src\cdctasm.asm
 InputName=cdctasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -354,7 +354,7 @@ InputPath=..\..\src\cdctasm.asm
 InputName=cdctasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -381,7 +381,7 @@ InputPath=..\..\src\cwin8asm.asm
 InputName=cwin8asm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -393,7 +393,7 @@ InputPath=..\..\src\cwin8asm.asm
 InputName=cwin8asm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -420,7 +420,7 @@ InputPath=..\..\src\cwinasm.asm
 InputName=cwinasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -432,7 +432,7 @@ InputPath=..\..\src\cwinasm.asm
 InputName=cwinasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -459,7 +459,7 @@ InputPath=..\..\src\mdctasm.asm
 InputName=mdctasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -471,7 +471,7 @@ InputPath=..\..\src\mdctasm.asm
 InputName=mdctasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -498,7 +498,7 @@ InputPath=..\..\src\msisasm.asm
 InputName=msisasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -510,7 +510,7 @@ InputPath=..\..\src\msisasm.asm
 InputName=msisasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 

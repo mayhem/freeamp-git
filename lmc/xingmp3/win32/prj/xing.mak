@@ -144,11 +144,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\xing.lmc"
+ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
 
 !ELSE 
 
-ALL : "fabaselib - Win32 Debug" ".\xing.lmc"
+ALL : "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\xing.lmc"
 
 !ENDIF 
 
@@ -188,6 +188,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\xing.pdb"
 	-@erase ".\xing.ilk"
 	-@erase ".\xing.lmc"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -240,7 +241,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\xing.lmc"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\xing.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                    ..\..\..\..\base\win32\prj\plugins
 	copy xing.lmc                            ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -447,11 +448,11 @@ LINK32_OBJS= \
 	"$(INTDIR)\wavep.obj" \
 	"$(INTDIR)\xinglmc.obj" \
 	"$(INTDIR)\xing.res" \
-	"$(INTDIR)\cdctasm.obj" \
 	"$(INTDIR)\cwin8asm.obj" \
 	"$(INTDIR)\cwinasm.obj" \
 	"$(INTDIR)\mdctasm.obj" \
 	"$(INTDIR)\msisasm.obj" \
+	"$(INTDIR)\cdctasm.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\xing.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
@@ -745,7 +746,7 @@ InputName=cdctasm
 "$(INTDIR)\cdctasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -758,7 +759,7 @@ InputName=cdctasm
 "$(INTDIR)\cdctasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -779,7 +780,7 @@ InputName=cwin8asm
 "$(INTDIR)\cwin8asm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -792,7 +793,7 @@ InputName=cwin8asm
 "$(INTDIR)\cwin8asm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -813,7 +814,7 @@ InputName=cwinasm
 "$(INTDIR)\cwinasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -826,7 +827,7 @@ InputName=cwinasm
 "$(INTDIR)\cwinasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -847,7 +848,7 @@ InputName=mdctasm
 "$(INTDIR)\mdctasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -860,7 +861,7 @@ InputName=mdctasm
 "$(INTDIR)\mdctasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -881,7 +882,7 @@ InputName=msisasm
 "$(INTDIR)\msisasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
@@ -894,7 +895,7 @@ InputName=msisasm
 "$(INTDIR)\msisasm.obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
-	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasmw -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 << 
 	
 
