@@ -66,6 +66,7 @@ void MusicBrowserUI::DeleteEvent(void)
             if(state & LVIS_SELECTED)
             {
                 found++;
+                ListView_DeleteItem(m_hPlaylistView, index);
                 m_oPlm->RemoveItem(index);
             }
 
@@ -393,13 +394,12 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
     pListView = (NM_LISTVIEW *)pHdr;
     if (pListView->hdr.idFrom == IDC_PLAYLISTBOX)
     {
-	    if (pListView->hdr.code == LVN_ITEMCHANGED)
+	    if(pListView->hdr.code == LVN_ITEMCHANGED)
         {
             m_currentindex = pListView->lParam;
             UpdateButtonStates();
         }
-
-	    if (pListView->hdr.code == NM_DBLCLK)
+	    else if(pListView->hdr.code == NM_DBLCLK)
         {
             // only do this for the root browser
             if(!m_pParent)
@@ -409,8 +409,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 m_playerEQ->AcceptEvent(new Event(CMD_Play));
             }
         }   
-        
-        if (pListView->hdr.code == LVN_COLUMNCLICK)
+        else if(pListView->hdr.code == LVN_COLUMNCLICK)
         {
             int column = pListView->iSubItem;
 
@@ -433,6 +432,16 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     break;
             }
         }   
+        else if(pListView->hdr.code == LVN_KEYDOWN)
+        {
+            LV_KEYDOWN* pnkd = (LV_KEYDOWN*)pHdr; 
+
+            if(pnkd->wVKey == VK_DELETE)
+            {
+                DeleteEvent();    
+            }
+
+        }
             
         return 0;
     }

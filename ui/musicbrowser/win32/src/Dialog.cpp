@@ -122,6 +122,25 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
             return 0;
         }
 
+        case WM_SYSCOLORCHANGE:
+        {
+            SendMessage(m_hMusicCatalog, WM_SYSCOLORCHANGE, 0, 0);
+            SendMessage(m_hPlaylistView, WM_SYSCOLORCHANGE, 0, 0);
+            SendMessage(m_hRebar, WM_SYSCOLORCHANGE, 0, 0);
+
+             // update REBARBANDINFO for all rebar bands
+            REBARBANDINFO rbb;
+
+	        rbb.cbSize = sizeof(REBARBANDINFO);
+	        rbb.fMask = RBBIM_COLORS;
+	        rbb.clrFore = GetSysColor(COLOR_BTNTEXT);
+	        rbb.clrBack = GetSysColor(COLOR_BTNFACE );	       
+
+            SendMessage(m_hRebar, RB_SETBANDINFO, 0, (LPARAM)&rbb);
+            SendMessage(m_hToolbar, WM_SYSCOLORCHANGE, 0, 0);
+            break;
+        }
+
 		case WM_SIZE:
         {
             SizeWindow(wParam, LOWORD(lParam), HIWORD(lParam));
@@ -829,7 +848,7 @@ void MusicBrowserUI::CreateToolbar(void)
 				g_hinst,
 				NULL );
 
-    /*m_hToolbar = CreateToolbarEx(hwndRebar, 
+    /*m_hToolbar = CreateToolbarEx(m_hWnd, 
                      WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
                      TBSTYLE_TOOLTIPS | TBSTYLE_LIST | WS_CLIPCHILDREN | 
                      WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE,
@@ -841,7 +860,7 @@ void MusicBrowserUI::CreateToolbar(void)
                      WS_CHILD | WS_VISIBLE | TBSTYLE_FLAT |
                      TBSTYLE_TOOLTIPS |  WS_CLIPCHILDREN | 
                      WS_CLIPSIBLINGS | CCS_NODIVIDER | CCS_NORESIZE, 
-                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR, g_hinst, NULL); 
+                     0, 0, 0, 0, m_hRebar, (HMENU) ID_TOOLBAR, g_hinst, NULL);
 
     // Send the TB_BUTTONSTRUCTSIZE message, which is required for 
     // backward compatibility. 
@@ -878,8 +897,6 @@ void MusicBrowserUI::CreateToolbar(void)
     index = SendMessage(m_hToolbar, TB_ADDSTRING, (WPARAM) 0, (LPARAM)"Clear Playlist");
     tbButtons[11].iString = index;
     
-    
-
     SendMessage(m_hToolbar, TB_ADDBUTTONS, (WPARAM) 12, (LPARAM) &tbButtons);
     SendMessage(m_hToolbar, TB_AUTOSIZE, (WPARAM) 0, (LPARAM) 0);
 
@@ -890,13 +907,13 @@ void MusicBrowserUI::CreateToolbar(void)
 
     // Initialize REBARBANDINFO for all rebar bands
 	rbb.cbSize = sizeof(REBARBANDINFO);
-	rbb.fMask = RBBIM_COLORS |	// clrFore and clrBack are valid
+	rbb.fMask = RBBIM_COLORS |	//  clrFore and clrBack are valid
 		RBBIM_CHILD |				// hwndChild is valid
 		RBBIM_CHILDSIZE |			// cxMinChild and cyMinChild are valid
 		RBBIM_STYLE |				// fStyle is valid
 		RBBIM_ID;					// wID is valid
 	rbb.clrFore = GetSysColor(COLOR_BTNTEXT);
-	rbb.clrBack = GetSysColor(COLOR_BTNFACE);
+	rbb.clrBack = GetSysColor(COLOR_BTNFACE );
 	rbb.fStyle = RBBS_NOVERT |	// do not display in vertical orientation
 		            RBBS_CHILDEDGE;
 	rbb.hbmBack = NULL;

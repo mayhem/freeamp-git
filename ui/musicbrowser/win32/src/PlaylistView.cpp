@@ -159,7 +159,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             rcClip.left += ListView_GetColumnWidth(hwndList, 0);
 
             // Check to see if this item is selected
-            if(dis->itemState & ODS_SELECTED)
+            if(dis->itemState & ODS_SELECTED && GetFocus() == hwndList)
             {
                 // Set the text background and foreground colors
                 SetTextColor(dis->hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
@@ -384,14 +384,28 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
 
     if(oldIndex != kInvalidIndex)
     {
-        ListView_DeleteItem(m_hPlaylistView, oldIndex);
+        LV_ITEM sItem;
+        
+        sItem.mask = LVIF_PARAM;
+        sItem.iItem = oldIndex;
+        sItem.iSubItem = 0;
+        sItem.lParam = 0;
+
+        ListView_GetItem(m_hPlaylistView, &sItem);
+
+        // we may have already deleted this item
+        // this tries to prevent a race condition 
+        // on delete....
+        if(item == (PlaylistItem*)sItem.lParam)
+        {
+            ListView_DeleteItem(m_hPlaylistView, oldIndex);
+        }
 
         if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
             oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
 
         ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
         ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);
-
     }
 }
 
