@@ -1147,6 +1147,13 @@ GetExtension(const char *title)
    char *temp_ext;
    char *ext_return = NULL;
 
+   if (strncmp(title, "file://", 7) != 0)
+   {
+       ext_return = new char[4];
+       strcpy(ext_return, "MP3");
+       return ext_return;
+   }
+
    temp_ext = strrchr(title, '.');
    if (temp_ext)
    {
@@ -1179,7 +1186,6 @@ ChooseLMC(const char *szUrl, char *szTitle)
 {
    RegistryItem *lmc_item = NULL;
    char     *iExt;
-
 
    iExt = GetExtension(szUrl);
    if (!iExt)
@@ -1290,9 +1296,11 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
 
    lmc_item = ChooseLMC(pc->URL().c_str());
    if (!lmc_item)
+   {
+      printf("Using default LMC!\n");
    // FIXME: Should probably have a user definable default LMC
       lmc_item = m_lmcRegistry->GetItem(0);
-
+   }
   
    if (pmi_item)
    {
@@ -1574,6 +1582,7 @@ Play(Event *pEvent)
     }
     else
     {
+        printf("Calling resume\n");
         m_pmo->Resume();
         if (SetState(PlayerState_Playing))
         {
