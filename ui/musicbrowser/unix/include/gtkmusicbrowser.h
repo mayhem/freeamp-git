@@ -89,7 +89,6 @@ class GTKMusicBrowser {
                     bool cdCreationMode = false);
     virtual ~GTKMusicBrowser();
 
-    void ShowPlaylist(void);
     void ShowMusicBrowser(void);
     void Close(bool inMain = true);
  
@@ -149,7 +148,6 @@ class GTKMusicBrowser {
     Properties *m_propManager;
 
     bool m_initialized;
-    bool m_browserCreated;
 
     bool master;
 

@@ -108,12 +108,6 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
 		}
             }
             break; }
-        case CMD_TogglePlaylistUI: {
-            if (mainBrowser->Visible())
-                mainBrowser->Close();
-            else
-                mainBrowser->ShowPlaylist();
-            break; } 
         case CMD_ToggleMusicBrowserUI: {
             if (mainBrowser->Visible())
                 mainBrowser->Close();
