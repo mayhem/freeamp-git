@@ -51,6 +51,7 @@ enum ControlTypeEnum
     eButtonControl,
     eTextControl,
     eSliderControl,
+    eVSliderControl,
     eDialControl,
     eMultiStateControl,
     

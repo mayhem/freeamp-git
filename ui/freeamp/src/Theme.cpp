@@ -45,6 +45,7 @@ ____________________________________________________________________________*/
 #include "ButtonControl.h"
 #include "DialControl.h"
 #include "SliderControl.h"
+#include "VSliderControl.h"
 #include "TextControl.h"
 #include "MultiStateControl.h"
 #include "ThemeZip.h"
@@ -654,6 +655,25 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        return kError_NoErr;
     }
 
+    if (oElement == string("VSliderControl"))
+    {
+       if (m_pCurrentControl)
+       {
+           m_oLastError = string("Controls cannot be nested");
+           return kError_InvalidParam;
+       }
+	   if (oAttrMap.find("Name") == oAttrMap.end())
+       {
+           m_oLastError = string("the <VSliderControl> tag needs a Name attribute");
+           return kError_ParseError;
+       }        
+
+       m_eCurrentControl = eVSliderControl;
+       m_pCurrentControl = new VSliderControl(m_pCurrentWindow,
+                                              oAttrMap["Name"]);
+       return kError_NoErr;
+    }
+
     if (oElement == string("TextControl"))
     {
        if (m_pCurrentControl)
@@ -939,6 +959,7 @@ Error Theme::EndElement(string &oElement)
     if (oElement == string("ButtonControl") ||
         oElement == string("DialControl") ||
         oElement == string("SliderControl") ||
+        oElement == string("VSliderControl") ||
         oElement == string("MultiStateControl"))
     {
        m_pCurrentWindow->AddControl(m_pCurrentControl);
