@@ -279,7 +279,7 @@ static BOOL CALLBACK IntroWizardSearch(HWND hwnd,
                                 "music collection.";
                                
             const char* kMsg2 = "By default "BRANDING" will search all the disk drives on "
-                                "your computer. If you would like to limit the "
+                                "your computer for music. If you would like to limit the "
                                 "scope of the search you may do so by selecting a "
                                 "disk drive for us to search. If you wish, you may "
                                 "also select a specific folder on that drive.";
