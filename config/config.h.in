@@ -41,6 +41,7 @@ ____________________________________________________________________________*/
 #define HAVE_BROKENMITPTHREADS 0
 
 #define HAVE_LINUX 0
+#define HAVE_LINUX_LIBC5 0
 #define HAVE_SOLARIS 0
 
 #define AC_HOST_OS "unknown"

@@ -143,6 +143,7 @@ int main() {
 }
   
     ],
+    AC_DEFINE(HAVE_LINUX_LIBC5)
     AC_MSG_RESULT(yes)
 echo "***"
 echo "*** X11 compilation has been enabled and libc5 was found."
