@@ -4,7 +4,7 @@
 HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 
 [RegisterFileTypes:HKCR:MP3AudioFile\shell\open\command]
-(Default)=S,<TARGETDIR>\freeamp.exe "%1"
+(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
 ---Comment---=
 
 [RegisterFileTypes:HKCR:PlayListFile\DefaultIcon]
@@ -12,7 +12,7 @@ HKCU0=Software\FreeAmp\FreeAmp v1.2\Main
 ---Comment---=
 
 [RegisterFileTypes:HKCR:PlayListFile\shell\open\command]
-(Default)=S,<TARGETDIR>\freeamp.exe "%1"
+(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
 ---Comment---=
 
 [RegisterFileTypes:HKCR:.m3u]
