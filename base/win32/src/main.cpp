@@ -37,37 +37,23 @@ ____________________________________________________________________________*/
 #include "log.h"
 #include "facontext.h"
 #include "win32prefs.h"
+#include "thread.h"
+#include "utility.h"
 
-static
-BOOL
-CALLBACK
-EnumThreadWndProc(  HWND hwnd,
-                    LPARAM lParam )
-{
-    BOOL    result = TRUE;
-    char    windowTitle[256];
-    char    freeampTitle[] = BRANDING;
-    int32   count;
+void CreateHiddenWindow(void* arg);
+void SendCommandLineToHiddenWindow();
 
-    count = GetWindowText(hwnd, windowTitle, sizeof(windowTitle));
+const char* kHiddenWindow = "FreeAmp Hidden Window";
+HINSTANCE g_hinst = NULL;
 
-    // If we found our main window, stop the enumeration
-    if (!strncmp(windowTitle, freeampTitle, strlen(freeampTitle)))
-    {
-        HWND* phwnd = (HWND*)lParam;
-        *phwnd = hwnd;
-        result =  FALSE;
-    }
-
-    return result;
-}
-
-int APIENTRY WinMain(	HINSTANCE hInstance, 
-						HINSTANCE hPrevInstance,
-		 				LPSTR lpszCmdLine, 
-						int cmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, 
+					 HINSTANCE hPrevInstance,
+		 			 LPSTR lpszCmdLine, 
+					 int cmdShow)
 {
     HANDLE runOnceMutex;
+
+    g_hinst = hInstance;
 
     runOnceMutex = CreateMutex(	NULL,
 							    TRUE,
@@ -75,41 +61,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     if(GetLastError() == ERROR_ALREADY_EXISTS)
     {
-        HWND hwnd = NULL;
-        // find currently running FreeAmp player
-        EnumWindows(EnumThreadWndProc, (LPARAM)&hwnd);
-
-        if(hwnd)
-        {
-            COPYDATASTRUCT data;
-
-            if(__argc > 1)
-            {
-                char* filelist = NULL;
-                size_t length = 0;
-
-                for(int32 i = 1; i < __argc; i++)
-                {
-                    int32 argLength = strlen(__argv[i]) + 1;
-                    
-                    filelist = (char*)realloc(filelist, length + argLength);
-
-                    strcpy(filelist + length, __argv[i]);
-
-                    length += argLength;
-                }
-
-                data.dwData = __argc - 1;
-                data.cbData = length;
-                data.lpData = filelist;
-
-                SendMessage(hwnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&data);
-
-                free(filelist);
-            }
-
-            SetForegroundWindow(hwnd);
-        }
+        SendCommandLineToHiddenWindow();
         
         CloseHandle(runOnceMutex);
         return 0;
@@ -154,6 +106,11 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     // create the player
 	Player *player = Player::GetPlayer(context);
 
+    // we are the first instance so create our hidden window
+    Thread* thread = Thread::CreateThread();
+
+    thread->Create(CreateHiddenWindow, context);
+
     // need a way to signal main thread to quit...
     Semaphore *termination = new Semaphore();
     
@@ -178,10 +135,190 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     // clean up our act
     delete player;
 	delete context;
+    delete thread;
 
     CloseHandle(runOnceMutex);
 
 	WSACleanup();
 
 	return 0;
+}
+
+static BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam)
+{
+    BOOL    result = TRUE;
+    char    windowTitle[256];
+    int32   count;
+
+    count = GetWindowText(hwnd, windowTitle, sizeof(windowTitle));
+
+    // If we found our main window, stop the enumeration
+    if (!strncmp(windowTitle, kHiddenWindow, strlen(kHiddenWindow)))
+    {
+        HWND* phwnd = (HWND*)lParam;
+        *phwnd = hwnd;
+        result =  FALSE;
+    }
+
+    return result;
+}
+
+void SendCommandLineToHiddenWindow()
+{
+    HWND hwnd = NULL;
+
+    // we give it five attempts and then give up
+    for(uint32 count = 0; count < 5; count++)
+    {
+        // find currently running FreeAmp player
+        EnumWindows(EnumWndProc, (LPARAM)&hwnd);
+
+        if(hwnd)
+        {
+            COPYDATASTRUCT data;
+
+            if(__argc > 1)
+            {
+                char* filelist = NULL;
+                size_t length = 0;
+
+                for(int32 i = 1; i < __argc; i++)
+                {
+                    int32 argLength = strlen(__argv[i]) + 1;
+                
+                    filelist = (char*)realloc(filelist, length + argLength);
+
+                    strcpy(filelist + length, __argv[i]);
+
+                    length += argLength;
+                }
+
+                data.dwData = __argc - 1;
+                data.cbData = length;
+                data.lpData = filelist;
+
+                SendMessage(hwnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&data);
+
+                free(filelist);
+            }
+
+            break;
+        }
+
+        Sleep(500);
+    }
+}
+
+static LRESULT WINAPI HiddenWndProc(HWND hwnd, 
+                                    UINT msg, 
+                                    WPARAM wParam, 
+                                    LPARAM lParam )
+{
+    LRESULT result = 0;
+    FAContext* context = (FAContext*)GetWindowLong(hwnd, GWL_USERDATA);
+
+    switch (msg)
+    {
+        case WM_CREATE:
+        {
+            context = (FAContext*)((LPCREATESTRUCT)lParam)->lpCreateParams;
+
+            assert(context != NULL);
+          
+            result = SetWindowLong(hwnd, GWL_USERDATA, (LONG)context);
+                        
+            break;
+        }
+
+        case WM_COPYDATA:
+        {
+            COPYDATASTRUCT* pcds = (COPYDATASTRUCT*)lParam;
+            int32 count = pcds->dwData;
+            char* array = (char*)pcds->lpData;
+            char path[MAX_PATH];
+            char url[MAX_PATH + 7];
+            uint32 length = sizeof(url);
+
+            for(int32 i = 0; i < count; i++)
+            {
+                strcpy(path, array);
+
+                HANDLE handle;
+                WIN32_FIND_DATA data;
+
+                handle = FindFirstFile(path, &data);
+
+                if(handle != INVALID_HANDLE_VALUE)
+                {
+                    char* cp = NULL;
+
+                    cp = strrchr(path, '\\');
+
+                    if(cp)
+                    {
+                        strcpy(cp + 1, data.cFileName);
+                    }
+
+                    FindClose(handle);
+                }
+
+                FilePathToURL(path, url, &length);
+
+                context->plm->AddItem(url);
+
+                array += strlen(array) + 1;
+            }
+            
+            break;
+        }
+
+        default:
+            result = DefWindowProc(hwnd, msg, wParam, lParam);
+            break;
+
+    }
+
+    return result;
+}
+
+
+void CreateHiddenWindow(void* arg)
+{
+    FAContext* context = (FAContext*)arg;
+    WNDCLASS wc;
+    MSG      msg;
+    HWND     hwnd;
+
+    memset(&wc, 0x00, sizeof(WNDCLASS));
+
+    wc.style = CS_OWNDC|CS_DBLCLKS;
+    wc.lpfnWndProc = HiddenWndProc;
+    wc.hInstance = g_hinst;
+    wc.hCursor = NULL;
+    wc.hIcon = NULL;
+    wc.hbrBackground = NULL;
+    wc.lpszClassName = kHiddenWindow;
+
+    RegisterClass(&wc);
+         
+    hwnd = CreateWindow(kHiddenWindow, 
+                        kHiddenWindow,
+                        WS_POPUP, 
+                        0, 
+                        0, 
+                        100, 
+                        100,
+                        NULL, 
+                        NULL, 
+                        g_hinst, 
+                        context);
+
+    if(hwnd)
+    {
+        while(GetMessage(&msg, NULL, 0, 0))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+    }
 }
