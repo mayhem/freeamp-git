@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 #include <string>
 #include <functional>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -54,10 +55,12 @@ char* kMyMusic = "My Music";
 char* kAllTracks = "All Tracks";
 char* kUncatagorized = "Uncategorized Tracks";
 char* kPlaylists = "My Playlists";
-char* kStreams = "My Favorite Streams";
+char* kStreams = "Streams";
+char* kFavoriteStreams = "My Favorite Streams";
 char* kPortables = "My Portables";
 char* kNewPlaylist = "Create a New Playlist...";
 char* kNewPortable = "Setup a Portable Player...";
+char* kCDAudio = "CD Audio";
 char* kWiredPlanet = "Wired Planet";
 char* kShoutCast = "ShoutCast";
 char* kIceCast = "IceCast";
@@ -68,7 +71,13 @@ void MusicBrowserUI::InitTree(void)
         TreeView_DeleteItem(m_hMusicView, m_hMyMusicItem);
     if(m_hPlaylistItem)
         TreeView_DeleteItem(m_hMusicView, m_hPlaylistItem);
-    
+    if(m_hStreamsItem)
+        TreeView_DeleteItem(m_hMusicView, m_hStreamsItem);
+    if(m_hPortableItem)
+        TreeView_DeleteItem(m_hMusicView, m_hPortableItem);
+    if(m_hCDItem)
+        TreeView_DeleteItem(m_hMusicView, m_hCDItem);
+
     TV_INSERTSTRUCT insert;
         
     insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
@@ -94,9 +103,17 @@ void MusicBrowserUI::InitTree(void)
     insert.hParent = NULL;
     m_hPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
 
-    HTREEITEM temp;
+    insert.item.pszText = kCDAudio;
+    insert.item.cchTextMax = lstrlen(insert.item.pszText);
+    insert.item.iImage = 13;
+    insert.item.iSelectedImage = 13;
+    insert.item.cChildren= 0;
+    insert.item.lParam = NULL;
+    insert.hInsertAfter = TVI_LAST;
+    insert.hParent = NULL;
+    m_hCDItem = TreeView_InsertItem(m_hMusicView, &insert);
 
-    insert.item.pszText = "Streams";
+    insert.item.pszText = kStreams;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 8;
     insert.item.iSelectedImage = 8;
@@ -104,7 +121,7 @@ void MusicBrowserUI::InitTree(void)
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = NULL;
-    temp = TreeView_InsertItem(m_hMusicView, &insert);
+    m_hStreamsItem = TreeView_InsertItem(m_hMusicView, &insert);
 
     insert.item.pszText = kWiredPlanet;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
@@ -113,7 +130,7 @@ void MusicBrowserUI::InitTree(void)
     insert.item.cChildren= 1;
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
-    insert.hParent = temp;
+    insert.hParent = m_hStreamsItem;
     m_hWiredPlanetItem = TreeView_InsertItem(m_hMusicView, &insert);
 
     insert.item.pszText = kIceCast;
@@ -123,7 +140,7 @@ void MusicBrowserUI::InitTree(void)
     insert.item.cChildren= 1;
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
-    insert.hParent = temp;
+    insert.hParent = m_hStreamsItem;
     m_hIceCastItem = TreeView_InsertItem(m_hMusicView, &insert);
    
     insert.item.pszText = kShoutCast;
@@ -133,7 +150,7 @@ void MusicBrowserUI::InitTree(void)
     insert.item.cChildren= 1;
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_LAST;
-    insert.hParent = temp;
+    insert.hParent = m_hStreamsItem;
     m_hShoutCastItem = TreeView_InsertItem(m_hMusicView, &insert);
 
     insert.item.pszText = kPortables;
@@ -182,7 +199,7 @@ void MusicBrowserUI::FillArtists(void)
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 6;
     insert.item.iSelectedImage = 6;
-    insert.item.cChildren= 1;
+    insert.item.cChildren = (m_context->catalog->GetUnsortedMusic()->size() ? 1 : 0);
     insert.item.lParam = NULL;       
     insert.hInsertAfter = TVI_FIRST;
     insert.hParent = m_hMyMusicItem;
@@ -192,7 +209,7 @@ void MusicBrowserUI::FillArtists(void)
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
     insert.item.iImage = 5;
     insert.item.iSelectedImage = 5;
-    insert.item.cChildren= 1;
+    insert.item.cChildren = (artistList->size() ? 1 : 0);
     insert.item.lParam = NULL;
     insert.hInsertAfter = TVI_FIRST;
     insert.hParent = m_hMyMusicItem;
@@ -288,6 +305,86 @@ void MusicBrowserUI::FillTracks(TV_ITEM *pItem)
         //TreeView_SortChildren(m_hMusicView, pItem->hItem, 0);
 }
 
+
+void MusicBrowserUI::RefreshCDList(vector<PlaylistItem*>* trackList)
+{
+    TV_INSERTSTRUCT                     insert;
+    TreeData                            data;
+    MetaData                            metadata;
+
+    HTREEITEM treeItem;
+
+    while(treeItem = TreeView_GetChild(m_hMusicView, m_hCDItem))
+    {
+        TreeView_DeleteItem(m_hMusicView, treeItem);
+    }
+
+    insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                 TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+    data.m_iLevel = 3;
+
+    vector<PlaylistItem*>::iterator track;
+
+    uint32 trackNumber = 1;
+
+    for(track = trackList->begin();
+        track != trackList->end();
+        track++)
+    {
+        data.m_pArtist = NULL;
+        data.m_pAlbum = NULL;
+        data.m_pTrack = (*track);
+
+        metadata = (*track)->GetMetaData();        
+
+        if(metadata.Title().size())
+            insert.item.pszText = (char*)(metadata.Title().c_str());
+        else
+        {
+            ostringstream ost;
+
+            ost << "CD Audio Track " << trackNumber;
+
+            insert.item.pszText = (char*)(ost.str().c_str());
+        }        
+            
+        insert.item.cchTextMax = strlen(insert.item.pszText);
+        insert.item.iImage = 4;
+        insert.item.iSelectedImage = 4;
+        insert.item.cChildren= 0;
+        insert.item.lParam = (LPARAM) new TreeData(data);
+        insert.hInsertAfter = TVI_LAST;
+        insert.hParent = m_hCDItem;
+        TreeView_InsertItem(m_hMusicView, &insert);
+
+        trackNumber++;
+    }
+
+    string CD;
+
+    if(trackList->size())
+    {
+        CD = (metadata.Album().size() ? metadata.Album() : "Unknown Album");
+        CD += " by ";
+        CD += (metadata.Artist().size() ? metadata.Artist() : "Unknown Artist");
+    }
+    else
+    {
+        CD = kCDAudio;
+    }
+
+    TV_ITEM tv_item;
+
+    tv_item.mask = TVIF_CHILDREN|TVIF_TEXT;
+    tv_item.hItem = m_hCDItem;
+    tv_item.cchTextMax = strlen(insert.item.pszText);
+    tv_item.pszText = (char*)(CD.c_str());
+    tv_item.cChildren = (trackList->size() ? 1 : 0);
+
+    TreeView_SetItem(m_hMusicView, &tv_item);
+}
+
 void MusicBrowserUI::FillAllTracks(void)
 {
     TV_INSERTSTRUCT                     insert;
@@ -324,9 +421,9 @@ void MusicBrowserUI::FillAllTracks(void)
             
                 metadata = (*track)->GetMetaData();
             
-                if (metadata.Title() == string(" ") || 
-                    metadata.Title().length() == 0)
-                    insert.item.pszText = "Unknown";
+                if(metadata.Title() == string(" ") || 
+                   metadata.Title().length() == 0)
+                   insert.item.pszText = "Unknown";
                 else    
                     insert.item.pszText = (char *)(metadata.Title().c_str());
                     
@@ -966,12 +1063,14 @@ void MusicBrowserUI::MusicCatalogTrackRemoved(const ArtistList* artist,
     HTREEITEM artistItem = NULL;
     HTREEITEM albumItem = NULL;
     HTREEITEM trackItem = NULL;
+    bool uncatagorized = false;
     
 
     // is this in the uncatagorized section?
     if(!artist) 
     {
         trackItem = FindTrack(m_hUncatItem, item);
+        uncatagorized = true;
     }
     else
     {
@@ -991,6 +1090,20 @@ void MusicBrowserUI::MusicCatalogTrackRemoved(const ArtistList* artist,
     if(trackItem)
     {
         TreeView_DeleteItem(m_hMusicView, trackItem);
+
+        if(uncatagorized)
+        {
+            if(!TreeView_GetChild(m_hMusicView, m_hUncatItem))
+            {
+                TV_ITEM tv_item;
+
+                tv_item.hItem = m_hUncatItem;
+                tv_item.mask = TVIF_CHILDREN;
+                tv_item.cChildren = 0;
+
+                TreeView_SetItem(m_hMusicView, &tv_item);
+            }
+        }
     }
 
     if(albumItem && !album->m_trackList->size())
@@ -1008,6 +1121,17 @@ void MusicBrowserUI::MusicCatalogTrackRemoved(const ArtistList* artist,
     if(trackItem)
     {
         TreeView_DeleteItem(m_hMusicView, trackItem);
+
+        if(!TreeView_GetChild(m_hMusicView, m_hUncatItem))
+        {
+            TV_ITEM tv_item;
+
+            tv_item.hItem = m_hAllItem;
+            tv_item.mask = TVIF_CHILDREN;
+            tv_item.cChildren = 0;
+
+            TreeView_SetItem(m_hMusicView, &tv_item);
+        }
     }
 
 }
@@ -1028,6 +1152,13 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
             TV_INSERTSTRUCT insert;
             TreeData        data;
             MetaData        metadata;
+            TV_ITEM         tv_item;
+
+            tv_item.hItem = m_hUncatItem;
+            tv_item.mask = TVIF_CHILDREN;
+            tv_item.cChildren = 1;
+
+            TreeView_SetItem(m_hMusicView, &tv_item);
 
             insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                                 TVIF_SELECTEDIMAGE | TVIF_PARAM; 
@@ -1271,6 +1402,13 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
             TV_INSERTSTRUCT insert;
             TreeData        data;
             MetaData        metadata;
+            TV_ITEM         tv_item;
+
+            tv_item.hItem = m_hAllItem;
+            tv_item.mask = TVIF_CHILDREN;
+            tv_item.cChildren = 1;
+
+            TreeView_SetItem(m_hMusicView, &tv_item);
 
             insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                                 TVIF_SELECTEDIMAGE | TVIF_PARAM;

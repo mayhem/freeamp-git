@@ -239,6 +239,10 @@ SOURCE=..\..\src\thread.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\timer.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\undomanager.cpp
 # End Source File
 # Begin Source File

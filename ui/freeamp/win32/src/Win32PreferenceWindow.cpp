@@ -3411,6 +3411,9 @@ bool Win32PreferenceWindow::PrefPluginsProc(HWND hwnd,
 
             while(item = pmo.GetItem(i++))
             {
+                if(!strncasecmp("cd.pmo", item->Name(), 7))
+                    continue;
+
                 if(*item->Description())
                     pos = ComboBox_AddString(hwndPMO, item->Description());
                 else

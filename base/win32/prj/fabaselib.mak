@@ -35,7 +35,7 @@ RSC=rc.exe
 OUTDIR=.\Release
 INTDIR=.\Release
 
-ALL : "..\fabaselib.lib"
+ALL : "..\..\..\config\config.h" "..\fabaselib.lib"
 
 
 CLEAN :
@@ -54,6 +54,7 @@ CLEAN :
 	-@erase "$(INTDIR)\registry.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\timer.obj"
 	-@erase "$(INTDIR)\undomanager.obj"
 	-@erase "$(INTDIR)\updatemanager.obj"
 	-@erase "$(INTDIR)\utility.obj"
@@ -62,6 +63,7 @@ CLEAN :
 	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\win32updatemanager.obj"
 	-@erase "..\fabaselib.lib"
+	-@erase "..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -94,7 +96,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\win32updatemanager.obj"
+	"$(INTDIR)\win32updatemanager.obj" \
+	"$(INTDIR)\timer.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -106,7 +109,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\..\..\config\config.h" "..\fabaselib.lib"
+ALL : "..\fabaselib.lib"
 
 
 CLEAN :
@@ -125,6 +128,7 @@ CLEAN :
 	-@erase "$(INTDIR)\registry.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\timer.obj"
 	-@erase "$(INTDIR)\undomanager.obj"
 	-@erase "$(INTDIR)\updatemanager.obj"
 	-@erase "$(INTDIR)\utility.obj"
@@ -133,7 +137,6 @@ CLEAN :
 	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\win32updatemanager.obj"
 	-@erase "..\fabaselib.lib"
-	-@erase "..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -166,7 +169,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\win32updatemanager.obj"
+	"$(INTDIR)\win32updatemanager.obj" \
+	"$(INTDIR)\timer.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -178,7 +182,7 @@ LIB32_OBJS= \
 OUTDIR=.\Debug
 INTDIR=.\Debug
 
-ALL : "..\..\..\config\config.h" "..\fabaselib.lib"
+ALL : "..\fabaselib.lib"
 
 
 CLEAN :
@@ -197,6 +201,7 @@ CLEAN :
 	-@erase "$(INTDIR)\registry.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\timer.obj"
 	-@erase "$(INTDIR)\undomanager.obj"
 	-@erase "$(INTDIR)\updatemanager.obj"
 	-@erase "$(INTDIR)\utility.obj"
@@ -205,7 +210,6 @@ CLEAN :
 	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\win32updatemanager.obj"
 	-@erase "..\fabaselib.lib"
-	-@erase "..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -238,7 +242,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\win32updatemanager.obj"
+	"$(INTDIR)\win32updatemanager.obj" \
+	"$(INTDIR)\timer.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -269,6 +274,7 @@ CLEAN :
 	-@erase "$(INTDIR)\registry.obj"
 	-@erase "$(INTDIR)\semaphore.obj"
 	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\timer.obj"
 	-@erase "$(INTDIR)\undomanager.obj"
 	-@erase "$(INTDIR)\updatemanager.obj"
 	-@erase "$(INTDIR)\utility.obj"
@@ -310,7 +316,8 @@ LIB32_OBJS= \
 	"$(INTDIR)\utility.obj" \
 	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\win32updatemanager.obj"
+	"$(INTDIR)\win32updatemanager.obj" \
+	"$(INTDIR)\timer.obj"
 
 "..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
@@ -422,13 +429,13 @@ SOURCE=..\..\src\debug.cpp
 
 SOURCE=..\..\src\downloadmanager.cpp
 
-"$(INTDIR)\downloadmanager.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\downloadmanager.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\errors.cpp
 
-"$(INTDIR)\errors.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\errors.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -440,7 +447,7 @@ SOURCE=..\..\src\log.cpp
 
 SOURCE=..\..\src\musiccatalog.cpp
 
-"$(INTDIR)\musiccatalog.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\musiccatalog.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -452,37 +459,37 @@ SOURCE=..\src\mutex.cpp
 
 SOURCE=..\..\src\player.cpp
 
-"$(INTDIR)\player.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\player.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\playlist.cpp
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\playlist.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\preferences.cpp
 
-"$(INTDIR)\preferences.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\preferences.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\propimpl.cpp
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\registrar.cpp
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\registrar.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\registry.cpp
 
-"$(INTDIR)\registry.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\registry.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -494,43 +501,49 @@ SOURCE=..\src\semaphore.cpp
 
 SOURCE=..\..\src\thread.cpp
 
-"$(INTDIR)\thread.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\thread.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\src\timer.cpp
+
+"$(INTDIR)\timer.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\undomanager.cpp
 
-"$(INTDIR)\undomanager.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\undomanager.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\updatemanager.cpp
 
-"$(INTDIR)\updatemanager.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\updatemanager.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\utility.cpp
 
-"$(INTDIR)\utility.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\utility.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\src\win32prefs.cpp
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\src\win32thread.cpp
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\src\win32updatemanager.cpp
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) "$(INTDIR)" "..\..\..\config\config.h"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -64,6 +64,35 @@ const char *themeExtension = "fat";
                                SendToUI(ev); ReleaseUIManipLock(); delete ev; \
                              }
 
+void CDTimer::Tick()
+{
+    Registry *pmoRegistry = m_context->player->GetPMORegistry();
+    RegistryItem *pmo_item = NULL;
+    int32 i = 0;
+
+    while(NULL != (pmo_item = pmoRegistry->GetItem(i++))) 
+    {
+        if(!strcmp("cd.pmo", pmo_item->Name())) 
+        {
+            break;
+        }
+    }
+
+    if(!pmo_item)
+        return;
+
+    PhysicalMediaOutput *pmo;
+    pmo = (PhysicalMediaOutput *)pmo_item->InitFunction()(m_context);
+    pmo->SetPropManager(m_context->props);
+
+    if(IsError(pmo->Init(NULL))) 
+    {
+        CDInfoEvent *cie = new CDInfoEvent(0, 0, "");
+        m_context->player->AcceptEvent(cie);
+    }
+
+    delete pmo;
+}
 
 Player *
 Player::
@@ -112,6 +141,8 @@ EventQueue()
     m_pmo = NULL;
     m_lmc = NULL;
     m_ui = NULL;
+
+    m_cdTimer = new CDTimer(m_context);
 
     m_argUIList = new vector < char *>();
 
@@ -171,6 +202,8 @@ EventQueue()
 Player::
 ~Player()
 {
+    TYPICAL_DELETE(m_cdTimer);
+
     TYPICAL_DELETE(m_dlm);
 
     TYPICAL_DELETE(m_pTermSem);
@@ -230,6 +263,7 @@ Player::
     TYPICAL_DELETE(m_uiRegistry);
     TYPICAL_DELETE(m_lmcExtensions);
     TYPICAL_DELETE(m_musicCatalog);
+    
 }
 
 void      
@@ -831,8 +865,7 @@ Run()
    m_eventServiceThread = Thread::CreateThread();
    m_eventServiceThread->Create(Player::EventServiceThreadFunc, this);
 
-
-
+   m_cdTimer->Start();
 
    delete[] name;
    delete[] musicBrowserName;

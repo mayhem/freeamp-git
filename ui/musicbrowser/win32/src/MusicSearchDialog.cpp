@@ -95,7 +95,7 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
             HWND hwndDrives = GetDlgItem(hwnd, IDC_DRIVES);
             HWND hwndDirectory = GetDlgItem(hwnd, IDC_DIRECTORY);
             DWORD  dwDrives;
-            char   szDrive[3];
+            char   szDrive[3] = "X:";
             int32  i, ret;
 
             i = ComboBox_AddString(hwndDrives, kAllDrives);
@@ -107,8 +107,7 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
                if (dwDrives & (1 << i))
                {
                   szDrive[0] = 'A' + i;
-                  szDrive[1] = ':';
-                  szDrive[2] = 0;
+                  
                   ret = GetDriveType(szDrive);
                   if (ret != DRIVE_CDROM && ret != DRIVE_REMOVABLE)
                   {

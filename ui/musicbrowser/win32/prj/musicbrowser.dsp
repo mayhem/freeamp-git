@@ -344,6 +344,10 @@ SOURCE=..\res\catalog.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\cd.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\closed.ico
 # End Source File
 # Begin Source File
@@ -422,6 +426,10 @@ SOURCE=..\res\wizard_small.bmp
 # Begin Group "includes"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE="..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\VC98\Include\BASETSD.H"
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\config\config.h

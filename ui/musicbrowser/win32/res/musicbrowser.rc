@@ -465,8 +465,8 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WARN                ICON    DISCARDABLE     "warn.ico"
 IDI_EXE_ICON            ICON    DISCARDABLE     "icon1.ico"
+IDI_WARN                ICON    DISCARDABLE     "warn.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -499,6 +499,7 @@ IDB_ICECAST             BITMAP  DISCARDABLE     "icecast.bmp"
 IDB_SHOUTCAST           BITMAP  DISCARDABLE     "shoutcast.bmp"
 IDB_BUSY                BITMAP  DISCARDABLE     "busy.bmp"
 IDB_STREAMS             BITMAP  DISCARDABLE     "streams.bmp"
+IDB_CD                  BITMAP  DISCARDABLE     "cd.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

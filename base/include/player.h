@@ -43,7 +43,7 @@ using namespace std;
 #include "musiccatalog.h"
 #include "hashtable.h"
 #include "downloadmanager.h"
-
+#include "timer.h"
 #include "lmc.h"
 
 typedef enum
@@ -55,6 +55,18 @@ typedef enum
 PlayerState;
 
 class FAContext;
+
+
+class CDTimer : public Timer {
+ public:
+    CDTimer(FAContext* context):Timer(5000),m_context(context){}
+    virtual ~CDTimer() {}
+
+    virtual void Tick();
+
+ private:
+    FAContext* m_context;
+};
 
 class Player : public EventQueue, Properties, PropertyWatcher
 {
@@ -192,6 +204,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
     DownloadManager* m_dlm;
     UserInterface *m_downloadUI;
+
+    CDTimer* m_cdTimer;
 };
 
 #endif // _PLAYER_H_

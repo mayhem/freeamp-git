@@ -310,6 +310,8 @@ class MusicBrowserUI : public UserInterface
     uint32 CountSelectedItems(HTREEITEM root);
     bool IsItemSelected(HTREEITEM item);
 
+    void RefreshCDList(vector<PlaylistItem*>* tracks);
+
     // Functions in EditTrackInfoDialog.cpp
     void CreateEditInfoLists(set<string>& artists,
                              set<string>& albums,
@@ -330,7 +332,7 @@ class MusicBrowserUI : public UserInterface
     Thread*             m_uiThread;
     POINT               m_sMinSize;
     HTREEITEM	        m_hPlaylistItem, m_hMyMusicItem, m_hPortableItem;
-    HTREEITEM           m_hAllItem, m_hUncatItem;
+    HTREEITEM           m_hAllItem, m_hUncatItem, m_hStreamsItem, m_hCDItem;
     int                 m_iCollapseMoveAmount;
     HCURSOR             m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
     HCURSOR             m_hSplitterCursor, m_hPointerCursor, m_hCurrentCursor;
@@ -353,6 +355,10 @@ class MusicBrowserUI : public UserInterface
     DeviceInfo*         m_portableDevice;
 
     bool                m_autoPlayHack;
+
+    vector<PlaylistItem*>* m_cdTracks;
+
+    uint32              m_cdId;
 };
 
 #endif

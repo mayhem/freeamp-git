@@ -289,7 +289,7 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
             HWND hwndDrives = GetDlgItem(hwnd, IDC_DRIVES);
             HWND hwndDirectory = GetDlgItem(hwnd, IDC_DIRECTORY);
             DWORD  dwDrives;
-            char   *szDrive = "X:";
+            char   szDrive[3] = "X:";
             int32  i, ret;
 
             i = ComboBox_AddString(hwndDrives, "All Drives");

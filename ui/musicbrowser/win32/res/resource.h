@@ -36,6 +36,7 @@
 #define IDB_SHOUTCAST                   134
 #define IDB_BUSY                        135
 #define IDB_STREAMS                     136
+#define IDB_CD                          137
 #define IDI_WARN                        207
 #define IDD_OPENURL                     219
 #define IDD_DELETETRACKS                220
@@ -164,7 +165,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         40076
 #define _APS_NEXT_CONTROL_VALUE         1040
 #define _APS_NEXT_SYMED_VALUE           101
