@@ -25,11 +25,13 @@ with your comments, or better yet head over to Bugzilla and enter a
 bug report <http://www.freeamp.org/bugzilla>.
 
 
-UPDATED FOR BETA 5 (December 8, 1999)
+UPDATED FOR FINAL RELEASE (December 17th, 1999)
 
-New features for beta 5:
+New features for final release:
 
-- There now a VSliderControl for doing vertical sliders
+- Fonts can now be embedded. We found a way to legally protect ourselves
+  even if people upload Themes with copyrighted (without a free license
+  to distribute) font embedded in them.
 
 GETTING STARTED
 
@@ -208,19 +210,21 @@ Font:
 
 To specify a font:
 
-<Font Name="San Serif" Face="Arial,Helvetica"/>
+<Font Name="San Serif" Face="Arial,Helvetica" File="verdana.ttf"/>
 
 The Name attribute specifies the given name for this font that 
 TextControls will use. The Face attribute specifies which font to use.
 This can be a comma separated list. FreeAmp will first attempt to
 find a font named Arial, and if it can't find that it will attempt
 to font font called Helvetica and so on. If FreeAmp can't find any
-of the specified fonts, it will use the default font.
+of the specified fonts, it will use the default font. 
 
-This comma separated list is useful for specfying similar fonts on
-different operating systems. Using the construct above will pretty
-much guarantee that you're going to get a san serif font on either
-Windows or Linux.
+If the File attribute is given, the system will load the given font 
+file before attempting to use the font. This allows theme designers to 
+embed their favorite TrueType fonts in their themes. If you intend to
+make your Theme available to others (and we hope you will!) please
+make sure that you have the rights to distribute the fonts you embed
+in your themes.
 
 
 Window:
@@ -520,6 +524,7 @@ QUICK REFERENCE
 
    Name -- The name of the bitmap as referenced by other controls
    Face -- A comma separated list of font faces to use
+   File -- The filename of the font to load from the theme package [optional]
 
    Subtags:
    
@@ -756,15 +761,14 @@ Seek          -- seek in a track
    
 APPENDIX B
 
-This is the current theme.xml file:
+This is the current Emusic theme.xml file:
 
 <Bitmap Name="Background" File="background.bmp" TransColor="#FF0000"/>
 <Bitmap Name="Buttons" File="buttons.bmp" TransColor="#FF0000"/>
-<Font Name="San Serif" Face="Arial,Helvetica"/>
-<Font Name="Serif" Face="Arial,Helvetica"/>
+<Font Name="Main" File="verdana.ttf" Face="Verdana"/>
 
-<ThemeInfo Name="FreeAmp Theme" Author="Bill Bull & Robert Kaye" 
-           EMail="info@freeamp.org" WebPage="http://www.freeamp.org"/>
+<ThemeInfo Name="EMusic Theme" Author="Bill Bull, Robert Kaye & Mark B. Elrod " 
+           EMail="info@freeamp.org" WebPage="http://www.emusic.com"/>
 
 <!-- This is a comment! -->
 <Window Name="MainWindow">
@@ -775,10 +779,10 @@ This is the current theme.xml file:
             <Position Pos="228,124"/>
             <ControlBitmap Rect="0,96,119,159" Name="Buttons"/>
         </MultiStateControl>
-        <ButtonControl Name="Logo" URL="http://www.freeamp.org">
-        	<Info Desc="Go to the FreeAmp web site" Tip="FreeAmp"/>
-            <Position Pos="22,128"/>
-            <ControlBitmap Rect="0,236,267,255" Name="Buttons"/>
+        <ButtonControl Name="Logo" URL="http://www.emusic.com">
+        	<Info Desc="Go to the EMusic web site" Tip="EMusic"/>
+            <Position Pos="17,126"/>
+            <ControlBitmap Rect="0,236,327,260" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Stop">
         	<Info Desc="Stop the current track" Tip="Stop"/>
@@ -786,7 +790,7 @@ This is the current theme.xml file:
             <ControlBitmap Rect="0,64,119,95" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Prev">
-        	<Info Desc="Move to previous track" Tip="Prev"/>
+        	<Info Desc="Move to previous track" Tip="Previous"/>
             <Position Pos="198,124"/>
             <ControlBitmap Rect="0,0,119,31" Name="Buttons"/>
         </ButtonControl>
@@ -796,29 +800,29 @@ This is the current theme.xml file:
             <ControlBitmap Rect="0,32,119,63" Name="Buttons"/>
         </ButtonControl>	
         <ButtonControl Name="Quit">
-        	<Info Desc="Quit FreeAmp" Tip="Quit"/>
+        	<Info Desc="Quit EMusic" Tip="Quit"/>
             <Position Rect="303,0,315,15"/>
-            <ControlBitmap Rect="212,257,263,272" Name="Buttons"/>
+            <ControlBitmap Rect="212,264,263,272" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Minimize">
-        	<Info Desc="Minimize FreeAmp" Tip="Minimize"/>
+        	<Info Desc="Minimize EMusic" Tip="Minimize"/>
             <Position Rect="289,0,301,15"/>
-            <ControlBitmap Rect="159,257,210,272" Name="Buttons"/>
+            <ControlBitmap Rect="159,264,210,272" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="Help">
-        	<Info Desc="View FreeAmp help" Tip="Help"/>
+        	<Info Desc="View EMusic help" Tip="Help"/>
             <Position Rect="275,0,287,15"/>
-            <ControlBitmap Rect="106,257,157,272" Name="Buttons"/>
+            <ControlBitmap Rect="106,264,157,272" Name="Buttons"/>
         </ButtonControl>
         <ButtonControl Name="ReloadTheme">
         	<Info Desc="Reload current theme" Tip="Reload theme"/>
             <Position Rect="12,0,24,15"/>
-            <ControlBitmap Rect="53,257,104,272" Name="Buttons"/>
+            <ControlBitmap Rect="53,264,104,272" Name="Buttons"/>
         </ButtonControl>
         <!--ButtonControl Name="WindowShade"!>
         	<!--Info Desc="Change to windowshade" Tip="Windowshade"/!>
             <!--Position Rect="269,4,280,13"/!>
-            <!--ControlBitmap Rect="0,257,51,272" Name="Buttons"/!>
+            <!--ControlBitmap Rect="0,264,51,272" Name="Buttons"/!>
             <!--ChangeWindow Window="WindowShade"/!>
         <!--/ButtonControl!>
         <ButtonControl Name="MyMusic">
@@ -854,25 +858,25 @@ This is the current theme.xml file:
         </MultiStateControl>
         <TextControl Name="Title">
             <Position Rect="9,21,317,38"/>
-            <Style Align="Left" Font="San Serif" Bold="Yes"/>
+            <Style Align="Left" Font="Main" Bold="Yes"/>
         </TextControl>
         <TextControl Name="Info">
             <Position Rect="9,53,179,67"/>
-            <Style Font="San Serif"/>
+            <Style Font="Main"/>
         </TextControl>	 
         <TextControl Name="StreamInfo">
             <Position Rect="9,40,210,52"/>
-            <Style Font="San Serif"/>
+            <Style Font="Main"/>
         </TextControl>
         <TextControl Name="Time">
         	   <Info Desc="Current time/time remaining"/>
             <Position Rect="210,41,317,67"/>
-            <Style Font="San Serif" Align="Right" Bold="Yes"/>
+            <Style Font="Main" Align="Right" Bold="Yes"/>
         </TextControl>
         <TextControl Name="TimeRemaining">
         	   <Info Desc="Time remaining/Current Time"/>
             <Position Rect="210,41,317,67"/>
-            <Style Font="San Serif" Align="Right" Bold="Yes" Color="#666666"/>
+            <Style Font="Main" Align="Right" Bold="Yes" Color="#666666"/>
         </TextControl>
         <SliderControl Name="Volume">  
         	   <Info Desc="Change volume" Tip="Volume"/>
