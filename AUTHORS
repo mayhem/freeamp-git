@@ -142,3 +142,6 @@ Michael Rich <istan@alltel.net>
 
 "Alexander Haväng" <eel@musiknet.se>
 * icecast title streaming fixes
+
+"Roger Hardiman" <roger@cs.strath.ac.uk>
+* Preliminary FreeBSD support
