@@ -476,6 +476,8 @@ KeyDown(int32 keyCode)
 {
     switch(keyCode) 
     { 
+        case VK_PRIOR:
+        case VK_NEXT:
         case VK_UP: 
         case VK_DOWN: 
         case VK_HOME: 
