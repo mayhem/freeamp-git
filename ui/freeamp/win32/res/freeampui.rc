@@ -10,6 +10,7 @@
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"
 #undef APSTUDIO_HIDDEN_SYMBOLS
+#include "..\..\..\..\config\config.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -33,10 +34,10 @@ CAPTION "General"
 FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "Remain on top of all other windows.",IDC_STAYONTOP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,145,128,10
-    CONTROL         "Show FreeAmp icon in the system tray instead of the taskbar.",
-                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,157,
-                    207,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,145,128,10
+    CONTROL         "Show application icon in the system tray instead of the taskbar.",
+                    IDC_TRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,157,
+                    213,10
     GROUPBOX        "Miscellaneous",IDC_STATIC,3,121,227,50
     GROUPBOX        "Save Music Folder",IDC_STATIC,3,3,227,34
     EDITTEXT        IDC_SAVEMUSICDIR,11,16,160,14,ES_AUTOHSCROLL
@@ -44,9 +45,9 @@ BEGIN
     GROUPBOX        "File Associations",IDC_STATIC,3,44,227,38
     CONTROL         "Reclaim stolen music file associations when application starts.",
                     IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,56,209,10
+                    WS_TABSTOP,12,56,209,10
     CONTROL         "Ask before reclaiming music file associations.",
-                    IDC_ASKRECLAIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,
+                    IDC_ASKRECLAIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     68,157,10
     GROUPBOX        "Show Toolbars As",IDC_STATIC,3,89,227,26
     CONTROL         "Text only",IDC_TEXTONLY,"Button",BS_AUTORADIOBUTTON,178,
@@ -57,7 +58,7 @@ BEGIN
                     BS_AUTORADIOBUTTON,11,100,66,10
     CONTROL         "Save current playlist when exiting the application.",
                     IDC_SAVECURRENTLIST,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,133,171,10
+                    WS_TABSTOP,12,133,171,10
 END
 
 IDD_PREF_DEBUG DIALOG DISCARDABLE  0, 0, 233, 174
@@ -85,7 +86,7 @@ BEGIN
                     13,154,213,10
     LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
                     IDC_STATIC,3,3,227,24
-    LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
+    LTEXT           "called FreeAmp.log. You should send us the log file when you report a bug.",
                     IDC_STATIC,3,27,227,17
     LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
                     IDC_STATIC,3,46,227,32
@@ -146,7 +147,7 @@ BEGIN
                     IDC_STATIC,3,123,227,25
     LTEXT           "William Bull, Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, Bill Yuan.",
                     IDC_STATIC,3,94,227,24
-    LTEXT           "version 2.0 beta 4",IDC_STATIC,88,14,58,8
+    LTEXT           "version 2.0 beta 5",IDC_STATIC,88,14,58,8
     LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
     PUSHBUTTON      "Visit FreeAmp.org",IDC_GOTOFREEAMP,30,156,67,14
     PUSHBUTTON      "Visit EMusic.com",IDC_GOTOEMUSIC,136,156,67,14
@@ -314,7 +315,8 @@ END
 BEGIN
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
-    "#undef APSTUDIO_HIDDEN_SYMBOLS\0"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""..\\..\\..\\..\\config\\config.h""\0"
 END
 
 3 TEXTINCLUDE DISCARDABLE 
