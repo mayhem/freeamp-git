@@ -1831,7 +1831,7 @@ else
 #line 1832 "configure"
 #include "confdefs.h"
 
-	    #define _MIT_POSIX_THREADS
+	    #define _MIT_POSIX_THREADS 1
 	    #include <pthread.h>
 	    int main(int argc,char**argv) {
 		int foo;

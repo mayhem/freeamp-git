@@ -102,7 +102,7 @@ if test "$mitpth" = "false"; then
     if test "$ltr" = "false"; then
 	AC_MSG_CHECKING(for broken Slackware MIT PThreads header (Obj C stub) and implementation)
 	AC_TRY_RUN([
-	    #define _MIT_POSIX_THREADS
+	    #define _MIT_POSIX_THREADS 1
 	    #include <pthread.h>
 	    int main(int argc,char**argv) {
 		int foo;
