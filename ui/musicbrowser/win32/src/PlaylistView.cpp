@@ -353,6 +353,11 @@ void MusicBrowserUI::InitList(void)
 
         m_itemsAddedBeforeWeWereCreated = 0;
     }
+
+    HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+
+    //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+    //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
 }
 
 void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item, 
@@ -395,6 +400,11 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
                               LVIS_SELECTED|LVIS_FOCUSED);
 
         ListView_RedrawItems(m_hPlaylistView, 0, ListView_GetItemCount(m_hPlaylistView) - 1);
+
+        HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+
+        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 }
 
@@ -436,6 +446,11 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
         SetFocus(m_hPlaylistView);
         m_bListChanged = true;
         UpdateTotalTime();
+
+        HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+
+        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 }
 
@@ -444,6 +459,11 @@ void MusicBrowserUI::PlaylistListSorted(void)
     ListView_RedrawItems(m_hPlaylistView, 0, ListView_GetItemCount(m_hPlaylistView) - 1);
     m_bListChanged = true;
     UpdateButtonMenuStates();
+
+    HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+
+    //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+    //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
 }
 
 void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
@@ -454,6 +474,11 @@ void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
     if(index != kInvalidIndex)
     {
         ListView_RedrawItems(hwnd, index, index);
+
+        HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+
+        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 }
 
@@ -494,6 +519,11 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
         {
             m_itemsAddedBeforeWeWereCreated++;
         }
+
+        HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+
+        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
 }
 

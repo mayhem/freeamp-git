@@ -705,6 +705,10 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
         // move past platform dir
         char* cp = strchr(item->GetCurrentFileLocation().c_str(), '/');
 
+        // move past arch dir
+        if(cp)
+            cp = strchr(cp + 1, '/');
+
         if(cp)
         {
             strcat(destPath, "\\");

@@ -56,11 +56,6 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
 # ADD LINK32 fabaselib.lib zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\"
-# Begin Special Build Tool
-SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-                  ..\..\..\themes\freeamp.fat themes
-# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
 
@@ -89,11 +84,6 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 fabaselib.lib zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\"
 # SUBTRACT LINK32 /profile
-# Begin Special Build Tool
-SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-                  ..\..\..\themes\freeamp.fat themes
-# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
 
@@ -123,11 +113,6 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe"
 # ADD LINK32 fabaselib.lib zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\"
-# Begin Special Build Tool
-SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-                  ..\..\..\themes\freeamp.fat themes
-# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
 
@@ -159,11 +144,6 @@ LINK32=link.exe
 # SUBTRACT BASE LINK32 /profile
 # ADD LINK32 fabaselib.lib zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\"
 # SUBTRACT LINK32 /profile
-# Begin Special Build Tool
-SOURCE=$(InputPath)
-PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-                  ..\..\..\themes\freeamp.fat themes
-# End Special Build Tool
 
 !ENDIF 
 
@@ -609,6 +589,175 @@ InputPath=..\..\..\lib\portio\i386\free\portio.sys
 SOURCE=..\res\warn.ico
 # End Source File
 # End Group
+# Begin Group "themes"
+
+# PROP Default_Filter "fat"
+# Begin Source File
+
+SOURCE=..\..\..\themes\Aquatica.fat
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\Aquatica.fat
+InputName=Aquatica
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\Aquatica.fat
+InputName=Aquatica
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\Aquatica.fat
+InputName=Aquatica
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\Aquatica.fat
+InputName=Aquatica
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\themes\EMusic.fat
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\EMusic.fat
+InputName=EMusic
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\EMusic.fat
+InputName=EMusic
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\EMusic.fat
+InputName=EMusic
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\EMusic.fat
+InputName=EMusic
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\themes\FreeAmp.fat
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\FreeAmp.fat
+InputName=FreeAmp
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\FreeAmp.fat
+InputName=FreeAmp
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\FreeAmp.fat
+InputName=FreeAmp
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\themes\FreeAmp.fat
+InputName=FreeAmp
+
+".\themes\$(InputName).fat" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST themes mkdir themes 
+	copy $(InputPath) themes 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# End Group
 # Begin Group "includes"
 
 # PROP Default_Filter ""
@@ -743,6 +892,10 @@ SOURCE=..\..\include\thread.h
 # Begin Source File
 
 SOURCE=..\..\..\ui\include\ui.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\include\undomanager.h
 # End Source File
 # Begin Source File
 

@@ -49,6 +49,57 @@ using namespace std;
 #include "eventdata.h"
 #include "musiccatalog.h"
 
+class UndoAdd : public UndoItem {
+ public:
+            UndoAdd(PlaylistManager* plm, const string& url, uint32 index);
+    virtual ~UndoAdd();
+
+    virtual void Undo();
+    virtual void Redo();
+ private:
+    PlaylistManager* m_plm;
+    string m_url;
+    uint32 m_index;
+};
+
+class UndoAddMulti : public UndoItem {
+ public:
+            UndoAddMulti(PlaylistManager* plm, vector<string>& urls, uint32 index);
+    virtual ~UndoAddMulti();
+
+    virtual void Undo();
+    virtual void Redo();
+ private:
+    PlaylistManager* m_plm;
+    vector<string> m_urls;
+    uint32 m_index;
+};
+
+class UndoRemove : public UndoItem {
+ public:
+            UndoRemove(PlaylistManager* plm, const string& url, uint32 index);
+    virtual ~UndoRemove();
+
+    virtual void Undo();
+    virtual void Redo();
+ private:
+    PlaylistManager* m_plm;
+    string m_url;
+    uint32 m_index;
+};
+
+class UndoMove : public UndoItem {
+ public:
+            UndoMove(PlaylistManager* plm, uint32 oldIndex, uint32 newIndex);
+    virtual ~UndoMove();
+
+    virtual void Undo();
+    virtual void Redo();
+ private:
+    PlaylistManager* m_plm;
+    uint32 m_newIndex, m_oldIndex;
+};
+
 
 // Function object used for sorting PlaylistItems in PlaylistManager
 bool PlaylistItemSort::operator() (PlaylistItem* item1, 
@@ -696,6 +747,10 @@ Error PlaylistManager::AddItem(PlaylistItem* item, bool queryForMetaData)
 
         if(queryForMetaData)
             RetrieveMetaData(item);
+
+        /*UndoAdd* undoItem = new UndoAdd(this, item->URL(), m_activeList->size() - 1);
+
+        m_undo.AddItem(undoItem);*/
      
         m_context->target->AcceptEvent(new PlaylistItemAddedEvent(item, this));
 
@@ -714,13 +769,13 @@ Error PlaylistManager::AddItem(PlaylistItem* item, uint32 index, bool queryForMe
     assert(item);
 
     if(index > m_activeList->size())
-        index = kInvalidIndex;
+        index = m_activeList->size();
 
     //index = CheckIndex(index);
 
     if(item && index != kInvalidIndex)
     {
-        m_activeList->insert(&(*m_activeList)[index],item);
+        m_activeList->insert(m_activeList->begin() + index,item);
 
         if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
         {
@@ -736,6 +791,10 @@ Error PlaylistManager::AddItem(PlaylistItem* item, uint32 index, bool queryForMe
 
         if(queryForMetaData)
             RetrieveMetaData(item);
+
+        /*UndoAdd* undoItem = new UndoAdd(this, item->URL(), index);
+
+        m_undo.AddItem(undoItem);*/
 
         m_context->target->AcceptEvent(new PlaylistItemAddedEvent(item, this));
 
@@ -755,6 +814,8 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, bool queryForMetaDa
 
     if(list)
     {
+        uint32 index = m_activeList->size();
+
         m_activeList->insert(m_activeList->end(),
                              list->begin(), 
                              list->end());
@@ -777,10 +838,21 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, bool queryForMetaDa
             if(queryForMetaData)
                 RetrieveMetaData(items);
         }
+        
+        /*vector<PlaylistItem *>::iterator i = list->begin();
+        vector<string> urls;
+
+        for(; i != list->end(); i++)
+            urls.push_back((*i)->URL());
+
+        UndoAddMulti* undoItem = new UndoAddMulti(this, urls, index);
+        m_undo.AddItem(undoItem);*/
 
         vector<PlaylistItem *>::iterator i = list->begin();
-        for (; i != list->end(); i++)
+        for(; i != list->end(); i++)
             m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
+
+        
 
         result = kError_NoErr;
     }
@@ -800,13 +872,13 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool 
     assert(list);
 
     if(index > m_activeList->size())
-        index = kInvalidIndex;
+        index = m_activeList->size();
 
     //index = CheckIndex(index);
 
     if(list && index != kInvalidIndex)
     {
-        m_activeList->insert(&(*m_activeList)[index],
+        m_activeList->insert(m_activeList->begin() + index,
                              list->begin(), 
                              list->end());
 
@@ -833,8 +905,17 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool 
                 RetrieveMetaData(items);
         }
 
+        /*vector<PlaylistItem *>::iterator i = list->begin();
+        vector<string> urls;
+
+        for(; i != list->end(); i++)
+            urls.push_back((*i)->URL());
+
+        UndoAddMulti* undoItem = new UndoAddMulti(this, urls, index);
+        m_undo.AddItem(undoItem);*/
+
         vector<PlaylistItem *>::iterator i = list->begin();
-        for (; i != list->end(); i++)
+        for(; i != list->end(); i++)
             m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
 
         result = kError_NoErr;
@@ -888,6 +969,10 @@ Error PlaylistManager::RemoveItem(uint32 index)
             }
         }
 
+        /*UndoRemove* undoItem = new UndoRemove(this, item->URL(), index);
+
+        m_undo.AddItem(undoItem);*/
+
         // if the metadata thread is still accessing this item
         // we don't wanna delete the item  out from under it.
         // instead we set a flag and let the metadata thread
@@ -919,7 +1004,22 @@ Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
 
     if(index != kInvalidIndex)
     {
-        for(uint32 i = 0; i < count; i++)
+        uint32 i;
+
+        /*UndoMultiItem* multiItem= new UndoMultiItem();
+
+        for(i = 0; i < count; i++)
+        {
+            PlaylistItem* item = (*m_activeList)[index + i];
+
+            UndoRemove* undoItem = new UndoRemove(this, item->URL(), index + i);
+
+            multiItem->AddItem(undoItem);
+        }
+
+        m_undo.AddItem(multiItem);*/
+
+        for(i = 0; i < count; i++)
         {
             PlaylistItem* item = (*m_activeList)[index + i];
 
@@ -933,7 +1033,7 @@ Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
                 {
                    m_current = kInvalidIndex;
                 }
-            }
+            }            
 
             // if the metadata thread is still accessing this item
             // we don't wanna delete the item  out from under it.
@@ -975,6 +1075,19 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
         uint32 oldIndex;
 
         size = items->size();
+
+        /*vector<PlaylistItem *>::iterator i = items->begin();
+
+        UndoMultiItem* multiItem= new UndoMultiItem();
+
+        for(; i != items->end(); i++)
+        {
+            UndoRemove* undoItem = new UndoRemove(this, (*i)->URL(), IndexOf(*i));
+
+            multiItem->AddItem(undoItem);
+        }
+
+        m_undo.AddItem(multiItem);*/
 
         for(index = 0; index < size; index++)
         {
@@ -1043,6 +1156,10 @@ Error PlaylistManager::RemoveAll()
 
         if(item)
         {            
+            /*UndoRemove* undoItem = new UndoRemove(this, item->URL(), IndexOf(item));
+
+            m_undo.AddItem(undoItem);*/
+
             // if the metadata thread is still accessing this item
             // we don't wanna delete the item  out from under it.
             // instead we set a flag and let the metadata thread
@@ -1093,6 +1210,12 @@ Error PlaylistManager::SwapItems(uint32 index1, uint32 index2)
     {
         PlaylistItem* temp;
 
+        /*UndoMove* undoItem1 = new UndoMove(this, index2, index1);
+        m_undo.AddItem(undoItem1);
+
+        UndoMove* undoItem2 = new UndoMove(this, index1, index2);
+        m_undo.AddItem(undoItem2);*/
+
         temp = (*m_activeList)[index1];
         (*m_activeList)[index1] = (*m_activeList)[index2];
         (*m_activeList)[index2] = temp;
@@ -1110,7 +1233,7 @@ Error PlaylistManager::SwapItems(uint32 index1, uint32 index2)
                 InternalSetCurrentIndex(index2);
             else if(m_current == index2)
                 InternalSetCurrentIndex(index1);
-        }
+        }        
 
         result = kError_NoErr;
     }
@@ -1136,12 +1259,15 @@ Error PlaylistManager::MoveItem(uint32 oldIndex, uint32 newIndex)
     {
         PlaylistItem* item = (*m_activeList)[oldIndex];
 
+        /*UndoMove* undoItem = new UndoMove(this, newIndex, oldIndex);
+        m_undo.AddItem(undoItem);*/
+
         m_activeList->erase(&(*m_activeList)[oldIndex]);
 
         if(newIndex > m_activeList->size())
             newIndex = m_activeList->size();
 
-        m_activeList->insert(&(*m_activeList)[newIndex],item);
+        m_activeList->insert(m_activeList->begin() + newIndex,item);
 
         if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
         {
@@ -1214,12 +1340,22 @@ Error PlaylistManager::MoveItems(vector<PlaylistItem*>* items, uint32 index)
         if(index >= m_activeList->size())
             index = m_activeList->size();
 
-        m_activeList->insert(&(*m_activeList)[index],
+        m_activeList->insert(m_activeList->begin() + index,
                              items->begin(), 
                              items->end());
 
         if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
             InternalSetCurrentIndex(IndexOf(currentItem));
+
+        /*UndoMultiItem* multiItem= new UndoMultiItem();
+
+        for(i = 0; i < size; i++)
+        {
+            UndoMove* undoItem = new UndoMove(this, index + i, oldIndices[i]);
+            multiItem.AddItem(undoItem);
+        }  
+
+        m_undo.AddItem(multiItem);*/
 
         for(i = 0; i < size; i++)
         {
@@ -1230,7 +1366,7 @@ Error PlaylistManager::MoveItems(vector<PlaylistItem*>* items, uint32 index)
                 m_context->target->AcceptEvent(
                     new PlaylistItemMovedEvent(oldIndices[i], index + i, item, this));
             }
-        }  
+        }
 
         result = kError_NoErr;
     }
@@ -1301,6 +1437,8 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
             InternalSetCurrentIndex(IndexOf(currentItem));
            
         m_context->target->AcceptEvent(new PlaylistSortedEvent(key, this));
+
+        //m_undo.Clear();
     }
 
     m_mutex.Release();
@@ -1843,7 +1981,7 @@ Error PlaylistManager::ReadPortablePlaylist(DeviceInfo* device,
                                                 cookie);
 
         vector<PlaylistItem *>::iterator i = m_portableList.begin();
-        for (; i != m_portableList.end(); i++)
+        for(; i != m_portableList.end(); i++)
             m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
     }
 
@@ -1969,6 +2107,47 @@ uint32 PlaylistManager::InternalIndexOf(vector<PlaylistItem*>* list,
 bool PlaylistManager::HasItem(const PlaylistItem* item)
 {
     return (IndexOf(item) != kInvalidIndex);
+}
+
+
+bool PlaylistManager::CanUndo()
+{
+    m_mutex.Acquire();
+    
+    bool result = m_undo.CanUndo();
+    
+    m_mutex.Release();
+
+    return result;
+}
+
+bool PlaylistManager::CanRedo()
+{
+    m_mutex.Acquire();
+
+    bool result = m_undo.CanRedo();
+    
+    m_mutex.Release();
+
+    return result;    
+}
+
+void PlaylistManager::Undo()
+{
+    m_mutex.Acquire();
+    
+    m_undo.Undo();
+    
+    m_mutex.Release();
+}
+
+void PlaylistManager::Redo()
+{
+    m_mutex.Acquire();
+    
+    m_undo.Redo();
+    
+    m_mutex.Release();
 }
 
 // Internal functions
@@ -2149,3 +2328,87 @@ void PlaylistManager::RetrieveMetaData(vector<PlaylistItem*>* list)
     }
 }
 
+
+UndoAdd::UndoAdd(PlaylistManager* plm, const string& url, uint32 index):
+    m_plm(plm), m_url(url), m_index(index)
+{
+    
+}
+
+UndoAdd::~UndoAdd()
+{
+
+}
+
+void UndoAdd::Undo()
+{
+    m_plm->RemoveItem(m_index);
+}
+
+void UndoAdd::Redo()
+{
+    m_plm->AddItem(m_url, m_index);
+}
+
+UndoAddMulti::UndoAddMulti(PlaylistManager* plm, vector<string>& urls, uint32 index):
+    m_plm(plm), m_urls(urls), m_index(index)
+{
+    
+}
+
+UndoAddMulti::~UndoAddMulti()
+{
+
+}
+
+void UndoAddMulti::Undo()
+{
+    m_plm->RemoveItems(m_index, m_urls.size());
+}
+
+void UndoAddMulti::Redo()
+{
+    m_plm->AddItems(m_urls, m_index);
+}
+
+UndoRemove::UndoRemove(PlaylistManager* plm, const string& url, uint32 index):
+    m_plm(plm), m_url(url), m_index(index)
+{
+
+}
+
+UndoRemove::~UndoRemove()
+{
+
+}
+
+void UndoRemove::Undo()
+{
+    m_plm->AddItem(m_url, m_index);
+}
+
+void UndoRemove::Redo()
+{
+    m_plm->RemoveItem(m_index);
+}
+
+UndoMove::UndoMove(PlaylistManager* plm, uint32 newIndex, uint32 oldIndex):
+    m_plm(plm), m_newIndex(newIndex), m_oldIndex(oldIndex)
+{
+
+}
+
+UndoMove::~UndoMove()
+{
+    
+}
+
+void UndoMove::Undo()
+{
+    m_plm->MoveItem(m_newIndex, m_oldIndex);
+}
+
+void UndoMove::Redo()
+{
+    m_plm->MoveItem(m_oldIndex, m_newIndex);
+}

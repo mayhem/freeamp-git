@@ -50,6 +50,9 @@ class Win32UpdateManager : public UpdateManager {
  public:
     Win32UpdateManager(FAContext* context);
     virtual ~Win32UpdateManager();
+
+    virtual Error UpdateComponents(UMCallBackFunction function = NULL,
+                                   void* cookie = NULL);
     
     virtual Error DetermineLocalVersions();
         

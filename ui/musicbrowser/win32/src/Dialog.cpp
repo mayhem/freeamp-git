@@ -218,6 +218,14 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     Close();
                     return 1;
 
+                case ID_EDIT_UNDO_ACTION:
+                    m_oPlm->Undo();
+                    return 1;
+
+                case ID_EDIT_REDO_ACTION:
+                    m_oPlm->Redo();
+                    return 1;
+
                 case ID_POPUP_ADDTRACK:
                 case ID_EDIT_ADDTRACK:
                     AddTrackEvent();

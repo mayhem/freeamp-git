@@ -42,6 +42,7 @@ using namespace std;
 #include "portabledevice.h"
 #include "registry.h"
 #include "plmevent.h"
+#include "undomanager.h"
 
 typedef enum {
     kPlaylistSortKey_FirstKey,
@@ -229,6 +230,13 @@ class PlaylistManager {
     Error ToggleRepeatMode();
     Error ToggleShuffleMode();
 
+    // Functions for undoing your actions
+    bool CanUndo();
+    bool CanRedo();
+
+    void Undo();
+    void Redo();
+
     // Functions for adding items to playlist       
     Error AddItem(const char* url);
     Error AddItem(const char* url, uint32 index);
@@ -371,6 +379,8 @@ class PlaylistManager {
     vector<MetaDataFormat*>         m_metadataFormats;
     vector<PlaylistFormatInfo*>     m_playlistFormats;
     vector<DeviceInfo*>             m_portablePlayers;
+
+    UndoManager m_undo;
 
 };
 
