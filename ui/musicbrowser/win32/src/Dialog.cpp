@@ -1182,7 +1182,7 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
         m_context->prefs->GetPrefString(kMusicBrowserHeaderWidthsPref, buf, &size);
         sscanf(buf, " %d , %d , %d , %d", &a, &b, &c, &d);
 
-        if(a >= 1 && b >= 1 && c >= 1 && d >= 1)
+        if(a >= 1 && b >= 5 && c >= 5 && d >= 5)
         {
             ListView_SetColumnWidth(m_hPlaylistView, 1, a);
             ListView_SetColumnWidth(m_hPlaylistView, 2, b);

@@ -3847,9 +3847,10 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
             //  Add all the columns that are currently in use to the
             // rightmost listbox.
             //
-            string columns, used;
-            columns = m_originalValues.playlistHeaderColumns;
-            char *token = strtok( (char *)columns.c_str(), "|" );
+            string used;
+			char *columns = new char[m_originalValues.playlistHeaderColumns.size() + 2];
+			strcpy(columns, m_originalValues.playlistHeaderColumns.c_str());
+            char *token = strtok( columns, "|" );
             while( token != NULL )
             {
                 SendDlgItemMessage(hwnd, IDC_CURRENT_COLUMN_LIST, LB_ADDSTRING,
@@ -3883,11 +3884,8 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
                                        0, (LPARAM)available[ i ] );
                 }
             }
-            break;
-        }
-        case WM_HELP:
-        {
-            //LaunchHelp(hwnd, Preferences_General);
+
+			delete [] columns;
             break;
         }
 
@@ -3897,29 +3895,6 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
 
             switch(LOWORD(wParam))
             {
-                 case IDCANCEL:
-                    SavePrefsValues(&m_originalValues);
-                    EndDialog(hwnd, FALSE);
-                    break;
-
-                case IDOK:
-                    SavePrefsValues(&m_proposedValues);
-                    EndDialog(hwnd, TRUE);
-                    break;
-
-                case IDC_HELPME:
-                    if(m_currentPage)
-                             SendMessage(m_currentPage->hwnd, UWM_HELP, 0, 0);
-                    break;
-
-                case IDC_APPLY:
-                {
-                    SavePrefsValues(&m_proposedValues);
-                    HWND hwndApply = GetDlgItem(hwnd, IDC_APPLY);
-
-                    EnableWindow(hwndApply, FALSE);
-                    break;
-                }
                 case IDC_REMOVE_COLUMN:
                 {
                     int selIndex = SendDlgItemMessage( hwnd, IDC_CURRENT_COLUMN_LIST, LB_GETCURSEL, 0, 0 );
@@ -3984,6 +3959,52 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
                     break;
                 }
             }       
+        }
+
+        case UWM_HELP:
+        case WM_HELP:
+        {
+            //ShowHelp(m_pContext, Preferences_Advanced);
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            NMHDR* notify = (NMHDR*)lParam;
+
+            switch(notify->code)
+            {
+                case PSN_HELP:
+                {
+         //           ShowHelp(m_pContext, Preferences_Advanced);
+                    break;
+                }
+                case PSN_SETACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_APPLY:
+                {
+                    SavePrefsValues(&m_proposedValues);
+                    break;
+                }
+
+                case PSN_KILLACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_RESET:
+                {
+                    SavePrefsValues(&m_originalValues);
+                    break;
+                }
+            }
+
+            break;
         }
     }
     return( result );

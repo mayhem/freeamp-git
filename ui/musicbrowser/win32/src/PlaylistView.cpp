@@ -925,8 +925,8 @@ ListViewWndProc(HWND hwnd,
 
 void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
 {
-    if(ListView_GetItemCount(hwnd))
-    {
+//    if(ListView_GetItemCount(hwnd))
+//    {
         PlaylistItem* item = NULL;
         uint32 textLength = 0;
         int32 columnWidth = ListView_GetColumnWidth(hwnd,column);
@@ -1004,6 +1004,9 @@ void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
                 text = "Unknown";
             }
 
+			if (strlen(text.c_str()) < strlen(columnText)) 
+				text = columnText;
+
             SIZE size;
 
             GetTextExtentPoint32(hdc, text.c_str(), text.size(), &size); 
@@ -1011,12 +1014,25 @@ void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
             if(size.cx > textLength)
                 textLength = size.cx;
         }
+		if (textLength <= 2)
+        {
+			text = GetColumnText(column);
+
+			SIZE size;
+			GetTextExtentPoint32(hdc, text.c_str(), text.size(), &size);
+
+			textLength = size.cx;
+		}
 
         ReleaseDC(hwnd, hdc);
 
-        textLength += 3;
+        textLength += 5;
 
-        if(column < m_columnInfo.GetNColumns())
+		char blah[1025];
+		sprintf(blah, "resizing %d to %d", column, textLength);
+		MessageBox(hwnd, blah, blah, MB_OK|MB_SETFOREGROUND);
+
+        if(column < m_columnInfo.GetNColumns()) 
         {
             int32 nextColumnWidth = ListView_GetColumnWidth(hwnd,column + 1);
 
@@ -1040,7 +1056,7 @@ void MusicBrowserUI::ResizeHeader(HWND hwnd, uint32 column)
 
             ListView_SetColumnWidth(hwnd,column - 1, nextColumnWidth);
         }
-    }
+//  }
 }
 
 LRESULT MusicBrowserUI::ListViewWndProc(HWND hwnd, 
