@@ -59,7 +59,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 							    TRUE,
 							    BRANDING " Should Only Run One Time!");
 
-    if(0)//GetLastError() == ERROR_ALREADY_EXISTS)
+    if(GetLastError() == ERROR_ALREADY_EXISTS)
     {
         SendCommandLineToHiddenWindow();
         
