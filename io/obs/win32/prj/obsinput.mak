@@ -568,38 +568,6 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\obsinput.pmi"
 
 !ENDIF 
 
-SOURCE=..\..\..\..\config\config.win32
-
-!IF  "$(CFG)" == "obsinput - Win32 Release"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "obsinput - Win32 Debug"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "obsinput - Win32 NASM Debug"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "obsinput - Win32 NASM Release"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ENDIF 
-
 SOURCE=..\res\obs.rc
 
 !IF  "$(CFG)" == "obsinput - Win32 Release"
@@ -669,8 +637,7 @@ DEP_CPP_OBSIN=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -704,8 +671,7 @@ DEP_CPP_OBSIN=\
 	"..\..\obsinput.h"\
 	
 
-"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -739,8 +705,7 @@ DEP_CPP_OBSIN=\
 	"..\..\obsinput.h"\
 	
 
-"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -775,8 +740,7 @@ DEP_CPP_OBSIN=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\obsinput.obj" : $(SOURCE) $(DEP_CPP_OBSIN) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -817,8 +781,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -855,8 +818,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -893,8 +855,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -931,8 +892,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -967,8 +927,7 @@ DEP_CPP_PMI_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -999,8 +958,7 @@ DEP_CPP_PMI_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1031,8 +989,7 @@ DEP_CPP_PMI_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1063,8 +1020,7 @@ DEP_CPP_PMI_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pmi.obj" : $(SOURCE) $(DEP_CPP_PMI_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1085,8 +1041,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1103,8 +1058,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1121,8 +1075,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1139,8 +1092,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1160,8 +1112,7 @@ DEP_CPP_STREA=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1176,8 +1127,7 @@ DEP_CPP_STREA=\
 	"..\..\..\include\streambuffer.h"\
 	
 
-"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1192,8 +1142,7 @@ DEP_CPP_STREA=\
 	"..\..\..\include\streambuffer.h"\
 	
 
-"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1209,8 +1158,7 @@ DEP_CPP_STREA=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1242,8 +1190,7 @@ DEP_CPP_TSTRE=\
 	"..\..\..\include\tstream.h"\
 	
 
-"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1271,8 +1218,7 @@ DEP_CPP_TSTRE=\
 	"..\..\..\include\tstream.h"\
 	
 
-"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1300,8 +1246,7 @@ DEP_CPP_TSTRE=\
 	"..\..\..\include\tstream.h"\
 	
 
-"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1329,8 +1274,7 @@ DEP_CPP_TSTRE=\
 	"..\..\..\include\tstream.h"\
 	
 
-"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\tstream.obj" : $(SOURCE) $(DEP_CPP_TSTRE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

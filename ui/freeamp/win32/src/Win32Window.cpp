@@ -33,6 +33,7 @@ ____________________________________________________________________________*/
 #include "Theme.h"
 #include "Win32Window.h"
 #include "Win32Canvas.h"
+#include "resource.h"
 #include "debug.h"
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
@@ -231,6 +232,14 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             DropFiles((HDROP) wParam);
             break;
 
+        case WM_SYSCOMMAND:
+        {
+            if (!MenuCommand(wParam))
+                result = DefWindowProc( hwnd, msg, wParam, lParam );
+                
+            break;
+        }    
+
         default:
             result = DefWindowProc( hwnd, msg, wParam, lParam );
             break;
@@ -306,7 +315,7 @@ Error Win32Window::Run(Pos &oPos)
         m_hWnd = CreateWindowEx(WS_EX_TOOLWINDOW,
                               szAppName, 
                               szAppName,
-                              WS_POPUP | WS_VISIBLE | WS_SYSMENU, 
+                              WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX, 
                               m_oWindowPos.x, 
                               m_oWindowPos.y, 
                               oRect.Width(), 
@@ -318,7 +327,7 @@ Error Win32Window::Run(Pos &oPos)
     else                          
         m_hWnd = CreateWindow(szAppName, 
                               szAppName,
-                              WS_POPUP | WS_VISIBLE | WS_SYSMENU, 
+                              WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX, 
                               m_oWindowPos.x, 
                               m_oWindowPos.y, 
                               oRect.Width(), 
@@ -344,6 +353,7 @@ Error Win32Window::Run(Pos &oPos)
         m_pTheme->PostWindowCreate();
 
         SetForegroundWindow(m_hWnd);
+        AddToSystemMenu(m_hWnd);
 
         while( GetMessage( &msg, NULL, 0, 0 ) )
         {
@@ -391,16 +401,16 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
     if (m_hWnd)
     {   
         Rect oNewRect, oSize;
- 
+
+        hRgn = ((Win32Canvas *)m_pCanvas)->GetMaskRgn(); 
+        if (hRgn)
+           SetWindowRgn(m_hWnd, hRgn, false);
+
         m_pCanvas->GetBackgroundRect(oSize);   
         GetReloadWindowPos(oRect, oSize.Width(), oSize.Height(), oNewRect);
         SetWindowPos(m_hWnd, NULL, oNewRect.x1, oNewRect.y1, 
                      oNewRect.Width(), oNewRect.Height(),
                      SWP_NOZORDER);
-    
-        hRgn = ((Win32Canvas *)m_pCanvas)->GetMaskRgn(); 
-        if (hRgn)
-           SetWindowRgn(m_hWnd, hRgn, false);
 
         CreateTooltips();
 
@@ -556,8 +566,10 @@ Error Win32Window::Minimize(void)
 {
 	if (!m_hWnd)
        return kError_YouScrewedUp;
-       
-	ShowWindow(m_hWnd, SW_MINIMIZE);
+
+    ShowWindow(m_hWnd, SW_MINIMIZE);
+    if (m_bLiveInToolbar)
+	   ShowWindow(m_hWnd, SW_HIDE);
 
     return kError_NoErr;
 }
@@ -567,7 +579,7 @@ Error Win32Window::Restore(void)
 	if (!m_hWnd)
        return kError_YouScrewedUp;
        
-	ShowWindow(m_hWnd, SW_RESTORE);
+    ShowWindow(m_hWnd, SW_RESTORE);
 
     return kError_NoErr;
 }
@@ -798,3 +810,30 @@ void Win32Window::BringWindowToFront(void)
     ShowWindow(m_hWnd, SW_RESTORE);
     SetForegroundWindow(m_hWnd);
 }
+
+void Win32Window::AddToSystemMenu(HWND hWnd)
+{
+    HMENU        hMenu, hPopup;
+    MENUITEMINFO sInfo;
+    BOOL         bRet;
+    
+    hMenu = GetSystemMenu(hWnd, false);
+    hPopup = LoadMenu(g_hinst, MAKEINTRESOURCE(IDM_TRAY));
+    hPopup = GetSubMenu(hPopup, 0);
+
+    sInfo.cbSize = sizeof(sInfo);
+    sInfo.fMask = MIIM_SUBMENU | MIIM_TYPE;
+    sInfo.hSubMenu = hPopup;
+    sInfo.fType = MFT_STRING;
+    sInfo.dwTypeData = BRANDING;
+    sInfo.cch = strlen(BRANDING);
+    sInfo.fState = 0;
+    
+    bRet = InsertMenuItem(hMenu, 0, true, &sInfo);
+    
+    sInfo.cbSize = sizeof(sInfo);
+    sInfo.fMask = MIIM_TYPE;
+    sInfo.fType = MFT_SEPARATOR;
+    sInfo.fState = 0;
+    bRet = InsertMenuItem(hMenu, 1, true, &sInfo);
+} 

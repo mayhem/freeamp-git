@@ -34,10 +34,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-MTL=midl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "musicbrowser - Win32 Release"
 
 OUTDIR=.\Release
@@ -84,6 +80,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -93,7 +90,40 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\musicbrowser.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\musicbrowser.bsc" 
@@ -143,8 +173,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Release" "fabaselib - Win32 Release"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                             ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                               ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                              ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                                ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -196,6 +226,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -205,7 +236,40 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\musicbrowser.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\musicbrowser.bsc" 
@@ -253,8 +317,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                             ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                               ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                              ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                                ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -307,6 +371,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -316,7 +381,40 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\musicbrowser.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\musicbrowser.bsc" 
@@ -364,8 +462,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug"\
  ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                             ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                               ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                              ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                                ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -415,6 +513,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -424,7 +523,40 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\musicbrowser.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\musicbrowser.bsc" 
@@ -474,41 +606,11 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Release"\
  "fabaselib - Win32 NASM Release" ".\musicbrowser.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                             ..\..\..\..\base\win32\prj\plugins
-	copy musicbrowser.ui                                                                               ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                              ..\..\..\..\base\win32\prj\plugins
+	copy musicbrowser.ui                                                                                ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
 
 
 !IF "$(CFG)" == "musicbrowser - Win32 Release" || "$(CFG)" ==\
@@ -545,6 +647,8 @@ DEP_CPP_DATAI=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\DataIndex.obj" : $(SOURCE) $(DEP_CPP_DATAI) "$(INTDIR)"
@@ -644,14 +748,14 @@ DEP_CPP_DATAI=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_DATAI=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\DataIndex.obj" : $(SOURCE) $(DEP_CPP_DATAI) "$(INTDIR)"
@@ -692,6 +796,8 @@ DEP_CPP_DIALO=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\Dialog.obj" : $(SOURCE) $(DEP_CPP_DIALO) "$(INTDIR)"
@@ -794,14 +900,14 @@ DEP_CPP_DIALO=\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_DIALO=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\Dialog.obj" : $(SOURCE) $(DEP_CPP_DIALO) "$(INTDIR)"
@@ -811,9 +917,6 @@ NODEP_CPP_DIALO=\
 !ENDIF 
 
 SOURCE=..\src\DropObject.cpp
-
-!IF  "$(CFG)" == "musicbrowser - Win32 Release"
-
 DEP_CPP_DROPO=\
 	"..\include\DropObject.h"\
 	"..\include\EnumFormatEtc.h"\
@@ -822,41 +925,6 @@ DEP_CPP_DROPO=\
 "$(INTDIR)\DropObject.obj" : $(SOURCE) $(DEP_CPP_DROPO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
-
-DEP_CPP_DROPO=\
-	"..\include\DropObject.h"\
-	"..\include\EnumFormatEtc.h"\
-	
-
-"$(INTDIR)\DropObject.obj" : $(SOURCE) $(DEP_CPP_DROPO) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
-
-DEP_CPP_DROPO=\
-	"..\include\DropObject.h"\
-	"..\include\EnumFormatEtc.h"\
-	
-
-"$(INTDIR)\DropObject.obj" : $(SOURCE) $(DEP_CPP_DROPO) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
-
-DEP_CPP_DROPO=\
-	"..\include\DropObject.h"\
-	"..\include\EnumFormatEtc.h"\
-	
-
-"$(INTDIR)\DropObject.obj" : $(SOURCE) $(DEP_CPP_DROPO) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\src\DropSource.cpp
 DEP_CPP_DROPS=\
@@ -868,6 +936,9 @@ DEP_CPP_DROPS=\
 
 
 SOURCE=..\src\DropTarget.cpp
+
+!IF  "$(CFG)" == "musicbrowser - Win32 Release"
+
 DEP_CPP_DROPT=\
 	"..\include\DropObject.h"\
 	"..\include\DropTarget.h"\
@@ -876,6 +947,41 @@ DEP_CPP_DROPT=\
 "$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
+
+DEP_CPP_DROPT=\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
+	
+
+"$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
+
+DEP_CPP_DROPT=\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
+	
+
+"$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
+
+DEP_CPP_DROPT=\
+	"..\include\DropObject.h"\
+	"..\include\DropTarget.h"\
+	
+
+"$(INTDIR)\DropTarget.obj" : $(SOURCE) $(DEP_CPP_DROPT) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\src\EditTrackInfoDialog.cpp
 
@@ -908,6 +1014,8 @@ DEP_CPP_EDITT=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\EditTrackInfoDialog.obj" : $(SOURCE) $(DEP_CPP_EDITT) "$(INTDIR)"
@@ -1007,14 +1115,14 @@ DEP_CPP_EDITT=\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_EDITT=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\EditTrackInfoDialog.obj" : $(SOURCE) $(DEP_CPP_EDITT) "$(INTDIR)"
@@ -1064,6 +1172,8 @@ DEP_CPP_EVENT=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
@@ -1166,14 +1276,14 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_EVENT=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
@@ -1211,6 +1321,8 @@ DEP_CPP_INTRO=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\IntroductionWizard.obj" : $(SOURCE) $(DEP_CPP_INTRO) "$(INTDIR)"
@@ -1304,14 +1416,14 @@ DEP_CPP_INTRO=\
 	"..\..\..\..\base\include\undomanager.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_INTRO=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\IntroductionWizard.obj" : $(SOURCE) $(DEP_CPP_INTRO) "$(INTDIR)"
@@ -1328,6 +1440,7 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
@@ -1352,6 +1465,8 @@ DEP_CPP_MULTI=\
 	"..\include\DropSource.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\MultiSelectTreeView.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
@@ -1436,6 +1551,7 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
@@ -1452,6 +1568,7 @@ DEP_CPP_MULTI=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
@@ -1459,9 +1576,8 @@ DEP_CPP_MULTI=\
 	"..\include\DropSource.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_MULTI=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\MultiSelectTreeView.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
@@ -1501,6 +1617,8 @@ DEP_CPP_MUSIC=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\MusicSearchDialog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
@@ -1600,14 +1718,14 @@ DEP_CPP_MUSIC=\
 	"..\..\..\..\base\win32\include\help.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_MUSIC=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\MusicSearchDialog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
@@ -1649,6 +1767,11 @@ DEP_CPP_MUSICT=\
 	"..\include\DropSource.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_MUSICT=\
+	"..\..\..\..\base\include\win32impl.h"\
 	
 
 "$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSICT) "$(INTDIR)"
@@ -1752,6 +1875,7 @@ DEP_CPP_MUSICT=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
@@ -1759,9 +1883,11 @@ DEP_CPP_MUSICT=\
 	"..\include\DropSource.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 NODEP_CPP_MUSICT=\
-	"..\..\..\..\config\config.h"\
+	"..\..\..\..\base\include\win32impl.h"\
 	
 
 "$(INTDIR)\MusicTree.obj" : $(SOURCE) $(DEP_CPP_MUSICT) "$(INTDIR)"
@@ -1801,6 +1927,8 @@ DEP_CPP_OPENS=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\OpenSavePlaylists.obj" : $(SOURCE) $(DEP_CPP_OPENS) "$(INTDIR)"
@@ -1900,14 +2028,14 @@ DEP_CPP_OPENS=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_OPENS=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\OpenSavePlaylists.obj" : $(SOURCE) $(DEP_CPP_OPENS) "$(INTDIR)"
@@ -1948,6 +2076,8 @@ DEP_CPP_PLAYL=\
 	"..\include\DropSource.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\PlaylistView.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
@@ -2048,6 +2178,7 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
@@ -2055,9 +2186,8 @@ DEP_CPP_PLAYL=\
 	"..\include\DropSource.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_PLAYL=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\PlaylistView.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
@@ -2072,6 +2202,8 @@ SOURCE=..\src\RemoveTracksDialog.cpp
 
 DEP_CPP_REMOV=\
 	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\RemoveTracksDialog.obj" : $(SOURCE) $(DEP_CPP_REMOV) "$(INTDIR)"
@@ -2100,11 +2232,13 @@ DEP_CPP_REMOV=\
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
 
-NODEP_CPP_REMOV=\
+DEP_CPP_REMOV=\
 	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\RemoveTracksDialog.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\RemoveTracksDialog.obj" : $(SOURCE) $(DEP_CPP_REMOV) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2140,6 +2274,8 @@ DEP_CPP_SAVEP=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\SavePlaylistDialog.obj" : $(SOURCE) $(DEP_CPP_SAVEP) "$(INTDIR)"
@@ -2236,14 +2372,14 @@ DEP_CPP_SAVEP=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_SAVEP=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\SavePlaylistDialog.obj" : $(SOURCE) $(DEP_CPP_SAVEP) "$(INTDIR)"
@@ -2284,6 +2420,8 @@ DEP_CPP_WIN32=\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\Win32MusicBrowser.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
@@ -2386,14 +2524,14 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\DataIndex.h"\
 	"..\include\DropTarget.h"\
 	"..\include\Win32MusicBrowser.h"\
-	
-NODEP_CPP_WIN32=\
-	"..\..\..\..\config\config.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\Win32MusicBrowser.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
@@ -2427,7 +2565,7 @@ DEP_RSC_MUSICB=\
 
 "$(INTDIR)\musicbrowser.res" : $(SOURCE) $(DEP_RSC_MUSICB) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\musicbrowser.res" /i\
- "\Local\src\freeamp\ui\musicbrowser\win32\res" /d "NDEBUG" $(SOURCE)
+ "\FreeAmp\freeamp\ui\musicbrowser\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -2435,7 +2573,7 @@ DEP_RSC_MUSICB=\
 
 "$(INTDIR)\musicbrowser.res" : $(SOURCE) $(DEP_RSC_MUSICB) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\musicbrowser.res" /i\
- "\Local\src\freeamp\ui\musicbrowser\win32\res" /d "_DEBUG" $(SOURCE)
+ "\FreeAmp\freeamp\ui\musicbrowser\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -2443,7 +2581,7 @@ DEP_RSC_MUSICB=\
 
 "$(INTDIR)\musicbrowser.res" : $(SOURCE) $(DEP_RSC_MUSICB) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\musicbrowser.res" /i\
- "\Local\src\freeamp\ui\musicbrowser\win32\res" /d "_DEBUG" $(SOURCE)
+ "\FreeAmp\freeamp\ui\musicbrowser\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -2451,7 +2589,7 @@ DEP_RSC_MUSICB=\
 
 "$(INTDIR)\musicbrowser.res" : $(SOURCE) $(DEP_RSC_MUSICB) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\musicbrowser.res" /i\
- "\Local\src\freeamp\ui\musicbrowser\win32\res" /d "NDEBUG" $(SOURCE)
+ "\FreeAmp\freeamp\ui\musicbrowser\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -2459,12 +2597,12 @@ DEP_RSC_MUSICB=\
 !IF  "$(CFG)" == "musicbrowser - Win32 Release"
 
 "fabaselib - Win32 Release" : 
-   cd "\Local\src\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 "fabaselib - Win32 ReleaseCLEAN" : 
-   cd "\Local\src\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 Release" RECURSE=1 
    cd "..\..\..\ui\musicbrowser\win32\prj"
@@ -2472,12 +2610,12 @@ DEP_RSC_MUSICB=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
 
 "fabaselib - Win32 Debug" : 
-   cd "\Local\src\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 "fabaselib - Win32 DebugCLEAN" : 
-   cd "\Local\src\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak CFG="fabaselib - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\ui\musicbrowser\win32\prj"
@@ -2485,12 +2623,12 @@ DEP_RSC_MUSICB=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
 
 "fabaselib - Win32 NASM Debug" : 
-   cd "\Local\src\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 "fabaselib - Win32 NASM DebugCLEAN" : 
-   cd "\Local\src\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\ui\musicbrowser\win32\prj"
@@ -2498,13 +2636,13 @@ DEP_RSC_MUSICB=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
 
 "fabaselib - Win32 NASM Release" : 
-   cd "\Local\src\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
-   cd "\Local\src\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" RECURSE=1 
    cd "..\..\..\ui\musicbrowser\win32\prj"
@@ -2514,12 +2652,12 @@ DEP_RSC_MUSICB=\
 !IF  "$(CFG)" == "musicbrowser - Win32 Release"
 
 "gdbm - Win32 Release" : 
-   cd "\Local\src\freeamp\lib\gdbm\prj"
+   cd "\FreeAmp\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Release" 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 "gdbm - Win32 ReleaseCLEAN" : 
-   cd "\Local\src\freeamp\lib\gdbm\prj"
+   cd "\FreeAmp\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Release"\
  RECURSE=1 
    cd "..\..\..\ui\musicbrowser\win32\prj"
@@ -2527,12 +2665,12 @@ DEP_RSC_MUSICB=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
 
 "gdbm - Win32 Debug" : 
-   cd "\Local\src\freeamp\lib\gdbm\prj"
+   cd "\FreeAmp\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 Debug" 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 "gdbm - Win32 DebugCLEAN" : 
-   cd "\Local\src\freeamp\lib\gdbm\prj"
+   cd "\FreeAmp\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 Debug" RECURSE=1\
  
    cd "..\..\..\ui\musicbrowser\win32\prj"
@@ -2540,12 +2678,12 @@ DEP_RSC_MUSICB=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
 
 "gdbm - Win32 NASM Debug" : 
-   cd "\Local\src\freeamp\lib\gdbm\prj"
+   cd "\FreeAmp\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug" 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 "gdbm - Win32 NASM DebugCLEAN" : 
-   cd "\Local\src\freeamp\lib\gdbm\prj"
+   cd "\FreeAmp\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Debug"\
  RECURSE=1 
    cd "..\..\..\ui\musicbrowser\win32\prj"
@@ -2553,12 +2691,12 @@ DEP_RSC_MUSICB=\
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
 
 "gdbm - Win32 NASM Release" : 
-   cd "\Local\src\freeamp\lib\gdbm\prj"
+   cd "\FreeAmp\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\gdbm.mak CFG="gdbm - Win32 NASM Release" 
    cd "..\..\..\ui\musicbrowser\win32\prj"
 
 "gdbm - Win32 NASM ReleaseCLEAN" : 
-   cd "\Local\src\freeamp\lib\gdbm\prj"
+   cd "\FreeAmp\freeamp\lib\gdbm\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\gdbm.mak CFG="gdbm - Win32 NASM Release"\
  RECURSE=1 
    cd "..\..\..\ui\musicbrowser\win32\prj"

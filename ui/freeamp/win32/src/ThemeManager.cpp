@@ -92,7 +92,7 @@ Error ThemeManager::GetDefaultTheme(string &oThemePath)
 
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oThemePath = string(dir);
-    oThemePath += string("\\themes\\freeamp.fat");    
+    oThemePath += string("\\themes\\") + string(BRANDING_DEFAULT_THEME);
 
     return kError_NoErr;
 }

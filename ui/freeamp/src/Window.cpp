@@ -515,6 +515,11 @@ void Window::Keystroke(unsigned char cKey)
     m_pTheme->HandleKeystroke(cKey);
 }
 
+bool Window::MenuCommand(uint32 uCommand)
+{
+    return m_pTheme->HandleMenuCommand(uCommand);
+}
+
 void Window::GetReloadWindowPos(Rect &oOldRect, int iNewWidth, int iNewHeight, 
                                 Rect &oNewRect)
 {

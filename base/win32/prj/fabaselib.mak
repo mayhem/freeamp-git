@@ -505,38 +505,6 @@ LIB32_OBJS= \
 !IF "$(CFG)" == "fabaselib - Win32 Release" || "$(CFG)" ==\
  "fabaselib - Win32 Debug" || "$(CFG)" == "fabaselib - Win32 NASM Debug" ||\
  "$(CFG)" == "fabaselib - Win32 NASM Release"
-SOURCE=..\..\..\config\config.win32
-
-!IF  "$(CFG)" == "fabaselib - Win32 Release"
-
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-InputPath=..\..\..\config\config.win32
-
-"..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
-
-!ENDIF 
-
 SOURCE=..\..\src\database.cpp
 
 !IF  "$(CFG)" == "fabaselib - Win32 Release"
@@ -551,8 +519,7 @@ DEP_CPP_DATAB=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -566,8 +533,7 @@ DEP_CPP_DATAB=\
 	"..\include\mutex.h"\
 	
 
-"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -581,8 +547,7 @@ DEP_CPP_DATAB=\
 	"..\include\mutex.h"\
 	
 
-"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -598,8 +563,7 @@ DEP_CPP_DATAB=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -650,8 +614,7 @@ NODEP_CPP_DOWNL=\
 	"..\..\include\win32impl.h"\
 	
 
-"$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -684,8 +647,7 @@ DEP_CPP_DOWNL=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -718,8 +680,7 @@ DEP_CPP_DOWNL=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -757,8 +718,7 @@ NODEP_CPP_DOWNL=\
 	"..\..\include\win32impl.h"\
 	
 
-"$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -769,8 +729,7 @@ DEP_CPP_ERROR=\
 	"..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\errors.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\errors.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -828,8 +787,7 @@ NODEP_CPP_MUSIC=\
 	"..\..\src\win32impl.h"\
 	
 
-"$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -871,8 +829,7 @@ DEP_CPP_MUSIC=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -914,8 +871,7 @@ DEP_CPP_MUSIC=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -962,8 +918,7 @@ NODEP_CPP_MUSIC=\
 	"..\..\src\win32impl.h"\
 	
 
-"$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\musiccatalog.obj" : $(SOURCE) $(DEP_CPP_MUSIC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1026,8 +981,7 @@ NODEP_CPP_PLAYE=\
 	"..\..\include\win32impl.h"\
 	
 
-"$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1072,8 +1026,7 @@ DEP_CPP_PLAYE=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1118,8 +1071,7 @@ DEP_CPP_PLAYE=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1169,8 +1121,7 @@ NODEP_CPP_PLAYE=\
 	"..\..\include\win32impl.h"\
 	
 
-"$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\player.obj" : $(SOURCE) $(DEP_CPP_PLAYE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1208,8 +1159,7 @@ NODEP_CPP_PLAYL=\
 	"..\..\include\win32impl.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1240,8 +1190,7 @@ DEP_CPP_PLAYL=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1272,8 +1221,7 @@ DEP_CPP_PLAYL=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1307,8 +1255,7 @@ NODEP_CPP_PLAYL=\
 	"..\..\include\win32impl.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1324,8 +1271,7 @@ DEP_CPP_PREFE=\
 	"..\..\include\preferences.h"\
 	
 
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1337,8 +1283,7 @@ DEP_CPP_PREFE=\
 	"..\..\include\preferences.h"\
 	
 
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1350,8 +1295,7 @@ DEP_CPP_PREFE=\
 	"..\..\include\preferences.h"\
 	
 
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1363,8 +1307,7 @@ DEP_CPP_PREFE=\
 	"..\..\include\preferences.h"\
 	
 
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1383,8 +1326,7 @@ DEP_CPP_PROPI=\
 	"..\include\mutex.h"\
 	
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1399,8 +1341,7 @@ DEP_CPP_PROPI=\
 	"..\include\mutex.h"\
 	
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1415,8 +1356,7 @@ DEP_CPP_PROPI=\
 	"..\include\mutex.h"\
 	
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1431,8 +1371,7 @@ DEP_CPP_PROPI=\
 	"..\include\mutex.h"\
 	
 
-"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1455,8 +1394,7 @@ NODEP_CPP_REGIS=\
 	"..\..\include\win32impl.h"\
 	
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1472,8 +1410,7 @@ DEP_CPP_REGIS=\
 	"..\..\include\registry.h"\
 	
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1489,8 +1426,7 @@ DEP_CPP_REGIS=\
 	"..\..\include\registry.h"\
 	
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1509,23 +1445,59 @@ NODEP_CPP_REGIS=\
 	"..\..\include\win32impl.h"\
 	
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
 
 SOURCE=..\..\src\registry.cpp
+
+!IF  "$(CFG)" == "fabaselib - Win32 Release"
+
 DEP_CPP_REGIST=\
 	"..\..\..\config\config.h"\
 	"..\..\include\registry.h"\
 	
 
-"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
+
+DEP_CPP_REGIST=\
+	"..\..\..\config\config.h"\
+	"..\..\include\registry.h"\
+	
+
+"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
+
+DEP_CPP_REGIST=\
+	"..\..\..\config\config.h"\
+	"..\..\include\registry.h"\
+	
+
+"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
+
+DEP_CPP_REGIST=\
+	"..\..\..\config\config.h"\
+	"..\..\include\registry.h"\
+	
+
+"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\src\semaphore.cpp
 DEP_CPP_SEMAP=\
@@ -1551,8 +1523,7 @@ NODEP_CPP_THREA=\
 	"..\..\src\solaristhread.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1564,8 +1535,7 @@ DEP_CPP_THREA=\
 	"..\include\win32thread.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1577,8 +1547,7 @@ DEP_CPP_THREA=\
 	"..\include\win32thread.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1595,8 +1564,7 @@ NODEP_CPP_THREA=\
 	"..\..\src\solaristhread.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1618,8 +1586,7 @@ DEP_CPP_UNDOM=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1637,8 +1604,7 @@ DEP_CPP_UNDOM=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1656,8 +1622,7 @@ DEP_CPP_UNDOM=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1675,8 +1640,7 @@ DEP_CPP_UNDOM=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\undomanager.obj" : $(SOURCE) $(DEP_CPP_UNDOM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1713,8 +1677,7 @@ DEP_CPP_UPDAT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\updatemanager.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\updatemanager.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1745,8 +1708,7 @@ DEP_CPP_UPDAT=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\updatemanager.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\updatemanager.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1777,8 +1739,7 @@ DEP_CPP_UPDAT=\
 	"..\include\semaphore.h"\
 	
 
-"$(INTDIR)\updatemanager.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\updatemanager.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1811,8 +1772,7 @@ DEP_CPP_UPDAT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\updatemanager.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\updatemanager.obj" : $(SOURCE) $(DEP_CPP_UPDAT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1831,8 +1791,7 @@ DEP_CPP_UTILI=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1845,8 +1804,7 @@ DEP_CPP_UTILI=\
 	"..\..\include\utility.h"\
 	
 
-"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1859,8 +1817,7 @@ DEP_CPP_UTILI=\
 	"..\..\include\utility.h"\
 	
 
-"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1875,8 +1832,7 @@ DEP_CPP_UTILI=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1893,8 +1849,7 @@ DEP_CPP_WIN32=\
 	"..\include\win32prefs.h"\
 	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1907,8 +1862,7 @@ DEP_CPP_WIN32=\
 	"..\include\win32prefs.h"\
 	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1921,8 +1875,7 @@ DEP_CPP_WIN32=\
 	"..\include\win32prefs.h"\
 	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1935,8 +1888,7 @@ DEP_CPP_WIN32=\
 	"..\include\win32prefs.h"\
 	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1952,8 +1904,7 @@ DEP_CPP_WIN32T=\
 	"..\include\win32thread.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1965,8 +1916,7 @@ DEP_CPP_WIN32T=\
 	"..\include\win32thread.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1978,8 +1928,7 @@ DEP_CPP_WIN32T=\
 	"..\include\win32thread.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1991,8 +1940,7 @@ DEP_CPP_WIN32T=\
 	"..\include\win32thread.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2029,8 +1977,7 @@ DEP_CPP_WIN32U=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2062,8 +2009,7 @@ DEP_CPP_WIN32U=\
 	"..\include\win32updatemanager.h"\
 	
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2095,8 +2041,7 @@ DEP_CPP_WIN32U=\
 	"..\include\win32updatemanager.h"\
 	
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2129,8 +2074,7 @@ DEP_CPP_WIN32U=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"\
- "..\..\..\config\config.h"
+"$(INTDIR)\win32updatemanager.obj" : $(SOURCE) $(DEP_CPP_WIN32U) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

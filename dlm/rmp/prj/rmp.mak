@@ -472,9 +472,6 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\rmp.dlf"
 !IF "$(CFG)" == "rmp - Win32 Release" || "$(CFG)" == "rmp - Win32 Debug" ||\
  "$(CFG)" == "rmp - Win32 NASM Release" || "$(CFG)" == "rmp - Win32 NASM Debug"
 SOURCE=..\..\..\lib\xml\src\Parse.cpp
-
-!IF  "$(CFG)" == "rmp - Win32 Release"
-
 DEP_CPP_PARSE=\
 	"..\..\..\base\include\debug.h"\
 	"..\..\..\base\include\errors.h"\
@@ -485,47 +482,6 @@ DEP_CPP_PARSE=\
 "$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "rmp - Win32 Debug"
-
-DEP_CPP_PARSE=\
-	"..\..\..\base\include\debug.h"\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\Parse.h"\
-	
-
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "rmp - Win32 NASM Release"
-
-DEP_CPP_PARSE=\
-	"..\..\..\base\include\debug.h"\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\Parse.h"\
-	
-
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "rmp - Win32 NASM Debug"
-
-DEP_CPP_PARSE=\
-	"..\..\..\base\include\debug.h"\
-	"..\..\..\base\include\errors.h"\
-	"..\..\..\config\config.h"\
-	"..\..\..\lib\xml\include\Parse.h"\
-	
-
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\rmp.cpp
 

@@ -674,8 +674,7 @@ DEP_CPP_BITMA=\
 	"..\..\include\Bitmap.h"\
 	
 
-"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -688,8 +687,7 @@ DEP_CPP_BITMA=\
 	"..\..\include\Bitmap.h"\
 	
 
-"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -702,8 +700,7 @@ DEP_CPP_BITMA=\
 	"..\..\include\Bitmap.h"\
 	
 
-"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -716,8 +713,7 @@ DEP_CPP_BITMA=\
 	"..\..\include\Bitmap.h"\
 	
 
-"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Bitmap.obj" : $(SOURCE) $(DEP_CPP_BITMA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -742,8 +738,7 @@ DEP_CPP_BUTTO=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -764,8 +759,7 @@ DEP_CPP_BUTTO=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -786,8 +780,7 @@ DEP_CPP_BUTTO=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -808,8 +801,7 @@ DEP_CPP_BUTTO=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ButtonControl.obj" : $(SOURCE) $(DEP_CPP_BUTTO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -828,8 +820,7 @@ DEP_CPP_CANVA=\
 	"..\..\include\Font.h"\
 	
 
-"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -844,8 +835,7 @@ DEP_CPP_CANVA=\
 	"..\..\include\Font.h"\
 	
 
-"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -860,8 +850,7 @@ DEP_CPP_CANVA=\
 	"..\..\include\Font.h"\
 	
 
-"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -876,42 +865,9 @@ DEP_CPP_CANVA=\
 	"..\..\include\Font.h"\
 	
 
-"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Canvas.obj" : $(SOURCE) $(DEP_CPP_CANVA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ENDIF 
-
-SOURCE=..\..\..\..\config\config.win32
-
-!IF  "$(CFG)" == "freeampui - Win32 Release"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
 
@@ -933,8 +889,7 @@ DEP_CPP_CONTR=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -954,8 +909,7 @@ DEP_CPP_CONTR=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -975,8 +929,7 @@ DEP_CPP_CONTR=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -996,8 +949,7 @@ DEP_CPP_CONTR=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Control.obj" : $(SOURCE) $(DEP_CPP_CONTR) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1008,68 +960,84 @@ SOURCE=..\..\src\DialControl.cpp
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 DEP_CPP_DIALC=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\Bitmap.h"\
 	"..\..\include\Canvas.h"\
 	"..\..\include\Control.h"\
 	"..\..\include\DialControl.h"\
 	"..\..\include\Font.h"\
+	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 DEP_CPP_DIALC=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\Bitmap.h"\
 	"..\..\include\Canvas.h"\
 	"..\..\include\Control.h"\
 	"..\..\include\DialControl.h"\
 	"..\..\include\Font.h"\
+	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 DEP_CPP_DIALC=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\Bitmap.h"\
 	"..\..\include\Canvas.h"\
 	"..\..\include\Control.h"\
 	"..\..\include\DialControl.h"\
 	"..\..\include\Font.h"\
+	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 DEP_CPP_DIALC=\
+	"..\..\..\..\base\include\debug.h"\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\Bitmap.h"\
 	"..\..\include\Canvas.h"\
 	"..\..\include\Control.h"\
 	"..\..\include\DialControl.h"\
 	"..\..\include\Font.h"\
+	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\DialControl.obj" : $(SOURCE) $(DEP_CPP_DIALC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1085,8 +1053,7 @@ DEP_CPP_FONT_=\
 	"..\..\include\Font.h"\
 	
 
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1098,8 +1065,7 @@ DEP_CPP_FONT_=\
 	"..\..\include\Font.h"\
 	
 
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1111,8 +1077,7 @@ DEP_CPP_FONT_=\
 	"..\..\include\Font.h"\
 	
 
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1124,8 +1089,7 @@ DEP_CPP_FONT_=\
 	"..\..\include\Font.h"\
 	
 
-"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Font.obj" : $(SOURCE) $(DEP_CPP_FONT_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1197,8 +1161,7 @@ NODEP_CPP_FREEA=\
 	"..\..\src\win32impl.h"\
 	
 
-"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1257,8 +1220,7 @@ DEP_CPP_FREEA=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1317,8 +1279,7 @@ DEP_CPP_FREEA=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1386,8 +1347,7 @@ NODEP_CPP_FREEA=\
 	"..\..\src\win32impl.h"\
 	
 
-"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\FreeAmpTheme.obj" : $(SOURCE) $(DEP_CPP_FREEA) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1412,8 +1372,7 @@ DEP_CPP_MULTI=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1434,8 +1393,7 @@ DEP_CPP_MULTI=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1456,8 +1414,7 @@ DEP_CPP_MULTI=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1478,8 +1435,7 @@ DEP_CPP_MULTI=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\MultiStateControl.obj" : $(SOURCE) $(DEP_CPP_MULTI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1496,8 +1452,7 @@ DEP_CPP_PARSE=\
 	"..\..\..\..\lib\xml\include\Parse.h"\
 	
 
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1510,8 +1465,7 @@ DEP_CPP_PARSE=\
 	"..\..\..\..\lib\xml\include\Parse.h"\
 	
 
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1524,8 +1478,7 @@ DEP_CPP_PARSE=\
 	"..\..\..\..\lib\xml\include\Parse.h"\
 	
 
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1538,8 +1491,7 @@ DEP_CPP_PARSE=\
 	"..\..\..\..\lib\xml\include\Parse.h"\
 	
 
-"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1564,8 +1516,7 @@ DEP_CPP_SLIDE=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1586,8 +1537,7 @@ DEP_CPP_SLIDE=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1608,8 +1558,7 @@ DEP_CPP_SLIDE=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1630,8 +1579,7 @@ DEP_CPP_SLIDE=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\SliderControl.obj" : $(SOURCE) $(DEP_CPP_SLIDE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1656,8 +1604,7 @@ DEP_CPP_TEXTC=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1678,8 +1625,7 @@ DEP_CPP_TEXTC=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1700,8 +1646,7 @@ DEP_CPP_TEXTC=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1722,8 +1667,7 @@ DEP_CPP_TEXTC=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\TextControl.obj" : $(SOURCE) $(DEP_CPP_TEXTC) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1775,8 +1719,7 @@ NODEP_CPP_THEME=\
 	"..\..\src\GTKWindow.h"\
 	
 
-"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1813,8 +1756,7 @@ DEP_CPP_THEME=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1851,8 +1793,7 @@ DEP_CPP_THEME=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1900,8 +1841,7 @@ NODEP_CPP_THEME=\
 	"..\..\src\GTKWindow.h"\
 	
 
-"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Theme.obj" : $(SOURCE) $(DEP_CPP_THEME) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1925,8 +1865,7 @@ DEP_CPP_THEMEM=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1944,8 +1883,7 @@ DEP_CPP_THEMEM=\
 	"..\..\include\ThemeZip.h"\
 	
 
-"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1963,8 +1901,7 @@ DEP_CPP_THEMEM=\
 	"..\..\include\ThemeZip.h"\
 	
 
-"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1984,8 +1921,7 @@ DEP_CPP_THEMEM=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ThemeManager.obj" : $(SOURCE) $(DEP_CPP_THEMEM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2005,8 +1941,7 @@ DEP_CPP_THEMEZ=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2021,8 +1956,7 @@ DEP_CPP_THEMEZ=\
 	"..\..\include\ThemeZip.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2037,8 +1971,7 @@ DEP_CPP_THEMEZ=\
 	"..\..\include\ThemeZip.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2054,8 +1987,7 @@ DEP_CPP_THEMEZ=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\ThemeZip.obj" : $(SOURCE) $(DEP_CPP_THEMEZ) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2080,8 +2012,7 @@ DEP_CPP_VSLID=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2102,8 +2033,7 @@ DEP_CPP_VSLID=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2124,8 +2054,7 @@ DEP_CPP_VSLID=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2146,8 +2075,7 @@ DEP_CPP_VSLID=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\VSliderControl.obj" : $(SOURCE) $(DEP_CPP_VSLID) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2165,8 +2093,7 @@ DEP_CPP_WIN32=\
 	"..\include\Win32Bitmap.h"\
 	
 
-"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2180,8 +2107,7 @@ DEP_CPP_WIN32=\
 	"..\include\Win32Bitmap.h"\
 	
 
-"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2195,8 +2121,7 @@ DEP_CPP_WIN32=\
 	"..\include\Win32Bitmap.h"\
 	
 
-"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2210,8 +2135,7 @@ DEP_CPP_WIN32=\
 	"..\include\Win32Bitmap.h"\
 	
 
-"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Bitmap.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2239,8 +2163,7 @@ DEP_CPP_WIN32C=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2264,8 +2187,7 @@ DEP_CPP_WIN32C=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2289,8 +2211,7 @@ DEP_CPP_WIN32C=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2314,8 +2235,7 @@ DEP_CPP_WIN32C=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Canvas.obj" : $(SOURCE) $(DEP_CPP_WIN32C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2333,8 +2253,7 @@ DEP_CPP_WIN32F=\
 	"..\include\Win32Font.h"\
 	
 
-"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2348,8 +2267,7 @@ DEP_CPP_WIN32F=\
 	"..\include\Win32Font.h"\
 	
 
-"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2363,8 +2281,7 @@ DEP_CPP_WIN32F=\
 	"..\include\Win32Font.h"\
 	
 
-"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2378,8 +2295,7 @@ DEP_CPP_WIN32F=\
 	"..\include\Win32Font.h"\
 	
 
-"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Font.obj" : $(SOURCE) $(DEP_CPP_WIN32F) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2400,8 +2316,7 @@ DEP_CPP_WIN32M=\
 	"..\..\include\MessageDialog.h"\
 	
 
-"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2418,8 +2333,7 @@ DEP_CPP_WIN32M=\
 	"..\..\include\MessageDialog.h"\
 	
 
-"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2436,8 +2350,7 @@ DEP_CPP_WIN32M=\
 	"..\..\include\MessageDialog.h"\
 	
 
-"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2454,8 +2367,7 @@ DEP_CPP_WIN32M=\
 	"..\..\include\MessageDialog.h"\
 	
 
-"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32MessageDialog.obj" : $(SOURCE) $(DEP_CPP_WIN32M) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2504,8 +2416,7 @@ NODEP_CPP_WIN32P=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2547,8 +2458,7 @@ DEP_CPP_WIN32P=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2590,8 +2500,7 @@ DEP_CPP_WIN32P=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2636,8 +2545,7 @@ NODEP_CPP_WIN32P=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32PreferenceWindow.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2670,8 +2578,7 @@ DEP_CPP_WIN32W=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2700,8 +2607,7 @@ DEP_CPP_WIN32W=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2730,8 +2636,7 @@ DEP_CPP_WIN32W=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2760,8 +2665,7 @@ DEP_CPP_WIN32W=\
 	"..\include\Win32Window.h"\
 	
 
-"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Win32Window.obj" : $(SOURCE) $(DEP_CPP_WIN32W) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2791,8 +2695,7 @@ DEP_CPP_WINDO=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2818,8 +2721,7 @@ DEP_CPP_WINDO=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2845,8 +2747,7 @@ DEP_CPP_WINDO=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2872,8 +2773,7 @@ DEP_CPP_WINDO=\
 	"..\..\include\Window.h"\
 	
 
-"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\Window.obj" : $(SOURCE) $(DEP_CPP_WINDO) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -2891,8 +2791,7 @@ DEP_RSC_FREEAM=\
 !IF  "$(CFG)" == "freeampui - Win32 Release"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
  "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
 
@@ -2900,8 +2799,7 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
  "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
@@ -2909,8 +2807,7 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
  "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
@@ -2918,8 +2815,7 @@ DEP_RSC_FREEAM=\
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\freeampui.res" : $(SOURCE) $(DEP_RSC_FREEAM) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i\
  "\FreeAmp\freeamp\ui\freeamp\win32\res" /d "NDEBUG" $(SOURCE)
 

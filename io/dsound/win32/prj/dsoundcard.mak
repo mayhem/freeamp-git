@@ -562,38 +562,6 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\dsoundcard.pmo"
 
 !ENDIF 
 
-SOURCE=..\..\..\..\config\config.win32
-
-!IF  "$(CFG)" == "dsoundcard - Win32 Release"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "dsoundcard - Win32 Debug"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Debug"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Release"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ENDIF 
-
 SOURCE=..\res\dsound.rc
 
 !IF  "$(CFG)" == "dsoundcard - Win32 Release"
@@ -665,8 +633,7 @@ DEP_CPP_DSOUN=\
 	"..\include\dsoundcardpmo.h"\
 	
 
-"$(INTDIR)\dsoundcardpmo.obj" : $(SOURCE) $(DEP_CPP_DSOUN) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\dsoundcardpmo.obj" : $(SOURCE) $(DEP_CPP_DSOUN) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -703,8 +670,7 @@ DEP_CPP_DSOUN=\
 	"..\include\dsoundcardpmo.h"\
 	
 
-"$(INTDIR)\dsoundcardpmo.obj" : $(SOURCE) $(DEP_CPP_DSOUN) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\dsoundcardpmo.obj" : $(SOURCE) $(DEP_CPP_DSOUN) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -741,8 +707,7 @@ DEP_CPP_DSOUN=\
 	"..\include\dsoundcardpmo.h"\
 	
 
-"$(INTDIR)\dsoundcardpmo.obj" : $(SOURCE) $(DEP_CPP_DSOUN) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\dsoundcardpmo.obj" : $(SOURCE) $(DEP_CPP_DSOUN) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -779,8 +744,7 @@ DEP_CPP_DSOUN=\
 	"..\include\dsoundcardpmo.h"\
 	
 
-"$(INTDIR)\dsoundcardpmo.obj" : $(SOURCE) $(DEP_CPP_DSOUN) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\dsoundcardpmo.obj" : $(SOURCE) $(DEP_CPP_DSOUN) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -821,8 +785,7 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -858,8 +821,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -895,8 +857,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -933,8 +894,7 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -975,8 +935,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1013,8 +972,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1051,8 +1009,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1089,8 +1046,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1131,8 +1087,7 @@ DEP_CPP_PMO_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1169,8 +1124,7 @@ DEP_CPP_PMO_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1207,8 +1161,7 @@ DEP_CPP_PMO_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1245,8 +1198,7 @@ DEP_CPP_PMO_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1267,8 +1219,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1285,8 +1236,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1303,8 +1253,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1321,8 +1270,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

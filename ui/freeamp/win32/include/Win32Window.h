@@ -79,6 +79,7 @@ class Win32Window : public Window
      void  SetStayOnTop(bool bStay);
      void  SetLiveInToolbar(bool bLive);
 	 void  MouseLeaveCheck(void);
+     void  AddToSystemMenu(HWND hWnd);
     
      HWND     m_hWnd;
      Pos      m_oWindowPos;

@@ -651,38 +651,6 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\xing.lmc"
 !IF "$(CFG)" == "xing - Win32 Release" || "$(CFG)" == "xing - Win32 Debug" ||\
  "$(CFG)" == "xing - Win32 NASM Release" || "$(CFG)" ==\
  "xing - Win32 NASM Debug"
-SOURCE=..\..\..\..\config\config.win32
-
-!IF  "$(CFG)" == "xing - Win32 Release"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
-
-InputPath=..\..\..\..\config\config.win32
-
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
-
-!ENDIF 
-
 SOURCE=..\..\..\..\io\src\eventbuffer.cpp
 
 !IF  "$(CFG)" == "xing - Win32 Release"
@@ -718,8 +686,7 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -755,8 +722,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -793,8 +759,7 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -830,8 +795,7 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -872,8 +836,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -910,8 +873,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -948,8 +910,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -986,8 +947,7 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1008,8 +968,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1026,8 +985,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1044,8 +1002,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1062,8 +1019,7 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1110,8 +1066,7 @@ DEP_CPP_CDCT_=\
 	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\cdct.obj" : $(SOURCE) $(DEP_CPP_CDCT_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cdct.obj" : $(SOURCE) $(DEP_CPP_CDCT_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1185,8 +1140,7 @@ DEP_CPP_CUPL3=\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1199,8 +1153,7 @@ DEP_CPP_CUPL3=\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1213,8 +1166,7 @@ DEP_CPP_CUPL3=\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1227,8 +1179,7 @@ DEP_CPP_CUPL3=\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1249,8 +1200,7 @@ NODEP_CPP_CWINM=\
 	"..\..\src\cwinq.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1263,8 +1213,7 @@ DEP_CPP_CWINM=\
 	"..\..\src\cwinb.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1281,8 +1230,7 @@ NODEP_CPP_CWINM=\
 	"..\..\src\cwinq.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1295,8 +1243,7 @@ DEP_CPP_CWINM=\
 	"..\..\src\cwinb.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1504,8 +1451,7 @@ DEP_CPP_L3DQ_=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1515,8 +1461,7 @@ DEP_CPP_L3INI=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1541,8 +1486,7 @@ DEP_CPP_MSIS_=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1556,8 +1500,7 @@ DEP_CPP_UPH_C=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1569,8 +1512,7 @@ DEP_CPP_UPH_C=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1582,8 +1524,7 @@ DEP_CPP_UPH_C=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1595,8 +1536,7 @@ DEP_CPP_UPH_C=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1608,8 +1548,7 @@ DEP_CPP_UPSF_=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1697,8 +1636,7 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1738,8 +1676,7 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1779,8 +1716,7 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1820,8 +1756,7 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
- "..\..\..\..\config\config.h"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

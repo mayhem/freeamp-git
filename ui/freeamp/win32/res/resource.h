@@ -159,17 +159,18 @@
 #define IDC_IMAGESONLY                  1058
 #define IDC_TEXTANDIMAGES               1059
 #define IDC_SAVECURRENTLIST             1060
-#define IDC_ITEM                        40001
-#define IDC_ABOUT                       40002
-#define IDC_OPEN                        40003
-#define IDC_SAVE                        40004
-#define IDC_PREF                        40005
-#define IDC_EXIT                        40006
-#define IDC_PLAY                        40007
-#define IDC_PAUSE                       40009
-#define IDC_NEXTSONG                    40010
-#define IDC_LASTSONG                    40011
-#define IDC_STOP                        40012
+
+// Do not change these values! These values are
+// synched to the FreeAmpMenuCommand values as defined
+// in FreeAmpTheme.h
+#define IDMC_MYMUSIC                     6900
+#define IDMC_PLAY                        6901
+#define IDMC_STOP                        6902
+#define IDMC_PAUSE                       6903
+#define IDMC_NEXTTRACK                   6904
+#define IDMC_PREVIOUSTRACK               6905
+#define IDMC_EXIT                        6906
+
 #define IDS_URL                         65535
 #define IDC_STATIC                      -1
 

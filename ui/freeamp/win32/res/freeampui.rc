@@ -299,6 +299,22 @@ BEGIN
     ICON            IDI_INFO,-1,7,7,21,20
 END
 
+IDM_TRAY MENU DISCARDABLE 
+BEGIN
+    POPUP "FreeAmp"
+    BEGIN
+        MENUITEM "&My Music...",                IDMC_MYMUSIC
+        MENUITEM SEPARATOR
+        MENUITEM "&Play",                       IDMC_PLAY
+        MENUITEM "&Pause",                      IDMC_PAUSE
+        MENUITEM "&Stop",                       IDMC_STOP
+        MENUITEM "&Next Track",                 IDMC_NEXTTRACK
+        MENUITEM "&Previous Track",             IDMC_PREVIOUSTRACK
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDMC_EXIT
+    END
+END
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

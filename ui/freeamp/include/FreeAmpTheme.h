@@ -45,6 +45,16 @@ enum TimeDisplayState
     kTimeRemaining
 };
 
+enum FreeAmpMenuCommand
+{
+    kMCMyMusic = 6900,
+    kMCPlay    = 6901,
+	kMCStop    = 6902,
+	kMCPause   = 6903,
+	kMCNext    = 6904,
+	kMCPrev    = 6905,
+	kMCExit    = 6906
+};
 
 class FreeAmpTheme : public UserInterface, public Theme
 {
@@ -59,6 +69,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         virtual void  LoadFreeAmpTheme(void);
         
         virtual void  HandleKeystroke(unsigned char cKey);
+        virtual bool  HandleMenuCommand(uint32 uCommand);
         virtual Error HandleControlMessage(string &oControlName, 
                                            ControlMessageEnum eMesg);
         virtual void  DropFiles(vector<string> *pFileList);
