@@ -51,9 +51,9 @@ ____________________________________________________________________________*/
 
 // default values
 const char*  kDefaultLibraryPath = "/boot/home/config/add-ons/freeamp";
-const char*  kDefaultUI = "FreeAmp.ui";
-const char*  kDefaultTextUI = "FreeAmpCmd.ui";
-const char*  kDefaultPMO = "Soundcard.pmo";
+const char*  kDefaultUI = "freeamp.ui";
+const char*  kDefaultTextUI = "freeampcmd.ui";
+const char*  kDefaultPMO = "soundcard.pmo";
 
 class LibDirFindHandle {
  public:
@@ -269,10 +269,10 @@ AppendToString(char **destPtr, const char *src, int32 length)
 
     if (oldStr)
     {
-        memcpy(newStr, oldStr, oldLen);
+        strncpy(newStr, oldStr, oldLen);
         delete[] oldStr;
     }
-    memcpy(newStr + oldLen, src, length);
+    strncpy(newStr + oldLen, src, length);
     newStr[newLen] = '\0';
     *destPtr = newStr;
 }
@@ -347,24 +347,18 @@ BeOSPrefEntry::
 
 BeOSPrefs::
 BeOSPrefs()
-:	m_prefsFilePath(0),
-	m_saveEnable(true),
-	m_changed(false),
-	m_errorLineNumber(0)
+:   m_prefsFilePath(0),
+    m_saveEnable(true),
+    m_changed(false),
+    m_errorLineNumber(0)
 {
-	BPath		prefPath;
-	if ( find_directory( B_USER_SETTINGS_DIRECTORY, &prefPath ) < B_NO_ERROR )
-	{
-        m_saveEnable = false;
-        return;
-	}
-	prefPath.Append( "freeamp.org" );
-	create_directory( prefPath.Path(), 0755 );
-	prefPath.Append( "freeamp_prefs" );
+    BPath prefPath( FreeampDir( NULL ) );
+    create_directory( prefPath.Path(), 0755 );
+    prefPath.Append( "preferences" );
 
     // Compute pathname of preferences file
-	m_prefsFilePath = new char[ strlen( prefPath.Path() ) + 1 ];
-	strcpy( m_prefsFilePath, prefPath.Path() );
+    m_prefsFilePath = new char[ strlen( prefPath.Path() ) + 1 ];
+    strcpy( m_prefsFilePath, prefPath.Path() );
 
     FILE *prefsFile = fopen(m_prefsFilePath, "r");
     if (!prefsFile && errno != ENOENT)
@@ -386,7 +380,7 @@ BeOSPrefs()
             lineNumber++;
 
             p = buffer;
-            while (*p && isspace(*p))
+            while (*p && (*p == ' ' && *p == '\t'))
                 p++;
 
             if (*p == '#')
@@ -406,19 +400,21 @@ BeOSPrefs()
                 int32 length;
                 
                 entry->key = ReadQuotableString(p, (const char **)&end, ":#");
-                if (entry->key && !m_ht.Value(entry->key))
+                if (entry->key && entry->key[0] == '/')
+                    continue;
+                else if (entry->key && !m_ht.Value(entry->key))
                     m_ht.Insert(entry->key, entry);
                 else if (!m_errorLineNumber)
                     m_errorLineNumber = lineNumber;
                 p = end;
                 
-                while (*p && isspace(*p))
+                while (*p && (*p == ' ' || *p == '\t'))
                     p++;
                 if (*p == ':')
                     p++;
                 else if (!m_errorLineNumber)
                     m_errorLineNumber = lineNumber;
-                while (*p && isspace(*p))
+                while (*p && (*p == ' ' || *p == '\t'))
                     p++;
                 
                 AppendToString(&entry->separator, end, p - end);
@@ -427,7 +423,6 @@ BeOSPrefs()
                 if (!entry->value && !m_errorLineNumber)
                     m_errorLineNumber = lineNumber;
                 p = end;
-                
                 length = strlen(p);
                 if (p[length - 1] != '\n')
                 {
@@ -473,14 +468,10 @@ SetDefaults()
     char buf[1024];
     uint32 size;
     
-    char cwd[_MAX_PATH]= {0x00};
-    
-    getcwd(cwd, sizeof(cwd));
-
     // set install directory value
     size = sizeof(buf);
     if (GetPrefString(kInstallDirPref, buf, &size) == kError_NoPrefValue)
-        SetPrefString(kInstallDirPref, cwd);
+        SetPrefString(kInstallDirPref, "Dummy");
 
     // set default freeamp library path value
     size = sizeof(buf);
@@ -547,7 +538,7 @@ Save()
     strcat(bakFilePath, bakSuffix);
 
     {
-        FILE *prefsFile = fopen(tmpFilePath, "w+");
+        FILE *prefsFile = fopen(tmpFilePath, "w");
         if (!prefsFile)
         {
             delete[] tmpFilePath;
@@ -646,7 +637,7 @@ GetPrefString(const char* pref, char* buf, uint32* len)
         return kError_BufferTooSmall;
     }
 
-    memcpy(buf, value, value_len);
+    strncpy(buf, value, value_len);
     *len = value_len;
     m_mutex.Release();
     return kError_NoErr;
@@ -727,8 +718,8 @@ GetFirstLibDir(char *path, uint32 *len)
         pPart = pCol + sizeof(char);
     }
 
-    pPath = (*hLibDirFind->m_pLibDirs)[0];
-    if (pPath) {
+    if (hLibDirFind->m_pLibDirs->size() > 0) {
+        pPath = (*hLibDirFind->m_pLibDirs)[0];
         strncpy(path,pPath,*len);
         *len = strlen(pPath);
     } else {
@@ -749,21 +740,16 @@ BeOSPrefs::
 GetNextLibDir(LibDirFindHandle *hLibDirFind, char *path, uint32 *len)
 {
     if (hLibDirFind) {
-        hLibDirFind->m_current++;
-        char *pPath = (*hLibDirFind->m_pLibDirs)[hLibDirFind->m_current];
-        if ( pPath &&
-             hLibDirFind->m_current < (int32)hLibDirFind->m_pLibDirs->size() )
-        {
+        if (++hLibDirFind->m_current < (int32)hLibDirFind->m_pLibDirs->size()) {
+            char *pPath = (*hLibDirFind->m_pLibDirs)[hLibDirFind->m_current];
             strncpy(path,pPath,*len);
             *len = strlen(pPath);
 //          cout << "returning next: " << path << endl;
             return kError_NoErr;
-        } else {
-            *path = '\0';
-            *len = 0;
-//          cout << "returning no next " << path << endl;
-            return kError_NoMoreLibDirs;
         }
+        *path = '\0';
+        *len = 0;
+//      cout << "returning no next " << path << endl;
     }
     return kError_NoMoreLibDirs;
 }
@@ -773,10 +759,11 @@ BeOSPrefs::
 GetLibDirClose(LibDirFindHandle *hLibDirFind)
 {
     if (hLibDirFind) {
-        vector <char*>::iterator i = hLibDirFind->m_pLibDirs->begin();
-
-        for (; i != hLibDirFind->m_pLibDirs->end(); i++)
-            delete *i;
+        while (hLibDirFind->m_pLibDirs->size() > 0)
+        {
+            delete (*(hLibDirFind->m_pLibDirs))[0];
+            hLibDirFind->m_pLibDirs->erase(hLibDirFind->m_pLibDirs->begin());
+        }
         delete hLibDirFind->m_pLibDirs;
         delete hLibDirFind;
     }

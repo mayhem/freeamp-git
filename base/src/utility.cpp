@@ -307,7 +307,7 @@ char *FreeampDir(Preferences *pref)
 {
     BPath prefPath;
     assert(find_directory(B_USER_SETTINGS_DIRECTORY, &prefPath) == B_NO_ERROR);
-    prefPath.Append( "freeamp.org" );
+    prefPath.Append( "freeamp" );
 
     const char *path = prefPath.Path();
     char *s = new char[strlen(path) + 1];
