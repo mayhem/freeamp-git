@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <sys/time.h>
 #include <unistd.h>
 #include <assert.h>
+#include <errno.h>
 
 #include "mutex.h"
 
