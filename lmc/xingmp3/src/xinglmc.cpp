@@ -762,7 +762,7 @@ Error XingLMC::BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
        printf("Buffering up...           \n");
        for(; !m_bExit;)
        {
-           sleep(1);
+           usleep(1000);
            iInPercent = m_pInputBuffer->GetBufferPercentage();
            iOutPercent = m_pOutputBuffer->GetBufferPercentage();
   	        printf("Input: %3d%% Output: %3d%%\r", iInPercent, iOutPercent);

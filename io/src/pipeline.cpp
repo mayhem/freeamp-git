@@ -24,7 +24,6 @@ ____________________________________________________________________________*/
 /* system headers */
 #include <stdlib.h>
 #include <iostream.h>
-#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
@@ -33,6 +32,7 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include <config.h>
+#include "pipeline.h"
 #include "pullbuffer.h"
 #include "eventbuffer.h"
 #include "facontext.h"

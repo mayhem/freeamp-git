@@ -62,8 +62,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                 ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
-            ..\..\..\..\base\win32\prj\plugins
+                  ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
+             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "fileinput - Win32 Debug"
@@ -95,8 +95,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                 ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
-            ..\..\..\..\base\win32\prj\plugins
+                  ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
+             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "fileinput - Win32 NASM Debug"
@@ -114,7 +114,7 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I "..\..\..\..\ui\include" /I "..\..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -130,8 +130,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                 ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
-            ..\..\..\..\base\win32\prj\plugins
+                  ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
+             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "fileinput - Win32 NASM Release"
@@ -163,8 +163,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                 ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
-            ..\..\..\..\base\win32\prj\plugins
+                  ..\..\..\..\base\win32\prj\plugins	copy fileinput.pmi\
+             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -224,10 +224,6 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\filebuffer.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\fileinput.def
 # End Source File
 # Begin Source File
@@ -245,6 +241,18 @@ SOURCE=..\..\..\..\base\src\log.cpp
 # Begin Source File
 
 SOURCE=..\..\..\..\base\win32\src\mutex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\pipeline.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\pmi.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\preferences.cpp
 # End Source File
 # Begin Source File
 

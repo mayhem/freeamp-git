@@ -41,12 +41,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "win32volume.h"
 
-#define BIT_SELECT  0x1f
-#define SLEEPTIME   256
-
-static const uint32 OBUFFERSIZE = 2 * 1152;
-
-class SoundCardPMO : public PhysicalMediaOutput, public EventBuffer
+class SoundCardPMO : public PhysicalMediaOutput
 {
 
 public:
@@ -54,20 +49,9 @@ public:
     virtual ~SoundCardPMO();
     
     virtual Error Init(OutputInfo* info);
-    virtual Error Pause();
-    virtual Error Resume();
-    virtual Error Break();
-    virtual void  WaitToQuit();
-    virtual Error Clear();
-
-    virtual Error SetPropManager(Properties *p);
     virtual VolumeManager *GetVolumeManager();
 
     static void   StartWorkerThread(void *);
-    virtual Error BeginWrite(void *&pBuffer, size_t &iBytesToWrite);
-    virtual Error EndWrite  (size_t iNumBytesWritten);
-    virtual Error AcceptEvent(Event *);
-    virtual int   GetBufferPercentage();
 
  
  private:
@@ -79,33 +63,27 @@ public:
     Error         FreeHeader();
     Error         AllocHeader(void *&pBuffer);
     Error         Write(void *pBuffer);
+	void          Pause(void);
+	void          Resume(void);
+	bool          WaitForDrain(void);
 
  private:
-    FAContext*      m_context;
+//    FAContext*      m_context;
 
-    Properties *    m_propManager;
-    Preferences*    m_prefs;
 	WAVEFORMATEX*	m_wfex;
 	LPWAVEHDR*		m_wavehdr_array;
 	HWAVEOUT		m_hwo;
 
-	uint32			m_index;
 	uint32			m_buffer[MAXCHANNELS];
 	uint32			m_channels;
 	uint32          m_samples_per_second;
-	uint32			m_buffer_count;
 	uint32			m_hdr_size;
-	uint32			m_fillup;
 	uint32			m_data_size;
 	uint32			m_num_headers;
-	bool			m_user_stop;
 	bool			m_initialized, m_bPaused;
 
     Thread         *m_pBufferThread;
-    Mutex          *m_pPauseMutex;
-    bool            m_bPause;
-    int             m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
-    int             m_iLastFrame;
+    int             m_iOutputBufferSize, m_iBaseTime, m_iBytesPerSample;
 	int             m_iHead, m_iTail, m_iOffset;
 };
 

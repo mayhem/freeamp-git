@@ -24,7 +24,6 @@ ____________________________________________________________________________*/
 /* system headers */
 #include <stdlib.h>
 #include <iostream.h>
-#include <sys/ioctl.h>
 #include <fcntl.h>
 //#include <sys/soundcard.h>
 #include <errno.h>
@@ -41,7 +40,6 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
 
 PhysicalMediaOutput::PhysicalMediaOutput(FAContext *context) :
                      PipelineUnit(context)
@@ -129,7 +127,7 @@ void PhysicalMediaOutput::Resume(void)
 
 bool PhysicalMediaOutput::WasteTime()
 {
-    usleep(50000);
+    usleep(10000);
 
     return m_bExit || m_bPause;
 }       

@@ -235,8 +235,7 @@ void HttpInput::LogError(char *szErrorMsg)
 #ifdef WIN32
    char *lpMessageBuffer;
 
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, N
-ULL,
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
                   WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                   (LPTSTR) &lpMessageBuffer, 0, NULL );
 
@@ -335,7 +334,7 @@ Error HttpInput::Open(void)
         iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
         if (!iRet)
         {
-		     usleep(100000);
+		   usleep(100000);
            continue;
         }
 

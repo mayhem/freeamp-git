@@ -24,20 +24,17 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #include <windows.h>
+#include <winbase.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* project headers */
-#include "config.h"
+//#include "config.h"
 #include "SoundCardPMO.h"
 #include "eventdata.h"
 #include "log.h"
 
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
-
-const int iDefaultBufferSize = 512 * 1024;
-const int iOrigBufferSize = 64 * 1024;
-const int iOverflowSize = 0;
-const int iWriteTriggerSize = 4192;
 
 Mutex *g_pHeaderMutex;
 
@@ -69,36 +66,26 @@ MCICallBack(HWAVEOUT hwo, UINT msg, DWORD dwInstance,
 }
 
 SoundCardPMO::SoundCardPMO(FAContext *context) :
-              EventBuffer(iOrigBufferSize, iOverflowSize, 
-                          iWriteTriggerSize, context)
+        PhysicalMediaOutput(context)
 {
    m_wfex = NULL;
    m_wavehdr_array = NULL;
    m_hwo = NULL;
 
-   m_index = 0;
    m_channels = 0;
    m_samples_per_second = 0;
-   m_buffer_count = 0;
    m_hdr_size = 0;
-   m_fillup = 0;
    m_data_size = 0;
-   m_user_stop = false;
    m_initialized = false;
    m_pBufferThread = NULL;
-   m_bExit = false;
-   m_pPauseMutex = new Mutex(); 
    g_pHeaderMutex = new Mutex(); 
-   m_iTotalBytesWritten = 0;
    m_iHead = 0;
    m_iTail = 0;
    m_iOffset = 0;
-   m_iLastFrame = -1;
-   m_bPaused = false;
-
-   m_context = context;
-   m_prefs = m_context->prefs;
-
+   m_iBaseTime = -1;
+   m_iBytesPerSample = 0;
+   m_num_headers = 0;
+   
    if (!m_pBufferThread)
    {
       m_pBufferThread = Thread::CreateThread();
@@ -110,24 +97,22 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
 SoundCardPMO::~SoundCardPMO()
 {
    m_bExit = true;
-   m_pWriteSem->Signal();
-   m_pReadSem->Signal();
-
-   m_pPauseMutex->Release();
+   m_pSleepSem->Signal();
+   m_pPauseSem->Signal();
 
    if (m_pBufferThread)
    {
       m_pBufferThread->Join();
       delete m_pBufferThread;
    }
-
+  
    if (m_initialized)
    {
       waveOutReset(m_hwo);
 
       while (waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
       {
-         Sleep(SLEEPTIME);
+         usleep(100000);
       }
 
       // Unprepare and free the header memory.
@@ -138,12 +123,6 @@ SoundCardPMO::~SoundCardPMO()
 
       delete []m_wavehdr_array;
       delete m_wfex;
-   }
-
-   if (m_pPauseMutex)
-   {
-      delete m_pPauseMutex;
-      m_pPauseMutex = NULL;
    }
    if (g_pHeaderMutex)
    {
@@ -161,33 +140,16 @@ Error SoundCardPMO::Init(OutputInfo * info)
 {
    Error     result = kError_UnknownErr;
    MMRESULT  mmresult = 0;
-   int32     iNewSize = iDefaultBufferSize;
 
    m_channels = info->number_of_channels;
    m_samples_per_second = info->samples_per_second;
    m_data_size = info->max_buffer_size;
-
-   m_context->prefs->GetOutputBufferSize(&iNewSize);
-   iNewSize *= 1024;
-
-   iNewSize -= iNewSize % m_data_size;
-   result = Resize(iNewSize, 0, m_data_size);
-   if (IsError(result))
-   {
-       ReportError("Internal buffer sizing error occurred.");
-       m_context->log->Error("Resize output buffer failed.");
-
-       return result;
-   }
 
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    m_num_headers = 32;
    m_hdr_size = sizeof(WAVEHDR);
    m_wavehdr_array = new LPWAVEHDR[m_num_headers];
-
-   m_fillup = 0;
-   m_user_stop = false;
 
    m_wfex = new WAVEFORMATEX;
 
@@ -232,103 +194,11 @@ Error SoundCardPMO::Init(OutputInfo * info)
       temp->dwLoops = 0;
       temp->dwFlags = NULL;
    }
-
-   for (i = 0; i < m_channels; i++)
-   {
-      m_buffer[i] = i * m_channels;
-   }
+   m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    m_initialized = true;
 
    return result;
-}
-
-void SoundCardPMO::WaitToQuit()
-{
-   if (m_pBufferThread)
-   {
-      m_pBufferThread->Join();
-      delete m_pBufferThread;
-      m_pBufferThread = NULL;
-   }
-} 
-
-int SoundCardPMO::GetBufferPercentage()
-{
-   return PullBuffer::GetBufferPercentage();
-}
-
-Error SoundCardPMO::Break()
-{
-   PullBuffer::BreakBlocks();
-
-   return kError_NoErr;
-}
-
-
-Error SoundCardPMO::Pause()
-{
-   if (m_bPaused)
-      return kError_NoErr;
-
-   m_pPauseMutex->Acquire();
-   waveOutPause(m_hwo);
-   m_bPaused = true;
-
-   return kError_NoErr;
-}
-
-Error SoundCardPMO::Resume()
-{
-   if (!m_bPaused)
-      return kError_NoErr;
-
-   m_pPauseMutex->Release();
-   waveOutRestart(m_hwo);
-   m_bPaused = false;
-
-   return kError_NoErr;
-}
-
-Error SoundCardPMO::SetPropManager(Properties * p)
-{
-   m_propManager = p;
-
-   return kError_NoErr;
-}
-
-Error SoundCardPMO::Reset(bool user_stop)
-{
-   Error     result = kError_NoErr;
-
-   if (user_stop)
-   {
-      m_user_stop = user_stop;
-
-      waveOutReset(m_hwo);
-   }
-
-   return result;
-}
-
-Error SoundCardPMO::BeginWrite(void *&pBuffer, size_t &iBytesToWrite)
-{
-   return EventBuffer::BeginWrite(pBuffer, iBytesToWrite);
-}
-
-Error SoundCardPMO::EndWrite(size_t iNumBytesWritten)
-{
-   return EventBuffer::EndWrite(iNumBytesWritten);
-}
-
-Error SoundCardPMO::AcceptEvent(Event *pEvent)
-{
-   return EventBuffer::AcceptEvent(pEvent);
-}
-
-Error SoundCardPMO::Clear()
-{
-   return EventBuffer::Clear();
 }
 
 void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
@@ -338,15 +208,11 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    int                 iTotalTime = 0;
    MMTIME              sTime;
 
-   if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
+   if (m_iBaseTime < 0)
    {
-//       m_iTotalBytesWritten = 1152 * pEvent->GetFrameNumber() *
-//                              m_iBytesPerSample;
-              
-       m_iTotalBytesWritten += 1152 * (pEvent->GetFrameNumber() - m_iLastFrame) *
-                              m_iBytesPerSample;
+       m_iBaseTime = (pEvent->GetFrameNumber() * 1152) / 
+                      m_samples_per_second;
    }
-   m_iLastFrame = pEvent->GetFrameNumber();
 
    if (m_samples_per_second <= 0)
       return;
@@ -354,10 +220,9 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    sTime.wType = TIME_BYTES;
    if (waveOutGetPosition(m_hwo, &sTime, sizeof(sTime)) != MMSYSERR_NOERROR)
        return;
-
-   iTotalTime = (m_iTotalBytesWritten + sTime.u.cb) /
-                (m_iBytesPerSample * m_samples_per_second);
    
+   iTotalTime = (sTime.u.cb / (m_samples_per_second * m_iBytesPerSample)) + m_iBaseTime;
+      
    hours = iTotalTime / 3600;
    minutes = (iTotalTime - 
                 (hours * 3600)) / 60;
@@ -365,19 +230,60 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 			    (hours * 3600) - 
 			    (minutes * 60);
 
-  /*char temp[1024];
-
-   wsprintf(temp, "Frame:%d\tTotalBytes: %d\tTotalTime: %d\t%d:%.02d:%.02d\r\n",
-       pEvent->GetFrameNumber(), m_iTotalBytesWritten, iTotalTime, hours, minutes, seconds);
-
-   OutputDebugString(temp);*/
-
    if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59)
       return;
 
    pmtpi = new MediaTimeInfoEvent(hours, minutes, seconds, 0,
                                   (float)iTotalTime, 0);
-   m_target->AcceptEvent(pmtpi);
+   m_pTarget->AcceptEvent(pmtpi);
+}
+
+bool SoundCardPMO::WaitForDrain(void)
+{
+   unsigned iLoop;
+
+   for(; !m_bExit && !m_bPause; )
+   {   
+       g_pHeaderMutex->Acquire();
+
+	   for(iLoop = 0; iLoop < m_num_headers; iLoop++)
+       {
+           if ((int)m_wavehdr_array[iLoop]->dwUser >= 0)
+			   break;
+	   }
+	   g_pHeaderMutex->Release();
+
+	   if (iLoop == m_num_headers)
+	   {
+		  return true;
+	   }
+	   WasteTime();
+   }
+   return false;
+}
+
+void SoundCardPMO::Pause(void)
+{
+    m_iBaseTime = -1;
+
+    waveOutPause(m_hwo);
+
+    PhysicalMediaOutput::Pause();
+}
+
+void SoundCardPMO::Resume(void)
+{
+	if (m_initialized)
+	   waveOutRestart(m_hwo);
+	
+	PhysicalMediaOutput::Resume();
+}
+
+Error SoundCardPMO::Reset(bool user_stop)
+{
+   waveOutPause(m_hwo);
+
+   return kError_NoErr;
 }
 
 Error SoundCardPMO::Write(void *pBuffer)
@@ -396,12 +302,7 @@ Error SoundCardPMO::Write(void *pBuffer)
 
    // Prepare & write newest header
    waveOutPrepareHeader(m_hwo, wavhdr, m_hdr_size);
-
-   m_pPauseMutex->Acquire(WAIT_FOREVER);
-
    waveOutWrite(m_hwo, wavhdr, m_hdr_size);
-
-   m_pPauseMutex->Release();
 
    return result;
 }
@@ -410,18 +311,22 @@ Error SoundCardPMO::AllocHeader(void *&pBuffer)
 {
     Error    eRet;
     unsigned iRead;
+	static char *pSaved = NULL;
 
     iRead = m_iOffset + m_data_size;
-    eRet = BeginRead(pBuffer, iRead);
+    eRet = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, iRead);
     if (eRet != kError_NoErr)
        return eRet;
 
-    eRet = EndRead(0);
+    eRet = ((EventBuffer *)m_pInputBuffer)->EndRead(0);
     if (eRet != kError_NoErr)
        return eRet;
 
+    if (pSaved == NULL)
+	   pSaved = (char *)pBuffer;
+	   
     pBuffer = (char *)pBuffer + m_iOffset;
-    WrapPointer(pBuffer);
+    ((EventBuffer *)m_pInputBuffer)->WrapPointer(pBuffer);
 
     m_iOffset += m_data_size;
 
@@ -435,13 +340,11 @@ Error SoundCardPMO::FreeHeader()
     unsigned  iRead;
 
     iRead = m_data_size;
-    eRet = BeginRead(pBuffer, iRead);
+    eRet = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, iRead);
     if (eRet != kError_NoErr)
        return eRet;
 
-//  assert(iRead == m_data_size);
-
-    eRet = EndRead(iRead);
+    eRet = ((EventBuffer *)m_pInputBuffer)->EndRead(iRead);
     if (eRet != kError_NoErr)
        return eRet;
 
@@ -508,21 +411,30 @@ void SoundCardPMO::WorkerThread(void)
    Event      *pEvent;
    int         iValue;
 
-   m_prefs->GetDecoderThreadPriority(&iValue);
+   // Don't do anything until resume is called.
+   m_pPauseSem->Wait();
 
+   m_pContext->prefs->GetDecoderThreadPriority(&iValue);
    m_pBufferThread->SetPriority(iValue);
 
-
-   m_bPause = false;
    for(; !m_bExit;)
    {
+      if (m_bPause)
+      {
+          m_pPauseSem->Wait();
+          continue;
+      }
+
+      // Loop until we get an Init event from the LMC
       if (!m_initialized)
       {
-          pEvent = GetEvent();
+          pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
 
           if (pEvent == NULL)
           {
-              m_pReadSem->Wait();
+              m_pLmc->Wake();
+              WasteTime();
+
               continue;
           }
 
@@ -530,66 +442,80 @@ void SoundCardPMO::WorkerThread(void)
           {
               if (IsError(Init(((PMOInitEvent *)pEvent)->GetInfo())))
               {
-                  delete (PMOInitEvent *)pEvent;
+                  delete pEvent;
                   break;
               }
-              delete (PMOInitEvent *)pEvent;
-          }
-		  else
-    		  delete pEvent;
+		  }
+          delete pEvent;
 
           continue;
       }
 
-      eErr = AllocHeader(pBuffer);
-      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
+      // Set up reading a block from the buffer. If not enough bytes are
+      // available, sleep for a little while and try again.
+      for(;;)
       {
-          m_pReadSem->Wait();
-          continue;
-      }
+		  if (m_bPause || m_bExit)
+			  break;
+	      
+          eErr = AllocHeader(pBuffer);
+		  if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
+             break;
 
-      if (eErr == kError_EventPending)
-      {
-          pEvent = GetEvent();
-
-          if (pEvent->Type() == PMO_Init)
-		  {
-              Init(((PMOInitEvent *)pEvent)->GetInfo());
-			  delete (PMOInitEvent *)pEvent;
-		  }
-		  else
-          if (pEvent->Type() == PMO_Reset)
-		  {
-              Reset(false);
-			  delete (PMOResetEvent *)pEvent;
-		  }
-		  else
-          if (pEvent->Type() == PMO_Info)
-		  {
-              HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
-			  delete (PMOTimeInfoEvent *)pEvent;
-		  } 
-		  else
-          if (pEvent->Type() == PMO_Quit)
+          if (eErr == kError_NoDataAvail)
           {
-              Reset(false);
-              delete (PMOQuitEvent *)pEvent;
-              break;
+              m_pLmc->Wake();
+    
+              WasteTime();
+              continue;
           }
 
-          continue;
-      }
+          // Is there an event pending that we need to take care of
+          // before we play this block of samples?
+          if (eErr == kError_EventPending)
+          {
+              pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
 
-      if (IsError(eErr))
-      {
-          ReportError("Internal error occured.");
-          m_context->log->Error("Cannot read from buffer in PMO worker tread: %d\n",
-              eErr);
+              if (pEvent->Type() == PMO_Init)
+                  Init(((PMOInitEvent *)pEvent)->GetInfo());
+    
+              if (pEvent->Type() == PMO_Reset)
+                  Reset(true);
+    
+              if (pEvent->Type() == PMO_Info) 
+                  HandleTimeInfoEvent((PMOTimeInfoEvent *)pEvent);
+    
+              if (pEvent->Type() == PMO_Quit) 
+              {
+                  delete pEvent;
+                  if (WaitForDrain())
+                     m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+
+                  return;
+              }
+ 
+              delete pEvent;
+    
+              continue;
+          }
+          
+          if (IsError(eErr))
+          {
+              ReportError("Internal error occured.");
+              m_pContext->log->Error("Cannot read from buffer in PMO "
+                                    "worker tread: %d\n", eErr);
+              return;
+          }
           break;
       }
+	  if (m_bPause || m_bExit)
+		 continue;
 
       Write(pBuffer);
+	  m_pLmc->Wake();
+
    }
-   m_context->log->Log(LogDecode, "PMO: Soundcard thread exiting\n");
+
+   m_pContext->log->Log(LogDecode, "PMO: Soundcard thread exiting\n");
 }    
 

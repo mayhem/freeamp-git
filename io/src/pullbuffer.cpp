@@ -36,6 +36,7 @@ ____________________________________________________________________________*/
 #define min(a,b) ((a) < (b) ? (a) : (b))
 #endif
 #define DB //printf("%s:%d\n",  __FILE__, __LINE__);
+#include "debug.hpp"
 
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,
@@ -300,8 +301,11 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
 
    m_iWriteIndex = m_iWriteIndex + iBytesWritten;
    if ((uint32)m_iWriteIndex > m_iBufferSize)
+   {  
+      assert(m_iOverflowSize > 0);
       memmove(m_pPullBuffer, m_pPullBuffer + m_iBufferSize,
               m_iWriteIndex - m_iBufferSize);
+   }
 
    m_iWriteIndex %= m_iBufferSize;
    m_iBytesInBuffer += iBytesWritten;
@@ -376,7 +380,7 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t iBytesNeeded)
    // We need to copy the beginning part of the buffer into the
    // overflow.
    iOverflow = (m_iReadIndex + iBytesNeeded) - m_iBufferSize; 
-   if (iOverflow > (int)m_iOverflowSize)
+   if (m_iOverflowSize != 0 && iOverflow > (int)m_iOverflowSize)
    {
        m_pMutex->Release();
        m_context->log->Error("Overflow buffer is too small!! \n"
@@ -385,7 +389,7 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t iBytesNeeded)
 
        return kError_InvalidParam;
    } 
-   if (iOverflow > 0)
+   if (m_iOverflowSize != 0 && iOverflow > 0)
        memcpy(m_pPullBuffer + m_iBufferSize, m_pPullBuffer, iOverflow);
 
    m_iBytesToRead = iBytesNeeded;
