@@ -26,6 +26,9 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 
+#include <set>
+using namespace std;
+
 #include <gtk/gtk.h>
 
 #include "ui.h"
@@ -93,7 +96,8 @@ class GTKMusicBrowser {
     bool Visible(void) { return isVisible; }
     Error AcceptEvent(Event *e);
 
-    uint32 m_currentindex;
+    uint32 m_lastindex;
+    set<uint32> m_plSelected;
     
     PlaylistSortType m_playlistColumnSort;
     int m_playlistLastSort;

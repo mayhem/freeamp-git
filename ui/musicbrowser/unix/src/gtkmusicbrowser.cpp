@@ -314,7 +314,7 @@ void GTKMusicBrowser::AddFileCMD()
 
                         while ((temp = strtok(NULL, "\n"))) {
                             AddTrackPlaylistEvent(temp);
-                            m_currentindex++;
+                            m_lastindex++;
                         }
                         AddTrackPlaylistEvent(first);
                     }
@@ -326,7 +326,7 @@ void GTKMusicBrowser::AddFileCMD()
         }
 
         if (playNow) {
-            m_currentindex = 0;
+            m_lastindex = 0;
             PlayEvent();
         }
     }
@@ -604,13 +604,13 @@ void GTKMusicBrowser::CreatePlaylist(void)
 
 void GTKMusicBrowser::DeleteListEvent(void)
 {
-    if (m_currentindex == kInvalidIndex)
+    if (m_lastindex == kInvalidIndex)
         return;
 
     m_plm->RemoveAll();
     if (master)
         m_context->target->AcceptEvent(new Event(CMD_Stop));
-    m_currentindex = kInvalidIndex;
+    m_lastindex = kInvalidIndex;
 }
 
 void GTKMusicBrowser::SetClickState(ClickState newState)
@@ -629,7 +629,7 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
                                  "/Edit/Add Stream to Favorites"), FALSE);
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Edit/Remove Items from My Music"), FALSE);
-        if (m_currentindex != 0) {
+        if (m_lastindex != 0 && m_plSelected.size() == 1) {
             gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                      "/Edit/Move Up"), TRUE);
             gtk_widget_set_sensitive(toolUp, TRUE);
@@ -639,7 +639,8 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
                                      "/Edit/Move Up"), FALSE);
             gtk_widget_set_sensitive(toolUp, FALSE);
         }
-        if (m_currentindex != m_plm->CountItems() - 1) {
+        if (m_lastindex != m_plm->CountItems() - 1 && m_plSelected.size() == 1) 
+        {
             gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                      "/Edit/Move Down"), TRUE);
             gtk_widget_set_sensitive(toolDown, TRUE);
@@ -808,11 +809,13 @@ void GTKMusicBrowser::DeletePlaylistItem(uint32 loc)
 void GTKMusicBrowser::DeleteEvent(void)
 {
     if (GetClickState() == kContextPlaylist) {
-        DeletePlaylistItem(m_currentindex);
+        set<uint32>::reverse_iterator i = m_plSelected.rbegin();
+        for (; i != m_plSelected.rend(); i++)
+            DeletePlaylistItem(*i);
     }
     else if (GetClickState() == kContextBrowser) {
-        vector<TreeData *>::iterator i = mbSelections->begin();
-        for (; i != mbSelections->end(); i++) {
+        vector<TreeData *>::reverse_iterator i = mbSelections->rbegin();
+        for (; i != mbSelections->rend(); i++) {
             switch ((*i)->type) {
                 case kTreePlaylist: {
                     m_context->catalog->RemovePlaylist((*i)->playlistname.c_str());
@@ -825,18 +828,19 @@ void GTKMusicBrowser::DeleteEvent(void)
                     break; }
                 case kTreeAlbum: {
                     AlbumList *list = (*i)->album;
-                    vector<PlaylistItem *>::iterator j = 
-                                                     list->m_trackList->begin();
-                    for (; j != list->m_trackList->end(); j++) 
+                    vector<PlaylistItem *>::reverse_iterator j = 
+                                                    list->m_trackList->rbegin();
+                    for (; j != list->m_trackList->rend(); j++) 
                         m_context->catalog->RemoveSong((*j)->URL().c_str());
                     break; }
                 case kTreeArtist: {
                     ArtistList *list = (*i)->artist;
-                    vector<AlbumList *>::iterator j = list->m_albumList->begin();
-                    for (; j != list->m_albumList->end(); j++) {
-                        vector<PlaylistItem *>::iterator k =
-                                                     (*j)->m_trackList->begin();
-                        for (; k != (*j)->m_trackList->end(); k++) 
+                    vector<AlbumList *>::reverse_iterator j = 
+                                                list->m_albumList->rbegin();
+                    for (; j != list->m_albumList->rend(); j++) {
+                        vector<PlaylistItem *>::reverse_iterator k =
+                                                    (*j)->m_trackList->rbegin();
+                        for (; k != (*j)->m_trackList->rend(); k++) 
                             m_context->catalog->RemoveSong((*k)->URL().c_str());
                     }
                     break; }
@@ -849,20 +853,20 @@ void GTKMusicBrowser::DeleteEvent(void)
 
 void GTKMusicBrowser::MoveUpEvent(void)
 {
-    if (m_currentindex == 0 || m_currentindex == kInvalidIndex)
+    if (m_lastindex == 0 || m_lastindex == kInvalidIndex)
         return;
-    m_plm->SwapItems(m_currentindex, m_currentindex - 1);
-    m_currentindex--;
+    m_plm->SwapItems(m_lastindex, m_lastindex - 1);
+    m_lastindex--;
     UpdatePlaylistList();
 }
 
 void GTKMusicBrowser::MoveDownEvent(void)
 {
-    if (m_currentindex == m_plm->CountItems() - 1 || 
-        m_currentindex == kInvalidIndex)
+    if (m_lastindex == m_plm->CountItems() - 1 || 
+        m_lastindex == kInvalidIndex)
         return;
-    m_plm->SwapItems(m_currentindex, m_currentindex + 1);
-    m_currentindex++;
+    m_plm->SwapItems(m_lastindex, m_lastindex + 1);
+    m_lastindex++;
     UpdatePlaylistList();
 }
 
@@ -873,8 +877,8 @@ void GTKMusicBrowser::MoveItemEvent(int source, int dest)
 
 void GTKMusicBrowser::AddTrackPlaylistEvent(char *path)
 {
-    if (m_currentindex == kInvalidIndex)
-        m_currentindex = 0;
+    if (m_lastindex == kInvalidIndex)
+        m_lastindex = 0;
 
     char *tempurl;
     bool additReally = false;
@@ -896,7 +900,7 @@ void GTKMusicBrowser::AddTrackPlaylistEvent(char *path)
     }
 
     if (additReally)
-        m_plm->AddItem(tempurl, m_currentindex);
+        m_plm->AddItem(tempurl, m_lastindex);
 
     if (needToDelete)
         delete [] tempurl;
@@ -904,9 +908,9 @@ void GTKMusicBrowser::AddTrackPlaylistEvent(char *path)
 
 void GTKMusicBrowser::AddTrackPlaylistEvent(PlaylistItem *newitem)
 {
-    if (m_currentindex == kInvalidIndex)
-        m_currentindex = 0;
-    m_plm->AddItem(newitem, m_currentindex, true);
+    if (m_lastindex == kInvalidIndex)
+        m_lastindex = 0;
+    m_plm->AddItem(newitem, m_lastindex, true);
 }
 
 void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
@@ -916,10 +920,10 @@ void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
     bool play = false;
     int playPos = 0;
 
-    if (m_currentindex == kInvalidIndex)
-        m_currentindex = 0;
+    if (m_lastindex == kInvalidIndex)
+        m_lastindex = 0;
     else if (end)
-        m_currentindex = m_plm->CountItems();
+        m_lastindex = m_plm->CountItems();
 
     if (master && (m_plm->CountItems() == 0)) {
         bool playNow = false;
@@ -929,9 +933,9 @@ void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
             play = true;
     }
     else 
-        playPos = m_currentindex;
+        playPos = m_lastindex;
 
-    m_plm->AddItems(newlist, m_currentindex, true);
+    m_plm->AddItems(newlist, m_lastindex, true);
 
     if (forceNoPlay)
         play = false;
@@ -939,7 +943,7 @@ void GTKMusicBrowser::AddTracksPlaylistEvent(vector<PlaylistItem *> *newlist,
         play = true;
 
     if (play) {
-        m_currentindex = playPos;
+        m_lastindex = playPos;
         PlayEvent();
     }
 }
@@ -952,7 +956,7 @@ void GTKMusicBrowser::AddTracksDoubleClick(vector<PlaylistItem *> *newlist)
 
     if (playNow) {
         DeleteListEvent();
-        m_currentindex = 0;
+        m_lastindex = 0;
         AddTracksPlaylistEvent(newlist, true, true);
     }
     else
@@ -961,7 +965,7 @@ void GTKMusicBrowser::AddTracksDoubleClick(vector<PlaylistItem *> *newlist)
 
 void GTKMusicBrowser::PlayEvent(void)
 {
-    m_plm->SetCurrentIndex(m_currentindex);
+    m_plm->SetCurrentIndex(m_lastindex);
     m_context->target->AcceptEvent(new Event(CMD_Play));
 }
 
@@ -994,11 +998,15 @@ void GTKMusicBrowser::PopUpInfoEditor(PlaylistItem *editee)
     }
 
     if (GetClickState() == kContextPlaylist) {
-        if (m_currentindex == kInvalidIndex)
+        if (m_lastindex == kInvalidIndex)
             return;
    
         vector<PlaylistItem *> *list = new vector<PlaylistItem *>;
-        list->push_back(m_plm->ItemAt(m_currentindex));
+
+        set<uint32>::iterator i = m_plSelected.begin();
+        for (; i != m_plSelected.end(); i++)
+            list->push_back(m_plm->ItemAt(*i));
+
         infoeditorUI *infoedit = new infoeditorUI(m_context, m_plm, list);
         infoedit->DisplayInfo();
     }
@@ -1180,7 +1188,7 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     m_context = context;
     m_initialized = false;
     isVisible = false;
-    m_currentindex = 0;
+    m_lastindex = 0;
     m_currentListName = "";
     m_state = kStateCollapsed;
     statusContext = 0;

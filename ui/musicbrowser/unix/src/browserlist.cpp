@@ -206,8 +206,8 @@ void GTKMusicBrowser::AddPlaylistItems(vector<PlaylistItem *> *items)
     RenumberPlaylistList(minpos);
 
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
-    gtk_clist_select_row(GTK_CLIST(playlistList), m_currentindex, 0);
-    gtk_clist_moveto(GTK_CLIST(playlistList), m_currentindex, 0, 0.5, -1);
+    gtk_clist_select_row(GTK_CLIST(playlistList), m_lastindex, 0);
+    gtk_clist_moveto(GTK_CLIST(playlistList), m_lastindex, 0, 0.5, -1);
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
 
@@ -231,8 +231,8 @@ void GTKMusicBrowser::RemovePlaylistItems(vector<uint32> *indices)
     RenumberPlaylistList(minpos);
 
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
-    gtk_clist_select_row(GTK_CLIST(playlistList), m_currentindex, 0);
-    gtk_clist_moveto(GTK_CLIST(playlistList), m_currentindex, 0, 0.5, -1);
+    gtk_clist_select_row(GTK_CLIST(playlistList), m_lastindex, 0);
+    gtk_clist_moveto(GTK_CLIST(playlistList), m_lastindex, 0, 0.5, -1);
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
 
@@ -312,8 +312,8 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
     else
         gtk_clist_columns_autosize(GTK_CLIST(playlistList));
 
-    gtk_clist_select_row(GTK_CLIST(playlistList), m_currentindex, 0);
-    gtk_clist_moveto(GTK_CLIST(playlistList), m_currentindex, 0, 0.5, -1);
+    gtk_clist_select_row(GTK_CLIST(playlistList), m_lastindex, 0);
+    gtk_clist_moveto(GTK_CLIST(playlistList), m_lastindex, 0, 0.5, -1);
     ChangeCurrentPlayingIndex(m_playingindex, m_playingindex);
     gtk_clist_thaw(GTK_CLIST(playlistList));
 }
@@ -344,10 +344,18 @@ static void set_current_index_internal(GtkWidget *widget, int row, int column,
                                        GdkEventButton *button,
                                        GTKMusicBrowser *p)
 {
-    p->m_currentindex = row;
+    p->m_lastindex = row;
+    p->m_plSelected.insert(row);
     if (button && button->type == GDK_2BUTTON_PRESS)
         p->PlayEvent();
     p->SetClickState(kContextPlaylist);
+}
+
+static void unset_current_index_internal(GtkWidget *widget, int row, int column,
+                                         GdkEventButton *button,
+                                         GTKMusicBrowser *p)
+{
+    p->m_plSelected.erase(row);
 }
 
 static gboolean list_drag_drop_internal(GtkWidget *widget,
@@ -459,7 +467,7 @@ static void list_drag_rec_internal(GtkWidget *widget, GdkDragContext *context,
             if (dest_info.insert_pos == GTK_CLIST_DRAG_AFTER)
                 dest_info.cell.row++;
 
-            p->m_currentindex = dest_info.cell.row;
+            p->m_lastindex = dest_info.cell.row;
             p->AddTracksPlaylistEvent(newlist);
 
             p->SetClickState(kContextPlaylist);
@@ -610,7 +618,7 @@ static void list_clicked(GtkWidget *w, GdkEventButton *event,
 
         gtk_clist_get_selection_info(clist, (int)event->x, 
                                      (int)event->y, &row, NULL);
-        p->m_currentindex = row;
+        p->m_lastindex = row;
         gtk_clist_select_row(clist, row, 0);
         p->PlaylistRightClick((int)event->x_root, 
                               (int)event->y_root,
@@ -643,6 +651,10 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
                        GTK_SIGNAL_FUNC(playlist_row_move_internal), this);
     gtk_signal_connect(GTK_OBJECT(playlistList), "select_row",
                        GTK_SIGNAL_FUNC(set_current_index_internal), this);
+    gtk_signal_connect(GTK_OBJECT(playlistList), "unselect_row",
+                       GTK_SIGNAL_FUNC(unset_current_index_internal), this);
+    gtk_clist_set_selection_mode(GTK_CLIST(playlistList),
+                                 GTK_SELECTION_EXTENDED);
     GtkTargetEntry new_clist_target_table[2] = {
         {"gtk-clist-drag-reorder", 0, 0},
         {"tree-drag", 0, 1}
@@ -673,7 +685,7 @@ void GTKMusicBrowser::CreatePlaylistList(GtkWidget *box)
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_widget_show(playlistList);
 
-    m_currentindex = m_plm->GetCurrentIndex();
+    m_lastindex = m_plm->GetCurrentIndex();
 
     UpdatePlaylistList();
 }

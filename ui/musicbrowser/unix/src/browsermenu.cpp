@@ -72,7 +72,7 @@ static void add_tool(GtkWidget *widget, GTKMusicBrowser *p)
                             p->GetContext()->player->IsSupportedExtension(ext)) 
                         {
                             p->AddTrackPlaylistEvent(temp);
-                            p->m_currentindex++;
+                            p->m_lastindex++;
                         }
                     }
                     if (ext)
@@ -261,7 +261,7 @@ static void add_track(GTKMusicBrowser *p, guint action, GtkWidget *w)
             first = strtok(filereturn, "\n");
             while ((temp = strtok(NULL, "\n"))) {
                 p->AddTrackPlaylistEvent(temp);
-                p->m_currentindex++;
+                p->m_lastindex++;
             }
             p->AddTrackPlaylistEvent(first);
        }
@@ -303,10 +303,13 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
     string urlToDel;
  
     if (p->GetClickState() == kContextPlaylist) {
-        urlToDel = p->GetContext()->plm->ItemAt(p->m_currentindex)->URL();
+        set<uint32>::reverse_iterator i = p->m_plSelected.rbegin();
+        for (; i != p->m_plSelected.rend(); i++) {
+            urlToDel = p->GetContext()->plm->ItemAt(*i)->URL();
 
-        if (p->AskToDelete(urlToDel)) 
-            p->DeletePlaylistItem(p->m_currentindex);
+            if (p->AskToDelete(urlToDel)) 
+                p->DeletePlaylistItem(*i);
+        }
     }
     else if (p->GetClickState() == kContextBrowser) {
         vector<TreeData *>::iterator i = p->mbSelections->begin();
@@ -319,11 +322,12 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
                 urlToDel = (*i)->track->URL();
             else if (type == kTreeArtist) {
                 ArtistList *list = (*i)->artist;
-                vector<AlbumList *>::iterator j = list->m_albumList->begin();
-                for (; j != list->m_albumList->end(); j++) {
-                    vector<PlaylistItem *>::iterator k = 
-                                                     (*j)->m_trackList->begin();
-                    for (; k != (*j)->m_trackList->end(); k++) {
+                vector<AlbumList *>::reverse_iterator j = 
+                                                 list->m_albumList->rbegin();
+                for (; j != list->m_albumList->rend(); j++) {
+                    vector<PlaylistItem *>::reverse_iterator k = 
+                                                    (*j)->m_trackList->rbegin();
+                    for (; k != (*j)->m_trackList->rend(); k++) {
                         urlToDel = (*k)->URL();
                         if (p->AskToDelete(urlToDel))
                             p->GetContext()->catalog->RemoveSong(urlToDel.c_str());
@@ -332,8 +336,9 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
             }
             else if (type == kTreeAlbum) {
                 AlbumList *list = (*i)->album;
-                vector<PlaylistItem *>::iterator j = list->m_trackList->begin();
-                for (; j != list->m_trackList->end(); j++) {
+                vector<PlaylistItem *>::reverse_iterator j = 
+                                                   list->m_trackList->rbegin();
+                for (; j != list->m_trackList->rend(); j++) {
                     urlToDel = (*j)->URL();
                     if (p->AskToDelete(urlToDel))
                         p->GetContext()->catalog->RemoveSong(urlToDel.c_str());
@@ -342,7 +347,8 @@ static void delete_sel(GTKMusicBrowser *p, guint action, GtkWidget *w)
             else
                 continue;
 
-            if (p->AskToDelete(urlToDel)) {
+            if (p->AskToDelete(urlToDel) && 
+                (type == kTreeTrack || type == kTreePlaylist)) {
                 switch (type) {
                     case kTreePlaylist: {
                         p->GetContext()->catalog->RemovePlaylist(urlToDel.c_str());
