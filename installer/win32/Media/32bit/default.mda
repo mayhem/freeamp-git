@@ -7,10 +7,10 @@ count=2
 LANGUAGEDEFAULT=0009
 
 [GeneralInfo]
-MEDIATYPE=144M
-DATAASFILES=No
+MEDIATYPE=CDROM
+DATAASFILES=Yes
 BUILDTYPE=Full
-BuildLocation=C:\Local\src\freeamp\installer\win32\Media\32bit
+BuildLocation=C:\TEMP\freeamp\installer\win32\Media\32bit
 BREAKBYTOPCOMPONENT=No
 REFRESH_DATAFILES=Yes
 REFRESH_SPLASH=Yes

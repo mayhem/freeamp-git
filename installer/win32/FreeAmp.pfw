@@ -21,7 +21,7 @@ Type=2
 Compress=1
 Sign=0
 Transfer=0
-Files=15
+Files=45
 
 [Engine]
 Setup=disk1\SETUP.EXE
@@ -56,96 +56,275 @@ Method=0
 
 ; ~~~~~~~~~~ File Section ~~~~~~~~~~~
 [SubFolders]
-Count=2
+Count=1
 Folder1=disk1
-Folder2=disk2
 
 [File 1]
-Name=DATA.TAG
+Name=Authors.txt
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 2]
-Name=data1.cab
+Name=Changes.txt
 Path=Media\32bit\Disk Images\disk1\
-Flags=2097153
+Flags=1
 Disk=0
 
 [File 3]
-Name=lang.dat
+Name=Copying.txt
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 4]
-Name=layout.bin
+Name=DATA.TAG
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 5]
-Name=os.dat
+Name=data1.cab
+Path=Media\32bit\Disk Images\disk1\
+Flags=2097153
+Disk=0
+
+[File 6]
+Name=download.ui
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
-[File 6]
-Name=SETUP.EXE
-Path=Media\32bit\Disk Images\disk1\
-Flags=589825
-Disk=0
-
 [File 7]
-Name=SETUP.INI
+Name=dsoundcard.pmo
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 8]
-Name=setup.ins
+Name=fileinput.pmi
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 9]
-Name=setup.lid
+Name=freeamp.cnt
 Path=Media\32bit\Disk Images\disk1\
 Flags=1
 Disk=0
 
 [File 10]
+Name=freeamp.exe
+Path=Media\32bit\Disk Images\disk1\
+Flags=65537
+Disk=0
+
+[File 11]
+Name=freeamp.fat
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 12]
+Name=freeamp.hlp
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 13]
+Name=freeamp.ui
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 14]
+Name=httpinput.pmi
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 15]
+Name=id3v1.mdf
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 16]
+Name=id3v2.mdf
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 17]
+Name=inetwh32.dll
+Path=Media\32bit\Disk Images\disk1\
+Flags=131089
+Disk=0
+
+[File 18]
+Name=lang.dat
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 19]
+Name=layout.bin
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 20]
+Name=m3u.plf
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 21]
+Name=MakeTheme.exe
+Path=Media\32bit\Disk Images\disk1\
+Flags=65537
+Disk=0
+
+[File 22]
+Name=misc.mdf
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 23]
+Name=msvcp50.dll
+Path=Media\32bit\Disk Images\disk1\
+Flags=131089
+Disk=0
+
+[File 24]
+Name=musicbrowser.ui
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 25]
+Name=obsinput.pmi
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 26]
+Name=os.dat
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 27]
+Name=pls.plf
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 28]
+Name=portio.sys
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 29]
+Name=ReadMe.txt
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 30]
+Name=rmp.dlf
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 31]
+Name=roboex32.dll
+Path=Media\32bit\Disk Images\disk1\
+Flags=131089
+Disk=0
+
+[File 32]
+Name=SETUP.EXE
+Path=Media\32bit\Disk Images\disk1\
+Flags=589825
+Disk=0
+
+[File 33]
+Name=SETUP.INI
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 34]
+Name=setup.ins
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 35]
+Name=setup.lid
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 36]
+Name=soundcard.pmo
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 37]
+Name=ThemeHowTo.txt
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 38]
+Name=toolbar.ui
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 39]
+Name=update.exe
+Path=Media\32bit\Disk Images\disk1\
+Flags=65537
+Disk=0
+
+[File 40]
+Name=xing.lmc
+Path=Media\32bit\Disk Images\disk1\
+Flags=1
+Disk=0
+
+[File 41]
 Name=_INST32I.EX_
 Path=Media\32bit\Disk Images\disk1\
 Flags=524289
 Disk=0
 
-[File 11]
+[File 42]
 Name=_ISDEL.EXE
 Path=Media\32bit\Disk Images\disk1\
 Flags=589825
 Disk=0
 
-[File 12]
+[File 43]
 Name=_SETUP.DLL
 Path=Media\32bit\Disk Images\disk1\
 Flags=655377
 Disk=0
 
-[File 13]
+[File 44]
 Name=_sys1.cab
 Path=Media\32bit\Disk Images\disk1\
 Flags=2097153
 Disk=0
 
-[File 14]
+[File 45]
 Name=_user1.cab
 Path=Media\32bit\Disk Images\disk1\
 Flags=2097153
 Disk=0
-
-[File 15]
-Name=data2.cab
-Path=Media\32bit\Disk Images\disk2\
-Flags=2097153
-Disk=1
