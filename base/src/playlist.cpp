@@ -240,7 +240,8 @@ SendInfoToPlayer()
         }
         else
         {
-            MediaInfoEvent *pMIE = new MediaInfoEvent(pli->URL(), 0);
+			// LEAK
+            /*LEAK*/MediaInfoEvent *pMIE = new MediaInfoEvent(pli->URL(), 0);
 
             m_target->AcceptEvent(pMIE);
         }
@@ -918,6 +919,7 @@ ExpandM3U(char *szM3UFile, List<char *> &MP3List)
 
 		 if (strlen(szLine))
 		 {
+			 //LEAK
 			 szMP3 = new char[strlen(szLine) + 1];
 			 strcpy(szMP3, szLine);
 			 MP3List.AddItem(szMP3);

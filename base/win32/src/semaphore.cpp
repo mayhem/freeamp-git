@@ -26,7 +26,7 @@ ____________________________________________________________________________*/
 
 Semaphore::Semaphore(int cnt) {
     m_count = cnt;
-    m_sem = CreateSemaphore(NULL, 
+    /*LEAK*/m_sem = CreateSemaphore(NULL, 
 		    				cnt,
 							1024,
 							""); 

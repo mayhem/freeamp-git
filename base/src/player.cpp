@@ -310,7 +310,8 @@ SetArgs(int32 argc, char **argv)
    m_argc = argList.CountItems();
    if (m_argc)
    {
-      m_argv = new pchar[m_argc];
+	   //LEAK
+	   m_argv = new pchar[m_argc];
       for (int f = 0; f < m_argc; f++)
       {
          m_argv[f] = argList.ItemAt(f);

@@ -94,7 +94,7 @@ Initialize()
 
         // check for plugins directory in cwd
 
-		HANDLE h = FindFirstFile(foo,&win32fd);
+		/*LEAK*/HANDLE h = FindFirstFile(foo,&win32fd);
 
 		if (h != INVALID_HANDLE_VALUE) 
         {

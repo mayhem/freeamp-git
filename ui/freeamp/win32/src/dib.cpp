@@ -83,9 +83,9 @@ Create( uint32 width,
 
     m_bytesPerLine = imageSize / m_height;
 
-    m_bits = (BYTE*)malloc(imageSize);
+    /*LEAK*/m_bits = (BYTE*)malloc(imageSize);
 
-    m_bitmapInfo = (BITMAPINFO*)malloc( sizeof BITMAPINFO + 
+    /*LEAK*/m_bitmapInfo = (BITMAPINFO*)malloc( sizeof BITMAPINFO + 
                                         sizeof RGBQUAD *
                                         NumberOfPaletteEntries());
 
@@ -181,8 +181,10 @@ Load(HANDLE module, LPCTSTR resource)
 
                 m_bytesPerLine = imageSize / m_height;
 
+				//LEAK
                 m_bits = (BYTE*)malloc(imageSize);
 
+				// LEAK
                 m_bitmapInfo = (BITMAPINFO*)malloc( sizeof BITMAPINFO + 
                                                     sizeof RGBQUAD *
                                                     numEntries);

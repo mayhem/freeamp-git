@@ -60,7 +60,7 @@ View(hwnd, parent, viewRegion)
     m_viewDying = false;
     m_pressed   = false;
 
-    InitializeCriticalSection(&m_criticalSection);
+    /*LEAK*/InitializeCriticalSection(&m_criticalSection);
 
     // create the text bitmap
     m_textBitmap = new DIB;
@@ -76,7 +76,7 @@ View(hwnd, parent, viewRegion)
     SetText("");
 
     m_thread = NULL;
-    m_semaphore = new Semaphore(1);
+    /*LEAK*/m_semaphore = new Semaphore(1);
 
     if(flags & TextType_Wiggle)
     {
@@ -241,7 +241,7 @@ SetText(char* text)
         delete [] m_text;
     }
 
-    m_text = new char[strlen(text) + 1];
+    /*LEAK*/m_text = new char[strlen(text) + 1];
     strcpy(m_text, text);
 
     int32 textLength = 0;
@@ -282,7 +282,7 @@ SetText(char* text)
         }
 
         // create new bitmap
-        m_textBitmap = new DIB;
+        /*LEAK*/m_textBitmap = new DIB;
         m_textBitmap->Create(   m_bitmapLength, 
                                 m_fontHeight, 
                                 m_fontBitmap->BitsPerPixel());

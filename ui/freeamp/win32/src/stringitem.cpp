@@ -75,7 +75,7 @@ SetText(char* text)
             m_text = NULL;
         }
 
-        m_text = new char[strlen(text) + 1];
+        /*LEAK*/m_text = new char[strlen(text) + 1];
         strcpy(m_text, text);
 
         int32 textLength = 0;
@@ -101,7 +101,7 @@ SetText(char* text)
             m_textBitmap = NULL;
         }
 
-        m_textBitmap = new DIB;
+        /*LEAK*/m_textBitmap = new DIB;
         m_textBitmap->Create(   textLength, 
                                 m_fontHeight, 
                                 m_fontBitmap->BitsPerPixel());

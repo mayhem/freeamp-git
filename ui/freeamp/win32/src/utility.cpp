@@ -47,7 +47,7 @@ DetermineRegion(DIB* bitmap,
     height = bitmap->Height();
 
     // empty region
-    result = CreateRectRgn(0,0,0,0);
+    /*LEAK*/result = CreateRectRgn(0,0,0,0);
 
     for(int32 y = 0; y < height; y++)
     {
@@ -73,7 +73,7 @@ DetermineRegion(DIB* bitmap,
                 scanning = false;
                 // regions are non-inclusive of their bottom & right edges
                 // so need to add one to values
-                scanline = CreateRectRgn(start, y, x, y + 1);
+                /*LEAK*/scanline = CreateRectRgn(start, y, x, y + 1);
 
                 CombineRgn( result,
                             result,
@@ -87,7 +87,7 @@ DetermineRegion(DIB* bitmap,
         // last pixel in scanline is included in region...
         if(scanning)
         {
-            scanline = CreateRectRgn(start, y, x, y + 1);
+            /*LEAK*/scanline = CreateRectRgn(start, y, x, y + 1);
 
             CombineRgn( result,
                         result,
@@ -113,7 +113,7 @@ DetermineControlRegions(DIB* bitmap,
     for(i = 0; i < numControls; i++)
     {
         // empty region
-        controlRegions[i] = CreateRectRgn(0,0,0,0);
+        /*LEAK*/controlRegions[i] = CreateRectRgn(0,0,0,0);
     }
 
     regionColors = new uint32[numControls];
@@ -148,7 +148,7 @@ DetermineControlRegions(DIB* bitmap,
                     scanning = false;
                     // regions are non-inclusive of their bottom
                     // & right edges so need to add one
-                    scanline = CreateRectRgn(start, y, x, y + 1);
+                    /*LEAK*/scanline = CreateRectRgn(start, y, x, y + 1);
 
                     CombineRgn( controlRegions[scanIndex],
                                 controlRegions[scanIndex],

@@ -1348,114 +1348,114 @@ CreateControls()
 {
     m_viewList = new LinkedList<View*>();
 
-    m_backgroundView = new BitmapView(  m_hwnd, 
+    /*LEAK*/m_backgroundView = new BitmapView(  m_hwnd, 
                                         NULL, 
                                         m_windowRegion, 
                                         m_bodyBitmap);
 
-    m_playlistBackView = new BitmapView(m_hwnd, 
+    /*LEAK*/m_playlistBackView = new BitmapView(m_hwnd, 
                                         NULL, 
                                         m_playlistBodyRegion, 
                                         m_playlistBodyBitmap);
 
     m_playlistBackView->Hide();
 
-    m_playView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_playView = new ButtonView(m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kPlayControl], 
                                 m_playBitmap,
                                 kPlayControl);
 
-    m_stopView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_stopView = new ButtonView(m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kPlayControl], 
                                 m_stopBitmap,
                                 kStopControl);
     m_stopView->Hide();
 
-    m_pauseView = new ButtonView(   m_hwnd, 
+    /*LEAK*/m_pauseView = new ButtonView(   m_hwnd, 
                                     m_backgroundView, 
                                     m_controlRegions[kPauseControl], 
                                     m_pauseBitmap,
                                     kPauseControl,
                                     ButtonType_ToggleButton);
 
-    m_nextView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_nextView = new ButtonView(m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kNextControl], 
                                 m_nextBitmap,
                                 kNextControl);
 
-    m_lastView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_lastView = new ButtonView(m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kLastControl], 
                                 m_lastBitmap,
                                 kLastControl);
 
-    m_modeView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_modeView = new ButtonView(m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kModeControl], 
                                 m_modeBitmap,
                                 kModeControl);
 
-    m_minimizeView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_minimizeView = new ButtonView(m_hwnd, 
                                     m_backgroundView, 
                                     m_controlRegions[kMinimizeControl], 
                                     m_minimizeBitmap,
                                     kMinimizeControl);
 
-    m_closeView = new ButtonView(   m_hwnd, 
+    /*LEAK*/m_closeView = new ButtonView(   m_hwnd, 
                                     m_backgroundView, 
                                     m_controlRegions[kCloseControl], 
                                     m_closeBitmap,
                                     kCloseControl);
 
-    m_repeatView = new ButtonView(  m_hwnd, 
+    /*LEAK*/m_repeatView = new ButtonView(  m_hwnd, 
                                     m_backgroundView, 
                                     m_controlRegions[kRepeatControl], 
                                     m_repeatBitmap,
                                     kRepeatControl);
 
-    m_shuffleView = new ButtonView( m_hwnd, 
+    /*LEAK*/m_shuffleView = new ButtonView( m_hwnd, 
                                     m_backgroundView, 
                                     m_controlRegions[kShuffleControl], 
                                     m_shuffleBitmap,
                                     kShuffleControl);
 
-    m_openView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_openView = new ButtonView(m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kOpenControl], 
                                 m_openBitmap,
                                 kOpenControl);
 
-    m_volumeView = new DialView(m_hwnd, 
+    /*LEAK*/m_volumeView = new DialView(m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kVolumeControl], 
                                 m_dialBitmap,
                                 kVolumeControl);
 
-    m_seekView = new DialView(  m_hwnd, 
+    /*LEAK*/m_seekView = new DialView(  m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kSeekControl], 
                                 m_dialBitmap,
                                 kSeekControl);
 
-    m_shuffleIconView = new StatusView( m_hwnd, 
+    /*LEAK*/m_shuffleIconView = new StatusView( m_hwnd, 
                                         m_backgroundView, 
                                         m_controlRegions[kShuffleStatusControl], 
                                         m_shuffleIconBitmap);
 
-    m_repeatIconView = new StatusView(  m_hwnd, 
+    /*LEAK*/m_repeatIconView = new StatusView(  m_hwnd, 
                                         m_backgroundView, 
                                         m_controlRegions[kRepeatStatusControl], 
                                         m_repeatIconBitmap);
 
-    m_repeatAllIconView = new StatusView(   m_hwnd, 
+    /*LEAK*/m_repeatAllIconView = new StatusView(   m_hwnd, 
                                             m_backgroundView, 
                                             m_controlRegions[kRepeatAllStatusControl], 
                                             m_repeatAllIconBitmap);
 
-    m_songTitleView = new TextView( m_hwnd, 
+    /*LEAK*/m_songTitleView = new TextView( m_hwnd, 
                                     m_backgroundView, 
                                     m_controlRegions[kSongTitleControl], 
                                     m_smallFontBitmap,
@@ -1466,7 +1466,7 @@ CreateControls()
 
 	m_songTitleView->SetText("Welcome to FreeAmp");
 
-    m_timeView = new TimeView(  m_hwnd, 
+    /*LEAK*/m_timeView = new TimeView(  m_hwnd, 
                                 m_backgroundView, 
                                 m_controlRegions[kSongInfoControl], 
                                 //m_timeBackgroundBitmap,
@@ -1481,7 +1481,7 @@ CreateControls()
 
     m_timeView->SetLabel("current");
 
-    m_volumeInfoView = new VolumeView(  m_hwnd, 
+    /*LEAK*/m_volumeInfoView = new VolumeView(  m_hwnd, 
                                         m_backgroundView, 
                                         m_controlRegions[kSongInfoControl], 
                                         m_timeBackgroundBitmap,
@@ -1495,7 +1495,7 @@ CreateControls()
 
     m_volumeInfoView->Hide();
 
-    m_panelBackingView = new BitmapView(m_hwnd, 
+    /*LEAK*/m_panelBackingView = new BitmapView(m_hwnd, 
                                         NULL, 
                                         m_controlRegions[kPanelBackingControl], 
                                         m_panelBackingBitmap, 
@@ -1503,21 +1503,21 @@ CreateControls()
 
     m_panelBackingView->Hide();
 
-    m_drawerView = new BitmapView(  m_hwnd, 
+    /*LEAK*/m_drawerView = new BitmapView(  m_hwnd, 
                                     NULL, 
                                     m_controlRegions[kPlaylistControl], 
                                     m_drawerBitmap, 
                                     m_drawerMaskBitmap, 
                                     kPlaylistControl);
 
-    m_playlistView = new ListView(  m_hwnd,
+    /*LEAK*/m_playlistView = new ListView(  m_hwnd,
                                     NULL,
                                     m_controlRegions[kPlaylistDisplayControl],
                                     MULTIPLE_SELECTION_LIST);
     
     m_playlistView->Hide();
 
-    m_scrollbarView = new ScrollView(   m_hwnd,
+    /*LEAK*/m_scrollbarView = new ScrollView(   m_hwnd,
                                         NULL,
                                         m_controlRegions[kScrollbarControl],
                                         m_scrollbarBitmap,
@@ -1527,28 +1527,28 @@ CreateControls()
 
     m_scrollbarView->SetTarget(m_playlistView);
 
-    m_addView = new ButtonView( m_hwnd, 
+    /*LEAK*/m_addView = new ButtonView( m_hwnd, 
                                 m_panelBackingView, 
                                 m_controlRegions[kAddControl], 
                                 m_addBitmap,
                                 kAddControl);
     m_addView->Hide();
 
-    m_deleteView = new ButtonView(  m_hwnd, 
+    /*LEAK*/m_deleteView = new ButtonView(  m_hwnd, 
                                     m_panelBackingView, 
                                     m_controlRegions[kDeleteControl], 
                                     m_deleteBitmap,
                                     kDeleteControl);
     m_deleteView->Hide();
 
-    m_loadView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_loadView = new ButtonView(m_hwnd, 
                                 m_panelBackingView, 
                                 m_controlRegions[kLoadControl], 
                                 m_loadBitmap,
                                 kLoadControl);
     m_loadView->Hide();
 
-    m_saveView = new ButtonView(m_hwnd, 
+    /*LEAK*/m_saveView = new ButtonView(m_hwnd, 
                                 m_panelBackingView, 
                                 m_controlRegions[kSaveControl], 
                                 m_saveBitmap,
@@ -1700,92 +1700,119 @@ LoadBitmaps()
         m_playerCanvas = new DIB;
         m_playerCanvas->Create(m_width, m_height, 24);
 
+		//LEAK
         m_bodyBitmap = new DIB;
         m_bodyBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_BODY));
 
-        m_playlistBodyBitmap = new DIB;
+		//LEAK
+		m_playlistBodyBitmap = new DIB;
         m_playlistBodyBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PLAYLIST_BODY));
 
+		//LEAK
         m_playBitmap = new DIB;
         m_playBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PLAY));
 
+		//LEAK
         m_stopBitmap = new DIB;
         m_stopBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_STOP));
 
+		//LEAK
         m_pauseBitmap = new DIB;
         m_pauseBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PAUSE));
 
+		//LEAK
         m_nextBitmap = new DIB;
         m_nextBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_NEXT));
 
+		//LEAK
         m_lastBitmap = new DIB;
         m_lastBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_LAST));
 
+		//LEAK
         m_modeBitmap = new DIB;
         m_modeBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_MODE));
 
+		//LEAK
         m_minimizeBitmap = new DIB;
         m_minimizeBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_MINIMIZE));
 
+		//LEAK
         m_closeBitmap = new DIB;
         m_closeBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_CLOSE));
 
+		//LEAK
         m_repeatBitmap = new DIB;
         m_repeatBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_REPEAT));
 
+		//LEAK
         m_shuffleBitmap = new DIB;
         m_shuffleBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SHUFFLE));
 
+		//LEAK
         m_openBitmap = new DIB;
         m_openBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_OPEN));
 
+		//LEAK
         m_dialBitmap = new DIB;
         m_dialBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DIALS));
 
+		//LEAK
         m_shuffleIconBitmap = new DIB;
         m_shuffleIconBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SHUFFLED_ICON));
 
+		//LEAK
         m_repeatIconBitmap = new DIB;
         m_repeatIconBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_REPEAT_ICON));
 
+		//LEAK
         m_repeatAllIconBitmap = new DIB;
         m_repeatAllIconBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_REPEAT_ALL_ICON));
 
+		//LEAK
         m_smallFontBitmap = new DIB;
         m_smallFontBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SMALL_FONT));
 
+		//LEAK
         m_largeFontBitmap = new DIB;
         m_largeFontBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_BIG_FONT));
 
+		//LEAK
         m_timeBackgroundBitmap = new DIB;
         m_timeBackgroundBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_TIME_BACK)); 
 
+		//LEAK
         m_drawerBitmap = new DIB;
         m_drawerBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DRAWER)); 
 
+		//LEAK
         m_panelBackingBitmap = new DIB;
         m_panelBackingBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PANEL_BACKING));
 
+		//LEAK
         m_scrollbarBitmap = new DIB;
         m_scrollbarBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SCROLLBAR));
 
+		//LEAK
         m_addBitmap = new DIB;
         m_addBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_ADD));
 
+		//LEAK
         m_deleteBitmap = new DIB;
         m_deleteBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DELETE));
 
+		//LEAK
         m_loadBitmap = new DIB;
         m_loadBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_LOAD));
 
+		//LEAK
         m_saveBitmap = new DIB;
         m_saveBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_SAVE));
     }
 
-    m_drawerMaskBitmap = new DIB;
+    /*LEAK*/m_drawerMaskBitmap = new DIB;
     m_drawerMaskBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_DRAWER_MASK));
 
-    m_panelBackingMaskBitmap = new DIB;
+    /*LEAK*/m_panelBackingMaskBitmap = new DIB;
     m_panelBackingMaskBitmap->Load(g_hinst, MAKEINTRESOURCE(IDB_PANEL_BACKING_MASK));
 
     /*DIB test;
@@ -1913,7 +1940,7 @@ InitializeRegions()
                             kNumControls - kPlaylistDisplayControl);
 
     // then determine what is the player body and what is a control
-    m_playerRegion = CreateRectRgn(0,0,0,0);
+    /*LEAK*/m_playerRegion = CreateRectRgn(0,0,0,0);
 
     CombineRgn( m_playerRegion,
                 m_playerRegion,
@@ -1933,7 +1960,7 @@ InitializeRegions()
 
     GetRgnBox(m_controlRegions[kPlaylistControl], &rect);
 
-    m_playListRegion = CreateRectRgn(rect.left,rect.top,rect.right,rect.bottom);
+    /*LEAK*/m_playListRegion = CreateRectRgn(rect.left,rect.top,rect.right,rect.bottom);
 
     rect.left++;
     rect.right--;
@@ -1954,7 +1981,7 @@ InitializeRegions()
     rect.bottom = rect.top;
     rect.top = rect.bottom - 92;
 
-    rectRgn = CreateRectRgn(rect.left,rect.top,rect.right,rect.bottom);
+    /*LEAK*/rectRgn = CreateRectRgn(rect.left,rect.top,rect.right,rect.bottom);
 
     CombineRgn( m_playListRegion,
                 m_playListRegion,
@@ -2374,7 +2401,7 @@ UpdatePlayList()
                 //char buffer[256];
                 //sprintf(buffer, "This is StringItem #%d", i);
 
-                StringItem* item = new StringItem(  playlistItem->StringForPlayerToDisplay(),
+                /*LEAK*/StringItem* item = new StringItem(  playlistItem->StringForPlayerToDisplay(),
                                                     m_smallFontBitmap,
                                                     10,
                                                     smallFontWidth);
