@@ -21,6 +21,7 @@
         $Id$
 ____________________________________________________________________________*/
 
+#define STRICT
 #include <windows.h>
 #include <windowsx.h>
 #include <sys/types.h>
@@ -162,7 +163,7 @@ void MusicBrowserUI::RemoveEvent(void)
         if(0 < DialogBoxParam(g_hinst, 
                               MAKEINTRESOURCE(IDD_REMOVETRACKS),
                               m_hWnd, 
-                              (int (__stdcall *)(void))::RemoveTracksDlgProc, 
+                              ::RemoveTracksDlgProc, 
                               (LPARAM)&deleteFromDrive))
         {       
             vector<PlaylistItem*> items;
@@ -282,7 +283,7 @@ void MusicBrowserUI::StartStopMusicSearch(void)
     if(0 < DialogBoxParam(g_hinst, 
                           MAKEINTRESOURCE(IDD_MUSICSEARCH),
                           m_hWnd, 
-                          (int (__stdcall *)(void))::MusicSearchDlgProc, 
+                          ::MusicSearchDlgProc, 
                           (LPARAM )this))
     {
         
@@ -406,7 +407,7 @@ void MusicBrowserUI::EditInfoEvent()
     if(0 < DialogBoxParam(g_hinst, 
                           MAKEINTRESOURCE(IDD_EDITINFO),
                           m_hWnd, 
-                          (int (__stdcall *)(void))::EditTrackInfoDlgProc, 
+                          ::EditTrackInfoDlgProc, 
                           (LPARAM )this))
     {
         for(track = items.begin(); track != items.end(); track++)

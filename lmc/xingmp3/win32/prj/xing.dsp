@@ -507,7 +507,7 @@ InputPath=..\..\src\msisasm.asm
 InputName=msisasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	c:\local\bin\nasm.exe -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 
@@ -519,7 +519,7 @@ InputPath=..\..\src\msisasm.asm
 InputName=msisasm
 
 "$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	nasm.exe -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 # End Custom Build
 

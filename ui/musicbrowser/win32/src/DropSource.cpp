@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/
 
 // system header files
+#define STRICT
 #include <windows.h>
 #include <commctrl.h>
 #include <stdio.h>

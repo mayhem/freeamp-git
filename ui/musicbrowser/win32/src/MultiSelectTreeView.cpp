@@ -21,6 +21,7 @@
         $Id$
 ____________________________________________________________________________*/
 
+#define STRICT
 #include <windows.h>
 #include <windowsx.h>
 #include <sys/types.h>
@@ -144,7 +145,7 @@ EditLabelWndProc(HWND hwnd,
 
     }
 
-    return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
+    return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam );
 }
 
 void MusicBrowserUI::EditItemLabel(HWND hwnd, HTREEITEM item)
@@ -709,5 +710,5 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
     } 
 	
 	//  Pass all non-custom messages to old window proc
-	return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
+	return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam );
 }

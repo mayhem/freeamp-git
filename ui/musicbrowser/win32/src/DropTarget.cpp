@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #endif
 
 // system header files
+#define STRICT
 #include <windows.h>
 #include <commctrl.h>
 #include <shlobj.h>
@@ -222,7 +223,7 @@ void DropTarget::AutoScroll(int scrollCode)
     {
         m_scrolling = true;
 
-        m_timer = SetTimer(GetParent(m_hwnd), SCROLL_TIMER, 250, (int (__stdcall *)(void))ScrollProc);
+        m_timer = SetTimer(GetParent(m_hwnd), SCROLL_TIMER, 250, ScrollProc);
     }
 }
 

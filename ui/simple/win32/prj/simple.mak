@@ -31,6 +31,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 OUTDIR=.\Release
@@ -74,7 +78,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -83,51 +86,20 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\simple.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\simple.pdb" /machine:I386 /def:".\simpleui.def"\
- /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" 
+LINK32_FLAGS=gdbm.lib fabaselib.lib version.lib wsock32.lib comctl32.lib\
+ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib\
+ shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
+ /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\simple.pdb"\
+ /machine:I386 /def:".\simpleui.def" /out:"simple.ui"\
+ /implib:"$(OUTDIR)\simple.lib" /libpath:"..\..\..\..\lib\gdbm"\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\simpleui.def"
 LINK32_OBJS= \
@@ -210,7 +182,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -219,51 +190,20 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\simple.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\simple.pdb" /debug /machine:I386 /def:".\simpleui.def"\
- /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept 
+LINK32_FLAGS=gdbm.lib fabaselib.lib version.lib wsock32.lib comctl32.lib\
+ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib\
+ shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
+ /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\simple.pdb" /debug\
+ /machine:I386 /def:".\simpleui.def" /out:"simple.ui"\
+ /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm"\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\simpleui.def"
 LINK32_OBJS= \
@@ -346,7 +286,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -355,51 +294,20 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\simple.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\simple.pdb" /debug /machine:I386 /def:".\simpleui.def"\
- /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept 
+LINK32_FLAGS=gdbm.lib fabaselib.lib version.lib wsock32.lib comctl32.lib\
+ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib\
+ shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
+ /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\simple.pdb" /debug\
+ /machine:I386 /def:".\simpleui.def" /out:"simple.ui"\
+ /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm"\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\simpleui.def"
 LINK32_OBJS= \
@@ -479,7 +387,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -488,51 +395,20 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\simple.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\simple.pdb" /machine:I386 /def:".\simpleui.def"\
- /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" 
+LINK32_FLAGS=gdbm.lib fabaselib.lib version.lib wsock32.lib comctl32.lib\
+ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib\
+ shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
+ /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\simple.pdb"\
+ /machine:I386 /def:".\simpleui.def" /out:"simple.ui"\
+ /implib:"$(OUTDIR)\simple.lib" /libpath:"..\..\..\..\lib\gdbm"\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\simpleui.def"
 LINK32_OBJS= \
@@ -571,6 +447,36 @@ $(DS_POSTBUILD_DEP) : "xing - Win32 NASM Release"\
 
 !ENDIF 
 
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
 
 !IF "$(CFG)" == "simple - Win32 Release" || "$(CFG)" == "simple - Win32 Debug"\
  || "$(CFG)" == "simple - Win32 NASM Debug" || "$(CFG)" ==\
@@ -591,28 +497,28 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -812,7 +718,7 @@ DEP_RSC_SIMPLE=\
 
 "$(INTDIR)\simple.res" : $(SOURCE) $(DEP_RSC_SIMPLE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\simple.res" /i\
- "\FreeAmp\freeamp\ui\simple\win32\res" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\simple\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
@@ -820,7 +726,7 @@ DEP_RSC_SIMPLE=\
 
 "$(INTDIR)\simple.res" : $(SOURCE) $(DEP_RSC_SIMPLE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\simple.res" /i\
- "\FreeAmp\freeamp\ui\simple\win32\res" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\simple\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
@@ -828,7 +734,7 @@ DEP_RSC_SIMPLE=\
 
 "$(INTDIR)\simple.res" : $(SOURCE) $(DEP_RSC_SIMPLE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\simple.res" /i\
- "\FreeAmp\freeamp\ui\simple\win32\res" /d "_DEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\simple\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
@@ -836,7 +742,7 @@ DEP_RSC_SIMPLE=\
 
 "$(INTDIR)\simple.res" : $(SOURCE) $(DEP_RSC_SIMPLE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\simple.res" /i\
- "\FreeAmp\freeamp\ui\simple\win32\res" /d "NDEBUG" $(SOURCE)
+ "\Local\src\freeamp\ui\simple\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -844,12 +750,12 @@ DEP_RSC_SIMPLE=\
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 "fileinput - Win32 Release" : 
-   cd "\FreeAmp\freeamp\io\local\win32\prj"
+   cd "\Local\src\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "fileinput - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\io\local\win32\prj"
+   cd "\Local\src\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fileinput.mak\
  CFG="fileinput - Win32 Release" RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -857,12 +763,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 "fileinput - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\io\local\win32\prj"
+   cd "\Local\src\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "fileinput - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\io\local\win32\prj"
+   cd "\Local\src\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fileinput.mak CFG="fileinput - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -870,12 +776,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
 
 "fileinput - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\io\local\win32\prj"
+   cd "\Local\src\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 NASM Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "fileinput - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\io\local\win32\prj"
+   cd "\Local\src\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fileinput.mak\
  CFG="fileinput - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -883,13 +789,13 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
 
 "fileinput - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\io\local\win32\prj"
+   cd "\Local\src\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak\
  CFG="fileinput - Win32 NASM Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "fileinput - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\io\local\win32\prj"
+   cd "\Local\src\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fileinput.mak\
  CFG="fileinput - Win32 NASM Release" RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -899,12 +805,12 @@ DEP_RSC_SIMPLE=\
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 "soundcard - Win32 Release" : 
-   cd "\FreeAmp\freeamp\io\soundcard\win32\prj"
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "soundcard - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\io\soundcard\win32\prj"
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\soundcard.mak\
  CFG="soundcard - Win32 Release" RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -912,12 +818,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 "soundcard - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\io\soundcard\win32\prj"
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "soundcard - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\io\soundcard\win32\prj"
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\soundcard.mak CFG="soundcard - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -925,12 +831,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
 
 "soundcard - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\io\soundcard\win32\prj"
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 NASM Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "soundcard - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\io\soundcard\win32\prj"
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\soundcard.mak\
  CFG="soundcard - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -938,13 +844,13 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
 
 "soundcard - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\io\soundcard\win32\prj"
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak\
  CFG="soundcard - Win32 NASM Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "soundcard - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\io\soundcard\win32\prj"
+   cd "\Local\src\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\soundcard.mak\
  CFG="soundcard - Win32 NASM Release" RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -954,12 +860,12 @@ DEP_RSC_SIMPLE=\
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 "xing - Win32 Release" : 
-   cd "\FreeAmp\freeamp\lmc\xingmp3\win32\prj"
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "xing - Win32 ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lmc\xingmp3\win32\prj"
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\xing.mak CFG="xing - Win32 Release"\
  RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -967,12 +873,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 "xing - Win32 Debug" : 
-   cd "\FreeAmp\freeamp\lmc\xingmp3\win32\prj"
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "xing - Win32 DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lmc\xingmp3\win32\prj"
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\xing.mak CFG="xing - Win32 Debug" RECURSE=1\
  
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -980,12 +886,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
 
 "xing - Win32 NASM Debug" : 
-   cd "\FreeAmp\freeamp\lmc\xingmp3\win32\prj"
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 NASM Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "xing - Win32 NASM DebugCLEAN" : 
-   cd "\FreeAmp\freeamp\lmc\xingmp3\win32\prj"
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\xing.mak CFG="xing - Win32 NASM Debug"\
  RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -993,12 +899,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
 
 "xing - Win32 NASM Release" : 
-   cd "\FreeAmp\freeamp\lmc\xingmp3\win32\prj"
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 NASM Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "xing - Win32 NASM ReleaseCLEAN" : 
-   cd "\FreeAmp\freeamp\lmc\xingmp3\win32\prj"
+   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\xing.mak CFG="xing - Win32 NASM Release"\
  RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"

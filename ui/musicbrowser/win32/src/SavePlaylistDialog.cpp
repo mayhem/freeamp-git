@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/
 
 // system includes
+#define STRICT
 #include <windows.h>
 #include <windowsx.h>
 #include <shlobj.h>
@@ -84,7 +85,7 @@ EditWndProc( HWND hwnd,
 
     }
 
-    return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
+    return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam );
 }
 
 

@@ -21,6 +21,7 @@
         $Id$
 ____________________________________________________________________________*/
 
+#define STRICT
 #include <windows.h>
 #include <windowsx.h>
 #include <sys/types.h>
@@ -196,7 +197,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
         if(0 < DialogBoxParam(g_hinst, 
                           MAKEINTRESOURCE(IDD_SAVEPLAYLIST),
                           m_hWnd, 
-                          (int (__stdcall *)(void))::SavePlaylistDlgProc, 
+                          ::SavePlaylistDlgProc, 
                           (LPARAM )szFile))
         {        
             oName = szInitialDir;

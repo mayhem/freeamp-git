@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #endif
 
 // system header files
+#define STRICT
 #include <windows.h>
 #include <shlobj.h>
 

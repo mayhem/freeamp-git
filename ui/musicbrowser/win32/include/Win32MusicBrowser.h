@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_WIN32MUSICBROWSER_H_
 #define INCLUDED_WIN32MUSICBROWSER_H_
 
+#define STRICT
 #include <windows.h>
 #include <commctrl.h>
 

@@ -21,12 +21,16 @@
         $Id$
 ____________________________________________________________________________*/
 
-#include <algorithm>
+#define STRICT
 #include <windows.h>
 #include <windowsx.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>
+
+#include <algorithm>
+
+using namespace std;
 
 #include "config.h"
 #include "utility.h"
