@@ -138,11 +138,6 @@ class MusicBrowserUI : public UserInterface
                             WPARAM wParam, 
                             LPARAM lParam);
 
-    BOOL SavePlaylistDlgProc(HWND hwnd, 
-                             UINT msg, 
-                             WPARAM wParam, 
-                             LPARAM lParam);
-
     BOOL EditTrackInfoDlgProc(HWND hwnd, 
                               UINT msg, 
                               WPARAM wParam, 

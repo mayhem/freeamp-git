@@ -210,8 +210,8 @@ class Preferences {
     Error GetVolume(int32* value);
     Error SetVolume(int32 value);  
 
-    Error GetUserName(char* name, uint32* len);
-    Error SetUserName(const char* name);
+    Error GetUsersName(char* name, uint32* len);
+    Error SetUsersName(const char* name);
 
     Error GetSaveMusicDirectory(char* path, uint32* len);
     Error SetSaveMusicDirectory(const char* path);

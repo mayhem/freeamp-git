@@ -41,29 +41,6 @@ BOOL CALLBACK SavePlaylistDlgProc(HWND hwnd,
                                   WPARAM wParam, 
                                   LPARAM lParam )
 {
-    MusicBrowserUI* ui = (MusicBrowserUI*)GetWindowLong(hwnd, GWL_USERDATA);
-
-    switch (msg)
-    {
-        case WM_INITDIALOG:
-        {
-            ui = (MusicBrowserUI*)lParam;
-            assert(ui != NULL);
-            SetWindowLong(hwnd, GWL_USERDATA, (LONG)ui);
-            break;
-        }            
-    }
-
-    return ui->SavePlaylistDlgProc(hwnd, msg, wParam, lParam);
-}        
-
-
-
-BOOL MusicBrowserUI::SavePlaylistDlgProc(HWND hwnd, 
-                                         UINT msg, 
-                                         WPARAM wParam, 
-                                         LPARAM lParam )
-{
     BOOL result = FALSE;
     static char* szName = NULL;
 
@@ -75,8 +52,11 @@ BOOL MusicBrowserUI::SavePlaylistDlgProc(HWND hwnd,
 
             szName = (char*)lParam;
             
+            SetFocus(hwndName);
             Edit_SetText(hwndName, szName);
-
+            Edit_SetSel(hwndName, 0, -1);
+            
+            return FALSE;
             break;
         }      
 

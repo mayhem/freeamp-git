@@ -767,14 +767,14 @@ SetVolume(int32 value)
 
 Error
 Preferences::
-GetUserName(char* name, uint32* len)
+GetUsersName(char* name, uint32* len)
 {
     return GetPrefString(kUserNamePref, name, len);
 }
 
 Error
 Preferences::
-SetUserName(const char* name)
+SetUsersName(const char* name)
 {
     return SetPrefString(kUserNamePref, name);
 }

@@ -94,7 +94,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
 {
     bool                result = false;
     int32               i, iOffset = 0;
-    uint32              size;
+    uint32              length;
     PlaylistFormatInfo  format;
     char                szFilter[512];
     OPENFILENAME        sOpen;
@@ -104,8 +104,8 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
     char                szExt[MAX_PATH] = {0x00};
     bool                addToDB = false;
     
-    size = MAX_PATH;
-    m_context->prefs->GetInstallDirectory(szPlaylistDir, &size);
+    length = MAX_PATH;
+    m_context->prefs->GetInstallDirectory(szPlaylistDir, &length);
 
     strcat(szPlaylistDir, "\\Playlists");
 
@@ -113,30 +113,10 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
     if (_stat(szPlaylistDir, &buf) != 0)
        _mkdir(szPlaylistDir);
 
-    for(i = 0; ; i++)
-    {
-       if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
-          break;
-    
-       sprintf(szFilter + iOffset, "%s (.%s)", 
-            format.GetDescription(),
-            format.GetExtension());
-       iOffset += strlen(szFilter + iOffset) + 1;     
-
-       sprintf(szFilter + iOffset, "*.%s", 
-            format.GetExtension());
-       iOffset += strlen(szFilter + iOffset) + 1;     
-    }
-    
-    strcpy(szFilter + iOffset, "All Files (*.*)\0");
-    iOffset += strlen(szFilter + iOffset) + 1;     
-    strcpy(szFilter + iOffset, "*.*\0");
-    iOffset += strlen(szFilter + iOffset) + 1;     
-    szFilter[iOffset] = 0;
-
     if(oName.length())
     {
-        strcpy(szInitialDir, oName.c_str());
+        length = sizeof(szInitialDir);
+        URLToFilePath(oName.c_str(), szInitialDir, &length);
 
         char* cp = NULL;
 
@@ -144,12 +124,62 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
         {
             *cp = 0x00;
             strcpy(szFile, cp + 1);
+
+            if(cp = strrchr(szFile, '.'))
+            {
+                *cp = 0x00;
+            }
         }
     }
     else
     {
+        char szName[256];
+        length = sizeof(szName);
+
+        m_context->prefs->GetUsersName(szName, &length);
+
+        if(strlen(szName))
+        {
+            char* cp = NULL;
+
+            if(cp = strrchr(szName, ' '))
+            {
+                *cp = 0x00;
+            }
+
+            sprintf(szFile, "%s\'s Greatest Hits", szName);
+        }
+        else
+        {
+            strcpy(szFile, "My Greatest Hits");
+        }
+
+        
+        HANDLE findFileHandle = NULL;
+        WIN32_FIND_DATA findData;
+        char findPath[MAX_PATH];
+        char tempFile[MAX_PATH];
+        uint32 index = 2;
+
+        strcpy(tempFile, szFile);
+
+        do
+        {
+            sprintf(findPath, "%s\\%s.m3u", szPlaylistDir, tempFile);
+
+            findFileHandle = FindFirstFile(findPath, &findData);
+            
+            if(findFileHandle != INVALID_HANDLE_VALUE)
+            {
+                sprintf(tempFile, "%s #%d", szFile, index++);
+            }
+
+            FindClose(findFileHandle);
+
+        }while(findFileHandle != INVALID_HANDLE_VALUE);
+
+        strcpy(szFile, tempFile);
         strcpy(szInitialDir, szPlaylistDir);
-        strcpy(szFile, "My Greatest Hits");
     }
 
     // is this playlist saved in our default location?
@@ -175,6 +205,27 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
     }
     else
     {
+        for(i = 0; ; i++)
+        {
+           if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)
+              break;
+    
+           sprintf(szFilter + iOffset, "%s (.%s)", 
+                format.GetDescription(),
+                format.GetExtension());
+           iOffset += strlen(szFilter + iOffset) + 1;     
+
+           sprintf(szFilter + iOffset, "*.%s", 
+                format.GetExtension());
+           iOffset += strlen(szFilter + iOffset) + 1;     
+        }
+    
+        strcpy(szFilter + iOffset, "All Files (*.*)\0");
+        iOffset += strlen(szFilter + iOffset) + 1;     
+        strcpy(szFilter + iOffset, "*.*\0");
+        iOffset += strlen(szFilter + iOffset) + 1;     
+        szFilter[iOffset] = 0;
+
         sOpen.lStructSize = sizeof(OPENFILENAME);
         sOpen.hwndOwner = m_hWnd;
         sOpen.hInstance = NULL;
