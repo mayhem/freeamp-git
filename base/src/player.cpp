@@ -902,6 +902,7 @@ void Player::Stop(Event *pEvent)
     if (m_lmc)
     {
        m_lmc->Stop();
+
        delete    m_lmc;
  
        m_lmc = NULL;
@@ -911,6 +912,7 @@ void Player::Stop(Event *pEvent)
     {
        SEND_NORMAL_EVENT(INFO_Stopped);
     }
+
     delete pEvent;
 }
 
@@ -1019,6 +1021,7 @@ void Player::Play(Event *pEvent)
            SEND_NORMAL_EVENT(INFO_Playing);
         }
     }
+
     delete pEvent;
 }
 

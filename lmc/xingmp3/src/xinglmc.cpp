@@ -149,7 +149,9 @@ XingLMC::XingLMC()
 
 XingLMC::~XingLMC()
 {
+   //Debug_v("lmc dtor");
    Stop();
+   //Debug_v("lmc stop done");
    if (m_xcqueue)
    {
       delete    m_xcqueue;
@@ -185,6 +187,7 @@ XingLMC::~XingLMC()
       free(m_szUrl);
       m_szUrl = NULL;
    }
+   //Debug_v("lmc dtor done");
 }
 
 Error     XingLMC::
@@ -203,17 +206,29 @@ Stop()
       m_bExit = true;
       m_pauseSemaphore->Signal();
 
+	  //Debug_v("output break");
       m_output->Break();
+	  //Debug_v("output pause");
       m_output->Pause();
+	  //Debug_v("input break");
       m_input->Break();
 
+	  //Debug_v("decode join");
       m_decoderThread->Join();  // wait for thread to exit
+	  //Debug_v("decode joined");
       g_Log->Log(LogDecode, "LMC: Decoder thread exited.\n");
 
+	  //Debug_v("delete input");
       delete m_input;
       m_input = NULL;
 
+	  //Debug_v("delete output");
+      delete m_output;
+      m_output = NULL;
+
+	  //Debug_v("delete thread");
       delete    m_decoderThread;
+	  //Debug_v("stop done");
 
       m_decoderThread = NULL;
    }
@@ -612,7 +627,14 @@ Error XingLMC::InitDecoder()
          info->bits_per_sample = decinfo.bits;
          info->number_of_channels = decinfo.channels;
          info->samples_per_second = decinfo.samprate;
-         m_iMaxWriteSize = (info->number_of_channels * 2 * 1152);
+         m_iMaxWriteSize = (info->number_of_channels * 
+			                (decinfo.bits / 8) * 1152);
+
+//		 if (decinfo.samprate < 44100)
+//			    m_iMaxWriteSize = 1152;
+
+//		 Debug_v("CH: %d BT: %d", decinfo.channels, decinfo.bits);
+//		 Debug_v("Data unit size: %d", m_iMaxWriteSize);
          info->max_buffer_size = m_iMaxWriteSize;
 
          pEvent = new PMOInitEvent(info);
@@ -878,6 +900,8 @@ void XingLMC::DecodeWork()
 #endif  //_VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
 
+
+		 //Debug_v("writing %d bytes", x.out_bytes);
          Err = m_output->EndWrite(x.out_bytes);
          if (Err == kError_Interrupt || Err == kError_YouScrewedUp)
             break;

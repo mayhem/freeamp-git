@@ -28,13 +28,14 @@ ____________________________________________________________________________*/
 
 #include "pullbuffer.h"
 #include "log.h"
+#include "debug.hpp"
 
 extern LogFile *g_Log;
 
 #ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
 #endif
-#define DB printf("%d\n", __LINE__);
+#define DB Debug_v("%x:%d\n", GetCurrentThread(), __LINE__);
 
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,
@@ -202,6 +203,7 @@ Error PullBuffer::Resize(size_t iNewSize,
        if (m_bReadOpPending || m_bWriteOpPending)
        {
            m_pMutex->Release();
+		   usleep(10000);
            continue;
        }
        break;

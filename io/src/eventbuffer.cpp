@@ -28,8 +28,9 @@ ____________________________________________________________________________*/
 #include <sys/types.h>
 
 #include "eventbuffer.h"
+#include "debug.hpp"
 
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
+#define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 EventBuffer::EventBuffer(size_t iBufferSize, size_t iOverFlowSize, 
                          size_t iWriteTriggerSize) : 
@@ -62,7 +63,6 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
        return PullBuffer::BeginRead(pBuffer, iBytesWanted, false);
    }
 
-
    if (pEvent->iIndex > iReadIndex)
       iMaxBytes = pEvent->iIndex - iReadIndex;
    else
@@ -70,7 +70,6 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t &iBytesWanted)
 
    if (iBytesWanted > iMaxBytes)
       iBytesWanted = iMaxBytes;
-
 
    return PullBuffer::BeginRead(pBuffer, iBytesWanted);
 }
