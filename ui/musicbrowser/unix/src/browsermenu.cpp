@@ -587,7 +587,6 @@ void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
      {"/File/_Import Tracks and Playlists","<control>I", (GtkItemFactoryCallback)import_list, 0, 0 },
      {"/File/_Export Playlist", NULL,           (GtkItemFactoryCallback)export_list, 0, 0 },
      {"/File/sep0",             NULL,           0,         0, "<Separator>" },
-     {"/File/Create New Audio CD", NULL,        (GtkItemFactoryCallback)create_cd, 0, 0 },
      {"/File/Search Computer for Music", NULL, (GtkItemFactoryCallback)music_search, 0, 0 },
      {"/File/sep2",             NULL,           0,         0, "<Separator>" },
      {"/File/_Close",           "<control>Q",   (GtkItemFactoryCallback)quit_menu, 0, 0 },

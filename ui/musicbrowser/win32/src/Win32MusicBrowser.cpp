@@ -59,7 +59,7 @@ const char *mbcdNotFoundMessage =
 const char *dbaseUpgradedMessage =
     "Due to internal changes, "the_BRANDING" has "
     "modified the format of the database that stores the "
-    "My Music tree. Unfortunatley, this means that you need "
+    "My Music tree. Unfortunately, this means that you need "
     "to search for music again to rebuild "the_BRANDING"'s "
     "internal catalog.";
 
