@@ -3012,7 +3012,7 @@ EOF
 EOF
 
     LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
-    CFLAGS="$CFLAGS -O0 -g3"
+    CFLAGS="$CFLAGS"
     ;;
   *qnx*)
     host_os="qnx"
