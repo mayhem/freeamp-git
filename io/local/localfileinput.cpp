@@ -48,7 +48,7 @@ ____________________________________________________________________________*/
 
 const uint32 iReadBlock = 8192;
 
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
+#define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 extern    "C"
 {
@@ -337,6 +337,7 @@ void LocalFileInput::WorkerThread(void)
           if (iRead < iReadBlock)
              m_pOutputBuffer->SetEndOfStream(true);
       }
+
       if (eError == kError_BufferTooSmall)
       {
           m_pSleepSem->Wait();

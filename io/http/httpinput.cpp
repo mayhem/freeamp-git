@@ -260,16 +260,8 @@ bool HttpInput::PauseLoop(bool bLoop)
 
 void HttpInput::LogError(char *szErrorMsg)
 {
-#ifdef WIN32
-   char *lpMessageBuffer;
-
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-                  WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                  (LPTSTR) &lpMessageBuffer, 0, NULL );
-
-    sprintf(m_szError, "%s: %s", szErrorMsg, lpMessageBuffer);
-   LocalFree(lpMessageBuffer);
-
+#ifdef WIN32 
+	MessageBox(NULL, szErrorMsg, "Streaming Error", MB_OK);
 #else
     ReportError(szErrorMsg);
 #endif

@@ -67,6 +67,8 @@ const bool  kDefaultLogging = false;
 const bool  kDefaultSaveStreams = false;
 const char* kDefaultSaveStreamsDir = ".";
 const int32 kDefaultPreBuffer = 0;
+const char *kDefaultProxyHost = "proxy.youdomain.com";
+const bool  kDefaultUseProxy = false;
 
 Error
 Preferences::
@@ -119,6 +121,13 @@ SetDefaults()
 
     if (GetPrefInt32(kPreBufferPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kPreBufferPref, kDefaultPreBuffer);
+
+	if (GetPrefBoolean(kUseProxyPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kUseProxyPref, kDefaultUseProxy);
+
+	dummyInt = 255;
+    if (GetPrefString(kProxyHostPref, dummyString, (unsigned int *)&dummyInt) == kError_NoPrefValue)
+		SetPrefString(kProxyHostPref, kDefaultProxyHost);
 
     return kError_NoErr;
 }

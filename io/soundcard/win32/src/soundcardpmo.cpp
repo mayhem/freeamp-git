@@ -36,6 +36,8 @@ ____________________________________________________________________________*/
 
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
+#define MAXINT32 0x7FFFFFFF
+
 Mutex *g_pHeaderMutex;
 
 extern    "C"
@@ -82,7 +84,7 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
    m_iHead = 0;
    m_iTail = 0;
    m_iOffset = 0;
-   m_iBaseTime = -1;
+   m_iBaseTime = MAXINT32;
    m_iBytesPerSample = 0;
    m_num_headers = 0;
    
@@ -208,10 +210,16 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    int                 iTotalTime = 0;
    MMTIME              sTime;
 
-   if (m_iBaseTime < 0)
+   if (m_iBaseTime == MAXINT32)
    {
        m_iBaseTime = (pEvent->GetFrameNumber() * 1152) / 
                       m_samples_per_second;
+
+       sTime.wType = TIME_BYTES;
+       if (waveOutGetPosition(m_hwo, &sTime, sizeof(sTime)) != MMSYSERR_NOERROR)
+           return;
+   
+       m_iBaseTime -= (sTime.u.cb / (m_samples_per_second * m_iBytesPerSample));
    }
 
    if (m_samples_per_second <= 0)
@@ -259,12 +267,13 @@ bool SoundCardPMO::WaitForDrain(void)
 	   }
 	   WasteTime();
    }
+ 
    return false;
 }
 
 void SoundCardPMO::Pause(void)
 {
-    m_iBaseTime = -1;
+    m_iBaseTime = MAXINT32;
 
     waveOutPause(m_hwo);
 
@@ -478,6 +487,8 @@ void SoundCardPMO::WorkerThread(void)
           if (eErr == kError_EventPending)
           {
               pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
+			  if (pEvent == NULL)
+				  continue;
 
               if (pEvent->Type() == PMO_Init)
                   Init(((PMOInitEvent *)pEvent)->GetInfo());
@@ -492,7 +503,9 @@ void SoundCardPMO::WorkerThread(void)
               {
                   delete pEvent;
                   if (WaitForDrain())
+				  {
                      m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
+				  }
 
                   return;
               }
@@ -518,7 +531,6 @@ void SoundCardPMO::WorkerThread(void)
 	  m_pLmc->Wake();
 
    }
-
    m_pContext->log->Log(LogDecode, "PMO: Soundcard thread exiting\n");
 }    
 

@@ -44,6 +44,7 @@ ____________________________________________________________________________*/
 #include "log.h"
 #include "pmo.h"
 
+
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
 Player   *Player::m_thePlayer = NULL;
@@ -1008,7 +1009,6 @@ Stop(Event *pEvent)
     if (m_pmo)
     {
        m_pmo->Pause();
-
        delete    m_pmo;
  
        m_pmo = NULL;

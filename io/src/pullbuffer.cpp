@@ -352,8 +352,12 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t iBytesNeeded)
 
    if (m_iReadIndex > m_iWriteIndex)
    {
-       iAvail = m_iBufferSize - m_iReadIndex + 
+	   if (m_iOverflowSize == 0)
+           iAvail = (m_iBufferSize - m_iReadIndex) + m_iWriteIndex;
+       else
+           iAvail = m_iBufferSize - m_iReadIndex + 
                 min((uint32)m_iWriteIndex, m_iOverflowSize);
+
    }
    else
    {

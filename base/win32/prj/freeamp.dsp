@@ -158,6 +158,10 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\src\debug.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\hashtable.cpp
 # End Source File
 # Begin Source File
@@ -483,6 +487,17 @@ InputPath=..\..\..\README
 # Begin Source File
 
 SOURCE=..\res\freeamp.rc
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

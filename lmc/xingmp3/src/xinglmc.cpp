@@ -51,7 +51,7 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 
-#define DB printf("%s:%d\n",  __FILE__, __LINE__);
+#define DB Debug_v("%s:%d\n",  __FILE__, __LINE__);
 
 const int iInitialOutputBufferSize = 64512;
 
@@ -334,14 +334,7 @@ Error XingLMC::ExtractMediaInfo()
    static int32 l[4] = {25, 3, 2, 1};
 
    int32     layer = l[m_sMpegHead.option];
-   static double ms_p_f_table[3][3] =
-   {
-      {8.707483f, 8.0f, 12.0f},
-      {26.12245f, 24.0f, 36.0f},
-      {26.12245f, 24.0f, 36.0f}
-   };
-
-   milliseconds_per_frame = ms_p_f_table[layer - 1][m_sMpegHead.sr_index];
+   milliseconds_per_frame = (double)(1152 * 1000) / (double)samprate;
 
    if (end > 0)
    {
@@ -628,10 +621,6 @@ void XingLMC::DecodeWork()
              m_pContext->log->Log(LogDecode, "Audio decode failed. "
                                              "Resetting the decoder.\n");
 
-             m_audioMethods.decode_init(&m_sMpegHead, m_frameBytes,
-				                           0, 0, 0, 24000);
-
-             GetHeadInfo();
              Err = AdvanceBufferToNextFrame();
              if (Err == kError_Interrupt)
                  break;
@@ -646,10 +635,10 @@ void XingLMC::DecodeWork()
              {
                  m_pContext->log->Error("LMC: Cannot advance to next frame: %d\n", Err);
                  ReportError("Cannot advance to next frame. Possible media corruption?");
-
                  return;
              }
-			 }
+			 m_audioMethods.decode_init(&m_sMpegHead, m_frameBytes, 0, 0, 0, 24000);
+		  }
 			 else
           {
 			    break;
@@ -689,7 +678,6 @@ void XingLMC::DecodeWork()
          {
              m_pContext->log->Error("lmc: EndWrite returned %d\n", Err);
              ReportError(szFailWrite);
-                     
              return;
          }
       }
@@ -699,19 +687,11 @@ void XingLMC::DecodeWork()
          m_pContext->log->Error("LMC: Maximum number of retries reached"
                       " while trying to decode.\n");
          ReportError("Cannot decode this MP3. Is the MP3 corrupted?");
-
          return;
       }
 
-      // EOF?
-      if (x.in_bytes == 0)
-         break;
-
       m_frameCounter++;
    }
-   if (m_bExit)
-	  return;
-
 
    return;
 }
