@@ -137,13 +137,14 @@ SoundCardPMO::~SoundCardPMO()
 
 void SoundCardPMO::SetVolume(int32 volume) 
 {
-   // When we begin playing the volume does not get set properly.
-   // In order to work around that, we'll save the last volume
-   // settting and then set the volume on the stream after we open
-   // the stream in init.
-   waveOutSetVolume(   (HWAVEOUT)WAVE_MAPPER, 
-                        MAKELPARAM( 0xFFFF*volume/100,  
-                                    0xFFFF*volume/100));
+    Int32PropValue *pProp = NULL;
+    
+    waveOutSetVolume((HWAVEOUT)WAVE_MAPPER, 
+                     MAKELPARAM( 0xFFFF*volume/100,  
+                                 0xFFFF*volume/100));
+                                 
+    pProp = new Int32PropValue(volume);
+    m_pContext->props->SetProperty("CurrentVolume", pProp);
 }
 
 int32 SoundCardPMO::GetVolume() 
@@ -158,8 +159,9 @@ int32 SoundCardPMO::GetVolume()
 
 Error SoundCardPMO::Init(OutputInfo * info)
 {
-   Error     result = kError_UnknownErr;
-   MMRESULT  mmresult = 0;
+   Error           result = kError_UnknownErr;
+   MMRESULT        mmresult = 0;
+   Int32PropValue *pProp = NULL;
 
    m_channels = info->number_of_channels;
    m_samples_per_second = info->samples_per_second;
@@ -216,6 +218,12 @@ Error SoundCardPMO::Init(OutputInfo * info)
       temp->dwFlags = NULL;
    }
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
+
+   if (IsntError(m_pContext->props->GetProperty("CurrentVolume", 
+                (PropValue **)&pProp)))
+   {
+      SetVolume(pProp->GetInt32());
+   }   
 
    m_initialized = true;
 
