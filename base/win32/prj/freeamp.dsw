@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "MakeTheme"="..\..\..\ui\freeamp\tools\win32\MakeTheme.dsp" - Package Owner=<4>
+Project: "MakeTheme"=..\..\..\ui\freeamp\tools\win32\MakeTheme.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -21,7 +21,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "cddb"="..\..\..\plm\metadata\cddb\prj\cddb.dsp" - Package Owner=<4>
+Project: "cddb"=..\..\..\plm\metadata\cddb\prj\cddb.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -33,7 +33,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "cdlmc"="..\..\..\lmc\cd\win32\prj\cdlmc.dsp" - Package Owner=<4>
+Project: "cdlmc"=..\..\..\lmc\cd\win32\prj\cdlmc.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -45,7 +45,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "cdoutput"="..\..\..\io\cd\win32\prj\cdoutput.dsp" - Package Owner=<4>
+Project: "cdoutput"=..\..\..\io\cd\win32\prj\cdoutput.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -57,7 +57,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dde"="..\..\..\ui\dde\win32\prj\dde.dsp" - Package Owner=<4>
+Project: "dde"=..\..\..\ui\dde\win32\prj\dde.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -69,7 +69,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "download"="..\..\..\ui\download\win32\prj\download.dsp" - Package Owner=<4>
+Project: "download"=..\..\..\ui\download\win32\prj\download.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -87,7 +87,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dsoundcard"="..\..\..\io\dsound\win32\prj\dsoundcard.dsp" - Package Owner=<4>
+Project: "dsoundcard"=..\..\..\io\dsound\win32\prj\dsoundcard.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -102,7 +102,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "fabaselib"=".\fabaselib.dsp" - Package Owner=<4>
+Project: "fabaselib"=.\fabaselib.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -114,7 +114,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "fileinput"="..\..\..\io\local\win32\prj\fileinput.dsp" - Package Owner=<4>
+Project: "fileinput"=..\..\..\io\local\win32\prj\fileinput.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -129,7 +129,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "freeamp"=".\freeamp.dsp" - Package Owner=<4>
+Project: "freeamp"=.\freeamp.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -233,11 +233,14 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name vorbismdf
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mbcd
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "freeampui"="..\..\..\ui\freeamp\win32\prj\freeampui.dsp" - Package Owner=<4>
+Project: "freeampui"=..\..\..\ui\freeamp\win32\prj\freeampui.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -258,7 +261,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "gdbm"="..\..\..\lib\gdbm\prj\gdbm.dsp" - Package Owner=<4>
+Project: "gdbm"=..\..\..\lib\gdbm\prj\gdbm.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -270,22 +273,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "httpinput"="..\..\..\io\http\win32\prj\httpinput.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name fabaselib
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "id3v1"="..\..\..\plm\metadata\id3v1\prj\id3v1.dsp" - Package Owner=<4>
+Project: "httpinput"=..\..\..\io\http\win32\prj\httpinput.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -300,7 +288,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "id3v2"="..\..\..\plm\metadata\id3v2\prj\id3v2.dsp" - Package Owner=<4>
+Project: "id3v1"=..\..\..\plm\metadata\id3v1\prj\id3v1.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -315,7 +303,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "m3u"="..\..\..\plm\playlist\m3u\prj\m3u.dsp" - Package Owner=<4>
+Project: "id3v2"=..\..\..\plm\metadata\id3v2\prj\id3v2.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -330,7 +318,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "misc"="..\..\..\plm\metadata\misc\prj\misc.dsp" - Package Owner=<4>
+Project: "m3u"=..\..\..\plm\playlist\m3u\prj\m3u.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -345,7 +333,34 @@ Package=<4>
 
 ###############################################################################
 
-Project: "musicbrowser"="..\..\..\ui\musicbrowser\win32\prj\musicbrowser.dsp" - Package Owner=<4>
+Project: "mbcd"=..\..\..\plm\metadata\mbcd\prj\mbcd.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "misc"=..\..\..\plm\metadata\misc\prj\misc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "musicbrowser"=..\..\..\ui\musicbrowser\win32\prj\musicbrowser.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -363,7 +378,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "obsinput"="..\..\..\io\obs\win32\prj\obsinput.dsp" - Package Owner=<4>
+Project: "obsinput"=..\..\..\io\obs\win32\prj\obsinput.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -378,7 +393,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "pls"="..\..\..\plm\playlist\pls\prj\pls.dsp" - Package Owner=<4>
+Project: "pls"=..\..\..\plm\playlist\pls\prj\pls.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -390,7 +405,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "pmp300"="..\..\..\plm\portable\pmp300\prj\pmp300.dsp" - Package Owner=<4>
+Project: "pmp300"=..\..\..\plm\portable\pmp300\prj\pmp300.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -408,7 +423,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "riolib"="..\..\..\plm\portable\pmp300\sba\prj\riolib.dsp" - Package Owner=<4>
+Project: "riolib"=..\..\..\plm\portable\pmp300\sba\prj\riolib.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -420,7 +435,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "rmp"="..\..\..\dlm\rmp\prj\rmp.dsp" - Package Owner=<4>
+Project: "rmp"=..\..\..\dlm\rmp\prj\rmp.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -435,7 +450,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "signature"="..\..\..\io\signature\win32\prj\signature.dsp" - Package Owner=<4>
+Project: "signature"=..\..\..\io\signature\win32\prj\signature.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -447,7 +462,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "simple"="..\..\..\ui\simple\win32\prj\simple.dsp" - Package Owner=<4>
+Project: "simple"=..\..\..\ui\simple\win32\prj\simple.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -468,7 +483,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "soundcard"="..\..\..\io\soundcard\win32\prj\soundcard.dsp" - Package Owner=<4>
+Project: "soundcard"=..\..\..\io\soundcard\win32\prj\soundcard.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -483,7 +498,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "toolbar"="..\..\..\ui\toolbar\win32\prj\toolbar.dsp" - Package Owner=<4>
+Project: "toolbar"=..\..\..\ui\toolbar\win32\prj\toolbar.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -498,7 +513,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "unzip"="..\..\..\lib\unzip\prj\unzip.dsp" - Package Owner=<4>
+Project: "unzip"=..\..\..\lib\unzip\prj\unzip.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -510,7 +525,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "update"="..\..\..\update\win32\prj\update.dsp" - Package Owner=<4>
+Project: "update"=..\..\..\update\win32\prj\update.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -525,7 +540,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "vorbis"="..\..\..\lmc\vorbis\win32\prj\vorbis.dsp" - Package Owner=<4>
+Project: "vorbis"=..\..\..\lmc\vorbis\win32\prj\vorbis.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -543,7 +558,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "vorbislib"="..\..\..\LMC\VORBIS\WIN32\PRJ\vorbislib.dsp" - Package Owner=<4>
+Project: "vorbislib"=..\..\..\LMC\VORBIS\WIN32\PRJ\vorbislib.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -555,7 +570,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "vorbismdf"="..\..\..\plm\metadata\vorbis\prj\vorbismdf.dsp" - Package Owner=<4>
+Project: "vorbismdf"=..\..\..\plm\metadata\vorbis\prj\vorbismdf.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -570,7 +585,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "wavout"="..\..\..\io\wavout\win32\prj\wavout.dsp" - Package Owner=<4>
+Project: "wavout"=..\..\..\io\wavout\win32\prj\wavout.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -582,7 +597,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "winamp"="..\..\..\ftc\winamp\prj\winamp.dsp" - Package Owner=<4>
+Project: "winamp"=..\..\..\ftc\winamp\prj\winamp.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -594,7 +609,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "xing"="..\..\..\lmc\xingmp3\win32\prj\xing.dsp" - Package Owner=<4>
+Project: "xing"=..\..\..\lmc\xingmp3\win32\prj\xing.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -609,7 +624,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "zlib"="..\..\..\lib\zlib\prj\zlib.dsp" - Package Owner=<4>
+Project: "zlib"=..\..\..\lib\zlib\prj\zlib.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
