@@ -268,6 +268,7 @@ class MusicBrowserUI : public UserInterface
     void  EditStreamInfoEvent();
     void  RemoveFavoriteEvent();
 	void  TipEvent(PlaylistItem *item = NULL);
+    void  BitziEvent(PlaylistItem *item = NULL);
 
     // Functions in PlaylistView.cpp
     void  PlaylistListItemAdded(const PlaylistItem* item);
@@ -375,6 +376,7 @@ class MusicBrowserUI : public UserInterface
     void CreateEditInfoLists(set<string>& artists,
                              set<string>& albums,
                              set<string>& genres);
+    void BitziLookup(const string &URL);
     
 
     // Data members

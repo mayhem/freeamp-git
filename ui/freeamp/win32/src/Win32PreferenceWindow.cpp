@@ -45,7 +45,7 @@ using namespace std;
 
 #include "eventdata.h"
 #include "thread.h"
-#include "win32updatemanager.h"
+//#include "win32updatemanager.h"
 #include "Win32PreferenceWindow.h"
 #include "Win32Window.h"
 #include "help.h"
@@ -111,6 +111,7 @@ PrefPluginsCallback(HWND hwnd,
 	return g_pCurrentPrefWindow->PrefPluginsProc(hwnd, msg, wParam, lParam);
 }
 
+#if 0
 static BOOL CALLBACK 
 PrefUpdateCallback(HWND hwnd, 
                    UINT msg, 
@@ -119,6 +120,7 @@ PrefUpdateCallback(HWND hwnd,
 {
 	return g_pCurrentPrefWindow->PrefUpdateProc(hwnd, msg, wParam, lParam);
 }
+#endif
 
 static BOOL CALLBACK 
 PrefCDAudioCallback(HWND hwnd, 
@@ -185,19 +187,20 @@ PrefBrowserCallback(HWND hwnd,
 
 Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
                                              ThemeManager *pThemeMan,
-                                             UpdateManager *pUpdateMan,
+//                                             UpdateManager *pUpdateMan,
                                              uint32 defaultPage) :
      PreferenceWindow(context, pThemeMan)
 {     
 	g_pCurrentPrefWindow = this;
     m_defaultPage = defaultPage;
-    m_updateManager = (Win32UpdateManager*)pUpdateMan;
+//    m_updateManager = (Win32UpdateManager*)pUpdateMan;
     m_prefs = context->prefs;
-    deleteUpdateManager = false;
+//    deleteUpdateManager = false;
     m_hwndPref = NULL;
     m_startPage = defaultPage;
     m_currentPage = NULL;
 
+#if 0
     if(!m_updateManager)
     {
         deleteUpdateManager = true;
@@ -210,6 +213,7 @@ Win32PreferenceWindow::Win32PreferenceWindow(FAContext *context,
         m_updateManager->SetArchitecture(string("X86"));
 #endif
     }
+#endif
 }
 
 Win32PreferenceWindow::~Win32PreferenceWindow(void)
@@ -261,9 +265,9 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
     page.pfnDlgProc = PrefCDAudioCallback;
     m_pages.push_back(page);
 
-    page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_UPDATE);
-    page.pfnDlgProc = PrefUpdateCallback;
-    m_pages.push_back(page);
+    //page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_UPDATE);
+    //page.pfnDlgProc = PrefUpdateCallback;
+    //m_pages.push_back(page);
 
     page.pszTemplate = MAKEINTRESOURCE(IDD_PREF_ADVANCED);
     page.pfnDlgProc = PrefAdvancedCallback;
@@ -290,8 +294,8 @@ bool Win32PreferenceWindow::DisplayPreferences(HWND hwndParent)
                         hwndParent,
                         MainCallback) > 0);
 
-    if(deleteUpdateManager)
-        delete m_updateManager;
+//    if(deleteUpdateManager)
+//        delete m_updateManager;
 
     return result;
 }
@@ -473,7 +477,7 @@ void Win32PreferenceWindow::GetPrefsValues(PrefsStruct* values)
     m_prefs->GetPrefBoolean(kLogInputPref, &values->logInput);
     m_prefs->GetPrefBoolean(kLogOutputPref, &values->logOutput);
     m_prefs->GetPrefBoolean(kLogPerformancePref, &values->logPerformance);
-    m_prefs->GetPrefBoolean(kCheckForUpdatesPref, &values->checkForUpdates);
+//    m_prefs->GetPrefBoolean(kCheckForUpdatesPref, &values->checkForUpdates);
     m_prefs->GetPrefBoolean(kAskToReclaimFiletypesPref, &values->askReclaimFiletypes);
     m_prefs->GetPrefBoolean(kReclaimFiletypesPref, &values->reclaimFiletypes);
     m_prefs->GetPrefBoolean(kShowToolbarTextLabelsPref, &values->useTextLabels);
@@ -515,7 +519,7 @@ void Win32PreferenceWindow::SavePrefsValues(PrefsStruct* values)
     if (m_oThemeList[values->currentTheme].length() > 0)
        m_pThemeMan->UseTheme(m_oThemeList[values->currentTheme]);
 
-    m_prefs->SetPrefBoolean(kCheckForUpdatesPref, values->checkForUpdates);
+//    m_prefs->SetPrefBoolean(kCheckForUpdatesPref, values->checkForUpdates);
     m_prefs->SetPrefString(kSaveMusicDirPref, values->saveMusicDirectory.c_str());
     m_prefs->SetPrefString(kPlaylistHeaderColumnsPref, values->playlistHeaderColumns.c_str());
     m_prefs->SetPrefBoolean(kAskToReclaimFiletypesPref, values->askReclaimFiletypes);
@@ -3054,6 +3058,7 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
     return result;
 }
 
+#if 0
 typedef struct ThreadStruct {
     Thread* thread;
     FAContext* context;
@@ -3816,6 +3821,7 @@ bool Win32PreferenceWindow::PrefUpdateProc(HWND hwnd,
 
     return result;
 }
+#endif
 
 uint32 CalcStringEllipsis(HDC hdc, string& displayString, int32 columnWidth)
 {

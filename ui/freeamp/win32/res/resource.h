@@ -84,6 +84,7 @@
 #define IDD_MAIN_PREF_DIALOG            195
 #define IDD_PREF_PROFILE                199
 #define IDB_FOLDER                      200
+#define IDR_CONTEXT                     201
 #define IDD_OPENURL                     219
 #define IDD_SAVERIO                     220
 #define IDD_UPDATEAVAILABLE             220
@@ -200,6 +201,10 @@
 #define IDMC_NEXTTRACK                  6904
 #define IDMC_PREVIOUSTRACK              6905
 #define IDMC_EXIT                       6906
+#define IDMC_FILE                       40013
+#define IDMC_SUGGEST                    40014
+#define IDMC_BITZILOOKUP                40015
+#define IDMC_EDITINFO                   40016
 #define IDS_URL                         65535
 #define IDC_STATIC                      -1
 
@@ -208,8 +213,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        201
-#define _APS_NEXT_COMMAND_VALUE         40013
+#define _APS_NEXT_RESOURCE_VALUE        202
+#define _APS_NEXT_COMMAND_VALUE         40017
 #define _APS_NEXT_CONTROL_VALUE         1080
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

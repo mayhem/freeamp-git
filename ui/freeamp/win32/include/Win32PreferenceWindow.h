@@ -38,7 +38,7 @@ using namespace std;
 
 #include "config.h"
 #include "PreferenceWindow.h"
-#include "win32updatemanager.h"
+//#include "win32updatemanager.h"
 #include "preferences.h"
 #include "log.h"
 #include "registrar.h"
@@ -92,7 +92,7 @@ typedef struct PrefsStruct
     string currentTheme;
 
     // page 7
-    bool checkForUpdates;
+//    bool checkForUpdates;
 
 	// page 8
 	bool updateCDAutomatically;
@@ -129,7 +129,7 @@ typedef struct PrefsStruct
             defaultFont == pref.defaultFont &&
             currentTheme == pref.currentTheme &&
 
-            checkForUpdates == pref.checkForUpdates &&
+//            checkForUpdates == pref.checkForUpdates &&
 
             reclaimFiletypes == pref.reclaimFiletypes &&
             askReclaimFiletypes == pref.askReclaimFiletypes &&
@@ -178,7 +178,7 @@ class Win32PreferenceWindow : public PreferenceWindow
 
                Win32PreferenceWindow(FAContext *context,
                                      ThemeManager *pThemeMan,
-                                     UpdateManager *pUpdateMan = NULL,
+//                                     UpdateManager *pUpdateMan = NULL,
                                      uint32 defaultPage = 0);
       virtual ~Win32PreferenceWindow(void); 
       
@@ -214,10 +214,10 @@ class Win32PreferenceWindow : public PreferenceWindow
                                   UINT msg,
                                   WPARAM wParam,
                                   LPARAM lParam);
-               bool PrefUpdateProc(HWND hwnd, 
-                                  UINT msg, 
-                                  WPARAM wParam, 
-                                  LPARAM lParam);
+//               bool PrefUpdateProc(HWND hwnd, 
+//                                  UINT msg, 
+//                                  WPARAM wParam, 
+//                                  LPARAM lParam);
                bool PrefAdvancedProc(HWND hwnd, 
                                   UINT msg, 
                                   WPARAM wParam, 
@@ -257,8 +257,8 @@ class Win32PreferenceWindow : public PreferenceWindow
       PrefsStruct  m_proposedValues;
       uint32       m_defaultPage;
 
-      bool deleteUpdateManager;
-      Win32UpdateManager* m_updateManager;
+//      bool deleteUpdateManager;
+//      Win32UpdateManager* m_updateManager;
       Preferences*   m_prefs;      
 
       map<string, string> m_oThemeList;

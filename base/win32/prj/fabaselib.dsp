@@ -294,10 +294,6 @@ SOURCE=..\..\src\undomanager.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\updatemanager.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\src\utility.cpp
 # End Source File
 # Begin Source File

@@ -58,6 +58,7 @@ class EditTrackInfoDialog
                     UINT msg, 
                     WPARAM wParam, 
                     LPARAM lParam); 
+    void BitziLookup(void);
  protected:
     void CreateEditInfoLists(set<string>& artists,
                              set<string>& albums,

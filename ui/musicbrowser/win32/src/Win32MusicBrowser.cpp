@@ -33,7 +33,6 @@ ____________________________________________________________________________*/
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <direct.h>
-
 #include <algorithm>
 
 using namespace std;
@@ -46,6 +45,11 @@ using namespace std;
 #include "eventdata.h"
 #include "MissingFileDialog.h"
 #include "player.h"
+
+#include <musicbrainz/bitzi/bitcollider.h>
+//#include <musicbrainz/bitzi/gui_win32.h>
+//#include <musicbrainz/bitzi/list.h>
+
 
 HINSTANCE g_hinst = NULL;
 const int iSpacer = 15;
@@ -1057,11 +1061,71 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             MessageBox(m_hWnd, dbaseUpgradedMessage, "Database Upgraded",
                        MB_OK|MB_SETFOREGROUND);
             break; }
+        case CMD_BitziLookup: {
+            BitziLookupEvent *ev = (BitziLookupEvent *)event;
+            BitziLookup(ev->URL());
+            break;
+        }
         default:
             break;
     }
     return kError_NoErr;
 }
 
+void MusicBrowserUI::BitziLookup(const string &URL)
+{
+    Bitcollider           *bc;
+    BitcolliderSubmission *submission = NULL;
+    BrowserEnum            browser = eBrowserNetscape;
+    char                   error[255];
+    int                    ret;
+  
+    error[0] = 0;
+    bc = bitcollider_init(false);
+    if (!bc)
+        strcpy(error, "Cannot create bitcollider. ");
+    else
+    {
+        submission = create_submission(bc);
+        set_auto_submit(submission, true);
+        if (!submission)
+            strcpy(error, "Cannot create submission. ");
+        {
+            char path[_MAX_PATH];
+            uint32 length = sizeof(path);
+
+            URLToFilePath(URL.c_str(), path, &length);
+            ::SetCursor(LoadCursor(NULL, IDC_WAIT));
+            ret = analyze_file(submission, path, false);
+            ::SetCursor(LoadCursor(NULL, IDC_ARROW));
+            if (!ret)
+                strcpy(error, "Cannot analyze file. ");
+            else
+            {
+                if (!submit_submission(submission, NULL, browser))
+                    strcpy(error, "Submission failed. ");
+            }
+        }
+    }
+    
+    if (submission)
+       delete_submission(submission);
+
+    if (bc)
+       bitcollider_shutdown(bc);
+  
+    if (error[0] != 0)
+    {
+         string message = string(error);
+         char   *ptr;
+  
+         ptr = get_error(bc);
+         if (ptr)
+             message += string(ptr);
+
+         MessageBox(NULL, message.c_str(), "Bitzi Lookup Error", MB_OK);
+  
+    }
+}
 
 

@@ -55,7 +55,7 @@ ____________________________________________________________________________*/
 #elif defined(WIN32)
 #include "Win32Window.h"
 #include "Win32PreferenceWindow.h"
-#include "win32updatemanager.h"
+//#include "win32updatemanager.h"
 #include "resource.h"
 extern HINSTANCE g_hinst;
 #elif defined(__BEOS__)
@@ -123,8 +123,8 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_eTimeDisplayState = kNormal;
    m_eTitleDisplayState = kNameArtist;
    m_oStreamInfo = string("");
-   m_pUpdateMan = NULL;
-   m_pUpdateThread = NULL;
+//   m_pUpdateMan = NULL;
+//   m_pUpdateThread = NULL;
    m_pOptionsThread = NULL;
    m_bInOptions = false;
    m_bShowBuffers = m_bPaused = m_bBufferingUp = false;
@@ -135,6 +135,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_eq = new Equalizer(context);
    m_eq->LoadSettings();
 
+#if 0
 #if defined( WIN32 )
     m_pUpdateMan = new Win32UpdateManager(m_pContext);
     m_pUpdateMan->DetermineLocalVersions();
@@ -146,6 +147,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
 #endif // _M_ALPHA
 
 #endif // WIN32
+#endif
 
    m_pContext->prefs->GetPrefString(kWindowModePref, szTemp, &iLen);
    if (iLen > 0)
@@ -171,9 +173,9 @@ FreeAmpTheme::~FreeAmpTheme()
         delete m_pOptionsThread;
         m_pOptionsThread = NULL;
     }
-#if defined( WIN32 )
-    delete m_pUpdateMan;
-#endif // WIN32
+//#if defined( WIN32 )
+//    delete m_pUpdateMan;
+//#endif // WIN32
 }
 
 Error FreeAmpTheme::Init(int32 startup_type)
@@ -207,7 +209,7 @@ void FreeAmpTheme::WorkerThread(void)
     m_pContext->prefs->GetPrefString(kMainWindowPosPref, szTemp, &iLen);
     sscanf(szTemp, " %d , %d", &m_oWindowPos.x, &m_oWindowPos.y);
 
-#ifdef WIN32
+#if 0 //WIN32
 
     bool checkForUpdates = false;
 
@@ -1194,18 +1196,19 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }
    if (oControlName == string("Download") && eMesg == CM_Pressed)
    {
-       if (m_oFileName.length() == 0)
-          return kError_NoErr;
-
-       //m_pContext->target->AcceptEvent(new Event(CMD_ToggleDownloadUI));
-       m_pContext->target->AcceptEvent(new 
-                   BitziLookupEvent(m_oFileName));
+       m_pContext->target->AcceptEvent(new Event(CMD_ToggleDownloadUI));
        return kError_NoErr;
    }
    if (oControlName == string("BitziLookup") && eMesg == CM_Pressed)
    {
        if (m_oFileName.length() == 0)
+       {
+          MessageDialog oBox(m_pContext);
+  
+          oBox.Show("A song must be loaded in order to look it up.", 
+                     string(BRANDING), kMessageOk);
           return kError_NoErr;
+       }
            
        m_pContext->target->AcceptEvent(new 
                    BitziLookupEvent(m_oFileName));
@@ -2024,9 +2027,7 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
         bEnable = true;
         m_oFileName = pItem->URL();
     }
-    //m_pWindow->ControlEnable(string("BitziLookup"), true, bEnable);
-    m_pWindow->ControlEnable(string("Download"), true, bEnable);
-
+    m_pWindow->ControlEnable(string("BitziLookup"), true, bEnable);
     m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
     m_pWindow->ControlStringValue(string("TrackName"), true, m_oTrackName);
     m_pWindow->ControlStringValue(string("TrackNo"), true, m_oTrackNo);
@@ -2165,6 +2166,7 @@ void FreeAmpTheme::PostWindowCreate(void)
 
 }
 
+#if 0
 void FreeAmpTheme::update_thread(void* arg)
 {
     FreeAmpTheme* _this = (FreeAmpTheme*)arg;
@@ -2194,6 +2196,7 @@ void FreeAmpTheme::UpdateThread()
 
     delete m_pUpdateThread;
 }
+#endif
 
 void FreeAmpTheme::ShowOptions(uint32 defaultPage)
 {
@@ -2231,7 +2234,8 @@ void FreeAmpTheme::OptionsThread(uint32 defaultPage)
 
 
 #ifdef WIN32
-    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, m_pUpdateMan, defaultPage);
+//    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, m_pUpdateMan, defaultPage);
+    pWindow = new Win32PreferenceWindow(m_pContext, m_pThemeMan, defaultPage);
 #elif defined(__BEOS__)
     pWindow = new BeOSPreferenceWindow(m_pContext, m_pThemeMan);
 #else

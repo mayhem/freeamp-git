@@ -148,8 +148,8 @@ BEGIN
     LTEXT           "Track #:",IDC_TRACKTEXT,168,46,28,8
     LTEXT           "Location:",IDC_LOCATIONTEXT,7,133,30,8
     LTEXT           "Playcount:",IDC_TRACKTEXT,164,78,34,8
-    PUSHBUTTON      "Look up this track on MusicBrainz",IDC_BUTTON_MB,7,25,
-                    243,14
+    PUSHBUTTON      "Look up at MusicBrainz",IDC_BUTTON_MB,7,25,112,14
+    PUSHBUTTON      "Look up at Bitzi",IDC_BITZILOOKUP,123,25,127,14
 END
 
 IDD_INTROWIZARD_HELLO DIALOG DISCARDABLE  0, 0, 316, 164

@@ -46,13 +46,6 @@ using namespace std;
 #include "apsplaylist.h"
 #include "FAMetaUnit.h"
 
-//RAK: Is this still used?
-//const char* kAudioFileFilter =
-//            "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
-//            "*.mpg;*.mp1;*.mp2;*.mp3;*.mpp\0"
-//            "All Files (*.*)\0"
-//            "*.*\0";
-
 void MusicBrowserUI::TipEvent(PlaylistItem *item)
 {
    vector<PlaylistItem*> items;
@@ -78,6 +71,29 @@ void MusicBrowserUI::TipEvent(PlaylistItem *item)
    string url = string("http://www.fairtunes.com/servlet/ArtistLookupServlet?redirectPage=http://www.fairtunes.com/search.jsp&searchTerms=") + encoded;
 
    ShellExecute(m_hWnd, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+}
+
+void MusicBrowserUI::BitziEvent(PlaylistItem *item)
+{
+    vector<PlaylistItem*> items;
+    PlaylistItem *lookup = NULL;
+    if (item)
+        lookup = item;
+   
+    if (!lookup) {
+        if(m_hPlaylistView == GetFocus())
+            GetSelectedPlaylistItems(&items); 
+        else if(m_hMusicView == GetFocus())
+            GetSelectedMusicTreeItems(&items); 
+
+        if (items.size() > 0)
+           lookup = *(items.begin());
+    }
+   
+    if (!lookup)
+   	   return;
+
+    m_context->target->AcceptEvent(new BitziLookupEvent(lookup->URL()));
 }
 
 void MusicBrowserUI::ClearPlaylistEvent(void)
@@ -1427,6 +1443,9 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                         EnableMenuItem(subMenu,
                                        ID_POPUP_REMOVE,
                                        MF_BYCOMMAND|MF_GRAYED);
+                        EnableMenuItem(subMenu,
+                                       ID_BITZI_LOOKUP,
+                                       MF_BYCOMMAND|MF_GRAYED);
                     }
 
 
@@ -1440,6 +1459,9 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                         EnableMenuItem(subMenu,
                                        ID_POPUP_EDITINFO,
                                        MF_BYCOMMAND|MF_GRAYED);    
+                        EnableMenuItem(subMenu,
+                                       ID_BITZI_LOOKUP,
+                                       MF_BYCOMMAND|MF_GRAYED);
                     }
 
 
@@ -1454,12 +1476,18 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                         EnableMenuItem(subMenu,
                                        ID_POPUP_RENAME,
                                        MF_BYCOMMAND|MF_GRAYED);                         
+                        EnableMenuItem(subMenu,
+                                       ID_BITZI_LOOKUP,
+                                       MF_BYCOMMAND|MF_GRAYED);
                     }
 
                     if(trackCount == 0)
                     {
                         EnableMenuItem(subMenu,
                                        ID_POPUP_EDITINFO,
+                                       MF_BYCOMMAND|MF_GRAYED);
+                        EnableMenuItem(subMenu,
+                                       ID_BITZI_LOOKUP,
                                        MF_BYCOMMAND|MF_GRAYED);
 
                         if( IsItemSelected(m_hNewPlaylistItem) &&

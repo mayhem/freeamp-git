@@ -109,6 +109,7 @@
 #define IDC_EDIT2                       1045
 #define IDC_MISSINGTRACK                1045
 #define IDC_BUTTON2                     1046
+#define IDC_BITZILOOKUP                 1046
 #define IDC_PLAYCOUNT                   1047
 #define IDC_RELATABLE_CAPTION1          1049
 #define IDC_RELATABLE_TEXT1             1050
@@ -215,7 +216,7 @@
 #define ID_HELP_RELATABLEWEBSITE        40099
 #define ID_POPUP_SUPDATE                40100
 #define ID_POPUP_VISITWEB               40101
-#define ID_LOOKUP_BITZI                 40102
+#define ID_BITZI_LOOKUP                 40102
 #define ID_HELP_BITZIWEBSITE            40103
 #define IDS_URL                         65535
 #define IDC_TRACKTEXT                   65535

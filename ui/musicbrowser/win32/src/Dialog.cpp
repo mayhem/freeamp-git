@@ -203,6 +203,10 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 					TipEvent();
 					return 1;
 
+				case ID_BITZI_LOOKUP:
+					BitziEvent();
+					return 1;
+
                 case ID_FILE_NEWPLAYLIST:
                     NewPlaylist();
                     return 1;
@@ -398,6 +402,17 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
 									NULL,
 									SW_SHOWNORMAL);
                     return 1;
+
+				case ID_HELP_BITZIWEBSITE:
+					ShellExecute(	hwnd,
+									"open",
+									"http://www.bitzi.com/welcome/freeamp/",
+									NULL,
+									NULL,
+									SW_SHOWNORMAL);
+                    return 1;
+
+
 
                 case ID_HELP_ABOUT:
                     m_context->target->AcceptEvent(new ShowPreferencesEvent(9));
@@ -1867,7 +1882,7 @@ void MusicBrowserUI::UpdateButtonStates()
 
 void MusicBrowserUI::UpdateMenuStates()
 {
-    HMENU        hMenuRoot, hMenu;
+    HMENU        hMenuRoot, hMenu, hBitziMenu;
     MENUITEMINFO sMenuItem;
 
     hMenuRoot = GetMenu(m_hWnd);
@@ -1876,6 +1891,8 @@ void MusicBrowserUI::UpdateMenuStates()
     // File Menu
     hMenu = GetSubMenu(hMenuRoot, 0); 
 
+    // Bitzi Menu
+    hBitziMenu = GetSubMenu(hMenuRoot, 6);
 
     EnableMenuItem(hMenu, ID_FILE_SAVEPLAYLIST, 
                    m_bListChanged ? MF_ENABLED : MF_GRAYED );
@@ -1888,8 +1905,8 @@ void MusicBrowserUI::UpdateMenuStates()
 
     // start off disabled... might enable below
     EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_GRAYED);
-
     EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_GRAYED);
+    EnableMenuItem(hBitziMenu, ID_BITZI_LOOKUP, MF_GRAYED);
 
     sMenuItem.cbSize = sizeof(MENUITEMINFO);
     sMenuItem.fMask =  MIIM_DATA|MIIM_TYPE;
@@ -1946,7 +1963,8 @@ void MusicBrowserUI::UpdateMenuStates()
         EnableMenuItem(hMenu, ID_EDIT_REMOVE, MF_ENABLED);
 
         EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_ENABLED);
-
+        if (count == 1)
+           EnableMenuItem(hBitziMenu, ID_BITZI_LOOKUP, MF_ENABLED);
 
         sMenuItem.cbSize = sizeof(MENUITEMINFO);
         sMenuItem.fMask = MIIM_DATA|MIIM_TYPE;
@@ -1999,6 +2017,8 @@ void MusicBrowserUI::UpdateMenuStates()
            trackCount)
         {
             EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_ENABLED);
+            if (trackCount == 1)
+               EnableMenuItem(hBitziMenu, ID_BITZI_LOOKUP, MF_ENABLED);
         }
 
         /*if(!IsItemSelected(m_hNewPlaylistItem) && !IsItemSelected(m_hAllItem) &&

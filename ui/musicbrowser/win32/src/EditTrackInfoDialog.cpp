@@ -43,6 +43,7 @@ ____________________________________________________________________________*/
 #include "EditTrackInfoDialog.h"
 #include "help.h"
 #include "uuid.h"
+#include "eventdata.h"
 
 EditTrackInfoDialog::EditTrackInfoDialog(FAContext* context,
                                          HINSTANCE hinst,
@@ -130,6 +131,7 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
             HWND hwndTrackText =  FindWindowEx(hwnd, NULL, NULL, "Track #:");
             HWND hwndPlayCount = GetDlgItem(hwnd, IDC_PLAYCOUNT);           
             HWND hwndMusicBrainz = GetDlgItem(hwnd, IDC_BUTTON_MB);
+            HWND hwndBitzi = GetDlgItem(hwnd, IDC_BITZILOOKUP);
 
             SYSTEMTIME sysTime;
 
@@ -153,6 +155,8 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
                 EnableWindow(hwndTitle, FALSE);
                 EnableWindow(hwndTitleText, FALSE);
 				Button_Enable(hwndMusicBrainz, FALSE);
+				Button_Enable(hwndMusicBrainz, FALSE);
+				Button_Enable(hwndBitzi, FALSE);
             }
             else
             {
@@ -306,6 +310,15 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
 					}
 				    break;
 				}
+			    case IDC_BITZILOOKUP:
+				{
+                    string URL(m_location);
+                    EditTrackInfoDialog *_this;
+                    
+                    _this = (EditTrackInfoDialog*)GetWindowLong(hwnd, GWL_USERDATA);
+                    _this->BitziLookup();
+				    break;
+				}
                 case IDHELP:
                 {
                     ShowHelp(m_context, Edit_Info);
@@ -451,4 +464,13 @@ void EditTrackInfoDialog::CreateEditInfoLists(set<string>& artists,
             }
         }
     }
+}
+
+void EditTrackInfoDialog::BitziLookup(void)
+{
+    char URL[MAX_PATH];
+    uint32 length = MAX_PATH;
+
+    FilePathToURL(m_location, URL, &length);
+    m_context->target->AcceptEvent(new BitziLookupEvent(string(URL)));
 }

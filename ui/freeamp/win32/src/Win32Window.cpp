@@ -206,6 +206,28 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             break;
         }       
 
+        case WM_RBUTTONDOWN:
+            break;
+
+        case WM_RBUTTONUP:
+        {
+            POINT pt;
+            HMENU hContext, hSubMenu;
+
+            hContext = LoadMenu(g_hinst, MAKEINTRESOURCE(IDR_CONTEXT));
+            hSubMenu = GetSubMenu(hContext, 0);
+
+            pt.x = (int16)LOWORD(lParam);
+            pt.y = (int16)HIWORD(lParam);
+            ClientToScreen(hwnd, &pt);
+            TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, 
+                           pt.x, pt.y, 0, hwnd, NULL);
+
+            DestroyMenu(hContext);
+
+            break;
+        }
+
         case WM_LBUTTONDOWN:
         {
             POINT pt;
@@ -356,6 +378,46 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             break;
         }
         
+        case WM_COMMAND:
+        {
+            string oControl;
+            switch(LOWORD(wParam))
+            {
+                case IDMC_EXIT:
+                    SendMessage(hwnd, WM_CLOSE, 0, 0);
+                    break;
+
+                case IDMC_MYMUSIC:
+                    oControl = string("MyMusic");
+                    break;
+
+                case IDMC_FILE:
+                    oControl = string("Files");
+                    break;
+
+                case IDMC_SUGGEST:
+                    oControl = string("Relatable Playlist");
+                    break;
+
+                case IDMC_BITZILOOKUP:
+                    oControl = string("BitziLookup");
+                    break;
+
+                case IDMC_EDITINFO:
+                    oControl = string("Title");
+                    m_pMindMeldMutex->Acquire();
+                    m_pTheme->HandleControlMessage(oControl, CM_MouseDoubleClick);
+                    m_pMindMeldMutex->Release();
+                    oControl.erase();
+                    break;
+            }
+            if (oControl.length())
+            {
+                m_pMindMeldMutex->Acquire();
+                m_pTheme->HandleControlMessage(oControl, CM_Pressed);
+                m_pMindMeldMutex->Release();
+            }
+        }
         default:
             result = DefWindowProc( hwnd, msg, wParam, lParam );
             break;
