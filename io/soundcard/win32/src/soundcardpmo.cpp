@@ -37,6 +37,7 @@ ____________________________________________________________________________*/
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
 #define MAXINT32 0x7FFFFFFF
+const int iFramesPerHeader = 8;
 
 Mutex *g_pHeaderMutex;
 
@@ -92,6 +93,8 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
    m_iBaseTime = MAXINT32;
    m_iBytesPerSample = 0;
    m_num_headers = 0;
+
+pBase = 0;
    
    if (!m_pBufferThread)
    {
@@ -427,7 +430,8 @@ Error SoundCardPMO::Reset(bool user_stop)
    return kError_NoErr;
 }
 
-Error SoundCardPMO::Write(void *pBuffer)
+
+Error SoundCardPMO::Write(void *pBuffer, uint32 uSize)
 {
    Error    result = kError_NoErr;
    WAVEHDR *wavhdr = NULL;
@@ -438,7 +442,17 @@ Error SoundCardPMO::Write(void *pBuffer)
       return kError_Interrupt;
    }
 
-   wavhdr->dwBufferLength = m_data_size;
+   if (pBase == NULL)
+      pBase = (char *)pBuffer;
+      
+   if ((((char *)pBuffer) + uSize)- pBase > m_pInputBuffer->GetBufferSize())
+   {
+      Debug_v("Diff: %d Size: %u", 
+          ((((char *)pBuffer) + uSize) - pBase), m_pInputBuffer->GetBufferSize());
+      assert(0);
+   }   
+         
+   wavhdr->dwBufferLength = uSize;
    wavhdr->lpData = (char *)pBuffer;
 
    // Prepare & write newest header
@@ -448,40 +462,60 @@ Error SoundCardPMO::Write(void *pBuffer)
    return result;
 }
 
-Error SoundCardPMO::AllocHeader(void *&pBuffer)
+Error SoundCardPMO::AllocHeader(void *&pBuffer, uint32 &uSize)
 {
     Error    eRet;
-    unsigned iRead;
-	static char *pSaved = NULL;
+    unsigned iRead, uMaxBytes;
+    int      iNumBlocks;
 
-    iRead = m_iOffset + m_data_size;
-    eRet = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, iRead);
-    if (eRet != kError_NoErr)
-       return eRet;
+    uMaxBytes = m_pInputBuffer->GetBufferSize() -
+                (m_pInputBuffer->GetReadIndex() + m_iOffset);
+
+    iNumBlocks = iFramesPerHeader;
+    if (iNumBlocks * m_data_size >= uMaxBytes && uMaxBytes != 0)
+    {
+       iNumBlocks = uMaxBytes / m_data_size;
+       assert(uMaxBytes % m_data_size == 0);
+    }   
+
+    while(iNumBlocks > 0)
+    {
+       uSize = m_data_size * iNumBlocks;
+       iRead = m_iOffset + uSize;
+       eRet = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, iRead);
+       if (eRet == kError_NoDataAvail)
+       {
+          iNumBlocks >>= 1;
+          continue;
+       }   
+       if (eRet != kError_NoErr)
+          return eRet;
+       else
+          break;    
+    }       
+    if (iNumBlocks == 0)
+       return kError_NoDataAvail;
 
     eRet = ((EventBuffer *)m_pInputBuffer)->EndRead(0);
     if (eRet != kError_NoErr)
-       return eRet;
+        return eRet;
 
-    if (pSaved == NULL)
-	   pSaved = (char *)pBuffer;
-	   
     pBuffer = (char *)pBuffer + m_iOffset;
     ((EventBuffer *)m_pInputBuffer)->WrapPointer(pBuffer);
 
-    m_iOffset += m_data_size;
+    m_iOffset += uSize;
     ((EventBuffer *)m_pInputBuffer)->SetBytesInUse(m_iOffset);
 
     return kError_NoErr;
 }
 
-Error SoundCardPMO::FreeHeader()
+Error SoundCardPMO::FreeHeader(uint32 uSize)
 {
     Error     eRet;
     void     *pBuffer;
     unsigned  iRead;
 
-    iRead = m_data_size;
+    iRead = uSize;
     eRet = ((EventBuffer *)m_pInputBuffer)->BeginRead(pBuffer, iRead);
     if (eRet != kError_NoErr)
        return eRet;
@@ -490,7 +524,7 @@ Error SoundCardPMO::FreeHeader()
     if (eRet != kError_NoErr)
        return eRet;
 
-    m_iOffset -= m_data_size;
+    m_iOffset -= uSize;
     ((EventBuffer *)m_pInputBuffer)->SetBytesInUse(m_iOffset);
 
     return kError_NoErr;
@@ -514,7 +548,7 @@ WAVEHDR *SoundCardPMO::NextHeader(bool bFreeHeadersOnly)
           {
               waveOutUnprepareHeader(m_hwo, &m_wavehdr_array[iLoop], sizeof(WAVEHDR));
 
-              eRet = FreeHeader();
+              eRet = FreeHeader(m_wavehdr_array[iLoop].dwBufferLength);
               if (IsError(eRet))
               {
                  g_pHeaderMutex->Release();
@@ -556,6 +590,7 @@ void SoundCardPMO::WorkerThread(void)
    Error       eErr;
    Event      *pEvent;
    int         iValue;
+   uint32      uSize;
 
    // Don't do anything until resume is called.
    m_pPauseSem->Wait();
@@ -607,7 +642,7 @@ void SoundCardPMO::WorkerThread(void)
 		  if (m_bPause || m_bExit)
 			  break;
 	      
-          eErr = AllocHeader(pBuffer);
+          eErr = AllocHeader(pBuffer, uSize);
 		  if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
              break;
 
@@ -680,7 +715,7 @@ void SoundCardPMO::WorkerThread(void)
 	  if (m_bPause || m_bExit)
 		 continue;
 
-      Write(pBuffer);
+      Write(pBuffer, uSize);
 	  m_pLmc->Wake();
 
       UpdateBufferStatus();

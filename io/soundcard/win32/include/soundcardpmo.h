@@ -60,9 +60,9 @@ public:
     virtual Error Reset(bool user_stop);
     void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);
     WAVEHDR      *NextHeader(bool bFreeHeadersOnly = false);
-    Error         FreeHeader();
-    Error         AllocHeader(void *&pBuffer);
-    Error         Write(void *pBuffer);
+    Error         FreeHeader(uint32 uSize);
+    Error         AllocHeader(void *&pBuffer, uint32 &uSize);
+    Error         Write(void *pBuffer, uint32 uSize);
 	void          Pause(void);
 	void          Resume(void);
 	void          Clear(void);
@@ -89,6 +89,7 @@ public:
 	
 	string          m_oDstLineName, m_oVolumeControlName;
 	DWORD           m_dwMinimum, m_dwMaximum, m_dwVolumeControlID;
+	char           *pBase;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */

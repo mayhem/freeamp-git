@@ -68,12 +68,14 @@ class PullBuffer
 		       {
 			       return (100 * m_iBytesInBuffer) / m_iBufferSize;
 			   };
-      void     WrapPointer(void *&pBuffer);
 
-    protected:
-
+      // These function really should not be public, but
+	  // the stupid windows PMO needs them. Grrr.
+      void       WrapPointer(void *&pBuffer);
       int32      GetWriteIndex();
       int32      GetReadIndex();
+
+    protected:
 
       FAContext *m_context;
       Mutex     *m_pMutex;

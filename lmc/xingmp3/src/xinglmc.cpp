@@ -645,6 +645,7 @@ Error XingLMC::InitDecoder()
          m_pContext->prefs->GetOutputBufferSize(&iNewSize);
          iNewSize *= 1024;
    
+         //iNewSize -= iNewSize % (m_iMaxWriteSize * 16);
          iNewSize -= iNewSize % m_iMaxWriteSize;
          result = m_pOutputBuffer->Resize(iNewSize, 0);
          if (IsError(result))

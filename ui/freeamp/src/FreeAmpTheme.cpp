@@ -470,7 +470,6 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          if (m_bShowBuffers)
              oName = string("StreamInfo");
 
-         Debug_v("%s into %s", oText.c_str(), oName.c_str());    
          m_pWindow->ControlStringValue(oName, true, oText);
 
          break;

@@ -103,12 +103,11 @@ static LRESULT WINAPI MainWndProc(HWND hwnd, UINT msg,
             
             break;
         }
-        case WM_NCCREATE:  
-        case WM_NCDESTROY: 
-        case WM_NCCALCSIZE:
-            return 1;    
         
         default:
+			if (!ui) 
+                return DefWindowProc( hwnd, msg, wParam, lParam );
+            
             return ui->WindowProc(hwnd, msg, wParam, lParam);
     }
     return result;
@@ -227,12 +226,22 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             break;
         }
 
+        case WM_CHAR:
+        {
+            Keystroke((unsigned char)wParam);
+            break;
+        }
+            
         case WM_KEYDOWN:
         {
             if (wParam == VK_F1)
+            {
                wParam = 'h';
+               Keystroke((unsigned char)wParam);
+            }
+            else   
+               result = DefWindowProc( hwnd, msg, wParam, lParam );
                
-            Keystroke((unsigned char)wParam);
             break;
         }
         
@@ -247,7 +256,9 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
         case WM_SYSCOMMAND:
         {
             if (!MenuCommand(wParam))
+            {
                 result = DefWindowProc( hwnd, msg, wParam, lParam );
+            }    
                 
             break;
         }    
