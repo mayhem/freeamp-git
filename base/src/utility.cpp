@@ -55,6 +55,7 @@ using namespace std;
 #include "facontext.h"
 #include "utility.h"
 #include "errors.h"
+#include "properties.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -846,9 +847,17 @@ void ShowHelp(FAContext *m_context, const char *helpurl)
 #endif
 #ifdef WIN32
 
+    Int32PropValue *pProp;
+    HWND            hWnd;
+    if (IsError(m_context->props->GetProperty("MainWindow", 
+                (PropValue **)&pProp)))
+       hWnd = NULL;
+    else
+       hWnd = (HWND)pProp->GetInt32();
+
     len = _MAX_PATH;
     FilePathToURL(oHelpFile.c_str(), dir, &len);
-	ShellExecute(NULL, "open", dir, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(hWnd, "open", dir, NULL, NULL, SW_SHOWNORMAL);
 #endif
     delete [] dir;
 } 
