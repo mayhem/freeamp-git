@@ -58,9 +58,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 {
     HANDLE runOnceMutex;
 
-    Debug_v("cmd [%s]", lpszCmdLine);
-
-    
     g_hinst = hInstance;
 
 	if(SendCommandLineToRealJukebox())
