@@ -26,10 +26,10 @@ ____________________________________________________________________________*/
 #include "preferences.h"
 
 
-#define DEFAULT_UI  
-
 const HKEY  kMainKey = HKEY_CURRENT_USER;
-const char* kFreeAmpKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.0";
+const char* kPrefsKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.0";
+const char* kFreeAmpKey = "SOFTWARE\\FreeAmp";
+const char* kFreeAmpVersionKey = "FreeAmp v1.0";
 const char* kInstallDirPref = "InstallDirectory";
 const char* kUIPref = "UI";
 const char* kDefaultUI = "freeamp.ui";
@@ -43,10 +43,15 @@ Preferences()
     m_prefsKey = NULL;
 
     result = RegOpenKeyEx(	kMainKey,
-							kFreeAmpKey,
+							kPrefsKey,
 							0, 
 							KEY_ALL_ACCESS,
 							&m_prefsKey);
+
+    if(result != ERROR_SUCCESS)
+    {
+        m_prefsKey = NULL;
+    }
 }
 
 Preferences::
@@ -79,15 +84,18 @@ Initialize()
 
         error = GetInstallDirectory(path, &length);
 
-		char foo[MAX_PATH+1] = {0x00};
+		char foo[MAX_PATH] = {0x00};
 		sprintf(foo,"%s\\plugins",cwd);
 		WIN32_FIND_DATA win32fd;
 
-		HANDLE h = FindFirstFile(foo,&win32fd);
-		// check for plugins directory in cwd
+        // check for plugins directory in cwd
 
-		if (h != INVALID_HANDLE_VALUE) {
-			if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		HANDLE h = FindFirstFile(foo,&win32fd);
+
+		if (h != INVALID_HANDLE_VALUE) 
+        {
+			if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) 
+            {
 				if(IsError(error) || strcmp(cwd, path))
 				{
 					result = RegSetValueEx( m_prefsKey,
@@ -104,8 +112,9 @@ Initialize()
     else // keys need to be created for the first time
     {
         DWORD disposition;
+        HKEY freeampKey;
 
-        // create the key in the windows registry
+        // create the main key in the windows registry
         result = RegCreateKeyEx(kMainKey,
                                 kFreeAmpKey,
                                 NULL, 
@@ -113,8 +122,22 @@ Initialize()
                                 REG_OPTION_NON_VOLATILE,
                                 KEY_ALL_ACCESS,
                                 NULL,
-                                &m_prefsKey,
+                                &freeampKey,
                                 &disposition);
+
+        if(result == ERROR_SUCCESS)
+        {
+            // create the version key under the freeamp key
+            result = RegCreateKeyEx(freeampKey,
+                                    kFreeAmpVersionKey,
+                                    NULL, 
+                                    "",
+                                    REG_OPTION_NON_VOLATILE,
+                                    KEY_ALL_ACCESS,
+                                    NULL,
+                                    &m_prefsKey,
+                                    &disposition);
+        }
 
         if(result == ERROR_SUCCESS)
         {
@@ -140,6 +163,8 @@ Initialize()
         {
              error = kError_NoPrefs;
         }
+
+        RegCloseKey(freeampKey);
     }
 
     return error;
