@@ -61,3 +61,6 @@ Other major contributors and their contributions:
 
 "Jean-Michel HERVE" <tuo_stg@hotmail.com>
 * x86 assembly optimized MP3 decoder
+
+"Tom Spindler" <dogcow@globalcenter.net>
+* Solaris port, makefile organization

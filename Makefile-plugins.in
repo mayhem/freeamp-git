@@ -1,0 +1,159 @@
+# Freeamp master Makefile
+# $Id$
+
+RELOC = @FPIC@
+
+include config/Makefile.header
+
+plugins-install install_plugins: install-plugins
+
+install-plugins: plugins
+	$(mkinstalldirs) $(DESTDIR)$(libdir)/freeamp/plugins
+	@list=`ls plugins/*.*`; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`"; \
+	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; \
+	done
+
+uninstall_plugins uninstall-plugins:
+	@list=`ls plugins/*.*`; for p in $$list; do \
+	  if test -f $(DESTDIR)$(libdir)/freeamp/$$p; then \
+	    echo "  rm -f $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`"; \
+	    rm -f $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; \
+	done
+
+OSDEPPLUGINS = @OSDEPPLUGINS@
+
+clean-plugins plugins-clean:
+	-rm -f $(LFIOBJ) $(HTTPOBJ) $(SCPMOOBJ) $(CMDUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) plugins/*.*
+
+PLUGINS =  plugins/localfileinput-$(HOST_OS).pmi
+PLUGINS += plugins/httpinput-$(HOST_OS).pmi
+PLUGINS += plugins/obsinput-$(HOST_OS).pmi
+PLUGINS += plugins/soundcard-$(HOST_OS).pmo
+PLUGINS += plugins/freeampcmd-$(HOST_OS).ui
+PLUGINS += plugins/mpg123-$(HOST_OS).ui
+PLUGINS += plugins/lcd-$(HOST_OS).ui
+PLUGINS += plugins/irman-$(HOST_OS).ui
+PLUGINS += plugins/xingmp3-$(HOST_OS).lmc
+
+plugins plugins-cc: $(PLUGINS) $(OSDEPPLUGINS)
+
+#
+# PMI section
+
+#
+# localfileinput is a nice simple example of a plugin dependency.
+LFIOBJ = io/local/filebuffer.o io/local/localfileinput.o
+
+plugins/localfileinput-$(HOST_OS).pmi: $(LFIOBJ)
+	$(LINKMOD) -o $@ $(LFIOBJ)
+
+#$(LFIOBJ):
+#	$(CXXCOMPILE) $(FPIC) -o $(*).o -c ${*:%.o=%}.c
+
+#
+# here's httpinput
+HTTPOBJ = io/http/httpinput.o io/http/httpbuffer.o
+
+plugins/httpinput-$(HOST_OS).pmi: $(HTTPOBJ)
+	$(LINKMOD) -o $@ $(HTTPOBJ)
+
+#$(HTTPOBJ):
+#	$(CXXCOMPILE) $(FPIC) -o $(*).o -c ${*:%.o=%}.c
+
+# obsinput
+OBSPMI = io/obs/obsbuffer.o io/obs/obsinput.o
+
+plugins/obsinput-$(HOST_OS).pmi: $(OBSPMI)
+	$(LINKMOD) -o $@ $(OBSPMI)
+
+#
+# PMO section
+
+SCPMOsolarisOBJ = io/soundcard/unix/solaris/src/volume.o
+SCPMOlinuxOBJ = io/soundcard/unix/linux/src/ossvolume.o
+
+SCPMObeosOBJ = io/soundcard/beos/src/ringbuffer.o 
+#SCPMObeosOBJ+=io/soundcard/beos/src/soundutils.o io/soundcard/beos/TestRing.o
+
+SCPMOOBJ = io/soundcard/$(OSDEP)/src/soundcardpmo.o $(SCPMO$(HOST_OS)OBJ)
+
+plugins/soundcard-$(HOST_OS).pmo: $(SCPMOOBJ)
+	$(LINKMOD) -o $@ $(SCPMOOBJ)
+
+# esound
+ESNDOBJ = io/esound/src/esdvolume.o io/esound/src/esoundpmo.o
+
+plugins/esound.pmo: $(ESNDOBJ)
+	$(LINKMOD) -o $@ $(ESNDOBJ)
+
+#
+# UI section
+
+# cmdline
+CMDUIOBJ = ui/cmdline/cmdlineUI.o
+
+plugins/freeampcmd-$(HOST_OS).ui: $(CMDUIOBJ)
+	$(LINKMOD) -o $@ $(CMDUIOBJ)
+
+# Mpg123 ui
+MPG123UIOBJ = ui/mpg123/Mpg123UI.o
+
+plugins/mpg123-$(HOST_OS).ui: $(MPG123UIOBJ)
+	$(LINKMOD) -o $@ $(MPG123UIOBJ)
+
+# lcd ui
+LCDUIOBJ = ui/lcd/src/lcdui.o ui/lcd/src/sockets.o
+
+plugins/lcd-$(HOST_OS).ui: $(LCDUIOBJ)
+	$(LINKMOD) -o $@ $(LCDUIOBJ) $(X_EXTRA_LIBS)
+
+# IRman
+IRMANUIOBJ = ui/irman/src/irmanui.o ui/irman/src/ircmd.o 
+IRMANUIOBJ += ui/irman/src/irfunc.o ui/irman/src/irio.o
+
+plugins/irman-$(HOST_OS).ui: $(IRMANUIOBJ)
+	$(LINKMOD) -o $@ $(IRMANUIOBJ)
+
+GTKUIOBJ = ui/gtk/freeamp-gtk.o
+
+plugins/gtk.ui: $(GTKUIOBJ)
+	$(LINKMOD) -o $@ $(GTKUIOBJ)
+
+# The studly X11 freeamp interface
+FREEAMPUIOBJ = ui/freeamp/unix/src/freeamp.o ui/freeamp/unix/src/windowhash.o
+FREEAMPUIOBJ += ui/freeamp/unix/src/res.o ui/freeamp/unix/src/fawindow.o
+
+plugins/freeamp-$(HOST_OS).ui: $(FREEAMPUIOBJ)
+	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(X_LIBS) $(X_EXTRA_LIBS)
+
+
+#
+# LMC section
+
+# the XING decoder objs and dependencies:
+# This is kinda nasty, since there's C, C++, and asm, oh my!
+# of course, each needs different compilation methods. grr.
+XINGLMCOBJX86 = lmc/xingmp3/src/x86gas.o
+
+XINGLMCOBJC = lmc/xingmp3/src/cdct.o lmc/xingmp3/src/cupl3.o \
+  lmc/xingmp3/src/hwin.o lmc/xingmp3/src/iup.o lmc/xingmp3/src/l3init.o \
+  lmc/xingmp3/src/msis.o lmc/xingmp3/src/wavep.o lmc/xingmp3/src/csbt.o \
+  lmc/xingmp3/src/cwinm.o lmc/xingmp3/src/icdct.o lmc/xingmp3/src/mdct.o \
+  lmc/xingmp3/src/uph.o lmc/xingmp3/src/cup.o lmc/xingmp3/src/dec8.o \
+  lmc/xingmp3/src/isbt.o lmc/xingmp3/src/l3dq.o lmc/xingmp3/src/mhead.o \
+  lmc/xingmp3/src/upsf.o lmc/xingmp3/src/iwinm.o
+
+XINGLMCOBJC += @XINGASM@
+#assembly lang code, if we need it
+
+XINGLMCOBJCXX=lmc/xingmp3/src/xinglmc.o
+
+XINGLMCOBJ = $(XINGLMCOBJC) $(XINGLMCOBJCXX)
+
+plugins/xingmp3-$(HOST_OS).lmc: $(XINGLMCOBJ)
+	$(LINKMOD) -o $@ $(XINGLMCOBJ)
+

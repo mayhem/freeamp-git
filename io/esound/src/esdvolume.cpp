@@ -1,7 +1,8 @@
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
-	Portions copyright (C) 1998 GoodNoise
+
+	Portions Copyright (C) 1998 GoodNoise
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,29 +21,43 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef MUTEX_H
-#define MUTEX_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/soundcard.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <esd.h>
 
-#include <pthread.h>
+#include "esdvolume.h"
 
-#define WAIT_FOREVER -1
+ESDVolumeManager::ESDVolumeManager()
+                 :VolumeManager()
+{
 
-class Mutex {
+}
 
-public:
-	Mutex(bool createOwned = false);
-	~Mutex();
+void ESDVolumeManager::SetVolume(int32 v) 
+{ // This OSS code will work for the moment.
+    int mixFd = open("/dev/mixer",O_RDWR);
+    if (mixFd != -1) 
+    {
+        v |= (v << 8);
+        ioctl(mixFd, SOUND_MIXER_WRITE_PCM, &v);
+        close(mixFd);
+    }
+}
 
+int32 ESDVolumeManager::GetVolume() 
+{
+    int mixFd = open("/dev/mixer",O_RDWR);
+    int volume = 0;
+    if (mixFd != -1) 
+    {
+        	ioctl(mixFd, SOUND_MIXER_READ_PCM, &volume);
+        	volume &= 0xFF;
+        	close(mixFd);
+    }
+    return volume;
+}
 
-	bool Acquire(long timeout = WAIT_FOREVER);
-	void Release();
-	void DumpMutex(void);
-
- private:
-	pthread_mutex_t m_mutex;
-	pthread_cond_t m_tCond;
-	int m_iBusy;
-	pthread_t m_tOwner;
-};
-
-#endif /* MUTEX_H */

@@ -1,3 +1,4 @@
+dnl $Id$
 dnl FreeAmp - The Free MP3 Player
 dnl Portions copyright (C) 1998 GoodNoise
 dnl
@@ -20,8 +21,8 @@ dnl Process this file with your mom to produce a configure script
 AC_INIT(base/src/player.cpp)
 AC_CONFIG_AUX_DIR(config)
 AC_CANONICAL_HOST
-AM_INIT_AUTOMAKE(freeamp, 1.2.3)
-AM_CONFIG_HEADER(config/config.h)
+
+AC_DEFINE_UNQUOTED(FREEAMP_VERSION, "1.2.3")
 
 AC_PROG_MAKE_SET
 
@@ -30,6 +31,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_ISC_POSIX
 AC_PROG_RANLIB
+AC_PROG_INSTALL
 AC_CHECK_PROGS(PERL, perl)
 AC_CHECK_PROGS(NASM, nasm)
 
@@ -169,23 +171,89 @@ AC_CHECK_LIB(dl, dlopen, foo="bar",
   AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (-ldl must work)])
 )
 
-
 dnl Check for some more stuff
 
-AC_SUBST(host_os)
+cmdline="true"
+isunix="true"
+OSLINK=""
+FPIC="-fpic"
+LINKMOD="gcc -shared"
 
-if test "$host_os" = "linux"; then
-   AC_DEFINE(HAVE_LINUX)
-elif test "$host_os" = "solaris2.6"; then
-   AC_DEFINE(HAVE_SOLARIS)
+case "$host_os" in
+  windowsnt)
+    cmdline="false"
+    isunix="false"
+    ;;
+  win32)
+    isunix="false"
+    ;;
+  beos*)
+    isunix="false"
+    ;;
+  linux*)
+    AC_DEFINE(HAVE_LINUX)
+dnl  OSLINK='-Wl,soname,${*F}'
+    LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
+dnl not needed.
+    ;;
+  solaris*)
+    host_os="solaris"
+    if test "$GCC" != "yes" ; then
+      dnl probably Sun CC.
+      FPIC="-Kpic"
+      LINKMOD="$CC -G"	
+    fi
+    dnl thank you, oh autoconf, for the oh-so-accurately named
+    dnl AC_EGREP_HEADER, which only uses egrep after it PUTS THE
+    dnl THING THROUGH CPP, MAKING #defineS NOT SHOW UP!
+    dnl This is why we use AC_EGREP_CPP instead.
+    AC_EGREP_CPP(yes,
+[#include <pthread.h>
+#ifdef PTHREAD_MUTEX_ERRORCHECK
+   yes
+#endif
+],
+      CFLAGS="$CFLAGS -DSOLDEBUGMUTEX"
+        AC_MSG_RESULT("Using Solaris debugging mutexen"),
+      AC_MSG_RESULT("Not using Solaris debugging mutexen")
+    )
+    ;;
+  *)
+    echo "what are you?"
+    ;;
+    
+esac  
+
+AC_DEFINE_UNQUOTED(HOST_OS, "${host_os}")
+AC_DEFINE_UNQUOTED(HOST_CPU, "${host_cpu}")
+
+
+dnl the following is to so that the right includes (and only the right
+dnl includes) are added in at compile time.
+OSINC="-Ibase/unix/include -Ibase/unix/$host_os/include -Iui/freeamp/unix/include -Iui/freeamp/unix/res"
+OSDEP="unix/$host_os"
+
+if test "$isunix" = "false"  ; then
+  OSINC="-Ibase/$host_os/include -Iui/freeamp/$host_os"
+  OSDEP="$host_os"
+dnl else
+dnl  OSDEPSRC=`find base/unix/src \( -name '*.c' -o -name '*.cpp' \) -print`
 fi
 
-if test "$host_os" = "windowsnt"; then
-   cmdline="false"
-else
-   cmdline="true"
-fi
+dnl OSDEPSRC="$OSDEPSRC `find base/$OSDEP/src \( -name '*.c' -o		\dnl 					     -name '*.cpp' \) -print`"
+dnl OSDEPOBJ=`echo $OSDEPSRC | sed -e 's,\.cp*,.o,g' | xargs echo`
+dnl I know. This is an abominable way to generate a dependency list.
+dnl it's either here or hardcoded in a Makefile, though.
 
+dnl AC_SUBST(OSDEPSRC)
+AC_SUBST(OSDEPOBJ)
+AC_SUBST(OSDEP)
+AC_SUBST(OSINC)
+AC_SUBST(OSLINK)
+AC_SUBST(FPIC)
+AC_SUBST(LINKMOD)
+AC_SUBST(build_cpu)
+AC_SUBST(CFLAGS)
 
 gtk="false"
 
@@ -194,22 +262,46 @@ AC_ARG_ENABLE(gtk,
               [case "${enableval}" in
 		yes) gtk="true" ;;
 		no)  gtk="false" ;;
-		*) AC_MSG_ERROR(bad value ${enableval} for --enable-gtk) ;;
+		*) gtk="true";
+		   EXTRALIBS="$EXTRALIBS $enableval";
+		   ;;
 	      esac])
 
 if test "$gtk" = "true"; then
-dnl ****
-dnl Check for GTK+
-dnl ****
-AM_PATH_GTK(1.0.6	, echo "             GTK+ compilation enabled", 
-dnl                   AC_MSG_ERROR(GTK+ distribution not found.)
-gtk="false"
-echo GTK+ compilation disabled
-)
+  AC_MSG_RESULT("Enabling GTK UI")
+  EXTRALIBS="$EXTRALIBS -lgtk"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/gtk.ui"
 fi
 
-AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
+dnl Check for GTK+
+dnl ****
+#AM_PATH_GTK(1.0.6	, echo "             GTK+ compilation enabled", 
+dnl                   AC_MSG_ERROR(GTK+ distribution not found.)
+#gtk="false"
+#echo GTK+ compilation disabled
+#)
+#fi
 
+#AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
+
+
+esound="false"
+AC_ARG_WITH(esound,
+[  --with-esound           Enable esound pmo],
+[ case "${withval}" in
+  no)  ;;
+  yes) esound="true"
+       ;;
+  *)   esound="true"
+       EXTRALIBS="$EXTRALIBS -L$withval"
+       ;; 
+  esac])
+
+if test "$esound" = "true"; then
+  AC_MSG_RESULT("Enabling esound PMO")
+  EXTRALIBS="$EXTRALIBS -lesound"
+  OSDEPPLUGINS="$OSDEPPLUGINS plugins/esound.pmo"
+fi
 
 mp3prof="false"
 
@@ -233,65 +325,73 @@ dnl *****
 mitpth="false"
 ltr="false"
 
-AC_MSG_CHECKING(for MIT PThreads)
-AC_EGREP_HEADER(PTHREAD_MUTEXTYPE_FAST,
-pthread.h,AC_DEFINE(HAVE_MITPTHREADS) AC_MSG_RESULT(yes)
-mitpth="true", 
-AC_MSG_RESULT(no)
-)
+if test "$host_os" = "solaris"; then
+  AC_MSG_RESULT([Enabling Solaris threads.])
+elif test "$host_os" = "beos"; then
+  AC_MSG_RESULT([This is BeOS; using BeOS threads.])
+else
 
-AC_MSG_CHECKING(for Base LinuxThreads)
-AC_EGREP_HEADER(PTHREAD_MUTEX_FAST_NP,pthread.h, AC_DEFINE(HAVE_BASELINUXTHREADS) 
-hblt="true"
-ltr="true"
-AC_MSG_RESULT(yes), 
-AC_MSG_RESULT(no)
-)
+  AC_MSG_CHECKING(for MIT PThreads)
+  AC_EGREP_HEADER(PTHREAD_MUTEXTYPE_FAST,
+  pthread.h,AC_DEFINE(HAVE_MITPTHREADS) AC_MSG_RESULT(yes)
+  mitpth="true", 
+  AC_MSG_RESULT(no)
+  )
+  
+  AC_MSG_CHECKING(for Base LinuxThreads)
+  AC_EGREP_HEADER(PTHREAD_MUTEX_FAST_NP,pthread.h, AC_DEFINE(HAVE_BASELINUXTHREADS) 
+  hblt="true"
+  ltr="true"
+  AC_MSG_RESULT(yes), 
+  AC_MSG_RESULT(no)
+  )
+  
+  AC_MSG_CHECKING(for LinuxThreads w/ErrorCheck Mutex)
+  AC_EGREP_HEADER(PTHREAD_MUTEX_ERRORCHECK_NP,pthread.h,AC_DEFINE(HAVE_ENHLINUXTHREADS)
+  ltr="true"
+  AC_MSG_RESULT(yes), 
+  AC_MSG_RESULT(no)
+  )
+  
+  if test "$mitpth" = "false"; then
+      if test "$ltr" = "false"; then
+  	AC_MSG_CHECKING(for broken Slackware MIT PThreads header (Obj C stub) and implementation)
+  	AC_TRY_RUN([
+  	    #define _MIT_POSIX_THREADS 1
+  	    #include <pthread.h>
+  	    int main(int argc,char**argv) {
+  		int foo;
+                  foo = 5 + PTHREAD_MUTEXTYPE_DEBUG;
+  		return 0;
+              }
+  	    ],
+  	    AC_DEFINE(HAVE_BROKENMITPTHREADS)
+  	    AC_DEFINE(HAVE_MITPTHREADS)
+  	    mitpth="true"
+  	    AC_MSG_RESULT(yes),
+  	    AC_MSG_RESULT(no),
+  	    AC_MSG_RESULT(assuming no)
+  	)
+      fi
+  fi
+  
+  
+  if test "$mitpth" = "false"; then
+     if test "$ltr" = "false"; then
+        echo "Can't find MIT PThreads or LinuxThreads complete development headers in /usr/include or /usr/local/include"
+        echo "Configure will stop."
+        exit 1
+     fi 
+  fi
 
-AC_MSG_CHECKING(for LinuxThreads w/ErrorCheck Mutex)
-AC_EGREP_HEADER(PTHREAD_MUTEX_ERRORCHECK_NP,pthread.h,AC_DEFINE(HAVE_ENHLINUXTHREADS)
-ltr="true"
-AC_MSG_RESULT(yes), 
-AC_MSG_RESULT(no)
-)
-
-if test "$mitpth" = "false"; then
-    if test "$ltr" = "false"; then
-	AC_MSG_CHECKING(for broken Slackware MIT PThreads header (Obj C stub) and implementation)
-	AC_TRY_RUN([
-	    #define _MIT_POSIX_THREADS 1
-	    #include <pthread.h>
-	    int main(int argc,char**argv) {
-		int foo;
-                foo = 5 + PTHREAD_MUTEXTYPE_DEBUG;
-		return 0;
-            }
-	    ],
-	    AC_DEFINE(HAVE_BROKENMITPTHREADS)
-	    AC_DEFINE(HAVE_MITPTHREADS)
-	    mitpth="true"
-	    AC_MSG_RESULT(yes),
-	    AC_MSG_RESULT(no),
-	    AC_MSG_RESULT(assuming no)
-	)
-    fi
-fi
-
-
-if test "$mitpth" = "false"; then
-   if test "$ltr" = "false"; then
-      echo "Can't find MIT PThreads or LinuxThreads complete development headers in /usr/include or /usr/local/include"
-      echo "Configure will stop."
-      exit 1
-   fi 
-fi
+fi dnl solaris, linux, or what have you. I should really indent those.
 
 dnl *****
 
 dnl Replace `main' with a function in -lasound:
 dnl AC_CHECK_LIB(asound, main)
 
-AM_CONDITIONAL(AM_HAVE_LINUXTHREADS, test "$hblt" = "true")
+#AM_CONDITIONAL(AM_HAVE_LINUXTHREADS, test "$hblt" = "true")
 
 AC_ARG_ENABLE(cmdline,
 	      [  --enable-cmdline        Build command line freeamp],
@@ -300,7 +400,7 @@ AC_ARG_ENABLE(cmdline,
 		no)  cmdline="false" ;;
 		*) AC_MSG_ERROR(bad value ${enableval} for --enable-cmdline) ;;
 	      esac])
-AM_CONDITIONAL(AM_ENABLE_CMDLINE, test "$cmdline" = "true")
+#AM_CONDITIONAL(AM_ENABLE_CMDLINE, test "$cmdline" = "true")
 
 
 AC_ARG_ENABLE(x11,
@@ -310,53 +410,55 @@ AC_ARG_ENABLE(x11,
 		  no) x11="false" ;;
 		  *) AC_MSG_ERROR(bad value ${enableval} for --enable-x11) ;;
 		esac])
-AM_CONDITIONAL(AM_ENABLE_X11, test "$x11" = "true")
+#AM_CONDITIONAL(AM_ENABLE_X11, test "$x11" = "true")
+
+FAUIPLUGIN=plugins/freeamp-${host_os}.ui
+if test "$isunix" = "false" -o "$x11" = "false"; then
+  AC_MSG_WARN([not compiling freeamp-$host_os ui plugin])
+else
+  OSDEPPLUGINS="$OSDEPPLUGINS $FAUIPLUGIN";
+  EXTRALIBS="-lXpm"
+fi
+
 
 dnl ****
 dnl Check for alsa
 dnl ****
 AC_CHECK_HEADER(sys/asoundlib.h,
 		AC_CHECK_LIB(asound, main,
-have_alsa="true"
-,
-have_alsa="false"
-)
+			     have_alsa="true"
+			     ,
+			     have_alsa="false"
+		)
 		,
-have_alsa="false"
+		have_alsa="false"
 )
 
+ALSAPMOPLUGIN=plugins/almasoundcard-${host_os}.pmo
+if test "$isunix" = "false" -a "$x11" = "true"; then
+  OSDEPPLUGINS="$OSDEPPLUGINS $ALSAPMOPLUGIN";
+  OSINC="$OSINC -Iio/soundcard/unix/linux/include"
+  AC_MSG_RESULT([compiling alsa soundcard plugin])
+fi
 
-AM_CONDITIONAL(AM_HAVE_ALSA, test "$have_alsa" = "true")
-AM_CONDITIONAL(AM_MP3_PROF, test "$mp3prof" = "true")
-
-AM_CONDITIONAL(AM_HAVE_NASM, test -n "$NASM")
-AM_CONDITIONAL(AM_HAVE_WIN32, test "$host_os" = "windowsnt")
-AM_CONDITIONAL(AM_HAVE_LINUX, test "$host_os" = "linux")
-AM_CONDITIONAL(AM_HAVE_X86, expr "$host_cpu" : "i.86$" > /dev/null)
+AC_SUBST(EXTRALIBS)
+AC_SUBST(OSDEPPLUGINS)
 
 if expr "$host_cpu" : "i.86$" > /dev/null; then
   if test -n "$NASM"; then
+    AC_MSG_RESULT([Using x86 optimizations])
+    XINGASM="`echo lmc/xingmp3/src/{cdct,cwin,cwin8,mdct,msis}asm.o`"
     AC_DEFINE(ASM_X86)
   else
+    AC_MSG_RESULT([nasm not available, using older x86 optimizations])
+    XINGASM=lmc/xingmp3/src/x86gas.o
     AC_DEFINE(ASM_X86_OLD)
   fi
 fi
 
-AC_DEFINE_UNQUOTED(HOST_OS, "${host_os}")
-AC_DEFINE_UNQUOTED(HOST_CPU, "${host_cpu}")
-AC_DEFINE_UNQUOTED(FREEAMP_VERSION, "${VERSION}")
 
-AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
-          base/unix/Makefile ui/freeamp/Makefile ui/freeamp/unix/Makefile ui/freeamp/unix/src/Makefile
-	  ui/Makefile base/unix/linux/Makefile base/unix/linux/src/Makefile
-	  io/local/Makefile io/http/Makefile io/obs/Makefile
-	  ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
-	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
-	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
-	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile ui/gtk/Makefile
-	  ui/lcd/Makefile ui/lcd/src/Makefile
- 	  io/alsa/Makefile io/alsa/unix/Makefile io/alsa/unix/linux/Makefile
- 	  io/alsa/unix/linux/src/Makefile
-	  ui/irman/Makefile ui/irman/src/Makefile
-)
+AC_SUBST(XINGASM)
+
+AC_CONFIG_HEADER(config/config.h)
+AC_OUTPUT(Makefile Makefile-plugins config/Makefile.header)
 

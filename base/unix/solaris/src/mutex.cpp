@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include "mutex.h"
 
@@ -36,7 +37,9 @@ Mutex::Mutex(bool createOwned)
 
    pthread_mutexattr_t attr;
 
-   myTid = 0;
+   m_iBusy = 0;
+   m_tOwner = 0;
+   pthread_cond_init(&m_tCond, NULL);
 
    pthread_mutexattr_init(&attr);
 
@@ -54,18 +57,11 @@ Mutex::Mutex(bool createOwned)
 
    if (!pthread_mutex_init(&m_mutex, &attr))
    {
-//	printf("created mutex %p\n", &m_mutex);
+     //	printf("created mutex %p\n", &m_mutex);
       if (createOwned)
       {
 //	printf("with createOwned!\n");
          pthread_mutex_lock(&m_mutex);
-#ifdef USE_HACK
-         myTid = pthread_self();
-#endif
-      }
-      else
-      {
-         pthread_mutex_unlock(&m_mutex);
       }
    }
    pthread_mutexattr_destroy(&attr);
@@ -76,8 +72,10 @@ Mutex::
 {
 
    pthread_mutex_destroy(&m_mutex);
+   pthread_cond_destroy(&m_tCond);
 }
 
+/* This is the old Mutex::Acquire. Doesn't work with recursive acqs.
 bool
 Mutex::
 Acquire(long timeout)
@@ -86,30 +84,80 @@ Acquire(long timeout)
    void *zot;
 
    zot = (void *) &m_mutex;
-   //   printf("woii! Acquire %p!\n", zot);
+   //      printf("woii! Acquire %p!\n", zot);
  
    while (pthread_mutex_trylock(&m_mutex)) {
-     //     printf("woii! %p sleeping!\n",&m_mutex);
+     //          printf("woii! %p sleeping!\n",&m_mutex);
      usleep(999999);
    }
    result = true;
    
    return (result);
-}
+} */
 
-void
-          Mutex::
-Release()
+bool Mutex::Acquire(long timeout)
 {
-//printf("Woi! Release %p!\n", (void *) &m_mutex);
+   pthread_mutex_lock(&m_mutex); 
+   if (m_iBusy != 0)
+   {
+       if (m_tOwner != pthread_self())
+       {     
+	 //	 printf("m_tOwner %lx, pthread_self %lx\n", (long) m_tOwner, (long) pthread_self());
+           do
+           {
+               if (timeout == WAIT_FOREVER)
+               {
+                   pthread_cond_wait(&m_tCond, &m_mutex);
+               }     
+               else
+               {  
+                   struct timespec sTime;
+                   struct timeval  sNow;
+   
+                   gettimeofday(&sNow, NULL);
+                   sTime.tv_sec = sNow.tv_sec;
+                   sTime.tv_nsec = sNow.tv_usec + timeout;
+                   if (sTime.tv_nsec >= 1000000)
+                   {
+                       sTime.tv_nsec -= 1000000;
+                       sTime.tv_sec++;
+                   }
+                   sTime.tv_nsec *= 1000;
+
+                   if (pthread_cond_timedwait(&m_tCond, &m_mutex, &sTime) ==
+                      ETIMEDOUT)
+                   {
+                      pthread_mutex_unlock(&m_mutex);
+                      return false;
+                   }
+               }
+
+           } while(m_iBusy != 0);
+       }
+   }
+   m_tOwner = pthread_self();
+   m_iBusy++;
    pthread_mutex_unlock(&m_mutex);
-#ifdef USE_HACK
-   myTid = 0;
-#endif
+           
+   return true;
 }
 
-void      Mutex::
-DumpMutex(void)
+
+void Mutex::Release()
+{
+   int iOwnerShip;
+
+//printf("Woi! Release %p!\n", (void *) &m_mutex);                   
+   pthread_mutex_lock(&m_mutex);
+   iOwnerShip = --m_iBusy;
+   pthread_mutex_unlock(&m_mutex);
+
+   if (iOwnerShip == 0)
+       pthread_cond_signal(&m_tCond);
+
+}
+
+void Mutex::DumpMutex(void)
 {
 #if HAVE_LINUXTHREADS
    cerr << "pMutex = " << this << "\n";
