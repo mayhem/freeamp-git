@@ -37,64 +37,8 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "freeamp-x11.h"
 
-
-#include "logo.xpm"
-#include "logo256.xpm"
-
-#define RIGHT_SIDE_WIDTH 83
-#define RIGHT_SIDE_HEIGHT 51
-#include "rightside.xpm"
-#include "rightside256.xpm"
-Pixmap right_side_pixmap;
-
-#define LEFT_SIDE_WIDTH 138
-#define LEFT_SIDE_HEIGHT 51
-#include "leftside.xpm"
-#include "leftside256.xpm"
-Pixmap left_side_pixmap;
-
-#define LCD_WIDTH 190
-#define LCD_HEIGHT 51
-#include "lcd.xpm"
-#include "lcd256.xpm"
-Pixmap lcd_pixmap;
-
-#define DIALS_WIDTH 66
-#define DIALS_HEIGHT 51
-#define SINGLE_DIAL_WIDTH 11
-#include "dials.xpm"
-#include "dials256.xpm"
-Pixmap dials_pixmap;
-
-#define TOTAL_WIDTH (LEFT_SIDE_WIDTH + SINGLE_DIAL_WIDTH + LCD_WIDTH + SINGLE_DIAL_WIDTH + RIGHT_SIDE_WIDTH)
-#define TOTAL_HEIGHT 51
-
-#include "player_full_mask.xbm"
-
-#define PLAYER_FULL_MASK_WIDTH player_full_mask_width
-#define PLAYER_FULL_MASK_HEIGHT player_full_mask_height
-Pixmap player_full_mask_pixmap;
-
-
-#define PLAY_BUTTON_X 29
-#define PLAY_BUTTON_Y 15
-#define PLAY_BUTTON_WIDTH 20
-#define PLAY_BUTTON_HEIGHT 20
-#include "play_buttons.xpm"
-#include "play_buttons256.xpm"
-Pixmap play_buttons_pixmap;
-Window play_button_window;
-
-#define MAJOR_BUTTON_MASK_WIDTH 20
-#define MAJOR_BUTTON_MASK_HEIGHT 20
-#include "major_button_mask.xbm"
-Pixmap major_button_mask_pixmap;
-
-#define MINOR_BUTTON_MASK_WIDTH 20
-#define MINOR_BUTTON_MASK_HEIGHT 20
-#include "minor_button_mask.xbm"
-Pixmap minor_button_mask_pixmap;
-
+#include "windowhash.h"
+#include "graphics.h"
 
 void FreeAmpUI::SetArgs(int argc, char **argv) {
     m_argc = argc;
@@ -109,16 +53,16 @@ UserInterface *Initialize() {
 	   }
 
 FreeAmpUI::FreeAmpUI() {
-    m_buttonStates = new ButtonState[kUpperBound];
-    for (int i=0;i<kUpperBound;i++) {
-	m_buttonStates[i].m_state = kNotLit;
-    }
+    m_windowHash = new WindowHash();
 }
 FreeAmpUI::~FreeAmpUI() {
-    if (m_buttonStates) {
-	delete m_buttonStates;
-	m_buttonStates = NULL;
+    if (m_windowHash) {
+	delete m_windowHash;
+	m_windowHash = NULL;
     }
+    XFreeGC(m_display, m_gc);
+    XCloseDisplay(m_display);
+
 }
 int32 FreeAmpUI::AcceptEvent(Event *e) {
     switch (e->Type()) {
@@ -170,49 +114,97 @@ void FreeAmpUI::Init()
     display_depth = DefaultDepth(m_display,m_screenNum);
     cerr << endl<<endl<<"Screen Depth: " << display_depth << endl;
     
-    m_mainWindow = XCreateSimpleWindow(m_display, RootWindow(m_display,m_screenNum), 
-			      0, 0, TOTAL_WIDTH, TOTAL_HEIGHT, 0,
-			      BlackPixel(m_display,m_screenNum), WhitePixel(m_display,m_screenNum));
+//    m_mainWindow = XCreateSimpleWindow(m_display, RootWindow(m_display,m_screenNum), 
+//			      0, 0, TOTAL_WIDTH, TOTAL_HEIGHT, 0,
+//			      BlackPixel(m_display,m_screenNum), WhitePixel(m_display,m_screenNum));
 
-    play_button_window = XCreateSimpleWindow(m_display,m_mainWindow,PLAY_BUTTON_X,PLAY_BUTTON_Y,
-					     PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,BlackPixel(m_display,m_screenNum),
-					     WhitePixel(m_display,m_screenNum));
+    m_mainWindow = new FAMainWindow(m_display,m_screenNum,m_gc,RootWindow(m_display,m_screenNum),0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
+    XGCValues values;
+    int valuemask = 0;
+    m_gc = XCreateGC(m_display, m_mainWindow->GetWindow(), valuemask, &values);
 
-    m_doubleBufferPixmap = XCreatePixmap(m_display,m_mainWindow,TOTAL_WIDTH,TOTAL_HEIGHT,display_depth);
+    m_mainWindow->SetGC(m_gc);
+
+    m_playButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),PLAY_BUTTON_X,PLAY_BUTTON_Y,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT*3);
+    m_playButton->SetPartialHeight(PLAY_BUTTON_HEIGHT);
+    
+    m_pauseButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),PAUSE_BUTTON_X,PAUSE_BUTTON_Y,PAUSE_BUTTON_WIDTH,PAUSE_BUTTON_HEIGHT*3);
+    m_pauseButton->SetPartialHeight(PAUSE_BUTTON_HEIGHT);
+
+    m_prevButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),PREV_BUTTON_X,PREV_BUTTON_Y,PREV_BUTTON_WIDTH,PREV_BUTTON_HEIGHT*3);
+    m_prevButton->SetPartialHeight(PREV_BUTTON_HEIGHT);
+
+    m_nextButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),NEXT_BUTTON_X,NEXT_BUTTON_Y,NEXT_BUTTON_WIDTH,NEXT_BUTTON_HEIGHT*3);
+    m_nextButton->SetPartialHeight(NEXT_BUTTON_HEIGHT);
+
+    m_doubleBufferPixmap = XCreatePixmap(m_display,m_mainWindow->GetWindow(),TOTAL_WIDTH,TOTAL_HEIGHT,display_depth);
+
+    m_switchModeButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),SWITCH_MODE_BUTTON_X,SWITCH_MODE_BUTTON_Y,SWITCH_MODE_BUTTON_WIDTH,SWITCH_MODE_BUTTON_HEIGHT*3);
+    m_switchModeButton->SetPartialHeight(SWITCH_MODE_BUTTON_HEIGHT);
 
     switch (display_depth) {
 	case 16:
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,logo,&m_iconPixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,leftside,&left_side_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,dials,&dials_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,lcd,&lcd_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo,&m_iconPixmap,NULL,NULL);	    
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside,&left_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials,&dials_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd,&lcd_pixmap,NULL,NULL);
 	    
-	    player_full_mask_pixmap =XCreateBitmapFromData(m_display,m_mainWindow,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+	    player_full_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
 
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,rightside,&right_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),rightside,&right_side_pixmap,NULL,NULL);
 
-	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
-	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow,(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,play_buttons,&play_buttons_pixmap,NULL,NULL);
+	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),play_buttons,&play_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),pause_buttons,&pause_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),last_buttons,&prev_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),next_buttons,&next_buttons_pixmap,NULL,NULL);
+
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),mode_buttons,&mode_buttons_pixmap,NULL,NULL);
 	    break;
 	case 8:
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,logo256,&m_iconPixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,leftside256,&left_side_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,dials256,&dials_pixmap,NULL,NULL);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,lcd256,&lcd_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo256,&m_iconPixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),leftside256,&left_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),dials256,&dials_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),lcd256,&lcd_pixmap,NULL,NULL);
 	    
-	    player_full_mask_pixmap =XCreateBitmapFromData(m_display,m_mainWindow,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+	    player_full_mask_pixmap =XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
 
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,rightside256,&right_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),rightside256,&right_side_pixmap,NULL,NULL);
 
-	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
-	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow,(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
-	    XpmCreatePixmapFromData(m_display,m_mainWindow,play_buttons256,&play_buttons_pixmap,NULL,NULL);
+	    major_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+	    minor_button_mask_pixmap = XCreateBitmapFromData(m_display,m_mainWindow->GetWindow(),(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),play_buttons256,&play_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),pause_buttons256,&pause_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),last_buttons256,&prev_buttons_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),next_buttons256,&next_buttons_pixmap,NULL,NULL);
+
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),mode_buttons256,&mode_buttons_pixmap,NULL,NULL);
 	    break;
 	default:
 	    cerr << "Only know how to deal with bit depths of 8 or 16 (256 or 65535 colors)!!!" << endl;
 	    m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+	    return;
     }
+
+    int x=0;
+    XCopyArea(m_display,left_side_pixmap,m_doubleBufferPixmap,m_gc,0,0,LEFT_SIDE_WIDTH,LEFT_SIDE_HEIGHT,x,0);
+    x+=LEFT_SIDE_WIDTH;
+    XCopyArea(m_display,dials_pixmap,m_doubleBufferPixmap,m_gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
+    x+=SINGLE_DIAL_WIDTH;
+    XCopyArea(m_display,lcd_pixmap,m_doubleBufferPixmap,m_gc,0,0,LCD_WIDTH,LCD_HEIGHT,x,0);
+    x+=LCD_WIDTH;
+    XCopyArea(m_display,dials_pixmap,m_doubleBufferPixmap,m_gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
+    x+=SINGLE_DIAL_WIDTH;
+    XCopyArea(m_display,right_side_pixmap,m_doubleBufferPixmap,m_gc,0,0,RIGHT_SIDE_WIDTH,RIGHT_SIDE_HEIGHT,x,0);
+    x+=RIGHT_SIDE_WIDTH;
+    m_mainWindow->SetPixmap(m_doubleBufferPixmap);
+
+    m_playButton->SetPixmap(play_buttons_pixmap);
+    m_pauseButton->SetPixmap(pause_buttons_pixmap);
+    m_prevButton->SetPixmap(prev_buttons_pixmap);
+    m_nextButton->SetPixmap(next_buttons_pixmap);
+    m_switchModeButton->SetPixmap(mode_buttons_pixmap);
 
     size_hints->flags = PPosition | PSize | PMinSize;
     size_hints->min_width = TOTAL_WIDTH;
@@ -246,32 +238,40 @@ void FreeAmpUI::Init()
     class_hints->res_name = m_argv[0];
     class_hints->res_class = "Basicwin";
     
-    XSetWMProperties(m_display, m_mainWindow, &windowName, &iconName, 
+    XSetWMProperties(m_display, m_mainWindow->GetWindow(), &windowName, &iconName, 
 		     m_argv, m_argc, size_hints, wm_hints, 
 		     class_hints);
     
     /* Select event types wanted */
-    XSelectInput(m_display, m_mainWindow, ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask | PointerMotionMask |
+    m_mainWindow->SelectInput(ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask | PointerMotionMask |
 		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
     
-    XSelectInput(m_display, play_button_window, ExposureMask | ButtonReleaseMask |
+    m_playButton->SelectInput(ExposureMask | ButtonReleaseMask |
 		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
-    
-    
-    /* create GC for text and drawing */
-    {
-	XGCValues values;
-	int valuemask = 0;
-	m_gc = XCreateGC(m_display, m_mainWindow, valuemask, &values);
 
-    }
+    m_pauseButton->SelectInput(ExposureMask | ButtonReleaseMask |
+		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
 
+    m_prevButton->SelectInput(ExposureMask | ButtonReleaseMask |
+		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
+
+    m_nextButton->SelectInput(ExposureMask | ButtonReleaseMask |
+		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
+
+    m_switchModeButton->SelectInput(ExposureMask | ButtonReleaseMask |
+		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
+
+    
     // set up shape
     XSetForeground(m_display,m_gc,BlackPixel(m_display,m_screenNum));
-    XFillRectangle(m_display,m_mainWindow,m_gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
-    XShapeCombineMask(m_display,m_mainWindow,ShapeBounding,0,0,player_full_mask_pixmap,ShapeSet);
+    XFillRectangle(m_display,m_mainWindow->GetWindow(),m_gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
+    m_mainWindow->SetMask(player_full_mask_pixmap);
 
-    XShapeCombineMask(m_display,play_button_window,ShapeBounding,0,0,major_button_mask_pixmap,ShapeSet);
+    m_playButton->SetMask(major_button_mask_pixmap);
+    m_pauseButton->SetMask(major_button_mask_pixmap);
+    m_prevButton->SetMask(major_button_mask_pixmap);
+    m_nextButton->SetMask(major_button_mask_pixmap);
+    m_switchModeButton->SetMask(minor_button_mask_pixmap);
 
     gtkListenThread = Thread::CreateThread();
     gtkListenThread->Create(FreeAmpUI::x11ServiceFunction,this);
@@ -288,148 +288,38 @@ void FreeAmpUI::X11EventService() {
     int32 button_click_spot_y = 0;
     XEvent report;
 
+    m_windowHash->Insert(m_mainWindow->GetWindow(),(FAWindow *)m_mainWindow);
+    m_windowHash->Insert(m_playButton->GetWindow(),(FAWindow *)m_playButton);
+    m_windowHash->Insert(m_pauseButton->GetWindow(),(FAWindow *)m_pauseButton);
+    m_windowHash->Insert(m_prevButton->GetWindow(),(FAWindow *)m_prevButton);
+    m_windowHash->Insert(m_nextButton->GetWindow(),(FAWindow *)m_nextButton);
+    m_windowHash->Insert(m_switchModeButton->GetWindow(),(FAWindow *)m_switchModeButton);
+
     /* Display window */
-    XMapWindow(m_display, m_mainWindow);
-    XMapWindow(m_display,play_button_window);
+    m_mainWindow->MapWindow();
+    m_playButton->MapWindow();
+    m_pauseButton->MapWindow();
+    m_nextButton->MapWindow();
+    m_prevButton->MapWindow();
+    m_switchModeButton->MapWindow();
     
-    fprintf(stderr,"Main window ID: %x\n",m_mainWindow);
-    fprintf(stderr,"Play Button ID: %x\n",play_button_window);
+    fprintf(stderr,"Main window ID: %x\n",m_mainWindow->GetWindow());
+    fprintf(stderr,"Play Button ID: %x\n",m_playButton->GetWindow());
+    fprintf(stderr,"PauseButton ID: %x\n",m_pauseButton->GetWindow());
+    fprintf(stderr,"Prev Button ID: %x\n",m_prevButton->GetWindow());
+    fprintf(stderr,"Next Button ID: %x\n",m_nextButton->GetWindow());
+
 
     /* get events, use first to display text and graphics */
     while (1)  {
 	XNextEvent(m_display, &report);
 
 	//fprintf(stderr, "window ID: %x\n", report.xany.window);
-	switch  (report.type) {
-	    case MotionNotify:
-		//fprintf(stderr, "%s: motion: %d  %d\n",m_argv[0], report.xmotion.x_root,report.xmotion.y_root);
-		if (report.xmotion.state & Button1Mask) {
-		    //fprintf(stderr, "%s: trying %d  %d\n",m_argv[0],report.xmotion.x_root-report.xmotion.x,report.xmotion.y_root-report.xmotion.y);
-		    //fprintf(stderr, "%s: from   %d  %d  and %d  %d\n",m_argv[0],report.xmotion.x_root,report.xmotion.y_root,report.xmotion.x,report.xmotion.y);
-		    //XMoveWindow(display,win,report.xmotion.x_root-report.xmotion.x,report.xmotion.y_root-report.xmotion.y);
-		    XMoveWindow(m_display,m_mainWindow,report.xmotion.x_root-button_click_spot_x,report.xmotion.y_root-button_click_spot_y);
-//		    XMoveWindow(m_display,m_mainWindow,report.xmotion.x_root,report.xmotion.y_root);
-		}
-		break;
-	    case Expose:
-		//fprintf(stderr, "%s: expose\n",m_argv[0]);
-		/* unless this is the last contiguous expose,
-		 * don't draw the window */
-		if (report.xexpose.count != 0)
-		    break;
-				/* place graphics in window, */
-		draw_graphics(report.xexpose.window, m_gc);
-		break;
-	    case ConfigureNotify:
-		/* window has been resized, change width and
-		 * height to send to draw_text and draw_graphics
-		 * in next Expose */
-		//fprintf(stderr,"%s: ConfigureNotify %d %d\n",m_argv[0],report.xconfigure.x,report.xconfigure.y);
-		break;
-	    case ButtonPress:
-		//fprintf(stderr, "%s: button press\n",m_argv[0]);
-		button_click_spot_x = report.xbutton.x;
-		button_click_spot_y = report.xbutton.y;
-		if (report.xbutton.window == play_button_window) {
-		    m_buttonStates[kPlayButton].m_state = kPressed;
-		    draw_graphics(report.xany.window,m_gc);
-		}
-		break;
-	    case ButtonRelease:
-		//fprintf(stderr, "%s: button release\n",m_argv[0]);
-		if (report.xbutton.window == play_button_window) {
-		    m_buttonStates[kPlayButton].m_state = kLit;
-		    m_plm->RemoveAll();
-		    m_plm->Add("/home/jdw/mp3s/old/incomplete-Aqua - Happy Boys and Girls.mp3",0);
-		    m_plm->SetFirst();
-		    m_playerEQ->AcceptEvent(new Event(CMD_Play));
-		    draw_graphics(report.xany.window,m_gc);
-		}
-		break;
-	    case EnterNotify:
-		//fprintf(stderr, "%s: entered window\n",m_argv[0]);
-		if (report.xcrossing.window == play_button_window) {
-		    if (m_buttonStates[kPlayButton].m_state != kLit) {
-			m_buttonStates[kPlayButton].m_state = kPressed;
-			draw_graphics(report.xany.window,m_gc);
-		    }
-		}
-		break;
-	    case LeaveNotify:
-		//fprintf(stderr,"%s: left window\n",m_argv[0]);
-		if (report.xcrossing.window == play_button_window) {
-		    if (m_buttonStates[kPlayButton].m_state != kLit) {
-			m_buttonStates[kPlayButton].m_state = kNotLit;
-			draw_graphics(report.xany.window,m_gc);
-		    }
-		}
-		break;
-	    case KeyPress: {
-		break;
-	    }
-	    case KeyRelease: {
-		char foo[32];
-		fprintf(stderr,"%s: key released\n",m_argv[0]);
-		XLookupString((XKeyEvent *)&report,foo,sizeof(foo),NULL,NULL);
-		//fprintf(stderr, "%s: keypress %s\n",m_argv[0],foo);
-		if (foo[0] == 'q') {
-		    m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
-		    XFreeGC(m_display, m_gc);
-		    XCloseDisplay(m_display);
-		    return;
-		}
-		break; }
-	    case DestroyNotify:
-		fprintf(stderr, "%s: destroy notify\n",m_argv[0]);
-		m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
-		XFreeGC(m_display, m_gc);
-		XCloseDisplay(m_display);
-		return;
-	    default:
-		/* all events selected by StructureNotifyMask
-		 * except ConfigureNotify are thrown away here,
-		 * since nothing is done with them */
-		break;
-	} /* end switch */
-    } /* end while */
-    fprintf(stderr, "%s: done!\n",m_argv[0]);
-}
-
-void FreeAmpUI::draw_graphics(Window win, GC gc)
-{
-    int x = 0;
-    if (win == m_mainWindow) {
-	XCopyArea(m_display,left_side_pixmap,m_doubleBufferPixmap,gc,0,0,LEFT_SIDE_WIDTH,LEFT_SIDE_HEIGHT,x,0);
-	x+=LEFT_SIDE_WIDTH;
-	XCopyArea(m_display,dials_pixmap,m_doubleBufferPixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
-	x+=SINGLE_DIAL_WIDTH;
-	XCopyArea(m_display,lcd_pixmap,m_doubleBufferPixmap,gc,0,0,LCD_WIDTH,LCD_HEIGHT,x,0);
-	x+=LCD_WIDTH;
-	XCopyArea(m_display,dials_pixmap,m_doubleBufferPixmap,gc,0,0,SINGLE_DIAL_WIDTH,DIALS_HEIGHT,x,0);
-	x+=SINGLE_DIAL_WIDTH;
-	XCopyArea(m_display,right_side_pixmap,m_doubleBufferPixmap,gc,0,0,RIGHT_SIDE_WIDTH,RIGHT_SIDE_HEIGHT,x,0);
-	x+=RIGHT_SIDE_WIDTH;
-	XCopyArea(m_display,m_doubleBufferPixmap,win,gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT,0,0);
-    } else if (win == play_button_window) {
-	switch (m_buttonStates[kPlayButton].m_state) {
-	    case kPressed: 
-		XCopyArea(m_display,play_buttons_pixmap,play_button_window,gc,0,PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
-		break;
-	    case kLit:
-		XCopyArea(m_display,play_buttons_pixmap,play_button_window,gc,0,2*PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
-		break;
-	    case kNotLit:
-		XCopyArea(m_display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
-		break;
+        FAWindow *w = m_windowHash->Value(report.xany.window);
+	
+	if (w) {
+	    //fprintf(stderr, "handling by class\n");
+	    w->DoEvent(report);
 	}
-    }
+    } /* end while */
 }
-
-
-
-
-
-
-
-
-

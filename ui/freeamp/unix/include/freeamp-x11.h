@@ -39,21 +39,10 @@ ____________________________________________________________________________*/
 #include "event.h"
 #include "thread.h"
 #include "playlist.h"
+#include "fawindow.h"
+#include "windowhash.h"
 
-enum {
-    kPlayButton = 0,
-    kUpperBound
 
-};
-enum {
-    kPressed = 0,
-    kLit,
-    kNotLit
-};
-class ButtonState {
- public:
-    int32 m_state;
-};
 class FreeAmpUI : public UserInterface {
  public:
     FreeAmpUI();
@@ -67,14 +56,27 @@ class FreeAmpUI : public UserInterface {
 
     EventQueue *m_playerEQ;
  private:
-    ButtonState *m_buttonStates;
+    FAMainWindow *m_mainWindow;
+    FATriStateWindow *m_playButton;
+    FATriStateWindow *m_pauseButton;
+    FATriStateWindow *m_prevButton;
+    FATriStateWindow *m_nextButton;
+
+    FATriStateWindow *m_switchModeButton;
+    FATriStateWindow *m_minimizeButton;
+    FATriStateWindow *m_closeButton;
+    FATriStateWindow *m_repeatButton;
+    FATriStateWindow *m_shuffleButton;
+    FATriStateWindow *m_ejectButton;
+
+    WindowHash *m_windowHash;
+
     Display *m_display;
     int32 m_screenNum;
     Pixmap m_doubleBufferPixmap;
-    Window m_mainWindow;
+    //Window m_mainWindow;
     Pixmap m_iconPixmap;
     GC m_gc;
-    void draw_graphics(Window win, GC gc);
     void X11EventService();
 
     int32 m_argc;
@@ -86,5 +88,7 @@ class FreeAmpUI : public UserInterface {
 
 
 #endif // _FreeAmpUI_H_
+
+
 
 
