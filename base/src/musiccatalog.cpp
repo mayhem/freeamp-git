@@ -55,7 +55,7 @@ using namespace std;
 
 #define METADATABASE_VERSION 1
 
-MusicCatalog::MusicCatalog(FAContext *context, char *databasepath = NULL)
+MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
 {
     m_database = NULL;
     m_context = context;
