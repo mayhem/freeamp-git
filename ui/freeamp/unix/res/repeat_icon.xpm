@@ -1,0 +1,35 @@
+/* XPM */
+static char *repeat_icon[] = {
+/* width height num_colors chars_per_pixel */
+"    12     7       21            1",
+/* colors */
+". c #1a1c10",
+"# c #1d1f12",
+"a c #1f2113",
+"b c #3b3b2f",
+"c c #3d3d32",
+"d c #414135",
+"e c #444438",
+"f c #48483b",
+"g c #707167",
+"h c #75766c",
+"i c #828478",
+"j c #8a8a81",
+"k c #8a8c7f",
+"l c #909087",
+"m c #919286",
+"n c #989a8d",
+"o c #99998f",
+"p c #9fa193",
+"q c #a1a197",
+"r c #abab9f",
+"s c #bdbdb0",
+/* pixels */
+"sfeeeeeeeefs",
+"agggggggggga",
+"blqqqqqocolb",
+".ippppn#.ki.",
+"jcefssdbbbcj",
+"igghmmg..ggi",
+"srqrssojbjrs"
+};

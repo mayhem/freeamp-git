@@ -34,11 +34,9 @@ extern "C" {
 
 
 #include <stdio.h>
-
-
 	   }
-#include "config.h"
 
+#include "config.h"
 #include "event.h"
 
 #include "freeamp-x11.h"
@@ -52,26 +50,31 @@ int screen_num;
 Pixmap double_buffer_pixmap;
 
 #include "logo.xpm"
+#include "logo256.xpm"
 
 #define RIGHT_SIDE_WIDTH 83
 #define RIGHT_SIDE_HEIGHT 51
 #include "rightside.xpm"
+#include "rightside256.xpm"
 Pixmap right_side_pixmap;
 
 #define LEFT_SIDE_WIDTH 138
 #define LEFT_SIDE_HEIGHT 51
 #include "leftside.xpm"
+#include "leftside256.xpm"
 Pixmap left_side_pixmap;
 
 #define LCD_WIDTH 190
 #define LCD_HEIGHT 51
 #include "lcd.xpm"
+#include "lcd256.xpm"
 Pixmap lcd_pixmap;
 
 #define DIALS_WIDTH 66
 #define DIALS_HEIGHT 51
 #define SINGLE_DIAL_WIDTH 11
 #include "dials.xpm"
+#include "dials256.xpm"
 Pixmap dials_pixmap;
 
 #define TOTAL_WIDTH (LEFT_SIDE_WIDTH + SINGLE_DIAL_WIDTH + LCD_WIDTH + SINGLE_DIAL_WIDTH + RIGHT_SIDE_WIDTH)
@@ -89,6 +92,7 @@ Pixmap player_full_mask_pixmap;
 #define PLAY_BUTTON_WIDTH 20
 #define PLAY_BUTTON_HEIGHT 20
 #include "play_buttons.xpm"
+#include "play_buttons256.xpm"
 Pixmap play_buttons_pixmap;
 Window play_button_window;
 
@@ -96,6 +100,11 @@ Window play_button_window;
 #define MAJOR_BUTTON_MASK_HEIGHT 20
 #include "major_button_mask.xbm"
 Pixmap major_button_mask_pixmap;
+
+#define MINOR_BUTTON_MASK_WIDTH 20
+#define MINOR_BUTTON_MASK_HEIGHT 20
+#include "minor_button_mask.xbm"
+Pixmap minor_button_mask_pixmap;
 
 static char *progname; /* name this program was invoked by */
 
@@ -133,7 +142,6 @@ int foo,bar,baz,biz;
 Window win;
 unsigned int width, height;	/* window size */
 int x, y; 	/* window position */
-unsigned int border_width = 4;	/* four pixels */
 unsigned int display_width, display_height;
 unsigned int icon_width, icon_height;
 char *window_name = "FreeAmp v1.0.0";
@@ -148,10 +156,11 @@ XClassHint *class_hints;
 XTextProperty windowName, iconName;
 char *display_name = (char *)NULL;
 int window_size = BIG_ENOUGH;	/* or TOO_SMALL to display contents */
+int32 display_depth;
 
 void FreeAmpUI::Init()
 {
-    
+
     if (!(size_hints = XAllocSizeHints())) {
 	fprintf(stderr, "%s: failure allocating memory\n", progname);
         exit(0);
@@ -184,80 +193,62 @@ void FreeAmpUI::Init()
     screen_num = DefaultScreen(display);
     display_width = DisplayWidth(display, screen_num);
     display_height = DisplayHeight(display, screen_num);
+    display_depth = DefaultDepth(display,screen_num);
+    cerr << endl<<endl<<"Screen Depth: " << display_depth << endl;
     
-    /* Note that in a real application, x and y would default to 0
-     * but would be settable from the command line or resource database.  
-     */
-    x = y = 0;
-    
-    /* size window with enough room for text */
-    //width = display_width/3, height = display_height/4;
-    width = 433;
-    height = 51;
-    /* create opaque window */
     win = XCreateSimpleWindow(display, RootWindow(display,screen_num), 
-			      x, y, width, height, border_width, 
+			      0, 0, TOTAL_WIDTH, TOTAL_HEIGHT, 0,
 			      BlackPixel(display,screen_num), WhitePixel(display,screen_num));
 
     play_button_window = XCreateSimpleWindow(display,win,PLAY_BUTTON_X,PLAY_BUTTON_Y,
 					     PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,BlackPixel(display,screen_num),
 					     WhitePixel(display,screen_num));
 
-    double_buffer_pixmap = XCreatePixmap(display,win,width,height,16);
+    double_buffer_pixmap = XCreatePixmap(display,win,TOTAL_WIDTH,TOTAL_HEIGHT,display_depth);
 
     /* Get available icon sizes from Window manager */
     
-    if (XGetIconSizes(display, RootWindow(display,screen_num), 
-		      &size_list, &count) == 0) {
-	//(void) fprintf( stderr, "%s: Window manager didn't set icon sizes - using default.\n", progname);
-	;
-    } else {
-	;
-	/* A real application would search through size_list
-	 * here to find an acceptable icon size, and then
-	 * create a pixmap of that size.  This requires
-	 * that the application have data for several sizes
-	 * of icons. */
-    }
-    
-    /* Create pixmap of depth 1 (bitmap) for icon */
-//    icon_pixmap = XCreateBitmapFromData(display, win, icon_bitmap_bits, 
-//					icon_bitmap_width, icon_bitmap_height);
-
-    XpmCreatePixmapFromData(display,win,logo,&icon_pixmap,NULL,NULL);
-//    XpmReadFileToPixmap(display,win,"logo.xpm",&icon_pixmap,NULL,NULL);
-    XpmCreatePixmapFromData(display,win,leftside,&left_side_pixmap,NULL,NULL);
-//    XpmReadFileToPixmap(display,win,"leftside.xpm",&left_side_pixmap,NULL,NULL);
-    XpmCreatePixmapFromData(display,win,dials,&dials_pixmap,NULL,NULL);
-    //XpmReadFileToPixmap(display,win,"dials.xpm",&dials_pixmap,NULL,NULL);
-    XpmCreatePixmapFromData(display,win,lcd,&lcd_pixmap,NULL,NULL);
-    //XpmReadFileToPixmap(display,win,"lcd.xpm",&lcd_pixmap,NULL,NULL);
-
-    //XReadBitmapFile(display,win,"player_full_mask.xbm",&foo,&bar,&player_full_mask_pixmap,&baz,&biz);
-    player_full_mask_pixmap =XCreateBitmapFromData(display,win,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
-
-    XpmCreatePixmapFromData(display,win,rightside,&right_side_pixmap,NULL,NULL);
-
-    major_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
-
-    XpmCreatePixmapFromData(display,win,play_buttons,&play_buttons_pixmap,NULL,NULL);
-
-//    if (XpmReadFileToPixmap(display,win,"rightside.xpm",&right_side_pixmap,NULL,NULL)) {
-//	fprintf( stderr, "%s: Couldn't read colorful xpm from disk\n",progname);
+//    if (XGetIconSizes(display, RootWindow(display,screen_num), 
+//		      &size_list, &count) == 0) {
+//	;
 //    } else {
-//	;//fprintf( stderr, "%s: Read xpm from disk\n",progname);
+//	;
 //    }
+    
+    switch (display_depth) {
+	case 16:
+	    XpmCreatePixmapFromData(display,win,logo,&icon_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(display,win,leftside,&left_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(display,win,dials,&dials_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(display,win,lcd,&lcd_pixmap,NULL,NULL);
+	    
+	    player_full_mask_pixmap =XCreateBitmapFromData(display,win,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
 
-    /* Set size hints for window manager.  The window manager may
-     * override these settings.  Note that in a real
-     * application if size or position were set by the user
-     * the flags would be UPosition and USize, and these would
-     * override the window manager's preferences for this window. */
-    
-    /* x, y, width, and height hints are now taken from
-     * the actual settings of the window when mapped. Note
-     * that PPosition and PSize must be specified anyway. */
-    
+	    XpmCreatePixmapFromData(display,win,rightside,&right_side_pixmap,NULL,NULL);
+
+	    major_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+	    minor_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
+	    XpmCreatePixmapFromData(display,win,play_buttons,&play_buttons_pixmap,NULL,NULL);
+	    break;
+	case 8:
+	    XpmCreatePixmapFromData(display,win,logo256,&icon_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(display,win,leftside256,&left_side_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(display,win,dials256,&dials_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(display,win,lcd256,&lcd_pixmap,NULL,NULL);
+	    
+	    player_full_mask_pixmap =XCreateBitmapFromData(display,win,(char *)player_full_mask_bits,PLAYER_FULL_MASK_WIDTH,PLAYER_FULL_MASK_HEIGHT);
+
+	    XpmCreatePixmapFromData(display,win,rightside256,&right_side_pixmap,NULL,NULL);
+
+	    major_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)major_button_mask_bits,MAJOR_BUTTON_MASK_WIDTH,MAJOR_BUTTON_MASK_HEIGHT);
+	    minor_button_mask_pixmap = XCreateBitmapFromData(display,win,(char *)minor_button_mask_bits,MINOR_BUTTON_MASK_WIDTH,MINOR_BUTTON_MASK_HEIGHT);
+	    XpmCreatePixmapFromData(display,win,play_buttons256,&play_buttons_pixmap,NULL,NULL);
+	    break;
+	default:
+	    cerr << "Only know how to deal with bit depths of 8 or 16 (256 or 65535 colors)!!!" << endl;
+	    m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
+    }
+
     size_hints->flags = PPosition | PSize | PMinSize;
     size_hints->min_width = width;
     size_hints->min_height = height;
@@ -290,10 +281,10 @@ void FreeAmpUI::Init()
 		     class_hints);
     
     /* Select event types wanted */
-    XSelectInput(display, win, ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask |
+    XSelectInput(display, win, ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask | PointerMotionMask |
 		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
     
-    XSelectInput(display, play_button_window, ExposureMask | KeyPressMask | ButtonReleaseMask | KeyReleaseMask |
+    XSelectInput(display, play_button_window, ExposureMask | ButtonReleaseMask |
 		 ButtonPressMask | StructureNotifyMask | EnterWindowMask | LeaveWindowMask | SubstructureNotifyMask);
     
     
@@ -319,6 +310,8 @@ void FreeAmpUI::Init()
 }
 
 void FreeAmpUI::x11ServiceFunction(void *p) {
+    int32 button_click_spot_x = 0;
+    int32 button_click_spot_y = 0;
     XEvent report;
     FreeAmpUI *pMe = (FreeAmpUI*)p;
 
@@ -332,15 +325,25 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
     /* get events, use first to display text and graphics */
     while (1)  {
 	XNextEvent(display, &report);
-	fprintf(stderr, "window ID: %x\n", report.xany.window);
+
+	//fprintf(stderr, "window ID: %x\n", report.xany.window);
 	switch  (report.type) {
+	    case MotionNotify:
+		//fprintf(stderr, "%s: motion: %d  %d\n",progname, report.xmotion.x_root,report.xmotion.y_root);
+		if (report.xmotion.state & Button1Mask) {
+		    //fprintf(stderr, "%s: trying %d  %d\n",progname,report.xmotion.x_root-report.xmotion.x,report.xmotion.y_root-report.xmotion.y);
+		    //fprintf(stderr, "%s: from   %d  %d  and %d  %d\n",progname,report.xmotion.x_root,report.xmotion.y_root,report.xmotion.x,report.xmotion.y);
+		    //XMoveWindow(display,win,report.xmotion.x_root-report.xmotion.x,report.xmotion.y_root-report.xmotion.y);
+		    XMoveWindow(display,win,report.xmotion.x_root-button_click_spot_x,report.xmotion.y_root-button_click_spot_y);
+//		    XMoveWindow(display,win,report.xmotion.x_root,report.xmotion.y_root);
+		}
+		break;
 	    case Expose:
-		fprintf(stderr, "%s: expose\n",progname);
+		//fprintf(stderr, "%s: expose\n",progname);
 		/* unless this is the last contiguous expose,
 		 * don't draw the window */
 		if (report.xexpose.count != 0)
 		    break;
-		
 				/* place graphics in window, */
 		draw_graphics(report.xexpose.window, gc, width, height);
 		break;
@@ -348,7 +351,7 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 		/* window has been resized, change width and
 		 * height to send to draw_text and draw_graphics
 		 * in next Expose */
-		fprintf(stderr,"%s: ConfigureNotify\n",progname);
+		//fprintf(stderr,"%s: ConfigureNotify %d %d\n",progname,report.xconfigure.x,report.xconfigure.y);
 		width = report.xconfigure.width;
 		height = report.xconfigure.height;
 		if ((width < size_hints->min_width) || 
@@ -358,13 +361,15 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 		    window_size = BIG_ENOUGH;
 		break;
 	    case ButtonPress:
-		fprintf(stderr, "%s: button press\n",progname);
+		//fprintf(stderr, "%s: button press\n",progname);
+		button_click_spot_x = report.xbutton.x;
+		button_click_spot_y = report.xbutton.y;
 		if (report.xbutton.window == play_button_window) {
 		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,2*PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
 		}
 		break;
 	    case ButtonRelease:
-		fprintf(stderr, "%s: button release\n",progname);
+		//fprintf(stderr, "%s: button release\n",progname);
 		if (report.xbutton.window == play_button_window) {
 		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
 		    pMe->m_plm->RemoveAll();
@@ -374,32 +379,32 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 		}
 		break;
 	    case EnterNotify:
-		fprintf(stderr, "%s: entered window\n",progname);
+		//fprintf(stderr, "%s: entered window\n",progname);
 		if (report.xcrossing.window == play_button_window) {
 		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,PLAY_BUTTON_HEIGHT,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
 		}
 		break;
 	    case LeaveNotify:
-		fprintf(stderr,"%s: left window\n",progname);
+		//fprintf(stderr,"%s: left window\n",progname);
 		if (report.xcrossing.window == play_button_window) {
 		    XCopyArea(display,play_buttons_pixmap,play_button_window,gc,0,0,PLAY_BUTTON_WIDTH,PLAY_BUTTON_HEIGHT,0,0);
 		}
 		break;
 	    case KeyPress: {
+		break;
+	    }
+	    case KeyRelease: {
 		char foo[32];
+		fprintf(stderr,"%s: key released\n",progname);
 		XLookupString((XKeyEvent *)&report,foo,sizeof(foo),NULL,NULL);
-		fprintf(stderr, "%s: keypress %s\n",progname,foo);
+		//fprintf(stderr, "%s: keypress %s\n",progname,foo);
 		if (foo[0] == 'q') {
 		    pMe->m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
 		    XFreeGC(display, gc);
 		    XCloseDisplay(display);
 		    return;
 		}
-		break;
-	    }
-	    case KeyRelease:
-		fprintf(stderr,"%s: key released\n",progname);
-		break;
+		break; }
 	    case DestroyNotify:
 		fprintf(stderr, "%s: destroy notify\n",progname);
 		pMe->m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));

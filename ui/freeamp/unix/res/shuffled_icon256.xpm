@@ -1,0 +1,25 @@
+/* XPM */
+static char *shuffled_icon256[] = {
+/* width height num_colors chars_per_pixel */
+"    11     6       12            1",
+/* colors */
+". c #808080",
+"# c #c0dcc0",
+"a c #553f00",
+"b c #553f55",
+"c c #557f55",
+"d c #7f7f55",
+"e c #aa9faa",
+"f c #aabfaa",
+"g c #d4bfaa",
+"h c #2a3f00",
+"i c #2a3f55",
+"j c #a0a0a4",
+/* pixels */
+"g#gfbbibfg#",
+"jjj.dddd.jj",
+"bhbbjjjefgg",
+"d.cd.jjjjjj",
+"jjjjgfgbaib",
+"jjjjjj.d.dd"
+};

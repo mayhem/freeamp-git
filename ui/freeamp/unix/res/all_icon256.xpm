@@ -1,0 +1,26 @@
+/* XPM */
+static char *all_icon256[] = {
+/* width height num_colors chars_per_pixel */
+"    11     8       11            1",
+/* colors */
+". c #808080",
+"# c #553f55",
+"a c #555f55",
+"b c #7f5f55",
+"c c #7f7f55",
+"d c #aa9faa",
+"e c #aabfaa",
+"f c #2a1f00",
+"g c #2a3f00",
+"h c #2a3f55",
+"i c #a0a0a4",
+/* pixels */
+"iiiii.f..f.",
+"iaaceihiihi",
+"cbc##.f..f.",
+"iaaga.giigi",
+"g#aafcf..f.",
+"h.iba.hiihi",
+"#fghfcfc.f.",
+"i....i.de.i"
+};
