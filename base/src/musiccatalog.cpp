@@ -519,17 +519,6 @@ Error MusicCatalog::AddSong(const char *url)
     if (!m_database->Working())
         return kError_DatabaseNotWorking;
 
-	struct stat st;
-	uint32 reallen = strlen(url) + 1;
-	char *realname = new char[reallen];
-	URLToFilePath(url, realname, &reallen);
-    if (-1 == stat(realname, &st)) {
-        delete [] realname;
-		return kError_NoErr;
-	}
-
-	delete [] realname;
-
     PlaylistItem *newtrack;
 
     MetaData *meta = ReadMetaDataFromDatabase(url);
