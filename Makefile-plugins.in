@@ -344,7 +344,7 @@ VORBISOBJ += lmc/vorbis/src/lib/time0.o
 VORBISOBJ += lmc/vorbis/src/lib/vorbisfile.o
 VORBISOBJ += lmc/vorbis/src/lib/window.o
 plugins/vorbis.lmc: $(VORBISOBJ)
-	$(LINKMOD) -o $@ $(VORBISOBJ) $(STATICLD) /usr/lib/vorbisfile.a -lvorbis
+	$(LINKMOD) -o $@ $(VORBISOBJ) $(STATICLD)
 
 
 # MDF section 

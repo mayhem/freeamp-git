@@ -170,7 +170,7 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection)
     args.push_back(pmetaData->Genre());
     args.push_back(pmetaData->Comment());
 
-    ret = o.Query(string(ExchangeMetadata), &args);
+    ret = o.Query(string(MBExchangeMetadata), &args);
     if (!ret)
     {
          o.GetQueryError(error);
@@ -185,16 +185,16 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData, bool bUseCollection)
 
     // Now start the data extraction process.
     // Select the first item in the list of returned items
-    o.Select(SelectExchangedData);
+    o.Select(MBSelectExchangedData);
 
-    pmetaData->SetArtist(o.Data(GetArtistName).c_str());
-    pmetaData->SetTitle(o.Data(GetTrackName).c_str());
-    pmetaData->SetAlbum(o.Data(GetAlbumName).c_str());
-    pmetaData->SetGenre(o.Data(GetGenre).c_str());
-    pmetaData->SetComment(o.Data(GetDescription).c_str());
-    pmetaData->SetYear(o.DataInt(GetYear));
-    pmetaData->SetTrack(o.DataInt(GetTrackNum));
-    pmetaData->SetLength(o.DataInt(GetDuration));
+    pmetaData->SetArtist(o.Data(MBGetArtistName).c_str());
+    pmetaData->SetTitle(o.Data(MBGetTrackName).c_str());
+    pmetaData->SetAlbum(o.Data(MBGetAlbumName).c_str());
+    pmetaData->SetGenre(o.Data(MBGetGenre).c_str());
+    pmetaData->SetComment(o.Data(MBGetDescription).c_str());
+    pmetaData->SetYear(o.DataInt(MBGetYear));
+    pmetaData->SetTrack(o.DataInt(MBGetTrackNum));
+    pmetaData->SetLength(o.DataInt(MBGetDuration));
 
     m_pSema->Signal();
 

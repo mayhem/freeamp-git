@@ -993,7 +993,7 @@ Error PMP300::WritePlaylist(DeviceInfo* device,
                                                   origInternal.end(), 
                                                   PlaylistItemCompare(item))) != origInternal.end())
                             {
-                                entryOrder[index] = distance(origInternal.begin(), position);
+                                entryOrder[index] = distance(origInternal.begin(), position, entryOrder[index]);
                             }
 
                         }
@@ -1014,7 +1014,7 @@ Error PMP300::WritePlaylist(DeviceInfo* device,
                                                   origExternal.end(), 
                                                   PlaylistItemCompare(item))) != origExternal.end())
                             {
-                                entryOrder[index] = distance(origExternal.begin(), position);
+                                entryOrder[index] = distance(origExternal.begin(), position, entryOrder[index]);
                             }
                         }
 

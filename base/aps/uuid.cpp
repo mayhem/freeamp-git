@@ -22,7 +22,7 @@ ____________________________________________________________________________*/
 
 #include "uuid.h"
 
-int uuid_parse(char *in, uuid_t uu)
+int uuid_parse(char *in, uuid_t1 uu)
 {
 	struct uuid uuid;
 	int i;
@@ -58,7 +58,7 @@ int uuid_parse(char *in, uuid_t uu)
 
 }
 
-void uuid_pack(struct uuid *uu, uuid_t ptr)
+void uuid_pack(struct uuid *uu, uuid_t1 ptr)
 {
 	__u32	tmp;
 	unsigned char	*out = ptr;
@@ -90,7 +90,7 @@ void uuid_pack(struct uuid *uu, uuid_t ptr)
 	memcpy(out+10, uu->node, 6);
 
 }
-void uuid_unpack(uuid_t in, struct uuid *uu)
+void uuid_unpack(uuid_t1 in, struct uuid *uu)
 {
   __u8	*ptr = in;
   __u32	tmp;
@@ -116,7 +116,7 @@ void uuid_unpack(uuid_t in, struct uuid *uu)
   memcpy(uu->node, ptr, 6);
 }
 
-void uuid_ascii(uuid_t in, char ascii[37])
+void uuid_ascii(uuid_t1 in, char ascii[37])
 {
     uuid foo;
 
