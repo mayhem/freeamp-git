@@ -427,8 +427,13 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
 
     prefs->SetUsersPortablePlayers(portableList.c_str());
 
-    m_currentValues = m_proposedValues = *values;
-    
+    // this gets called by each page unfortunately
+    // so save some effort by only doing it once
+    if(*values != m_currentValues) 
+    {
+        m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
+        m_currentValues = m_proposedValues = *values;
+    }
 }
 
 bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd, 
@@ -1734,9 +1739,6 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
                 {
                     SavePrefsValues(prefs, &m_proposedValues);
                     LoadThemeListBox(hwnd);
-                    m_pContext->target->AcceptEvent(
-                         new Event(INFO_PrefsChanged));
-                    
                     break;
                 }
 
@@ -1748,10 +1750,7 @@ bool Win32PreferenceWindow::PrefThemeProc(HWND hwnd,
 
                 case PSN_RESET:
                 {
-                    SavePrefsValues(prefs, &m_originalValues);
-                    m_pContext->target->AcceptEvent(
-                         new Event(INFO_PrefsChanged));
-                         
+                    SavePrefsValues(prefs, &m_originalValues);                         
                     break;
                 }
             }
