@@ -120,7 +120,9 @@ decode (standard decoder) reduction_code:
 #include <float.h>
 #include <math.h>
 #include <string.h>
-//#include <io.h>
+#ifdef WIN32
+#include <io.h>
+#endif
 #include <fcntl.h>		/* file open flags */
 #include <sys/types.h>		/* someone wants for port */
 #include <sys/stat.h>		/* forward slash for portability */
@@ -128,10 +130,12 @@ decode (standard decoder) reduction_code:
 #include "port.h"
 
 // JDW
+#ifdef __linux__
 #include <sys/ioctl.h>
 #include <sys/soundcard.h>
 #include <fcntl.h>
 #include <errno.h>
+#endif
 // JDW
 
 
