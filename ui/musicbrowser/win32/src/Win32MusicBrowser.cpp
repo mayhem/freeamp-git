@@ -235,6 +235,7 @@ void MusicBrowserUI::Init()
     m_hNewPlaylistItem = NULL;
     m_hStreamsItem = NULL;
     m_hCDItem = NULL;
+    m_hFavoritesItem = NULL;
     
     m_hMusicView = NULL;
     m_hPortableItem = NULL;

@@ -64,6 +64,8 @@ char* kCDAudio = "CD Audio";
 char* kWiredPlanet = "Wired Planet";
 char* kShoutCast = "ShoutCast";
 char* kIceCast = "IceCast";
+char* kFavorites = "Favorites";
+char* kNewFavorite = "Add a New Stream...";
 
 void MusicBrowserUI::InitTree()
 {
@@ -122,6 +124,16 @@ void MusicBrowserUI::InitTree()
     insert.hInsertAfter = TVI_LAST;
     insert.hParent = NULL;
     m_hStreamsItem = TreeView_InsertItem(m_hMusicView, &insert);
+
+    insert.item.pszText = kFavorites;
+    insert.item.cchTextMax = lstrlen(insert.item.pszText);
+    insert.item.iImage = 14;
+    insert.item.iSelectedImage = 14;
+    insert.item.cChildren= 1;
+    insert.item.lParam = NULL;
+    insert.hInsertAfter = TVI_LAST;
+    insert.hParent = m_hStreamsItem;
+    m_hFavoritesItem = TreeView_InsertItem(m_hMusicView, &insert);
 
     insert.item.pszText = kWiredPlanet;
     insert.item.cchTextMax = lstrlen(insert.item.pszText);
@@ -583,6 +595,55 @@ void MusicBrowserUI::FillPlaylists()
     m_hNewPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
 }
 
+void MusicBrowserUI::FillFavorites()
+{
+    TV_INSERTSTRUCT                        insert;
+    vector<PlaylistItem*>::const_iterator  url;
+    const vector<PlaylistItem*>*           streams;
+    TreeData                               data;
+
+    insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                        TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+
+    streams = m_context->catalog->GetStreams(); 
+
+    data.m_iLevel = 1;
+
+    for(url = streams->begin(); 
+        url != streams->end(); 
+        url++)
+    {
+        PlaylistItem* stream = new PlaylistItem(**url);
+        MetaData metadata;
+
+        //stream->SetURL(urls[i]);
+        //metadata.SetTitle(stations[i]);
+        //metadata.SetArtist("Wired Planet");
+        //stream->SetMetaData(&metadata);
+
+        data.m_pStream = stream;
+
+        insert.item.pszText = (char*)stream->GetMetaData().Title().c_str();
+        insert.item.cchTextMax = strlen(insert.item.pszText);
+        insert.item.iImage = 8;
+        insert.item.iSelectedImage = 8;
+        insert.item.cChildren= 0;
+        insert.item.lParam = (LPARAM) new TreeData(data);
+        insert.hInsertAfter = TVI_SORT;
+        insert.hParent = m_hFavoritesItem;
+        TreeView_InsertItem(m_hMusicView, &insert);
+    }
+    
+    insert.item.pszText = kNewFavorite;
+    insert.item.cchTextMax = strlen(insert.item.pszText);
+    insert.item.iImage = 8;
+    insert.item.iSelectedImage = 8;
+    insert.item.cChildren= 0;
+    insert.item.lParam = NULL;
+    insert.hInsertAfter = TVI_FIRST;
+    insert.hParent = m_hFavoritesItem;
+    m_hNewPlaylistItem = TreeView_InsertItem(m_hMusicView, &insert);
+}
 void MusicBrowserUI::FillWiredPlanet()
 {
     TV_INSERTSTRUCT insert;

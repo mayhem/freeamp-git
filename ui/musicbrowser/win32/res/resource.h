@@ -50,6 +50,7 @@
 #define IDB_ARTIST                      544
 #define IDB_TRACK                       545
 #define IDB_ALBUM                       546
+#define IDB_FAVORITES                   547
 #define IDC_MUSICTREE                   1000
 #define IDC_PLAYLISTBOX                 1002
 #define IDC_PLAYLISTCOMBO               1003

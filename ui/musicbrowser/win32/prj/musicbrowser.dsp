@@ -364,6 +364,10 @@ SOURCE=..\res\drag.cur
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\favorites.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\icecast.bmp
 # End Source File
 # Begin Source File

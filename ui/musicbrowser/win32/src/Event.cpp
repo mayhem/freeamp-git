@@ -648,6 +648,10 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     {
                         FillWiredPlanet();
                     }
+                    else if(pTreeView->itemNew.hItem == m_hFavoritesItem)
+                    {
+                        FillFavorites();
+                    }
                     else if(pTreeView->itemNew.hItem == m_hPortableItem)
                     {
                         FillPortables();

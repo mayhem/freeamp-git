@@ -532,6 +532,7 @@ IDB_SHOUTCAST           BITMAP  DISCARDABLE     "shoutcast.bmp"
 IDB_BUSY                BITMAP  DISCARDABLE     "busy.bmp"
 IDB_STREAMS             BITMAP  DISCARDABLE     "streams.bmp"
 IDB_CD                  BITMAP  DISCARDABLE     "cd.bmp"
+IDB_FAVORITES           BITMAP  DISCARDABLE     "favorites.bmp"
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////

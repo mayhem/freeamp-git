@@ -891,6 +891,9 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_CD));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     DeleteObject(bmp);
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_FAVORITES));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    DeleteObject(bmp);
     
 
     TreeView_SetImageList(m_hMusicView, hList, TVSIL_NORMAL); 
