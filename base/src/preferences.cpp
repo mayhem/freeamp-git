@@ -67,7 +67,7 @@ const bool  kDefaultLogging = false;
 const bool  kDefaultSaveStreams = false;
 const char* kDefaultSaveStreamsDir = ".";
 const int32 kDefaultPreBuffer = 0;
-const char *kDefaultProxyHost = "proxy.youdomain.com";
+const char *kDefaultProxyHost = "proxy.yourdomain.com";
 const bool  kDefaultUseProxy = false;
 
 Error
@@ -530,6 +530,49 @@ SetSaveStreamsDirectory(char* path)
 {
     return SetPrefString(kSaveStreamsDirPref, path);
 }
+
+Error
+Preferences::
+GetUseProxyServer(bool* value)
+{
+    return GetPrefBoolean(kUseProxyPref, value);
+}
+
+Error
+Preferences::
+SetUseProxyServer(bool value)
+{
+    return SetPrefBoolean(kUseProxyPref, value);
+}
+
+Error
+Preferences::
+GetProxyServerAddress(char* host, uint32* len)
+{
+    return GetPrefString(kProxyHostPref, host, len);
+}
+
+Error
+Preferences::
+SetProxyServerAddress(char* host)
+{
+    return SetPrefString(kProxyHostPref, host);
+}
+
+Error
+Preferences::
+GetPrebufferLength(int32* value)
+{
+    return GetPrefInt32(kPreBufferPref, value);
+}
+
+Error
+Preferences::
+SetPrebufferLength(int32 value)
+{
+    return SetPrefInt32(kPreBufferPref, value);
+}
+
 
 LibDirFindHandle *
 Preferences::

@@ -157,6 +157,15 @@ class Preferences {
     Error GetSaveStreamsDirectory(char* path, uint32* len);
     Error SetSaveStreamsDirectory(char* path);
 
+    Error GetUseProxyServer(bool* value);
+    Error SetUseProxyServer(bool value);
+
+    Error GetProxyServerAddress(char* host, uint32* len);
+    Error SetProxyServerAddress(char* host);
+
+    Error GetPrebufferLength(int32* value);
+    Error SetPrebufferLength(int32 value);
+
 };
 
 #endif /* _PREFERENCES_H */

@@ -55,6 +55,8 @@ typedef struct PrefsStruct {
     int32 streamInterval;
     bool saveStreams;
     char saveStreamsDirectory[MAX_PATH + 1];
+    bool useProxyServer;
+    char proxyServer[256]; // is there a domain name length limit???
     
     // page 3
     bool enableLogging;
@@ -69,6 +71,7 @@ typedef struct PrefsStruct {
         memset(defaultUI, 0x00, sizeof(defaultUI));
         memset(defaultPMO, 0x00, sizeof(defaultPMO));
         memset(saveStreamsDirectory, 0x00, sizeof(saveStreamsDirectory));
+        memset(proxyServer, 0x00, sizeof(proxyServer));
     }
 
 }PrefsStruct;
@@ -85,6 +88,7 @@ GetPrefsValues(Preferences* prefs,
     uint32 size = 256;
 
     prefs->GetDefaultPMO(values->defaultPMO, &size);
+    size = 256;
     prefs->GetDefaultUI(values->defaultUI, &size);
     prefs->GetDecoderThreadPriority(&values->decoderThreadPriority);
     prefs->GetInputBufferSize(&values->inputBufferSize);
@@ -94,6 +98,9 @@ GetPrefsValues(Preferences* prefs,
 
     prefs->GetStreamBufferInterval(&values->streamInterval);
     prefs->GetSaveStreams(&values->saveStreams);
+    size = 256;
+    prefs->GetProxyServerAddress(values->proxyServer, &size);
+    prefs->GetUseProxyServer(&values->useProxyServer);
     size = MAX_PATH;
     prefs->GetSaveStreamsDirectory(values->saveStreamsDirectory, &size);
 
@@ -122,6 +129,8 @@ SavePrefsValues( Preferences* prefs,
     prefs->SetStreamBufferInterval(values->streamInterval);
     prefs->SetSaveStreams(values->saveStreams);
     prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory);
+    prefs->SetProxyServerAddress(values->proxyServer);
+    prefs->SetUseProxyServer(values->useProxyServer);
 
     prefs->SetUseDebugLog(values->enableLogging);
     prefs->SetLogMain(values->logMain);
@@ -488,6 +497,12 @@ PrefPage2Proc(  HWND hwnd,
     static HWND hwndSaveStreamsDirectory = NULL;
     static HWND hwndBrowse = NULL;
     static HWND hwndSaveLocationText = NULL;
+    static HWND hwndUseProxyServer = NULL;
+    static HWND hwndProxyServerAddress = NULL;
+    static HWND hwndProxyServerPort = NULL;
+    static HWND hwndProxyServerAddressText = NULL;
+    static HWND hwndProxyServerPortText = NULL;
+    static HWND hwndColon = NULL;
    
     switch(msg)
     {
@@ -499,10 +514,18 @@ PrefPage2Proc(  HWND hwnd,
 
             // get the handles to all our controls
             hwndStreamInterval = GetDlgItem(hwnd, IDC_STREAM_INTERVAL);
+
             hwndSaveStreams = GetDlgItem(hwnd, IDC_SAVESTREAMS);
             hwndSaveStreamsDirectory = GetDlgItem(hwnd, IDC_STREAMSAVEDIR);
             hwndBrowse = GetDlgItem(hwnd, IDC_BROWSE);
             hwndSaveLocationText = GetDlgItem(hwnd, IDC_SAVELOCATION_TEXT);
+
+            hwndUseProxyServer = GetDlgItem(hwnd, IDC_USEPROXY);
+            hwndProxyServerAddress = GetDlgItem(hwnd, IDC_PROXYADDRESS);
+            hwndProxyServerAddressText = GetDlgItem(hwnd, IDC_PROXYADDRESS_TEXT);
+            hwndProxyServerPort = GetDlgItem(hwnd, IDC_PORT);
+            hwndProxyServerPortText = GetDlgItem(hwnd, IDC_PORT_TEXT);
+            hwndColon = GetDlgItem(hwnd, IDC_COLON_TEXT);
 
             // initialize our controls
             int32 value;
@@ -527,6 +550,45 @@ PrefPage2Proc(  HWND hwnd,
 
             Button_Enable(  hwndSaveLocationText,
                             originalValues.saveStreams);
+
+            char* port = NULL;
+
+            strcpy(temp, originalValues.proxyServer);
+            port = strrchr(temp, ':');
+
+            if(port)
+            {
+                *port = 0x00;
+                port++;
+
+                Edit_SetText(hwndProxyServerPort, 
+                             port);
+
+            }
+
+            Edit_SetText(   hwndProxyServerAddress, 
+                            temp);
+
+            Edit_LimitText(hwndProxyServerPort, 5);
+
+            Button_SetCheck(hwndUseProxyServer, originalValues.useProxyServer);
+
+
+            Button_Enable(  hwndProxyServerAddress, 
+                            originalValues.useProxyServer);
+
+            Button_Enable(  hwndProxyServerAddressText, 
+                            originalValues.useProxyServer);
+
+            Button_Enable(  hwndProxyServerPort,
+                            originalValues.useProxyServer);
+
+            Button_Enable(  hwndProxyServerPortText, 
+                            originalValues.useProxyServer);
+
+            Button_Enable(  hwndColon, 
+                            originalValues.useProxyServer);
+
             
             break;
         }
@@ -655,6 +717,83 @@ PrefPage2Proc(  HWND hwnd,
                 
                     break;
                 } 
+
+                case IDC_USEPROXY:
+                {
+                    BOOL enabled;
+
+                    if(Button_GetCheck(hwndUseProxyServer) == BST_CHECKED)
+                    {
+                        currentValues.useProxyServer = true;
+                    }
+                    else
+                    {
+                        currentValues.useProxyServer = false;
+                    }
+
+                    enabled = (currentValues.useProxyServer ? TRUE : FALSE);
+
+                    Button_Enable(hwndProxyServerAddress, enabled);
+
+                    Button_Enable(hwndProxyServerAddressText, enabled);
+
+                    Button_Enable(hwndProxyServerPort, enabled);
+
+                    Button_Enable(hwndProxyServerPortText, enabled);
+
+                    Button_Enable(hwndColon, enabled);
+
+
+                    if(memcmp(  &originalValues, 
+                                &currentValues, 
+                                sizeof(PrefsStruct)))
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_PROXYADDRESS:
+                case IDC_PORT:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char port[6];
+
+                        memset(currentValues.proxyServer, 0x00, MAX_PATH);
+                        Edit_GetText(   hwndProxyServerAddress, 
+                                        currentValues.proxyServer,
+                                        MAX_PATH);
+
+                        Edit_GetText(   hwndProxyServerPort, 
+                                        port,
+                                        sizeof(port));
+
+                        if(*port)
+                        {
+                            strcat(currentValues.proxyServer, ":");
+                            strcat(currentValues.proxyServer, port);
+                        }
+
+                        if(memcmp(  &originalValues, 
+                                    &currentValues, 
+                                    sizeof(PrefsStruct)))
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
             }
 
             break;

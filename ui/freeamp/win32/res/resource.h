@@ -103,6 +103,12 @@
 #define IDC_STREAMSAVEDIR               1017
 #define IDC_BROWSE                      1018
 #define IDC_SAVELOCATION_TEXT           1019
+#define IDC_PORT                        1020
+#define IDC_PROXYADDRESS_TEXT           1021
+#define IDC_PORT_TEXT                   1022
+#define IDC_USEPROXY                    1023
+#define IDC_PROXYADDRESS                1024
+#define IDC_COLON_TEXT                  1025
 #define IDC_OPEN_URL                    1029
 #define IDC_ITEM                        40001
 #define IDC_ABOUT                       40002
@@ -125,7 +131,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        194
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1020
+#define _APS_NEXT_CONTROL_VALUE         1026
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
