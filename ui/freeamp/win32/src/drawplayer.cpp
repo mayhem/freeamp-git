@@ -2160,7 +2160,9 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 							if (g_ui->m_plm->GetRepeat() != REPEAT_NOT) {
 								g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
 							} else {
-								g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+								if (g_buttonStateArray[kPlayControl].shown == FALSE) {
+									g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+								}
 							}
 						}
 					} else {

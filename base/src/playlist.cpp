@@ -96,6 +96,9 @@ void PlayListManager::Add(char *pc, int type) {
 		}
 		item->m_type = type;
 		m_pMediaElems->Insert(item);
+		if (m_pMediaElems->NumElements() == 1) {
+			m_current = 0; // set current to first
+		}
 		// add a corresponding element to the order list
 		OrderListItem *orderItem = new OrderListItem();
 		orderItem->m_indexToRealVector = m_pMediaElems->NumElements() - 1;
@@ -128,47 +131,62 @@ PlayListItem *PlayListManager::GetCurrent() {
 
 void PlayListManager::SetFirst() { 
 	GetPLManipLock();
-    if (m_order == SHUFFLE_RANDOM) {
-		SetNext();
-    } else {
-		m_current = 0; 
-    }
-    SendInfoToPlayer();
+	int32 elems = m_pMediaElems->NumElements();
+	if (elems) {
+		if (m_order == SHUFFLE_RANDOM) {
+			SetNext();
+		} else {
+			m_current = 0; 
+		}
+	    SendInfoToPlayer();
+	} else {
+		m_current = -1;
+	}
 	ReleasePLManipLock();
 }
 
 void PlayListManager::SetNext() { 
 	GetPLManipLock();
-    if (!(m_repeat == REPEAT_CURRENT)) {
-		int32 count = m_pOrderList->NumElements();
-		if (count != 0) {
-			if (SHUFFLE_RANDOM == m_order) { 
-				m_current = (int32) (( (double)count * rand()) / (RAND_MAX+1.0));
-			} else {
-				m_current++;
-				if ((m_current >= count) && (m_repeat == REPEAT_ALL)) {
-					m_current = 0;
-				} 
+	int32 elems = m_pMediaElems->NumElements();
+	if (elems) {
+		if (!(m_repeat == REPEAT_CURRENT)) {
+			int32 count = m_pOrderList->NumElements();
+			if (count != 0) {
+				if (SHUFFLE_RANDOM == m_order) { 
+					m_current = (int32) (( (double)count * rand()) / (RAND_MAX+1.0));
+				} else {
+					m_current++;
+					if ((m_current >= count) && (m_repeat == REPEAT_ALL)) {
+						m_current = 0;
+					} 
+				}
+				SendInfoToPlayer();
 			}
-			SendInfoToPlayer();
 		}
+	} else {
+		m_current = -1;
 	}
 	ReleasePLManipLock();
 }
 
 void PlayListManager::SetPrev() {
 	GetPLManipLock();
-    if (!(m_repeat == REPEAT_CURRENT)) {
-		int32 count = m_pOrderList->NumElements();
-		if (m_order == SHUFFLE_RANDOM) {
-			SetNext();
-		} else {
-			m_current--;
-			if ((m_current < 0) && (m_repeat == REPEAT_ALL)) {
-				m_current = count - 1;
+	int32 elems = m_pMediaElems->NumElements();
+	if (elems) {
+		if (!(m_repeat == REPEAT_CURRENT)) {
+			int32 count = m_pOrderList->NumElements();
+			if (m_order == SHUFFLE_RANDOM) {
+				SetNext();
+			} else {
+				m_current--;
+				if ((m_current < 0) && (m_repeat == REPEAT_ALL)) {
+					m_current = count - 1;
+				}
 			}
+			SendInfoToPlayer();
 		}
-		SendInfoToPlayer();
+	} else {
+		m_current = -1;
 	}
 	ReleasePLManipLock();
 }
@@ -194,6 +212,7 @@ void PlayListManager::SendRepeatModeToPlayer() {
 void PlayListManager::SetShuffle(ShuffleMode oop) {
 	GetPLManipLock();
 	if ((oop >= 0) && (oop < SHUFFLE_INTERNAL_NUMBER)) {
+		int32 elems = m_pOrderList->NumElements();
 		switch (oop) {
 		case SHUFFLE_SHUFFLED:
 			// reshuffle
@@ -201,8 +220,13 @@ void PlayListManager::SetShuffle(ShuffleMode oop) {
 			break;
 		case SHUFFLE_NOT_SHUFFLED:
 			// m_current points into the ordered list, restore it to 'correct' element
+
 			if (m_order == SHUFFLE_SHUFFLED) {
-				m_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealVector;
+				if ((elems > 0) && (m_current >= 0) && (m_current < elems)) {
+					m_current = (m_pOrderList->ElementAt(m_current))->m_indexToRealVector;
+				} else {
+					m_current = -1;
+				}
 			}
 			break;
 		default:
