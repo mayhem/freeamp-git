@@ -159,6 +159,14 @@ extern unsigned int global_cycles;
 
 #endif
 
+float equalizer[32] = {
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+};
+int enableEQ = 0;
+float EQ_gain_adjust = 1.0;
 
 /*********  bitstream buffer */
 #define BS_BUFBYTES 60000U
