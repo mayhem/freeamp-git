@@ -167,7 +167,7 @@ void infoeditorUI::MBClick(void)
                         "Profile and signature your music collection.";
 
        GTKMessageDialog *dialog = new GTKMessageDialog();
-       dialog->Show(message.c_str(), caption.c_str(), kMessageOk);
+       dialog->Show(message.c_str(), caption.c_str(), kMessageOk, true);
 
        delete dialog;
    }
