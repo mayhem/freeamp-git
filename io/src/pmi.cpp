@@ -30,7 +30,7 @@ ____________________________________________________________________________*/
 #include <errno.h>
 #include <assert.h>
 
-#include <config.h>
+#include "config.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>

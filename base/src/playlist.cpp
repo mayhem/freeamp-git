@@ -1031,7 +1031,7 @@ Error PlaylistManager::RemoveAll()
 {
     Error result = kError_InvalidParam;
     uint32 index = m_activeList->size() - 1;
-    uint32 size = m_activeList->size();
+    //uint32 size = m_activeList->size();
     PlaylistItem* item = NULL;
     m_mutex.Acquire();
 

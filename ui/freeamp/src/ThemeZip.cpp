@@ -238,7 +238,7 @@ Error ThemeZip::CompressThemeZip(const string &oDestFile,
 
 #define ISODIGIT(Char) \
   ((unsigned char) (Char) >= '0' && (unsigned char) (Char) <= '7')
-#define ISSPACE(Char) (__isascii (Char) && isspace (Char))
+#define ISSPACE(Char) (isascii (Char) && isspace (Char))
 
 
 long from_oct (int digs, char *where)

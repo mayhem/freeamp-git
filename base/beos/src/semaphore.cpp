@@ -93,7 +93,7 @@ bool Semaphore::Wait( long timeout )
 	}
 	else
 	{
-		stat = acquire_sem_etc( mutex, 1, B_TIMEOUT, timeout * 1e6 );
+		stat = acquire_sem_etc( mutex, 1, B_TIMEOUT, (bigtime_t)(timeout * 1e6) );
 	}
 
 	return( stat == B_NO_ERROR );

@@ -112,7 +112,7 @@ class Window
       virtual Error Minimize(void) = 0;
       virtual Error Restore(void) = 0;
 	  virtual bool  LButtonDown(void) = 0;
-	  virtual Error GetDesktopSize(int &iX, int &iY) = 0;
+	  virtual Error GetDesktopSize(int32 &iX, int32 &iY) = 0;
       
       // Mouse position is in screen coordinates
       virtual Error SetMousePos(Pos &oMousePos) = 0;

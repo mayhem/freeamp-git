@@ -30,20 +30,26 @@ ____________________________________________________________________________*/
 
 
 #include <assert.h>
+
 #ifdef WIN32
-#include <windows.h>
 #include <io.h>
-#include <direct.h>
 #else
 #include <sys/socket.h>
 #include <netdb.h>
-#include <arpa/inet.h>
 #include <unistd.h>
+#endif
+
+#if defined(unix) || defined(__BEOS__)
 #define SOCKET int
+#endif
+
+#if defined(unix)
+#include <arpa/inet.h>
 #define closesocket(x) close(x)
 #define O_BINARY 0
 #endif
-#ifdef unix
+
+#if !defined(WIN32)
 #include <strstream>
 typedef ostrstream ostringstream;
 #else
@@ -204,8 +210,6 @@ bool UpdateManager::IsUpdateAvailable()
     
     if(m_mutex.Acquire(0))
     {
-        uint32 updateCount = 0;
-
         UpdateItem* item;
 
         vector<UpdateItem*>::iterator i = m_itemList.begin();
@@ -233,7 +237,7 @@ bool UpdateManager::IsUpdateAvailable()
                 localMajorVersion = 0;
             
             numFields = sscanf(item->GetCurrentFileVersion().c_str(),
-                   "%d.%d.%d", 
+                   "%lu.%lu.%lu", 
                    &currentMajorVersion,&currentMinorVersion,&currentRevisionVersion);
 
             if(numFields < 3)
@@ -306,7 +310,7 @@ Error UpdateManager::UpdateComponents(UMCallBackFunction function,
                     localMajorVersion = 0;
                 
                 numFields = sscanf(item->GetCurrentFileVersion().c_str(),
-                       "%d.%d.%d", 
+                       "%lu.%lu.%lu", 
                        &currentMajorVersion,&currentMinorVersion,&currentRevisionVersion);
 
                 if(numFields < 3)
@@ -391,7 +395,7 @@ Error UpdateManager::DownloadInfo(string& info,
     char hostname[kMaxHostNameLen + 1];
     char localname[kMaxHostNameLen + 1];
     char proxyname[kMaxHostNameLen + 1];
-    uint8  port;
+    unsigned short  port;
     struct sockaddr_in  addr;
     struct hostent      host;
     SOCKET s = -1;
@@ -409,7 +413,7 @@ Error UpdateManager::DownloadInfo(string& info,
         int32 numFields;
 
         numFields = sscanf(proxyname, 
-                           "http://%[^:/]:%u", hostname, &port);
+                           "http://%[^:/]:%hu", hostname, &port);
 
         sprintf(proxyname, "http://%s%s", kUpdateServer, kUpdateFile);
         file = proxyname;
@@ -681,7 +685,7 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
         char hostname[kMaxHostNameLen + 1];
         char localname[kMaxHostNameLen + 1];
         char proxyname[kMaxHostNameLen + 1];
-        uint8  port;
+        unsigned short port;
         struct sockaddr_in  addr;
         struct hostent      host;
         SOCKET s = -1;
@@ -744,7 +748,7 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
             if(useProxy)
             {
                 numFields = sscanf(proxyname, 
-                                   "http://%[^:/]:%u", hostname, &port);
+                                   "http://%[^:/]:%hu", hostname, &port);
 
                 strcpy(proxyname, item->GetCurrentFileURL().c_str());
                 file = proxyname;
@@ -752,7 +756,7 @@ Error UpdateManager::DownloadItem(UpdateItem* item,
             else
             {
                 numFields = sscanf(item->GetCurrentFileURL().c_str(), 
-                               "http://%[^:/]:%u", hostname, &port);
+                               "http://%[^:/]:%hu", hostname, &port);
 
                 file = strchr(item->GetCurrentFileURL().c_str() + 7, '/');
             }

@@ -42,7 +42,7 @@ class Bitmap
 {
     public:
 
-              Bitmap(string &oName);
+              Bitmap(const string &oName);
      virtual ~Bitmap(void);
 
      virtual void  GetName(string &oName);

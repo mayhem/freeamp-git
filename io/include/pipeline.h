@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 
+#include "config.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -41,7 +42,6 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "semaphore.h"
 #include "mutex.h"
-#include "config.h"
 #include "errors.h"
 #include "facontext.h"
 #include "event.h"

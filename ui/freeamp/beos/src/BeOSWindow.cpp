@@ -225,7 +225,7 @@ BeOSWindow::LButtonDown(void)
 }
 
 Error
-BeOSWindow::GetDesktopSize(int &iX, int &iY)
+BeOSWindow::GetDesktopSize(int32 &iX, int32 &iY)
 {
 	BScreen s;
 	BRect r = s.Frame();

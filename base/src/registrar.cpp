@@ -46,7 +46,7 @@ Registrar::
 InitializeRegistry(Registry* registry, Preferences* prefs)
 {
     Error error = kError_NoErr;
-    char dir[MAX_PATH];
+    char dir[_MAX_PATH];
 
 #ifndef WIN32
     HashTable<int32 *> *pHT = new HashTable<int32 *>;
@@ -74,7 +74,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
         if (dir[0] == '~') {
 	    if (dir[1] != '/') {
 		// a ~ then a users name
-		char newdir[MAX_PATH];
+		char newdir[_MAX_PATH];
 		char *tmp = strchr(dir,'/');
 		char tmpChar = 0x00;
 		if (tmp) { tmpChar = *tmp; *tmp = '\0'; }
@@ -83,13 +83,13 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 		    strcpy(newdir, pwd->pw_dir);
 		    if (tmpChar) { *tmp = tmpChar; }
 		    if (tmp) { strcat(newdir,tmp); }
-		    memcpy(dir,newdir,MAX_PATH);
+		    memcpy(dir,newdir,_MAX_PATH);
 		} else {
 		    cerr << "Couldn't get user's identity: " << &(dir[1]) << endl;
 		}
 	    } else {
 		// just a ~
-		char newdir[MAX_PATH];
+		char newdir[_MAX_PATH];
 		struct passwd *pwd = getpwuid(getuid());
 		if (pwd) {
 		    strcpy(newdir,pwd->pw_dir);
@@ -97,7 +97,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 		    if (pSlash) {
 			strcat(newdir,pSlash);
 		    }
-		    memcpy(dir,newdir,MAX_PATH);
+		    memcpy(dir,newdir,_MAX_PATH);
 		} else {
 		    cerr << "Couldn't get user's identity: " << getuid() << endl;
 		}
@@ -107,7 +107,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 	len = sizeof(dir);
         WIN32_FIND_DATA find;
         HANDLE handle;
-        char search[MAX_PATH];
+        char search[_MAX_PATH];
 
         if(*m_subdir != DIR_MARKER)
             strcat(dir, DIR_MARKER_STR);
@@ -137,7 +137,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 		    }
 		}
 #endif
-                char file[MAX_PATH];
+                char file[_MAX_PATH];
 
 		//cerr << "Found file: " << find.cFileName << endl;
 

@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #endif
 
 #include <sys/stat.h>
+
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -38,7 +39,8 @@ ____________________________________________________________________________*/
 
 #include <string>
 #include <algorithm>
-#ifdef unix
+
+#if !defined(WIN32)
 #include <strstream>
 typedef ostrstream ostringstream;
 #else
@@ -699,13 +701,13 @@ void MusicCatalog::WriteMetaDataToDatabase(const char *url,
     ost << metadata.Comment().size() << kDatabaseDelimiter;
     ost << metadata.Genre().size() << kDatabaseDelimiter;
 
-    sprintf(num, "%d", metadata.Year());
+    sprintf(num, "%ld", metadata.Year());
     ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%d", metadata.Track());
+    sprintf(num, "%ld", metadata.Track());
     ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%d", metadata.Time());
+    sprintf(num, "%ld", metadata.Time());
     ost << strlen(num) << kDatabaseDelimiter;
-    sprintf(num, "%d", metadata.Size());
+    sprintf(num, "%ld", metadata.Size());
     ost << strlen(num) << kDatabaseDelimiter;
 
     ost << metadata.Artist();
@@ -739,20 +741,21 @@ MetaData *MusicCatalog::ReadMetaDataFromDatabase(const char *url)
     MetaData *metadata = new MetaData();
     char *value = dbasedata + 2;
 
-    uint32 numFields, offset = 0;
+    uint32 numFields = 0;
+    int offset = 0;
 
-    sscanf(value, "%d%n", &numFields, &offset);
+    sscanf(value, "%lu%n", &numFields, &offset);
     uint32* fieldLength =  new uint32[numFields];
 
     for(uint32 i = 0; i < numFields; i++)
     {
-        uint32 temp;
+        int temp;
 
-        sscanf(value + offset, " %d %n", &fieldLength[i], &temp);
+        sscanf(value + offset, " %lu %n", &fieldLength[i], &temp);
 
         if (i == numFields - 1) {
             char intholder[10];
-            sprintf(intholder, "%d", fieldLength[i]);
+            sprintf(intholder, "%lu", fieldLength[i]);
             offset += strlen(intholder) + 1;
         }
         else

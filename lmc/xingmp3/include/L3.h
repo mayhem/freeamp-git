@@ -51,6 +51,12 @@ ____________________________________________________________________________*/
 #define LITTLE_ENDIAN 0
 #endif
 
+#if defined(__POWERPC__)
+#define LITTLE_ENDIAN 0
+#elif defined(__INTEL__)
+#define LITTLE_ENDIAN 1
+#endif
+
 #ifndef LITTLE_ENDIAN
 #error Layer III LITTLE_ENDIAN must be defined 0 or 1
 #endif

@@ -25,7 +25,7 @@ ____________________________________________________________________________*/
 #include "Bitmap.h"
 #include "debug.h"
 
-Bitmap::Bitmap(string &oName)
+Bitmap::Bitmap(const string &oName)
 {
    m_oBitmapName = oName;
    m_bHasTransColor = false;

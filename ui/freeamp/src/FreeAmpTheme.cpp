@@ -44,6 +44,7 @@ ____________________________________________________________________________*/
 extern HINSTANCE g_hinst;
 #elif defined(__BEOS__)
 #include "BeOSPreferenceWindow.h"
+#include "win32impl.h"
 #endif
 
 #include "FreeAmpTheme.h"
@@ -383,7 +384,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
          char szTemp[100];
          string oName("BufferInfo"), oText;
 
-		 sprintf(szTemp, "I: %3d O: %3d %c", 
+		 sprintf(szTemp, "I: %3ld O: %3ld %c", 
                  info->GetInputPercent(),
                  info->GetOutputPercent(),
                  info->IsBufferingUp() ? '^' : ' ');
@@ -423,11 +424,11 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
          if (info->GetBitRate() == 0)
-              sprintf(text, "VBR %dkhz %s", 
+              sprintf(text, "VBR %ldkhz %s", 
                    info->GetSampleRate() / 1000, 
                    info->GetChannels() ? "Stereo" : "Mono");
          else
-              sprintf(text, "%dkbps %dkhz %s", 
+              sprintf(text, "%ldkbps %ldkhz %s", 
                    info->GetBitRate() / 1000,
                    info->GetSampleRate() / 1000, 
                    info->GetChannels() ? "Stereo" : "Mono");
@@ -498,8 +499,8 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
 
       case CMD_LoadTheme:
       {
-          char          szSavedTheme[MAX_PATH], szNewTheme[MAX_PATH];
-          uint32        iLen = MAX_PATH;
+          char          szSavedTheme[_MAX_PATH], szNewTheme[_MAX_PATH];
+          uint32        iLen = _MAX_PATH;
           string        oThemePath;
           MessageDialog oBox(m_pContext);
 	      string        oMessage(szKeepThemeMessage);
@@ -507,7 +508,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
           LoadThemeEvent *pInfo = (LoadThemeEvent *)e;
           URLToFilePath(pInfo->URL(), szNewTheme, &iLen);
 
-          iLen = MAX_PATH;
+          iLen = _MAX_PATH;
           m_pContext->prefs->GetPrefString(kThemePathPref, szSavedTheme, &iLen);
 
           if (strcmp(szSavedTheme, szNewTheme))
@@ -1094,8 +1095,8 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
 
 void FreeAmpTheme::DropFiles(vector<string> *pFileList)
 {
-    char                     ext[MAX_PATH];
-    char                     url[MAX_PATH + 7];
+    char                     ext[_MAX_PATH];
+    char                     url[_MAX_PATH + 7];
     uint32                   length, countbefore;
     vector<string>::iterator i;
     
@@ -1111,7 +1112,7 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
         {
             HANDLE          findFileHandle = NULL;
             WIN32_FIND_DATA findData;
-            char            findPath[MAX_PATH + 1];
+            char            findPath[_MAX_PATH + 1];
             char*           file;
             vector<PlaylistItem*> oList;
 
@@ -1154,7 +1155,7 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
         else
         {
             PlaylistFormatInfo     oInfo;              
-            char                   ext[MAX_PATH];
+            char                   ext[_MAX_PATH];
             int                    j;
             Error                  eRet = kError_NoErr;
             

@@ -178,7 +178,7 @@ bool PipelineUnit::Sleep(void)
 
 void PipelineUnit::DebugPrint(void)
 {
-    printf("[%c %c %d]", 
+    printf("[%c %c %ld]", 
         m_bSleeping ? 'S' : 'W',
         m_bPause ? 'P' : 'R',
         m_pOutputBuffer->GetBufferPercentage());

@@ -28,19 +28,29 @@ ____________________________________________________________________________*/
 #pragma warning(disable:4786) 
 #endif
 
+#include "config.h"
+
 #include <assert.h>
+
 #ifdef WIN32
 #include <io.h>
 #else
 #include <sys/socket.h>
 #include <netdb.h>
-#include <arpa/inet.h>
 #include <unistd.h>
+#endif
+
+#if defined(unix) || defined(__BEOS__)
 #define SOCKET int
+#endif
+
+#if defined(unix)
+#include <arpa/inet.h>
 #define closesocket(x) close(x)
 #define O_BINARY 0
 #endif
-#ifdef unix
+
+#if !defined(WIN32)
 #include <strstream>
 typedef ostrstream ostringstream;
 #else
@@ -56,7 +66,7 @@ typedef ostrstream ostringstream;
 #include <algorithm>
 //#include <iterators>
 
-#include "config.h"
+
 #include "facontext.h"
 
 #include "errors.h"
@@ -588,7 +598,7 @@ Error DownloadManager::Download(DownloadItem* item)
         char hostname[kMaxHostNameLen + 1];
         char localname[kMaxHostNameLen + 1];
         char proxyname[kMaxHostNameLen + 1];
-        uint8  port;
+        unsigned short port;
         struct sockaddr_in  addr;
         struct hostent      host;
         SOCKET s = -1;
@@ -622,7 +632,7 @@ Error DownloadManager::Download(DownloadItem* item)
             if(useProxy)
             {
                 numFields = sscanf(proxyname, 
-                                   "http://%[^:/]:%u", hostname, &port);
+                                   "http://%[^:/]:%hu", hostname, &port);
 
                 strcpy(proxyname, item->SourceURL().c_str());
                 file = proxyname;
@@ -630,7 +640,7 @@ Error DownloadManager::Download(DownloadItem* item)
             else
             {
                 numFields = sscanf(item->SourceURL().c_str(), 
-                               "http://%[^:/]:%u", hostname, &port);
+                               "http://%[^:/]:%hu", hostname, &port);
 
                 file = strchr(item->SourceURL().c_str() + 7, '/');
             }
@@ -1239,9 +1249,9 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << item->DestinationFile().size() << kDatabaseDelimiter;
                     ost << item->PlaylistName().size() << kDatabaseDelimiter;
 
-                    sprintf(num, "%d", item->GetTotalBytes());
+                    sprintf(num, "%ld", item->GetTotalBytes());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%d", item->GetBytesReceived());
+                    sprintf(num, "%ld", item->GetBytesReceived());
                     ost << strlen(num) << kDatabaseDelimiter;
 
                     // metadata lengths
@@ -1251,13 +1261,13 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << metadata.Comment().size() << kDatabaseDelimiter;
                     ost << metadata.Genre().size() << kDatabaseDelimiter;
 
-                    sprintf(num, "%d", metadata.Year());
+                    sprintf(num, "%ld", metadata.Year());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%d", metadata.Track());
+                    sprintf(num, "%ld", metadata.Track());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%d", metadata.Time());
+                    sprintf(num, "%ld", metadata.Time());
                     ost << strlen(num) << kDatabaseDelimiter;
-                    sprintf(num, "%d", metadata.Size());
+                    sprintf(num, "%ld", metadata.Size());
                     ost << strlen(num) << kDatabaseDelimiter;
 
                     // now stuff all the data in there
@@ -1314,20 +1324,21 @@ void DownloadManager::LoadResumableDownloadItems()
                 if(!value)
                     continue;
 
-                uint32 numFields, offset = 0;
+                uint32 numFields = 0;
+                int offset = 0;
  
-                sscanf(value, "%d%n", &numFields, &offset);
+                sscanf(value, "%lu%n", &numFields, &offset);
                 uint32* fieldLength =  new uint32[numFields];
  
                 for(uint32 i = 0; i < numFields; i++)
                 {
-                   uint32 temp;
+                   int temp;
  
-                   sscanf(value + offset, " %d %n", &fieldLength[i], &temp);
-                   printf("field %d: %d\n", i, fieldLength[i]);
+                   sscanf(value + offset, " %lu %n", &fieldLength[i], &temp);
+                   printf("field %lu: %lu\n", i, fieldLength[i]);
                    if (i == numFields - 1) {
                        char intholder[10];
-                       sprintf(intholder, "%d", fieldLength[i]);
+                       sprintf(intholder, "%lu", fieldLength[i]);
                        offset += strlen(intholder) + 1;
                    }
                    else

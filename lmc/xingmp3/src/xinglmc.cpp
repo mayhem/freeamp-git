@@ -392,8 +392,8 @@ Error XingLMC::ExtractMediaInfo()
 }
 
 Error XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
-                                 int &iTotalFrames, int &iSampleRate, 
-                                 int &iLayer)
+                                 int32 &iTotalFrames, int32 &iSampleRate, 
+                                 int32 &iLayer)
 {
    Error        Err;
    static int32 l[4] = {25, 3, 2, 1};
@@ -455,10 +455,10 @@ Error XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
 
 uint32 XingLMC::CalculateSongLength(const char *szUrl)
 {
-    char   path[MAX_PATH];
-    uint32 len = MAX_PATH;
+    char   path[_MAX_PATH];
+    uint32 len = _MAX_PATH;
     float  fTotalSeconds, fMsPerFrame;
-    int    iTotalFrames, iSampleRate, iLayer;
+    int32    iTotalFrames, iSampleRate, iLayer;
     Error  eRet;
 
     URLToFilePath(szUrl, path, &len);

@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 
+#include "config.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -40,7 +41,6 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "pipeline.h"
 #include "thread.h"
-#include "config.h"
 #include "errors.h"
 #include "eventdata.h"
 

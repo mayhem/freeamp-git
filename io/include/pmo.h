@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 
+#include "config.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -43,7 +44,6 @@ ____________________________________________________________________________*/
 #include "pipeline.h"
 #include "mutex.h"
 #include "eventdata.h"
-#include "config.h"
 #include "errors.h"
 #include "properties.h"
 #include "facontext.h"

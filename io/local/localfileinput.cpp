@@ -35,7 +35,7 @@ ____________________________________________________________________________*/
 #include <netinet/in.h>
 #endif
 
-#include <config.h>
+#include "config.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>

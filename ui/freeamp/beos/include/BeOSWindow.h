@@ -51,7 +51,7 @@ public:
     virtual Error   Minimize( void );
     virtual Error   Restore( void );
     virtual bool  LButtonDown(void);
-	virtual Error GetDesktopSize(int &iX, int &iY);
+	virtual Error GetDesktopSize(int32 &iX, int32 &iY);
 
     // These functions should be called from the OS dependent event
     // loop to handle mouse messages
