@@ -1278,6 +1278,12 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        m_pWindow->ControlIntValue(oControlName, true, iState);
        return kError_NoErr;
    }
+   if (oControlName == string("Title") && eMesg == CM_MouseDoubleClick)
+   {
+       m_pContext->target->AcceptEvent(new 
+                            Event(CMD_EditCurrentPlaylistItemInfo));
+       return kError_NoErr;
+   } 
   
    return kError_NoErr;
 }

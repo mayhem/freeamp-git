@@ -30,19 +30,20 @@ ____________________________________________________________________________*/
 
 static TransitionInfo pTransitions[] =
 {  
-    { CS_Normal,    CT_SetValue,         CS_Normal    },
-    { CS_Normal,    CT_Show,             CS_Normal    },
-    { CS_Normal,    CT_Timer,            CS_Normal    },
-    { CS_Normal,    CT_MouseEnter,       CS_MouseOver },
-    { CS_MouseOver, CT_SetValue,         CS_MouseOver },
-    { CS_MouseOver, CT_Timer,            CS_MouseOver },
-    { CS_MouseOver, CT_MouseLeave,       CS_Normal    },
-    { CS_MouseOver, CT_MouseLButtonDown, CS_Pressed   },
-    { CS_Pressed,   CT_MouseLButtonUp,   CS_MouseOver },
-    { CS_Pressed,   CT_MouseLeave,       CS_Normal    },
-    { CS_Normal,    CT_Hide,             CS_Hidden    },
-    { CS_Hidden,    CT_Show,             CS_Normal    },
-    { CS_LastState, CT_LastTransition,   CS_LastState } 
+    { CS_Normal,    CT_SetValue,                 CS_Normal    },
+    { CS_Normal,    CT_Show,                     CS_Normal    },
+    { CS_Normal,    CT_Timer,                    CS_Normal    },
+    { CS_Normal,    CT_MouseEnter,               CS_MouseOver },
+    { CS_MouseOver, CT_SetValue,                 CS_MouseOver },
+    { CS_MouseOver, CT_Timer,                    CS_MouseOver },
+    { CS_MouseOver, CT_MouseLeave,               CS_Normal    },
+    { CS_MouseOver, CT_MouseLButtonDown,         CS_Pressed   },
+    { CS_Any,       CT_MouseLButtonDoubleClick,  CS_Same      },
+    { CS_Pressed,   CT_MouseLButtonUp,           CS_MouseOver },
+    { CS_Pressed,   CT_MouseLeave,               CS_Normal    },
+    { CS_Normal,    CT_Hide,                     CS_Hidden    },
+    { CS_Hidden,    CT_Show,                     CS_Normal    },
+    { CS_LastState, CT_LastTransition,           CS_LastState } 
 };
 
 const int m_iMarqueeScrollIncrement = 5;
@@ -89,6 +90,7 @@ bool TextControl::UseToDragWindow(void)
 {
     return m_oName != string("Time") && 
            m_oName != string("TimeRemaining") &&
+           m_oName != string("Title") &&
            m_oName != string("HeadlineInfo") &&
            m_oName != string("HeadlineStreamInfo");
 }
@@ -119,6 +121,9 @@ void TextControl::Transition(ControlTransitionEnum  eTrans,
             break;
         case CT_MouseLeave:
             m_pParent->SendControlMessage(this, CM_MouseLeave);
+            break;
+        case CT_MouseLButtonDoubleClick:
+            m_pParent->SendControlMessage(this, CM_MouseDoubleClick);
             break;
         case CT_SetValue:
             TextChanged();

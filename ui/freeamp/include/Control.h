@@ -51,6 +51,7 @@ enum ControlMessageEnum
     CM_Pressed,
     CM_MouseEnter,
     CM_MouseLeave,
+    CM_MouseDoubleClick,
     CM_SliderUpdate,
     CM_ValueChanged,
     CM_ChangeWindow,
@@ -72,6 +73,7 @@ enum ControlTransitionEnum
     CT_MouseLeave,
     CT_MouseLButtonUp,
     CT_MouseLButtonDown,
+    CT_MouseLButtonDoubleClick,
     CT_SetValue,
     CT_Timer,
 

@@ -659,6 +659,27 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     return;
 }
 
+void Window::HandleMouseLButtonDoubleClick(Pos &oScreenPos)
+{
+    Control *pControl;
+    Rect     oRect;
+    Pos      oPos;
+
+    IncUsageRef();
+
+    GetWindowPosition(oRect);
+    oPos.x = oScreenPos.x - oRect.x1;
+    oPos.y = oScreenPos.y - oRect.y1;
+
+    pControl = ControlFromPos(oPos);
+    if (pControl)
+        m_pMouseInControl->AcceptTransition(CT_MouseLButtonDoubleClick);
+
+    DecUsageRef();
+
+    return;
+}
+
 void Window::HandleMouseLButtonUp(Pos &oScreenPos)
 {
     Control *pControl;

@@ -59,7 +59,12 @@ void button_down(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     gdk_threads_leave();
     ui->m_pMindMeldMutex->Acquire();
     if (e->button.button == 1) 
-        ui->HandleMouseLButtonDown(oPos);
+    {
+        if (e->type==GDK_2BUTTON_PRESS)
+            ui->HandleMouseLButtonDoubleClick(oPos);
+        else
+            ui->HandleMouseLButtonDown(oPos);
+    }
     else if (e->button.button == 3)
         ui->BringWindowToFront();
     ui->m_pMindMeldMutex->Release();

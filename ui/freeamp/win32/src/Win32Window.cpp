@@ -228,6 +228,25 @@ LRESULT Win32Window::WindowProc(HWND hwnd, UINT msg,
             break;
         }
 
+        case WM_LBUTTONDBLCLK:
+        {
+            POINT pt;
+            Pos oPos;
+
+            pt.x = (int16)LOWORD(lParam);
+            pt.y = (int16)HIWORD(lParam);
+
+            ClientToScreen(hwnd, &pt);
+            oPos.x = pt.x;
+            oPos.y = pt.y;
+
+            m_pMindMeldMutex->Acquire();
+            HandleMouseLButtonDoubleClick(oPos);
+            m_pMindMeldMutex->Release();
+            
+            break;
+        }
+
         case WM_CHAR:
         {
             Keystroke((unsigned char)wParam);
