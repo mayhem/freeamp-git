@@ -318,13 +318,13 @@ static BOOL CALLBACK IntroWizardSearch( HWND hwnd,
             const char* kCaption1 = "Search Computer For Music";
             const char* kCaption2 = "Where Would You Like to Look for Music?";
             const char* kMsg1 = "In order to populate the My Music Collection pane "
-                                BRANDING" will search your computer for supported music "
+                                the_BRANDING" will search your computer for supported music "
                                 "files. The files will not be moved or modified during "
                                 "this process. Their location will be remembered in "
                                 "order to provide you with an organized view of your "
                                 "music collection.";
                                
-            const char* kMsg2 = "By default "BRANDING" will search all the disk drives on "
+            const char* kMsg2 = "By default "the_BRANDING" will search all the disk drives on "
                                 "your computer for music. If you would like to limit the "
                                 "scope of the search you may do so by selecting a "
                                 "disk drive for us to search. If you wish, you may "
@@ -656,7 +656,7 @@ bool MusicBrowserUI::IntroductionWizard(vector<string>* searchPaths)
     psh.hwndParent = m_hWnd;
     psh.hInstance = hinst;
     psh.pszIcon = NULL;
-    psh.pszCaption = "Welcome to "BRANDING;
+    psh.pszCaption = "Welcome to "the_BRANDING;
     psh.nPages = sizeof(psp)/sizeof(PROPSHEETPAGE);
     psh.nStartPage = 0;
     psh.ppsp = psp;

@@ -98,7 +98,7 @@ const int iInitialFrameSize = iMaxFrameSize * iNumSanityCheckFrames;
 
 const char *szFailRead = "Cannot read MP3 data from input plugin.";
 const char *szFailWrite = "Cannot write audio data to output buffer.";
-const char *szCannotDecode = BRANDING" cannot play this file/stream. This file/stream may be corrupted.";
+const char *szCannotDecode = The_BRANDING" cannot play this file/stream. This file/stream may be corrupted.";
 
 XingLMC::XingLMC(FAContext *context) :
          LogicalMediaConverter(context)

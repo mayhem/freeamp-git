@@ -59,7 +59,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
     runOnceMutex = CreateMutex(	NULL,
 							    TRUE,
-							    BRANDING " Should Only Run One Time!");
+							    The_BRANDING" Should Only Run One Time!");
 
     if(GetLastError() == ERROR_ALREADY_EXISTS)
     {
@@ -401,7 +401,7 @@ const char* kMimeTypes[] = {
 };
 
 const char* kOpenCommand = "\\shell\\open\\command";
-const char* kNotifyStolen = "Music files normally associated with " BRANDING "\r\n"
+const char* kNotifyStolen = "Music files normally associated with "the_BRANDING "\r\n"
                             "have been associated with another application.\r\n"
                             "Do you want to reclaim these music files?";
 

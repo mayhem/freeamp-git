@@ -251,7 +251,7 @@ SoundCardPMO::Init( OutputInfo* info )
 
 	if ( m_player->InitCheck() < B_NO_ERROR )
 	{
-		PRINT(( "SoundPlayerPMO::Init:error constructing BSOundPlayer\n" ));
+		PRINT(( "SoundPlayerPMO::Init:error constructing BSoundPlayer\n" ));
 		return kError_InitFailed;
 	}
 

@@ -33,7 +33,7 @@ ____________________________________________________________________________*/
 #include "win32prefs.h"
 #include "updatemanager.h"
 
-const char* kMessage = "An instance of "BRANDING" is currently running. Please "
+const char* kMessage = "An instance of "the_BRANDING" is currently running. Please "
                        "close the application before continuing the update.";
 
 void MoveFiles(const char* src, const char* dest);
@@ -54,7 +54,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     {
         int32 result;
 
-        result = MessageBox(NULL, kMessage, "Updating "BRANDING, MB_RETRYCANCEL);
+        result = MessageBox(NULL, kMessage, "Updating "the_BRANDING, MB_RETRYCANCEL);
 
         if(result == IDCANCEL)
         {

@@ -62,12 +62,12 @@ void WorkerThreadStart(void* arg);
 
 #define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
-const char *szWelcomeMsg = "Welcome to the "BRANDING" Player!";
+const char *szWelcomeMsg = "Welcome to "the_BRANDING"!";
 const char *szParseError = "Parsing the Theme description failed. Cause: ";
 const char *szCantFindHelpError = "Cannot find the help files. Please make "
                                   "sure that the help files are properly "
                                   "installed, and you are not running "
-                                  BRANDING" from the build directory.";
+                                  the_BRANDING" from the build directory.";
 const char *szKeepThemeMessage = "Would you like to keep this theme?";
 const int iVolumeChangeIncrement = 10;
 

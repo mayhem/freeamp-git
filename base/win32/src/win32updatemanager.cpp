@@ -102,10 +102,10 @@ Error Win32UpdateManager::UpdateComponents(UMCallBackFunction function,
         int32 response;
 
         response = MessageBox(NULL, 
-                              BRANDING" needs to close down and restart in order to replace components\r\n"
+                              The_BRANDING" needs to close down and restart in order to replace components\r\n"
                               "which are being used. If you do not wish to quit the application you\r\n"
                               "can choose \"Cancel\" and update again at a later time.",
-                              "Restart "BRANDING"?", 
+                              "Restart "the_BRANDING"?", 
                               MB_OKCANCEL|MB_ICONQUESTION|MB_SETFOREGROUND);
 
         if(response == IDOK)

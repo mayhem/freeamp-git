@@ -607,7 +607,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 
             m_ui->ReadPreferences();
 
-            m_ui->SetTrayTooltip("Welcome to "BRANDING);
+            m_ui->SetTrayTooltip("Welcome to "the_BRANDING);
 
 			result = TRUE;
 

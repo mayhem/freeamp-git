@@ -558,12 +558,21 @@ Error PlaylistManager::SetShuffleMode(bool shuffle)
 {
     m_mutex.Acquire();
 
-    m_shuffle = shuffle;
-
-    if(m_shuffle)
+    if(shuffle)
     {
         random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
     }
+    else
+    {
+        // need to change current index so that this plays from 
+        // current song when it continues
+        const PlaylistItem* currentItem = GetCurrentItem();
+
+        if(currentItem && kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+            InternalSetCurrentIndex(IndexOf(currentItem));
+    }
+
+    m_shuffle = shuffle;
 
     m_context->target->AcceptEvent(new PlaylistShuffleEvent(m_shuffle, this));
 

@@ -518,7 +518,7 @@ Usage(const char *progname)
     if(m_didUsage)
         return;
 
-    printf(BRANDING " version " FREEAMP_VERSION " -- Usage:\n\n");
+    printf(The_BRANDING " version " FREEAMP_VERSION " -- Usage:\n\n");
     printf("%s [-save] [-ui <UI plugin name>] <MP3 file/stream> "
       "[MP3 file/stream] ...\n\n", progname);
     printf("Example command line:\n\n");
@@ -799,17 +799,17 @@ Run()
       if (!uisActivated)
       {
 #ifdef WIN32
-         MessageBox(NULL, BRANDING" cannot find user a valid interface module.\r\n"
-                          "Please make sure that " BRANDING" is installed correctly.\r\n"
-                          "You may wish to remove and reinstall " BRANDING" to fix this problem",
-                    BRANDING " Error", MB_OK);
+         MessageBox(NULL, The_BRANDING" cannot find a valid user interface module.\r\n"
+                          "Please make sure that " the_BRANDING" is installed correctly.\r\n"
+                          "You may wish to remove and reinstall " the_BRANDING" to fix this problem",
+                          BRANDING" Error", MB_OK);
 #else
          const char *thePath = getenv(FREEAMP_PATH_ENV);
 
          if (thePath == NULL)
           thePath = m_context->prefs->GetLibDirs();
-         cerr << "No UI plugin in '" << thePath << "' matched 'plugins/" << name << "' or 'plugins/" << name << ".ui'" << endl;
-         cerr << BRANDING << " will quit." << endl;
+         cerr << "No UI plugin in '" << thePath << "' matched 'plugins/" << name << "' or 'plugins/" << name << ".ui.'" << endl;
+         cerr << The_BRANDING << " will quit." << endl;
 #endif
          Event    *e = new Event(CMD_QuitPlayer);
 
