@@ -251,7 +251,7 @@ void TitleStreamServer::WorkerThread(void)
    fd_set          sSet; 
    struct timeval  sTv; 
    int             iRet;
-   unsigned int    iStructSize;
+   int             iStructSize;
 
    for(; !m_bExit; ) 
    {
