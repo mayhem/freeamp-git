@@ -161,6 +161,12 @@ AcceptEvent(Event* event)
 				EnableWindow(m_hwndStop, FALSE);
 				EnableWindow(m_hwndPause, FALSE);
 				EnableWindow(m_hwndSlider, FALSE);
+
+                SendMessage(m_hwndSlider,
+						    TBM_SETPOS,
+						    (WPARAM)TRUE,
+						    (LPARAM)0);
+
 	            break; 
             }
 
@@ -449,16 +455,26 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 
 		case WM_COMMAND:
 		{
+            static bool isPaused = false;
+
 			switch(wParam)
 			{
 				case IDC_PLAY:
 				{
-                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_Play));
+                    if(isPaused)
+                    {
+                        m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_TogglePause));
+                        isPaused = false;
+                    }
+                    else
+                        m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_Play));
+
 					break;
 				}
 
 				case IDC_PAUSE:
 				{
+                    isPaused = true;
                     m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_TogglePause));
 					break;
 				}

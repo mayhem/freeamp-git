@@ -54,14 +54,14 @@ int32 Seek(PMIRef ref, int32 offset, int32 origin)
     return pmi->Seek(offset, origin);
 }
 
-bool SetTo(PMIRef ref, char* url)
+Error SetTo(PMIRef ref, char* url)
 {
     PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref->ref;
 
     return pmi->SetTo(url);
 }
 
-bool Close(PMIRef ref)
+Error Close(PMIRef ref)
 { 
     PhysicalMediaInput* pmi = (PhysicalMediaInput*)ref->ref;
 

@@ -35,7 +35,13 @@ typedef enum Error
     kError_FindFuncFailed   = 4,
     kError_NoFiles          = 5,
     kError_NoPrefs          = 6,
-    kError_BufferTooSmall   = 7
+    kError_BufferTooSmall   = 7,
+    kError_OutOfMemory      = 8,
+    kError_FileNoAccess     = 9,
+    kError_FileExists       = 10,
+    kError_FileInvalidArg   = 11,
+    kError_FileNotFound     = 12,
+    kError_FileNoHandles    = 13
 
 }Error;
 

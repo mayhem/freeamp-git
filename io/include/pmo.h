@@ -60,6 +60,8 @@ public:
 	virtual bool Init(OutputInfo* /*info*/){ return false; }
 	virtual bool Reset(bool /*user_stop*/){ return false; }
 	virtual int32 Write(void * /* pBuffer */, int32 /* bufflength */) { return -1; }
+    virtual void Pause(){}
+    virtual void Resume(){}
 	virtual void Clear(){ }
 };
 
@@ -71,6 +73,8 @@ typedef struct PMO{
     bool    (*Init)         (struct PMO*, OutputInfo*);
     bool    (*Reset)        (struct PMO*, bool);
     int32   (*Write)        (struct PMO*, void*, int32);
+    void    (*Pause)        (struct PMO*);
+    void    (*Resume)       (struct PMO*);
     void    (*Clear)        (struct PMO*);
     void    (*Cleanup)      (struct PMO*);
 }PMO, *PMORef;

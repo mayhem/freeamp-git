@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <fcntl.h>
 #include <string.h>
 #include <iostream.h>
+#include <errno.h>
 
 #include <config.h>
 
@@ -85,38 +86,70 @@ LocalFileInput::
     //cout << "Done deleting LocalFileInput" << endl;
 }
 
-bool LocalFileInput::
+Error LocalFileInput::
 SetTo(char* url)
 {
+    Error result = kError_NoErr;
+
     if(m_fd >= 0) {
-	close(m_fd);
-	m_fd = -1;
+	    close(m_fd);
+	    m_fd = -1;
     }
+
     if(m_path) {
-	delete [] m_path;
-	m_path = NULL;
+	    delete [] m_path;
+	    m_path = NULL;
     }
 
     if (url) {
+	    int32 len = strlen(url) + 1;
+	    m_path = new char[len];
 	
-	int32 len = strlen(url) + 1;
-	m_path = new char[len];
+	    if(m_path) {
+	        memcpy(m_path,url,len);
+	    } else {
+	        result = kError_OutOfMemory;
+	    }
 	
-	if(m_path) {
-	    memcpy(m_path,url,len);
-	} else {
-	    return false;
-	}
+        if(IsntError(result))
+        {
+	        m_fd = open(m_path, RD_BNRY_FLAGS);
 	
-	m_fd = open(m_path, RD_BNRY_FLAGS);
-	
-	if( m_fd < 0 ) {
-	    return false;
-	}
-	return true;
+	        if( m_fd < 0 ) {
+
+                switch(errno) {
+                    case EACCES:
+                        result =  kError_FileNoAccess;
+                        break;
+
+                    case EEXIST:
+                        result =  kError_FileExists;
+                        break;
+
+                    case EINVAL:
+                        result =  kError_FileInvalidArg;
+                        break;
+
+                    case EMFILE:
+                        result =  kError_FileNoHandles;
+                        break;
+
+                    case ENOENT:
+                        result =  kError_FileNotFound;
+                        break;
+
+                    default:
+                        result =  kError_UnknownErr;
+                        break;
+                }
+	            
+            }
+        }
     } else {
-	return false;
+	    result = kError_InvalidParam;
     }
+
+    return result;
 }
 
 int32 LocalFileInput::
@@ -131,12 +164,12 @@ Seek(int32 offset, int32 origin)
 	return lseek(m_fd, offset, origin);
 }
 
-bool LocalFileInput::
+Error LocalFileInput::
 Close(void)
 {
 	close(m_fd);
 	m_fd = -1;
-	return true;
+	return kError_NoErr;
 }
 
 

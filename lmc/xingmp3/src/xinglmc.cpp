@@ -419,12 +419,14 @@ void XingLMC::DecodeWork() {
     return;
 }
 void XingLMC::Pause() {
+    m_output->Pause(m_output);
     XingCommand *xc = new XingCommand[1];
     xc[0] = XING_Pause;
     m_xcqueue->Write(xc);
 }
 
 void XingLMC::Resume() {
+    m_output->Resume(m_output);
     XingCommand *xc = new XingCommand[1];
     xc[0] = XING_Resume;
     m_xcqueue->Write(xc);

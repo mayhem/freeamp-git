@@ -259,6 +259,21 @@ NextHeader()
 
 void 
 SoundCardPMO::
+Pause()
+{
+     waveOutPause(m_hwo);
+}
+
+void 
+SoundCardPMO::
+Resume()
+{
+    waveOutRestart(m_hwo);
+}
+
+
+void 
+SoundCardPMO::
 Clear()
 {
 	waveOutReset(m_hwo);

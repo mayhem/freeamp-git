@@ -108,7 +108,9 @@ class Player {
     UIRegistry*             m_uiRegistry;
 
     char*                   m_argUI;
-    bool                    m_autoplay;
+
+    int32                   m_argc;          
+    char**                  m_argv;
 
 };
 

@@ -38,8 +38,8 @@ public:
 	virtual ~LocalFileInput(void);
 	virtual int32 Read(void* buf, size_t numbytes);
 	virtual int32 Seek(int32 offset, int32 origin);
-	virtual bool SetTo(char* url);
-	virtual bool Close(void);
+	virtual Error SetTo(char* url);
+	virtual Error Close(void);
 	virtual const char* Url(void) const { return m_path; }
 	
 private:

@@ -76,7 +76,10 @@ Player::Player() {
 
     m_argUI = NULL;
 
-    m_autoplay = false;
+    m_argc  = 0;
+    m_argv  = NULL;
+
+    //m_autoplay = false;
 }
 
 Player::~Player() {
@@ -179,30 +182,19 @@ Player::~Player() {
 
 
 void Player::SetArgs(int32 argc, char** argv){
-    PlayList* playlist = new PlayList;
-    char *arg = NULL;
-    bool shuffle = false;
+    m_argc = argc;
+    m_argv = argv;
 
-    for(int32 i = 1;i < argc; i++) 
+    char *arg = NULL;
+
+    for(int32 i = 1;i < m_argc; i++) 
     {
-	    arg = argv[i];
+	    arg = m_argv[i];
 
 	    if (arg[0] == '-') 
         {
 	        switch (arg[1]) 
             {
-		        case 's':
-                {
-                    shuffle = true;
-		            break;
-	            } 
-
-                case 'p':
-                {
-                    m_autoplay = true;
-		            break;
-	            } 
-
                 case 'u':
                 case 'U':
                 {
@@ -217,18 +209,7 @@ void Player::SetArgs(int32 argc, char** argv){
 	            } 
             }
         }
-        else 
-        {
-            playlist->Add(arg,0);
-	    }
     }
-
-    playlist->SetFirst();
-
-    if(shuffle) 
-	    playlist->Shuffle();
-    
-    Player::GetPlayer()->AcceptEvent(new Event(CMD_SetPlaylist,playlist));
 }
 
 void Player::Run(){
@@ -279,16 +260,14 @@ void Player::Run(){
 
 		    	m_uiRef->SetTarget(m_uiRef, eq);
 
+                m_uiRef->SetArgs(m_uiRef, m_argc, m_argv);
+
                 RegisterActiveUI(m_uiRef);
             }
         }
     }
 
     delete [] name;
-
-    if(m_autoplay)
-       AcceptEvent(new Event(CMD_Play));
- 
 }
 
 int32 Player::AcceptEventStub(EventQueueRef ref, Event* e){
@@ -447,12 +426,14 @@ int32 Player::ServiceEvent(Event *pC) {
 	    
 	    case CMD_Play: {
 		PlayListItem *pc = m_myPlayList->GetCurrent();
+        Error error = kError_NoErr;
+
 		if (pc) {
 		    if (m_lmcRef) {
-			m_lmcRef->Stop(m_lmcRef);
-			m_lmcRef->Cleanup(m_lmcRef);
-			delete m_lmcRef;
-			m_lmcRef = NULL;
+			    m_lmcRef->Stop(m_lmcRef);
+			    m_lmcRef->Cleanup(m_lmcRef);
+			    delete m_lmcRef;
+			    m_lmcRef = NULL;
 		    }
 		    
 		    RegistryItem* item = NULL;
@@ -462,31 +443,38 @@ int32 Player::ServiceEvent(Event *pC) {
 		    item = m_pmiRegistry->GetItem(0);
 		    
 		    if(item) {
-			pmi = new PMI;
-			item->InitFunction()(pmi);
-			pmi->SetTo(pmi, pc->m_url);
+			    pmi = new PMI;
+			    item->InitFunction()(pmi);
+			    error = pmi->SetTo(pmi, pc->m_url);
+
+                if(IsError(error))
+                {
+                    pmi->Cleanup(pmi);
+                    delete pmi;
+                    break;
+                }
 		    }
-		    
+
 		    item = m_pmoRegistry->GetItem(0);
 		    
 		    if(item) {
-			pmo = new PMO;
-			item->InitFunction()(pmo);
+			    pmo = new PMO;
+			    item->InitFunction()(pmo);
 		    }
 		    
 		    item = m_lmcRegistry->GetItem(0);
 
 		    if(item) {
-			m_lmcRef = new LMC;
-			item->InitFunction()(m_lmcRef);
+			    m_lmcRef = new LMC;
+			    item->InitFunction()(m_lmcRef);
 
-            EventQueueRef eq = new EventQueue;
-            eq->ref = this;
-            eq->AcceptEvent = AcceptEventStub;
+                EventQueueRef eq = new EventQueue;
+                eq->ref = this;
+                eq->AcceptEvent = AcceptEventStub;
 
-			m_lmcRef->SetTarget(m_lmcRef, eq);
-			m_lmcRef->SetPMI(m_lmcRef, pmi);
-			m_lmcRef->SetPMO(m_lmcRef, pmo);
+			    m_lmcRef->SetTarget(m_lmcRef, eq);
+			    m_lmcRef->SetPMI(m_lmcRef, pmi);
+			    m_lmcRef->SetPMO(m_lmcRef, pmo);
 		    }
 		    
 		    m_lmcRef->InitDecoder(m_lmcRef);
@@ -499,13 +487,13 @@ int32 Player::ServiceEvent(Event *pC) {
             m_myPlayList->SetFirst();
 		    //cout << "no more in playlist..." << endl;
 		    if (m_lmcRef) {
-			m_lmcRef->Stop(m_lmcRef);
-			m_lmcRef->Cleanup(m_lmcRef);
-			delete m_lmcRef;
-			m_lmcRef = NULL;
+			    m_lmcRef->Stop(m_lmcRef);
+			    m_lmcRef->Cleanup(m_lmcRef);
+			    delete m_lmcRef;
+			    m_lmcRef = NULL;
 		    }
 		    if (SetState(STATE_Stopped)) {
-			SEND_NORMAL_EVENT(INFO_Stopped);
+			    SEND_NORMAL_EVENT(INFO_Stopped);
 		    }
 		    //cout << "killed lmc" << endl;
 		    GetUIManipLock();

@@ -37,8 +37,8 @@ void Initialize(PMIRef ref);
 
 int32 Read(PMIRef ref, void* buf, size_t numbytes);
 int32 Seek(PMIRef ref, int32 offset, int32 origin);
-bool SetTo(PMIRef ref, char* url);
-bool Close(PMIRef ref);
+Error SetTo(PMIRef ref, char* url);
+Error Close(PMIRef ref);
 const char* Url(PMIRef ref);
 void Cleanup(PMIRef ref);
 

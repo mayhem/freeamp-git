@@ -38,6 +38,8 @@ void Initialize(PMORef ref);
 bool Init(PMORef ref, OutputInfo* info);
 bool Reset(PMORef ref, bool user_stop);
 int32 Write(PMORef ref, void* buf, int32 len);
+void Pause(PMORef ref);
+void Resume(PMORef ref);
 void Clear(PMORef ref);
 void Cleanup(PMORef ref);
 
