@@ -133,6 +133,16 @@ void ResolvePath(char** path)
     dotslash[1] = DIR_MARKER;
     dotdotslash[2] = DIR_MARKER;
 
+#ifdef WIN32
+
+    // network path, skip initial double slash
+    if(strlen(cp) > 1 && cp[0] == '\\' && cp[1] == '\\')
+    {
+        cp += 2;
+    }
+
+#endif
+
     while(*cp)
     {
         if(cp[0] == DIR_MARKER)
