@@ -935,8 +935,11 @@ void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)
 
         // this hack insures that the text labels are added.
         // if buttons are small then they won't be added...
-        SendMessage(m_hImageToolbar, TB_SETBUTTONSIZE, 0, 
-                    MAKELPARAM(100, 50));
+        if(images && !textLabels)
+        {
+            SendMessage(m_hImageToolbar, TB_SETBUTTONSIZE, 0, 
+                        MAKELPARAM(24, 20));
+        }
     }
 
     SendMessage(m_hImageToolbar, TB_ADDBUTTONS, (WPARAM) 11, (LPARAM) &tbButtons);
