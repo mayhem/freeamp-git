@@ -219,6 +219,7 @@ void PhysicalMediaOutput::CheckForBufferUp(bool bForceBufferUp)
 
    if (!m_pPmi->IsStreaming() || 
        m_pPmiBuffer == NULL ||
+       m_pPmiBuffer->IsEndOfStream() || 
        m_pInputBuffer == NULL)
       return;
 
