@@ -73,6 +73,7 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
 
 void MusicCatalog::StartTimer(void)
 {
+    WatchTimer();
     if (m_timeout > 0)
         m_context->timerManager->StartTimer(&m_watchTimer, watch_timer,
                                             m_timeout, this);
@@ -1118,12 +1119,15 @@ void MusicCatalog::WatchTimer(void)
 
     m_context->prefs->GetWatchThisDirectory(watchDir, &length);
 
-    string watchPath = watchDir;
-
     vector<string> searchPaths;
-    searchPaths.push_back(watchPath);
 
-    PruneDirectory(watchPath);
+    char *temp = strtok(watchDir, ";");
+    do {
+        string dir = temp;
+        searchPaths.push_back(dir);
+        PruneDirectory(dir);
+    } while ((temp = strtok(NULL, ";")));
+
     SearchMusic(searchPaths, false);
 
     delete [] watchDir;
