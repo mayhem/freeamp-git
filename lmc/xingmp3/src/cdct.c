@@ -89,9 +89,6 @@ static void back_bf(int m, int n, float x[], float f[])
    }
 }
 /*------------------------------------------------------------*/
-#ifndef unix
-#define _EQUALIZER_ENABLE_
-#endif
 
 #ifdef  _EQUALIZER_ENABLE_
 extern float equalizer[32];
@@ -100,10 +97,12 @@ extern int enableEQ;
 
 void fdct32(float x[], float c[])
 {
-   //float a[32];			/* ping pong buffers */
-   //float b[32];
+#if (!defined(ASM_X86) && !defined(ASM_X86_OLD) || defined(_EQUALIZER_ENABLE_))
+   float a[32];			/* ping pong buffers */
+   float b[32];
+   int p, q;
+#endif
    float *src = x;
-   //int p, q;
 
 #ifdef  _EQUALIZER_ENABLE_
    int i;
