@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -26,13 +25,10 @@ ____________________________________________________________________________*/
 #ifndef THREAD_H
 #define THREAD_H
 
-#include <windows.h>
 #include "config.h"
 
-#define THREAD_RETURN uint32
-#define THREAD_LINKAGE __stdcall
 
-typedef THREAD_RETURN ( THREAD_LINKAGE *thread_function)( void * arg);
+typedef void (*thread_function)(void * arg);
 
 typedef enum Priority{
 	Idle			= -15,
@@ -48,25 +44,21 @@ typedef enum Priority{
 class Thread {
 
 public:
-	Thread();
-	~Thread();
+    virtual ~Thread(){}
 
 
-	bool Create(thread_function function, void* arg);
-	void Destroy();
-	void Suspend();
-	void Resume();
-	void Join();
+	virtual bool Create(thread_function function, void* arg) = 0;
+	virtual void Destroy() = 0;
+	virtual void Suspend() = 0;
+	virtual void Resume() = 0;
+	virtual void Join() = 0;
 
-	Priority GetPriority() const;
-	Priority SetPriority(Priority priority);
-
-
-private:
-	Priority	m_priority;
-	HANDLE		m_threadHandle;	
-	unsigned	m_threadId;
-
+	virtual Priority GetPriority() const = 0;
+	virtual Priority SetPriority(Priority priority) = 0;
+    
+    static Thread* CreateThread();
 };
+
+
 
 #endif /* THREAD_H */

@@ -23,26 +23,49 @@ ____________________________________________________________________________*/
 
 #include <process.h>
 
-#include "thread.h"
+#include "win32thread.h"
 
-Thread::
+
+win32Thread::
+win32Thread():
 Thread()
 {
 	m_priority		= Normal;
 	m_threadHandle	= NULL;	
 	m_threadId		= 0;
+    m_function      = NULL;
+    m_arg           = NULL;
 }
 
-Thread::
-~Thread()
+win32Thread::
+~win32Thread()
 {
-	CloseHandle(m_threadHandle);
+    if(m_threadHandle)
+    {
+	    CloseHandle(m_threadHandle);
+    }
 }
 
+uint32 __stdcall 
+win32Thread::
+internalThreadFunction(void* arg)
+{
+    win32Thread* thread = (win32Thread*) arg;
 
+    return thread->InternalThreadFunction();
+}
+
+uint32 
+win32Thread::
+InternalThreadFunction()
+{
+    m_function(m_arg);
+
+    return 0;
+}
 
 bool 
-Thread::
+win32Thread::
 Create(thread_function function, void* arg)
 {
 	bool result = false;
@@ -50,8 +73,8 @@ Create(thread_function function, void* arg)
 	m_threadHandle = (HANDLE) _beginthreadex(
 									NULL,
 									0,
-									function,
-									arg,
+									internalThreadFunction,
+									this,
 									0,
 									&m_threadId);
 	if(m_threadHandle)
@@ -63,44 +86,42 @@ Create(thread_function function, void* arg)
 }
 
 void 
-Thread::
+win32Thread::
 Destroy()
 {
-	 TerminateThread( m_threadHandle, 0 );
-
-	 //CloseHandle(m_threadHandle);
+	 TerminateThread(m_threadHandle, 0);
 }
 
 void 
-Thread::
+win32Thread::
 Suspend()
 {
 	 SuspendThread(m_threadHandle);
 }
 
 void 
-Thread::
+win32Thread::
 Resume()
 {
 	ResumeThread(m_threadHandle);
 }
 
 void
-Thread::
+win32Thread::
 Join()
 {
 	WaitForSingleObject(m_threadHandle, INFINITE);
 }
 
 Priority 
-Thread::
+win32Thread::
 GetPriority() const
 {
 	return (Priority) GetThreadPriority(m_threadHandle);
 }
 
 Priority 
-Thread::
+win32Thread::
 SetPriority(Priority priority)
 {
 	Priority old = (Priority) GetThreadPriority(m_threadHandle);
