@@ -95,7 +95,7 @@ int Win32Canvas::RenderText(int iFontHeight, Rect &oClipRect,
    
    DeleteObject(SelectObject(hMemDC, m_pBufferBitmap->GetBitmapHandle()));
    
-   hFont = CreateFont(iFontHeight, 0, 0, 0, bBold ? FW_BOLD : FW_NORMAL, 
+   hFont = CreateFont(-iFontHeight, 0, 0, 0, bBold ? FW_BOLD : FW_NORMAL, 
                       bItalic, bUnderline, 0, DEFAULT_CHARSET,
  					  OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                       DEFAULT_PITCH, oFontFace.c_str()); 
@@ -156,7 +156,7 @@ int Win32Canvas::RenderOffsetText(int iFontHeight, Rect &oClipRect,
    
    DeleteObject(SelectObject(hMemDC, m_pBufferBitmap->GetBitmapHandle()));
    
-   hFont = CreateFont(iFontHeight, 0, 0, 0, bBold ? FW_BOLD : FW_NORMAL, 
+   hFont = CreateFont(-iFontHeight, 0, 0, 0, bBold ? FW_BOLD : FW_NORMAL, 
                       bItalic, bUnderline, 0, DEFAULT_CHARSET,
  					  OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                       DEFAULT_PITCH, oFontFace.c_str()); 
