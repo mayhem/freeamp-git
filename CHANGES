@@ -3,8 +3,9 @@ Changes for Linux and Windows version 1.2.3:
 - Fixed support for MPEG 2.5 streams and files
 - Windows release now uses Jean-Michel HERVE's x86 optimizations
 - Added support for saving incoming SHOUTcase/HTTP streams to disk,
-  enabled by the "-save" command-line argument or the "SaveStreams"
-  preference.  See the README for more information.
+  (enabled by the "-save" command-line argument or the "SaveStreams"
+  preference on Linux).  See the README for more information.
+- Added an install-freeamp script for Linux
 
 Changes for Linux version 1.2.2:
 --------------------------------------------------------------------
