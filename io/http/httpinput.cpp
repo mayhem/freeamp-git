@@ -167,10 +167,14 @@ GetLength(size_t &iSize)
     return kError_FileSeekNotSupported;
 }
 
-bool HttpInput::
+Error HttpInput::
 GetID3v1Tag(unsigned char *pTag)
 {
-    return m_pPullBuffer->GetID3v1Tag(pTag);
+    if (m_pPullBuffer->GetID3v1Tag(pTag)) {
+	return kError_NoErr;
+    } else {
+	return kError_UnknownErr;
+    }
 }
 
 Error HttpInput::
