@@ -1508,9 +1508,7 @@ DB
        return kError_NoErr;
     }
 
-    m_oLastError = string("Invalid tag: ") + oElement;
-
-    return kError_InvalidParam;
+    return kError_NoErr;
 }
 
 Error Theme::EndElement(string &oElement)
@@ -1629,9 +1627,7 @@ Error Theme::EndElement(string &oElement)
        return kError_NoErr;
     }
 
-    m_oLastError = string("Invalid close tag: ") + oElement;
-
-    return kError_InvalidParam;
+    return kError_NoErr;
 }    
 
 Error Theme::PCData(string &oData)
