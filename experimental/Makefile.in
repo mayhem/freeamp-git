@@ -29,7 +29,7 @@ top_builddir = .
 AUTOCONF = @AUTOCONF@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
@@ -45,10 +45,12 @@ GTK_CFLAGS = @GTK_CFLAGS@
 GTK_CONFIG = @GTK_CONFIG@
 GTK_LIBS = @GTK_LIBS@
 MAKEINFO = @MAKEINFO@
+NASM = @NASM@
 PACKAGE = @PACKAGE@
+PERL = @PERL@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
-host_os = @host_os@
+AC_HOST_OS = @host_os@
 CFLAGS = @CFLAGS@ -D_REENTRANT
 OSDEP = @OSDEP@
 OSINC = @OSINC@
@@ -67,7 +69,7 @@ CONFIG_CLEAN_FILES =
 PROGRAMS =  $(bin_PROGRAMS)
 
 XINGDEFS = @XINGDEFS@
-DEFS = -I. -I$(srcdir) -I./config -D$(host_os) -DUNIX_LIBDIR=\"$(libdir)\" $(XINGDEFS)
+DEFS = -I. -I$(srcdir) -I./config -DUNIX_LIBDIR=\"$(libdir)\" $(XINGDEFS) -D$(AC_HOST_OS)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 X_CFLAGS = @X_CFLAGS@
@@ -78,6 +80,7 @@ X_PRE_LIBS = @X_PRE_LIBS@
 FREEAMPOBJ =  base/src/hashtable.o base/src/log.o base/src/player.o
 FREEAMPOBJ += base/src/playlist.o base/src/propimpl.o base/src/registrar.o
 FREEAMPOBJ += base/src/registry.o base/src/thread.o io/src/eventbuffer.o
+FREEAMPOBJ += base/src/prefixprefs.o base/src/preferences.o
 FREEAMPOBJ += io/src/pmiregistry.o io/src/pmoregistry.o
 FREEAMPOBJ += io/src/pullbuffer.o io/src/streambuffer.o
 FREEAMPOBJ += lmc/src/lmcregistry.o ui/src/uiregistry.o
@@ -132,7 +135,13 @@ install-exec-local: install_plugins
 
 uninstall-local: uninstall_plugins
 
-install_plugins:
+plugins-install install_plugins: install-plugins
+
+install-freeamp:
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) freeamp $(DESTDIR)$(bindir)
+
+install-plugins:
 	$(mkinstalldirs) $(DESTDIR)$(libdir)/freeamp/plugins
 	@list=`ls plugins/*.*`; for p in $$list; do \
 	  if test -f $$p; then \
@@ -141,7 +150,7 @@ install_plugins:
 	  else :; fi; \
 	done
 
-uninstall_plugins:
+uninstall_plugins uninstall-plugins:
 	@list=`ls plugins/*.*`; for p in $$list; do \
 	  if test -f $(DESTDIR)$(libdir)/freeamp/$$p; then \
 	    echo "  rm -f $(DESTDIR)$(libdir)/freeamp/`echo $$p|sed '$(transform)'`"; \
@@ -151,15 +160,15 @@ uninstall_plugins:
 
 OSDEPPLUGINS = @OSDEPPLUGINS@
 
-PLUGINS =  plugins/localfileinput-@host_os@.pmi
-PLUGINS += plugins/httpinput-@host_os@.pmi
-PLUGINS += plugins/obsinput-@host_os@.pmi
-PLUGINS += plugins/soundcard-@host_os@.pmo
-PLUGINS += plugins/freeampcmd-@host_os@.ui
-PLUGINS += plugins/mpg123-@host_os@.ui
-PLUGINS += plugins/lcd-@host_os@.ui
-PLUGINS += plugins/irman-@host_os@.ui
-PLUGINS += plugins/xingmp3-@host_os@.lmc
+PLUGINS =  plugins/localfileinput-$(AC_HOST_OS).pmi
+PLUGINS += plugins/httpinput-$(AC_HOST_OS).pmi
+PLUGINS += plugins/obsinput-$(AC_HOST_OS).pmi
+PLUGINS += plugins/soundcard-$(AC_HOST_OS).pmo
+PLUGINS += plugins/freeampcmd-$(AC_HOST_OS).ui
+PLUGINS += plugins/mpg123-$(AC_HOST_OS).ui
+PLUGINS += plugins/lcd-$(AC_HOST_OS).ui
+PLUGINS += plugins/irman-$(AC_HOST_OS).ui
+PLUGINS += plugins/xingmp3-$(AC_HOST_OS).lmc
 
 plugins: $(PLUGINS) $(OSDEPPLUGINS)
 
@@ -170,7 +179,7 @@ plugins: $(PLUGINS) $(OSDEPPLUGINS)
 # localfileinput is a nice simple example of a plugin dependency.
 LFIOBJ = io/local/filebuffer.o io/local/localfileinput.o
 
-plugins/localfileinput-@host_os@.pmi: $(LFIOBJ)
+plugins/localfileinput-$(AC_HOST_OS).pmi: $(LFIOBJ)
 	$(LINKMOD) -o $@ $(LFIOBJ)
 
 #$(LFIOBJ):
@@ -180,7 +189,7 @@ plugins/localfileinput-@host_os@.pmi: $(LFIOBJ)
 # here's httpinput
 HTTPOBJ = io/http/httpinput.o io/http/httpbuffer.o
 
-plugins/httpinput-@host_os@.pmi: $(HTTPOBJ)
+plugins/httpinput-$(AC_HOST_OS).pmi: $(HTTPOBJ)
 	$(LINKMOD) -o $@ $(HTTPOBJ)
 
 #$(HTTPOBJ):
@@ -189,7 +198,7 @@ plugins/httpinput-@host_os@.pmi: $(HTTPOBJ)
 # obsinput
 OBSPMI = io/obs/obsbuffer.o io/obs/obsinput.o
 
-plugins/obsinput-@host_os@.pmi: $(OBSPMI)
+plugins/obsinput-$(AC_HOST_OS).pmi: $(OBSPMI)
 	$(LINKMOD) -o $@ $(OBSPMI)
 
 #
@@ -198,7 +207,7 @@ plugins/obsinput-@host_os@.pmi: $(OBSPMI)
 # soundcardpmo is os-dependent, so have to fool with $(OSDEP)
 SCPMOOBJ = io/soundcard/$(OSDEP)/src/soundcardpmo.o
 
-plugins/soundcard-@host_os@.pmo: $(SCPMOOBJ)
+plugins/soundcard-$(AC_HOST_OS).pmo: $(SCPMOOBJ)
 	$(LINKMOD) -o $@ $(SCPMOOBJ)
 
 
@@ -208,33 +217,33 @@ plugins/soundcard-@host_os@.pmo: $(SCPMOOBJ)
 # cmdline
 CMDUIOBJ = ui/cmdline/cmdlineUI.o
 
-plugins/freeampcmd-@host_os@.ui: $(CMDUIOBJ)
+plugins/freeampcmd-$(AC_HOST_OS).ui: $(CMDUIOBJ)
 	$(LINKMOD) -o $@ $(CMDUIOBJ)
 
 # Mpg123 ui
 MPG123UIOBJ = ui/mpg123/Mpg123UI.o
 
-plugins/mpg123-@host_os@.ui: $(MPG123UIOBJ)
+plugins/mpg123-$(AC_HOST_OS).ui: $(MPG123UIOBJ)
 	$(LINKMOD) -o $@ $(MPG123UIOBJ)
 
 # lcd ui
 LCDUIOBJ = ui/lcd/src/lcdui.o ui/lcd/src/sockets.o
 
-plugins/lcd-@host_os@.ui: $(LCDUIOBJ)
+plugins/lcd-$(AC_HOST_OS).ui: $(LCDUIOBJ)
 	$(LINKMOD) -o $@ $(LCDUIOBJ) $(X_EXTRA_LIBS)
 
 # IRman
 IRMANUIOBJ = ui/irman/src/irmanui.o ui/irman/src/ircmd.o 
 IRMANUIOBJ += ui/irman/src/irfunc.o ui/irman/src/irio.o
 
-plugins/irman-@host_os@.ui: $(IRMANUIOBJ)
+plugins/irman-$(AC_HOST_OS).ui: $(IRMANUIOBJ)
 	$(LINKMOD) -o $@ $(IRMANUIOBJ)
 
 # The studly X11 freeamp interface
 FREEAMPUIOBJ = ui/freeamp/unix/src/freeamp.o ui/freeamp/unix/src/windowhash.o
 FREEAMPUIOBJ += ui/freeamp/unix/src/res.o ui/freeamp/unix/src/fawindow.o
 
-plugins/freeamp-@host_os@.ui: $(FREEAMPUIOBJ)
+plugins/freeamp-$(AC_HOST_OS).ui: $(FREEAMPUIOBJ)
 	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(X_LIBS) $(X_EXTRA_LIBS)
 
 
@@ -264,7 +273,7 @@ XINGLMCOBJ = $(XINGLMCOBJC) $(XINGLMCOBJCXX)
 #the second is needed so that $@ will have the right entry for the
 # linux -Wl,-soname=gobbledegook.so stuff.
 
-plugins/xingmp3-@host_os@.lmc: $(XINGLMCOBJ)
+plugins/xingmp3-$(AC_HOST_OS).lmc: $(XINGLMCOBJ)
 	$(LINKMOD) -o $@ $(XINGLMCOBJ)
 
 #$(XINGLMCOBJC):
@@ -274,5 +283,5 @@ plugins/xingmp3-@host_os@.lmc: $(XINGLMCOBJ)
 #	$(CXXCOMPILE) $(FPIC) $(XINGDEF) -Ilmc/xingmp3/include -c ${*:%.o=%}.cpp
 
 #the following does not work. dammit.
-#xingmp3-@host_os@.lmc := CFLAGS = $(FPIC) -Ilmc/xingmp3/include @ISX86@
-#plugins/xingmp3-@host_os@.lmc := CFLAGS = $(FPIC) -Ilmc/xingmp3/include @ISX86@
+#xingmp3-$(AC_HOST_OS).lmc := CFLAGS = $(FPIC) -Ilmc/xingmp3/include @ISX86@
+#plugins/xingmp3-$(AC_HOST_OS).lmc := CFLAGS = $(FPIC) -Ilmc/xingmp3/include @ISX86@

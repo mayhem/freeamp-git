@@ -7,7 +7,6 @@ Makefile.in change.)
 
 Vaguely important things not working:
 * gtk compilation definitely does not work.
-* install is broken.
 
 How to use:
 

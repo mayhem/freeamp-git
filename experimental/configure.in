@@ -1,3 +1,4 @@
+dnl $Id$
 dnl FreeAmp - The Free MP3 Player
 dnl Portions copyright (C) 1998 GoodNoise
 dnl
@@ -30,12 +31,15 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_ISC_POSIX
 AC_PROG_RANLIB
+AC_PROG_INSTALL
+AC_CHECK_PROGS(PERL, perl)
+AC_CHECK_PROGS(NASM, nasm)
 
 dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_STDC_HEADERS
-AC_HAVE_HEADERS(unistd.h io.h pthread.h)
+AC_HAVE_HEADERS(unistd.h io.h pthread.h errno.h)
 
 x11="true"
 
@@ -166,10 +170,7 @@ AC_CHECK_LIB(dl, dlopen, foo="bar",
   AC_MSG_ERROR([FreeAmp requires the ability to load libraries dynamically (-ldl must work)])
 )
 
-
 dnl Check for some more stuff
-
-AC_SUBST(host_os)
 
 cmdline="true"
 isunix="true"
@@ -205,9 +206,15 @@ dnl probably Sun CC.
     
 esac  
 
+AC_DEFINE_UNQUOTED(AC_HOST_OS, "${host_os}")
+AC_DEFINE_UNQUOTED(AC_HOST_CPU, "${host_cpu}")
+dnl I am morally opposed to the previous two lines, because they screw up
+dnl the namespace.
+
+
 dnl the following is to so that the right includes (and only the right
 dnl includes) are added in at compile time.
-OSINC="-Ibase/unix/$host_os/include -Ibase/unix/include -Iui/freeamp/unix/include -Iui/freeamp/unix/res"
+OSINC="-Ibase/unix/include -Ibase/unix/$host_os/include -Iui/freeamp/unix/include -Iui/freeamp/unix/res"
 OSDEP="unix/$host_os"
 
 if test "$isunix" = "false"  ; then
