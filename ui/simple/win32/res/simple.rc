@@ -135,25 +135,6 @@ BEGIN
     PUSHBUTTON      "FreeAmp.org",IDC_WEBLINK,70,76,50,14
 END
 
-IDD_PREF4 DIALOG DISCARDABLE  0, 0, 233, 174
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About"
-FONT 8, "MS Sans Serif"
-BEGIN
-    LTEXT           "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of music, EMusic",
-                    IDC_STATIC,3,28,227,25
-    LTEXT           "THE Source for Downloadable Music, is funding both the FreeAmp.org \ndomain and the efforts of the FreeAmp team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward, and Mark H. Weaver.",
-                    IDC_STATIC,3,52,227,33
-    LTEXT           "Other people have also contributed to FreeAmp:",
-                    IDC_STATIC,3,92,227,9
-    LTEXT           "FreeAmp is being released under the terms of the GPL. As is provided by the GPL, all of EMusic's and your efforts toward FreeAmp will be released back to the community at large.",
-                    IDC_STATIC,3,137,227,25
-    LTEXT           "Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, and Bill Yuan.",
-                    IDC_STATIC,3,104,227,30
-    LTEXT           "version 1.3",IDC_STATIC,98,14,36,8
-    LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
-END
-
 IDD_PREF3 DIALOG DISCARDABLE  0, 0, 233, 174
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Debug"
@@ -265,6 +246,27 @@ BEGIN
     LTEXT           "Seconds",IDC_STATIC,103,156,29,8
 END
 
+IDD_PREF4 DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of",
+                    IDC_STATIC,3,24,227,24
+    LTEXT           "music, EMusic.com, THE Source for Downloadable Music, is funding both the FreeAmp.org domain and the efforts of the FreeAmp team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward, and Mark H. Weaver.",
+                    IDC_STATIC,3,48,227,33
+    LTEXT           "Other people have also contributed to FreeAmp:",
+                    IDC_STATIC,3,83,227,9
+    LTEXT           "FreeAmp is being released under the terms of the GPL. As is provided by the GPL, all of EMusic.com's and your efforts toward FreeAmp will be released back to the community at large.",
+                    IDC_STATIC,3,122,227,25
+    LTEXT           "Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, and Bill Yuan.",
+                    IDC_STATIC,3,92,227,24
+    LTEXT           "version 1.3",IDC_STATIC,98,14,36,8
+    LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
+    PUSHBUTTON      "Visit FreeAmp.org",IDC_GOTOFREEAMP,30,156,67,14
+    PUSHBUTTON      "Visit EMusic.com",IDC_GOTOEMUSIC,136,156,67,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -285,14 +287,6 @@ BEGIN
         RIGHTMARGIN, 179
         TOPMARGIN, 7
         BOTTOMMARGIN, 90
-    END
-
-    IDD_PREF4, DIALOG
-    BEGIN
-        LEFTMARGIN, 3
-        RIGHTMARGIN, 230
-        TOPMARGIN, 3
-        BOTTOMMARGIN, 170
     END
 
     IDD_PREF3, DIALOG
@@ -317,6 +311,14 @@ BEGIN
         RIGHTMARGIN, 230
         TOPMARGIN, 3
         BOTTOMMARGIN, 171
+    END
+
+    IDD_PREF4, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 170
     END
 END
 #endif    // APSTUDIO_INVOKED

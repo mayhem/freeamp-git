@@ -122,6 +122,8 @@
 #define IDC_IPADDRESS3                  1033
 #define IDC_IPADDRESS4                  1034
 #define IDC_PERIOD3                     1035
+#define IDC_GOTOFREEAMP                 1036
+#define IDC_GOTOEMUSIC                  1037
 #define IDC_ITEM                        40001
 #define IDC_ABOUT                       40002
 #define IDC_OPEN                        40003
@@ -143,7 +145,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        195
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1036
+#define _APS_NEXT_CONTROL_VALUE         1037
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -23,7 +23,6 @@ ____________________________________________________________________________*/
 
 /* system headers */
 #define STRICT
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <shlobj.h>
@@ -1351,6 +1350,36 @@ PrefPage4Proc(  HWND hwnd,
             psp = (PROPSHEETPAGE*)lParam;
             prefs = (Preferences*)psp->lParam;
             
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_GOTOFREEAMP:
+                {
+                    ShellExecute(   hwnd, 
+                                    "open", 
+                                    "http://www.freeamp.org/", 
+                                    NULL, 
+                                    NULL, 
+                                    SW_SHOWNORMAL);
+                    break;
+                }
+
+                case IDC_GOTOEMUSIC:
+                {
+                    ShellExecute(   hwnd, 
+                                    "open", 
+                                    "http://www.emusic.com/", 
+                                    NULL, 
+                                    NULL, 
+                                    SW_SHOWNORMAL);
+                    break;
+                }
+            }
+
             break;
         }
 

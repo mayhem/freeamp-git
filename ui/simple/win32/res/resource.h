@@ -65,6 +65,8 @@
 #define IDC_IPADDRESS3                  1033
 #define IDC_IPADDRESS4                  1034
 #define IDC_PERIOD3                     1035
+#define IDC_GOTOFREEAMP                 1036
+#define IDC_GOTOEMUSIC                  1037
 #define IDC_FIND                        20156
 #define IDC_RECENTF1                    31000
 #define IDC_SELECTALL                   32901
