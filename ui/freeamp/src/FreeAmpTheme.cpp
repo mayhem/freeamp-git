@@ -223,17 +223,20 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       {
          int iState = 0;
          bool bEnable = true;
+         string oEmpty("");
          
          m_pWindow->ControlIntValue(string("PlayPause"), true, iState);
          m_pWindow->ControlEnable(string("Play"), true, bEnable);
          bEnable = false;
          m_pWindow->ControlEnable(string("Pause"), true, bEnable);
          m_bPlayShown = false;
+         m_pWindow->ControlStringValue("BufferInfo", true, oEmpty);
          
          if (e->Type() == INFO_Stopped)
          {
             m_iSeekPos = 0;
             m_iTotalSeconds = -1;
+            m_iCurrentSeconds = -1;
             m_pWindow->ControlIntValue(string("Seek"), true, m_iSeekPos);
             UpdateTimeDisplay(m_iCurrentSeconds);
             
@@ -254,6 +257,7 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       {
          m_iSeekPos = 0;
          m_iTotalSeconds = -1;
+         m_iCurrentSeconds = -1;
          m_pWindow->ControlIntValue(string("Seek"), true, m_iSeekPos);
          UpdateTimeDisplay(m_iCurrentSeconds);
          
@@ -920,7 +924,7 @@ void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
                 
     }    
     else    
-    if (m_iTotalSeconds >= 0)
+    if (iCurrentSeconds >= 0)
     {
         if (iCurrentSeconds > 3600)
            sprintf(szText, "%d:%02d:%02d", 
