@@ -1079,6 +1079,16 @@ void MusicBrowserUI::BitziLookup(const string &URL)
     BrowserEnum            browser = eBrowserNetscape;
     char                   error[255];
     int                    ret;
+    char                   path[_MAX_PATH];
+    uint32                 length = sizeof(path);
+
+    URLToFilePath(URL.c_str(), path, &length);
+    if (access(path, 0))
+    {
+         MessageBox(m_hWnd, "Cannot lookup the current item. Please select a "
+                   "file to lookup.", "Bitzi Lookup Error", MB_OK); 
+         return;
+    }
   
     error[0] = 0;
     bc = bitcollider_init(false);
@@ -1091,10 +1101,6 @@ void MusicBrowserUI::BitziLookup(const string &URL)
         if (!submission)
             strcpy(error, "Cannot create submission. ");
         {
-            char path[_MAX_PATH];
-            uint32 length = sizeof(path);
-
-            URLToFilePath(URL.c_str(), path, &length);
             ::SetCursor(LoadCursor(NULL, IDC_WAIT));
             ret = analyze_file(submission, path, false);
             ::SetCursor(LoadCursor(NULL, IDC_ARROW));
@@ -1123,8 +1129,7 @@ void MusicBrowserUI::BitziLookup(const string &URL)
          if (ptr)
              message += string(ptr);
 
-         MessageBox(NULL, message.c_str(), "Bitzi Lookup Error", MB_OK);
-  
+         MessageBox(m_hWnd, message.c_str(), "Bitzi Lookup Error", MB_OK);
     }
 }
 
