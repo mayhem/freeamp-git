@@ -1866,7 +1866,10 @@ bool PlaylistManager::IsSupportedPlaylistFormat(const char *extension)
     m_mutex.Acquire();
 
     if (!extension)
+    {
+        m_mutex.Release();
         return false;
+    }
 
     uint32 numFormats = m_playlistFormats.size();
 
