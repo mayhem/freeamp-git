@@ -396,7 +396,7 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     if (m_state == STATE_COLLAPSED)
     {
        m_state = STATE_EXPANDED;
-       SetWindowText(m_hWnd, "Music Browser");
+       SetWindowText(m_hWnd, BRANDING " - Music Browser");
        sItem.dwTypeData = "View &playlist only";
        
        SetWindowPos(m_hWnd, NULL, 0, 0, 
@@ -409,7 +409,7 @@ void MusicBrowserUI::ExpandCollapseEvent(void)
     else
     {                
        m_state = STATE_COLLAPSED;
-       SetWindowText(m_hWnd, "Playlist Manager");
+       SetWindowText(m_hWnd, BRANDING " - Playlist Manager");
        sItem.dwTypeData = "View &music browser";
        
        SetWindowPos(m_hWnd, NULL, 0, 0, 
@@ -731,7 +731,7 @@ void MusicBrowserUI::SetTitles(void)
        SetWindowText(GetDlgItem(m_hWnd, IDC_PLAYLISTTITLE), 
                      "Currently listening to:");
        SetWindowText(m_hWnd, 
-                     "Music Catalog: Current listening list");
+                     BRANDING " - My Music");
     }   
     else
     {
@@ -750,7 +750,7 @@ void MusicBrowserUI::SetTitles(void)
        oTitle = string("Editing playlist: ") + oName;
        SetWindowText(GetDlgItem(m_hWnd, IDC_PLAYLISTTITLE), 
                      oTitle.c_str());
-       oTitle = string("Music Catalog editing playlist: ") + oName;
+       oTitle = string(BRANDING " - Editing ") + oName;
        SetWindowText(m_hWnd, oTitle.c_str());
     }   
 }

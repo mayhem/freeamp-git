@@ -28,7 +28,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDD_MUSICBROWSER DIALOGEX 0, 0, 359, 180
 STYLE DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Music Browser"
+CAPTION "FreeAmp - My Music"
 MENU IDR_MENU1
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -115,7 +115,7 @@ BEGIN
         MENUITEM "&New Playlist...",            ID_FILE_NEWPLAYLIST
         MENUITEM "&Open Playlist...",           ID_FILE_OPENPLAYLIST
         MENUITEM "Save Playlist",               ID_FILE_SAVEPLAYLIST
-        MENUITEM "Save &As Playlist...",        ID_FILE_SAVEASPLAYLIST
+        MENUITEM "Save Playlist &As ...",       ID_FILE_SAVEASPLAYLIST
         MENUITEM SEPARATOR
         MENUITEM "&Import...",                  ID_FILE_IMPORT
         MENUITEM "Search for &Music...",        ID_FILE_SEARCHFORMUSIC
