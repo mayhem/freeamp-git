@@ -23,10 +23,14 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#ifdef WIN32
+#include <winsock.h>
+#else
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#endif
 
 #include "httpbuffer.h"
 
@@ -84,10 +88,60 @@ HttpBuffer::~HttpBuffer(void)
     delete m_szError;
 }
 
+// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+// As far as I can tell there are many different versions of gethostbyname_r
+// out there. If this code does not compile for your platform, please
+// fix one of the following sections so that it will work on your
+// system. (without breaking the existing systems, please!)
+// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+Error GetHostByName(char *szHostName, struct hostent *pResult)
+{
+#ifdef WIN32
+    struct hostent *pTemp;
+
+    pTemp = gethostbyname(szHostName);
+    if (pTemp == NULL)
+        return kError_NoDataAvail;
+
+    memcpy(pResult, pTemp, sizeof(struct hostent));
+
+    return kError_NoErr;
+#endif
+
+#ifdef __linux__
+    char               *pDummyBuf;
+    struct hostent     *pRes;
+    int                 iErrno, iRet;
+
+    pDummyBuf = new char[iGetHostNameBuffer]; 
+    iRet = gethostbyname_r(szHostName, pResult, pDummyBuf, 
+                           iGetHostNameBuffer, &pRes, &iErrno);
+    delete pDummyBuf;
+
+    return (iRet < 0) ? kError_NoDataAvail : kError_NoErr;
+#endif
+
+#ifdef __solaris__
+    char               *pDummyBuf;
+    struct hostent     *pRes;
+    int                 iErrno, iRet;
+
+    pDummyBuf = new char[iGetHostNameBuffer]; 
+    pRes = gethostbyname_r(szHostName, pResult, pDummyBuf, 
+                           iGetHostNameBuffer, &iErrno);
+    delete pDummyBuf;
+
+    return (pRes == NULL) ? kError_NoDataAvail : kError_NoErr;
+#endif
+}
+// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+// Please read the note on top of this function
+// NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+
 Error HttpBuffer::Open(void)
 {
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
-    char               *pDummyBuf, *pInitialBuffer;
+    char               *pInitialBuffer;
     unsigned            iPort;
     int                 iRet, iErrno, iDummy, iRead, iLoop;
     struct sockaddr_in  sAddr;
@@ -106,18 +160,9 @@ Error HttpBuffer::Open(void)
     szFile = strchr(m_szUrl + 7, '/');
     memset(&sAddr, 0, sizeof(struct sockaddr_in));
 
-//#define USING_GDB 1
-#ifndef USING_GDB
-
-    // Does anyone know how to use gethostbyname_r properly?
-    // What is the proper size for dummybuf?
-    pDummyBuf = new char[iGetHostNameBuffer]; 
-    iRet = gethostbyname_r(szHostName, &sHost, pDummyBuf, 
-                           iGetHostNameBuffer, &pRes, &iErrno);
-    if (iRet < 0)
+    eRet = GetHostByName(szHostName, &sHost);
+    if (eRet != kError_NoErr)
     {
-       // For some reason error reporting on the pmi does not work.
-       // When it does work, remove the following print
        sprintf(m_szError, "Cannot find host %s\n", szHostName);
        return (Error)httpError_CustomError;
     }
@@ -126,24 +171,7 @@ Error HttpBuffer::Open(void)
     sAddr.sin_family= sHost.h_addrtype;
     sAddr.sin_port= htons((unsigned short)iPort);
 
-    delete pDummyBuf;
-
     m_hHandle = socket(sHost.h_addrtype,SOCK_STREAM,0);
-
-#else
-
-    // That IP resolves to moon.eorbit.net for testing purposes
-//    int dum = 0x2D4BBECE;
-//    int dum = (38) | (200 << 8) | (144 << 16) | (97 << 24);
-    int dum = (194) | (165 << 8) | (250 << 16) | (29 << 24);
-
-    sAddr.sin_family= AF_INET;
-    memcpy((char *)&sAddr.sin_addr,&dum, sizeof(dum));
-    sAddr.sin_port= htons((unsigned short)iPort);
-
-    m_hHandle = socket(AF_INET,SOCK_STREAM,0);
-#endif
-
     if (m_hHandle < 0)
     {
        return (Error)httpError_CannotOpenSocket;
@@ -169,7 +197,7 @@ Error HttpBuffer::Open(void)
 
     pInitialBuffer = new char[iInitialBufferSize + 1];
     
-    iRead = read(m_hHandle, pInitialBuffer, iInitialBufferSize);
+    iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
     if (iRead < 0)
     {
        close(m_hHandle);
@@ -220,7 +248,7 @@ Error HttpBuffer::Open(void)
             if (iLoop < iHeaderBytes)
                break;
                
-            iRead = read(m_hHandle, pInitialBuffer, iInitialBufferSize);
+            iRead = recv(m_hHandle, pInitialBuffer, iInitialBufferSize, 0);
             if (iRead < 0)
             {
                close(m_hHandle);

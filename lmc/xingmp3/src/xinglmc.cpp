@@ -91,8 +91,9 @@ static int sample_rate_table[8] =
 };
 
 const int ID3_TAG_SIZE = 128;
-const int iMaxDecodeRetries = 4;     // one partial frame and three full frames
-const int iInitialBufferSize = 1024;
+const int iMaxDecodeRetries = 6;     // one partial frame and five full frames
+const int iInitialBufferSize = 1100; // just larger than the largest frame size
+const int iStreamingBufferSize = 5;  // in seconds
 
 #define ENSURE_INITIALIZED if (!m_properlyInitialized) return kError_PluginNotInitialized;
 
@@ -174,14 +175,16 @@ Error XingLMC::AdvanceBufferToNextFrame()
 		 pBuffer = ((unsigned char *)pBufferBase) + 1;
 	    
        for(iCount = 0; iCount < iNumBytes - 1 &&
-           !(*pBuffer == 0xFF && (*(pBuffer+1) & 0xE0) == 0xE0); 
+           !(*pBuffer == 0xFF && (*(pBuffer+1) & 0xF0) == 0xF0); 
            pBuffer++, iCount++)
                ; // <=== Empty body!
    
        m_input->EndRead(iCount + 1);
 
-       if (iCount < iNumBytes - 1)
+       if (iCount != 0 && iCount < iNumBytes - 1)
+       {
           break;
+       }
 
        iNumBytes = iInitialBufferSize;
        BeginRead(pBufferBase, iNumBytes);
@@ -197,7 +200,7 @@ Error XingLMC::AdvanceBufferToNextFrame()
 Error XingLMC::GetHeadInfo()
 {
    int          iNumBytes, iLoop;
-	unsigned int iDummy;
+	unsigned int iForward;
 	bool         bRet;
 	void        *pBuffer;
 	Error        Err;
@@ -210,11 +213,27 @@ Error XingLMC::GetHeadInfo()
        {
            m_frameBytes = head_info3((unsigned char *)pBuffer,
 			                            iNumBytes, &m_sMpegHead, 
-                                     &m_iBitRate, &iDummy);
-           m_input->EndRead(0);
+                                     &m_iBitRate, &iForward);
+           if (m_frameBytes > 0)
+           {
+              MPEG_HEAD sHead;
+              int       iFrameBytes, iBitRate;
+              
+              iFrameBytes = head_info3(((unsigned char *)pBuffer) + iForward + 2,
+                                       iNumBytes - (iForward + 2), &sHead,
+                                       &iBitRate, &iForward);
+              m_input->EndRead(0);
 
-           if (m_frameBytes)
-			     return kError_NoErr;
+
+              // Did the decoder find a bad sync marker?
+              if (iFrameBytes == m_frameBytes && iBitRate == m_iBitRate)
+              {
+			         return kError_NoErr;
+              }
+
+           }
+           else
+              m_input->EndRead(0);
 
            AdvanceBufferToNextFrame();
        }
@@ -242,7 +261,16 @@ CanDecode()
    if (!m_input->IsStreaming())
        m_input->Seek(dummy, 0, SEEK_FROM_START);
 
-   return GetHeadInfo() == kError_NoErr;
+   Err = GetHeadInfo();
+   if (Err != kError_NoErr)
+   {
+       return false;
+   }
+
+   if (m_input->CachePMI())
+       m_input->SetBufferSize((m_iBitRate * iStreamingBufferSize * 1000) / 8192);
+
+   return true;
 }
 
 Error     XingLMC::
@@ -375,6 +403,9 @@ InitDecoder()
 		 if (Err != kError_NoErr)
 		    return Err;
    }
+
+   if (!m_input->CachePMI())
+       m_input->SetBufferSize((m_iBitRate * iStreamingBufferSize * 1000) / 8192);
 
    // select decoder
    m_audioMethods = audio_table[0][0];       // not integer, non 8 bit mode
@@ -640,7 +671,9 @@ DecodeWork()
              }
 			 }
 			 else
+          {
 			    break;
+          }
       }
       m_input->EndRead(x.in_bytes);
 
@@ -841,15 +874,8 @@ ChangePosition(int32 position)
 
    int32     dummy;
 
-#if 1
-   error = m_input->Seek(dummy, 0, SEEK_FROM_START);
-   m_frameCounter = 0;
-   m_frameWaitTill = position;
-   actually_decode = 0;
-#else
    error = m_input->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);
 	m_frameCounter = position;
-#endif
 
    m_seekMutex->Release();
 

@@ -37,6 +37,7 @@ PullBuffer::PullBuffer(size_t iBufferSize,
    m_bEOS = false;
    m_bReadOpPending = false;
    m_bWriteOpPending = false;
+
    m_iReadIndex =  m_iWriteIndex = 0;
    m_iBytesInBuffer = 0;
 
@@ -77,7 +78,7 @@ void PullBuffer::Clear(void)
        }
        break;
    }
-  
+ 
    m_bEOS = false;
    m_iReadIndex =  m_iWriteIndex = 0;
    m_iBytesInBuffer = 0;
@@ -85,6 +86,47 @@ void PullBuffer::Clear(void)
    m_pWriteSem->Signal();
 
    m_pMutex->Release();
+}
+
+Error PullBuffer::Resize(size_t iNewSize, 
+                         size_t iNewOverflowSize, 
+                         size_t iNewWriteTriggerSize)
+{
+   unsigned char *pNew;
+
+   if (iNewSize <= m_iBufferSize)
+       return kError_BufferTooSmall;
+
+   // If this is a complicated buffer re-size, screw it. :-)
+   if (m_iReadIndex > m_iWriteIndex)
+       return kError_InvalidError;
+
+   for(;;)
+   {
+       m_pMutex->Acquire();
+
+       if (m_bReadOpPending || m_bWriteOpPending)
+       {
+           m_pMutex->Release();
+           continue;
+       }
+       break;
+   }
+
+   pNew = new unsigned char[iNewSize + iNewOverflowSize];
+   memcpy(pNew, m_pPullBuffer, m_iBytesInBuffer);
+
+   delete m_pPullBuffer;
+   m_pPullBuffer = pNew;
+   m_iBufferSize = iNewSize;
+   m_iOverflowSize = iNewOverflowSize;
+   m_iWriteTriggerSize = iNewWriteTriggerSize;
+
+   m_pWriteSem->Signal();
+
+   m_pMutex->Release();
+
+   return kError_NoErr;
 }
 
 bool PullBuffer::IsEndOfStream(void)
@@ -172,7 +214,9 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
 
    m_bWriteOpPending = false;
 
+   //printf("Write: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
+
 
    return kError_NoErr;
 }
@@ -255,6 +299,7 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
 
    m_bReadOpPending = false;
 
+   //printf(" Read: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
 
    return kError_NoErr;

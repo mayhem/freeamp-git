@@ -50,6 +50,8 @@ class     LocalFileInput:public PhysicalMediaInput
 	virtual bool  CanHandle(char *szUrl);
 	virtual bool  IsStreaming(void)
 	              { return false; };
+   virtual Error SetBufferSize(size_t iNewSize)
+                 { return kError_NoErr; };
 
    virtual Error SetTo(char *url);
    virtual Error Close(void);

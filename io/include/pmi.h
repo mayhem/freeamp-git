@@ -68,6 +68,8 @@ public:
 
 	 virtual bool  IsStreaming(void)
 	               {return false;}
+    virtual Error SetBufferSize(size_t iSize)
+	               {return kError_GotDefaultMethod;}
     virtual int32 GetBufferPercentage()
 	               {return 0;};
 	 virtual void  Pause()

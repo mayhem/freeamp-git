@@ -53,6 +53,10 @@ class PullBuffer
       virtual  void     DiscardBytes();
 
       void     Clear        (void);
+      Error    Resize       (size_t iNewSize,
+                             size_t iNewOverflowSize,
+                             size_t iWriteTriggerSize);
+
       bool     IsEndOfStream(void);
       void     SetEndOfStream(bool bEOS);
       size_t   GetNumBytesInBuffer(void)

@@ -43,9 +43,9 @@ ____________________________________________________________________________*/
 /* project headers */
 #include "httpinput.h"
 
-const int iBufferSize = 65536;
-const int iOverflowSize = 8192;
-const int iTriggerSize = 8192;
+const int iBufferSize = 8192;
+const int iOverflowSize = 1024;
+const int iTriggerSize = 1024;
 
 extern    "C"
 {
@@ -162,6 +162,12 @@ SetTo(char *url)
    }
 
    return result;
+}
+
+Error HttpInput::
+SetBufferSize(size_t iNewSize)
+{
+    return m_pPullBuffer->Resize(iNewSize, iNewSize / 8, iNewSize / 8);
 }
 
 Error HttpInput::

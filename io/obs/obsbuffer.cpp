@@ -23,11 +23,15 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#ifdef WIN32
+#include <winsock.h>
+#else
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h> 
 #include <netdb.h>
+#endif
 
 #include "obsbuffer.h"
 
@@ -207,12 +211,12 @@ void ObsBuffer::WorkerThread(void)
              break;
           }
 
-			 iRead -= sizeof(PacketHeader);
-			 for(pCopy = pTemp + sizeof(PacketHeader); iRead > 0;)
+			 iRead -= sizeof(RTPHeader);
+			 for(pCopy = pTemp + sizeof(RTPHeader); iRead > 0;)
 			 {
 			     iActual = min(iToCopy, iRead);
 			     memcpy(pBuffer, pCopy, iActual);
-              EndWrite(iRead);
+              EndWrite(iActual);
 
 				  pCopy += iActual;
 				  iRead -= iActual;

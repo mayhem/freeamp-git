@@ -177,7 +177,7 @@ int head_info3(unsigned char *buf, unsigned int n, MPEG_HEAD *h, int *br, unsign
 	// jdw insertion...
    while ((pBuf < n) && !(
 		  (buf[pBuf] == 0xFF) && 
-		  ((buf[pBuf+1] & 0xE0) == 0xE0) )
+		  ((buf[pBuf+1] & 0xF0) == 0xF0) )
 		 ) {
 		pBuf++;
    }

@@ -155,7 +155,6 @@ Error FileBuffer::GetID3v1Tag(unsigned char *pTag)
         return kError_NoErr;
     }
 
-    printf("no tag!\n");
     return kError_NoDataAvail;
 }
 

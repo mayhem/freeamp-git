@@ -50,20 +50,12 @@ struct ID3Tag
    char cGenre;
 }; 
 
-typedef struct
+struct RTPHeader
 {
-   char  cType          __attribute__ ((packed));
-   char  cConfig        __attribute__ ((packed));
-   short iSize          __attribute__ ((packed));
-   int   iIPAddress     __attribute__ ((packed));
-   short iPort          __attribute__ ((packed));
-   char  cProtVer       __attribute__ ((packed));
-   char  cProtLevel     __attribute__ ((packed));
-   short iPacket        __attribute__ ((packed));
-   short iTimeStamp     __attribute__ ((packed));
-   short iByteOffset    __attribute__ ((packed));
-} PacketHeader;
-
+    int32 iFlags;
+    int32 iTimestamp;
+    int32 iSyncSourceId;
+};
 
 enum
 {

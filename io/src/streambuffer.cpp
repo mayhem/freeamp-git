@@ -104,7 +104,7 @@ Error StreamBuffer::BeginWrite(void *&pBuffer, size_t &iBytesNeeded)
 
    eRet = PullBuffer::BeginWrite(pBuffer, iBytesNeeded);
    m_pStreamMutex->Acquire();
-   
+  
 	if (m_bPause && eRet == kError_BufferTooSmall)
 	{
 	    DiscardBytes();
