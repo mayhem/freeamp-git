@@ -356,7 +356,7 @@ Error XingLMC::ExtractMediaInfo()
 {
    int32           samprate, layer;
    Error           eRet;
-   float           totalSeconds, fMsPerFrame;
+   float           totalSeconds = -1, fMsPerFrame;
    MediaInfoEvent *pMIE;
 
    eRet = GetBitstreamStats(totalSeconds, fMsPerFrame,
@@ -401,7 +401,7 @@ Error XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
    static int32 l[4] = {25, 3, 2, 1};
    int32        sampRateIndex;
 
-   fTotalSeconds = fMsPerFrame = 0.0;
+   fTotalSeconds = fMsPerFrame = -1.0;
    iTotalFrames = iSampleRate = iLayer = 0;
 
    if (!m_pPmi && !m_fpFile)
@@ -455,7 +455,7 @@ Error XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
    else
    {
        iTotalFrames = -1;
-       //fTotalSeconds = -1;
+       fTotalSeconds = -1;
    }
    
    return kError_NoErr;
