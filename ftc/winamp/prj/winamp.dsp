@@ -167,10 +167,6 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir               
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\..\lib\xml\src\Parse.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\winamp.cpp
 # End Source File
 # Begin Source File

@@ -104,6 +104,7 @@
 #define IDC_CHECK                       1042
 #define IDC_BUTTON1                     1043
 #define IDC_RELATABLE_WEB               1043
+#define IDC_BUTTON_MB                   1043
 #define IDC_RADIO3                      1044
 #define IDC_EDIT2                       1045
 #define IDC_MISSINGTRACK                1045

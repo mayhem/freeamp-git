@@ -42,7 +42,7 @@ ____________________________________________________________________________*/
 #include "resource.h"
 #include "EditTrackInfoDialog.h"
 #include "help.h"
-
+#include "uuid.h"
 
 EditTrackInfoDialog::EditTrackInfoDialog(FAContext* context,
                                          HINSTANCE hinst,
@@ -129,7 +129,8 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
             HWND hwndTitleText =  FindWindowEx(hwnd, NULL, NULL, "Title:");
             HWND hwndTrackText =  FindWindowEx(hwnd, NULL, NULL, "Track #:");
             HWND hwndPlayCount = GetDlgItem(hwnd, IDC_PLAYCOUNT);           
- 
+            HWND hwndMusicBrainz = GetDlgItem(hwnd, IDC_BUTTON_MB);
+
             SYSTEMTIME sysTime;
 
             GetSystemTime(&sysTime);
@@ -151,6 +152,7 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
 
                 EnableWindow(hwndTitle, FALSE);
                 EnableWindow(hwndTitleText, FALSE);
+				Button_Enable(hwndMusicBrainz, FALSE);
             }
             else
             {
@@ -276,6 +278,34 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
         {
             switch(LOWORD(wParam))
             {
+			    case IDC_BUTTON_MB:
+				{
+					if (m_editMetaData->GUID() == "") 
+					{
+                        string caption = "No Signature Found";
+                        string message = "This track does not have a Relatable Signature "
+                                         "associated with it.  To look up this track on the "
+                                         "MusicBrainz server, you need to enable a Relatable "
+                                         "Profile and signature your music collection.";
+
+                        MessageBox(NULL, message.c_str(), caption.c_str(), MB_OK|MB_SETFOREGROUND);
+					}
+					else {
+                        string url = "http://www.musicbrainz.org/showguid.html?guid=";
+   
+                        char ascii_uuid[37];
+                        uuid_t1 uu;
+
+                        memset(uu, '\0', 17 * sizeof(unsigned char));
+                        strncpy((char *)uu, m_editMetaData->GUID().c_str(), 16);
+                        uuid_ascii(uu, ascii_uuid);
+
+                        url += ascii_uuid;
+
+                        ShellExecute(hwnd, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+					}
+				    break;
+				}
                 case IDHELP:
                 {
                     ShowHelp(m_context, Edit_Info);
