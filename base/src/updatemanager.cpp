@@ -70,8 +70,8 @@ typedef ostrstream ostringstream;
 
 
 const char* kUpdateServer = "fatman.freeamp.org";
-const char* kUpdatePath = "/update/test/";
-const char* kUpdateFile = "/update/test/version_info.xml";
+const char* kUpdatePath = "/update/freeamp/";
+const char* kUpdateFile = "/update/freeamp/version_info.xml";
 const char* kUpdateRequest = "GET %s HTTP/1.0\n"
                              "Host: %s\n"
                              "User-Agent: "BRANDING"/%s\n"
