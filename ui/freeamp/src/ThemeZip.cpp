@@ -23,6 +23,7 @@ ____________________________________________________________________________*/
 
 #include <time.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #ifdef WIN32
 #include <windows.h>
