@@ -74,6 +74,7 @@ ____________________________________________________________________________*/
 #undef HAVE_ZLIB
 #undef HAVE_ARTSC_ARTSC_H
 #undef HAVE_KDE_ARTSC_ARTSC_H
+#undef HAVE_SSTREAM
 
 #undef USING_GDKPIXBUF
 

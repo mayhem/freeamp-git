@@ -57,6 +57,11 @@ dnl Checks for header files.
 AC_STDC_HEADERS
 AC_HAVE_HEADERS(unistd.h io.h pthread.h errno.h)
 
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+AC_HAVE_HEADERS(sstream)
+AC_LANG_RESTORE
+
 AC_CHECK_LIB(socket, connect, [EXTRALIBS="$EXTRALIBS -lsocket"])
 AC_CHECK_LIB(nsl, gethostbyname, [EXTRALIBS="$EXTRALIBS -lnsl"])
 

@@ -41,8 +41,12 @@ ____________________________________________________________________________*/
 
 #if !defined(WIN32)
 #include <sys/time.h>
-#include <strstream>
-typedef ostrstream ostringstream;
+#ifdef HAVE_SSTREAM
+   #include <sstream>
+#else
+   #include <strstream>
+   typedef ostrstream ostringstream;
+#endif
 #else
 #include <sstream>
 #endif
@@ -1539,7 +1543,7 @@ void DownloadManager::SaveResumableDownloadItems()
                     ost << '\0';     
                     
                     sprintf(num, "%ld", (long int)index);
-#ifdef WIN32 
+#if defined(WIN32) || defined(HAVE_SSTREAM) 
                     database.Insert(num, (char*)ost.str().c_str());  
 #else
                     database.Insert(num, (char*)ost.str());
