@@ -22,8 +22,13 @@ ____________________________________________________________________________*/
 
 /* System Includes */
 #define STRICT
+#ifdef WIN32
 #include <windows.h>
 #include <commctrl.h>
+#else 
+#include <unistd.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <iostream.h>
@@ -40,6 +45,8 @@ ____________________________________________________________________________*/
 
 Error InitWindowsRegistry()
 {
+#ifdef WIN32
+
     Error   error = kError_UnknownErr;
     HKEY    hkey;
 	DWORD   type;
@@ -114,12 +121,18 @@ Error InitWindowsRegistry()
     }
 
     return error;
+#else // WIN32
+
+    return kError_NoErr;
+
+#endif // WIN32
 }
 
 
 
 Error GetInstallDirectory(char* path, int32 len)
 {
+#ifdef WIN32
     Error   error = kError_UnknownErr;
     HKEY    hkey;
 	DWORD   type;
@@ -159,5 +172,25 @@ Error GetInstallDirectory(char* path, int32 len)
     }
   
     return error;
+#else // WIN32
+
+    if (path) {
+	getcwd(path,len);
+	return kError_NoErr;
+    }
+    return kError_UnknownErr;
+
+#endif
 }
+
+
+
+
+
+
+
+
+
+
+
 

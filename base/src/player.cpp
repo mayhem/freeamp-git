@@ -402,7 +402,7 @@ int32 Player::ServiceEvent(Event *pC) {
 		        m_lmcRef->ChangePosition(m_lmcRef, myPlayList->GetSkip());
 		        m_lmcRef->Decode(m_lmcRef);
 
-#ifdef __linux__
+#if 0
                 
 		        PhysicalMediaInput* pmi = NULL;
 		        //cout << "Done deleting myLMC" << endl;

@@ -77,14 +77,14 @@ target_os = @target_os@
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
-@AM_HAVE_WIN32_FALSE@FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp thread.cpp
+@AM_HAVE_WIN32_FALSE@FILES = player.cpp bootstrap.cpp command.cpp buffer.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp utility.cpp
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = libfabase.a
 libfabase_a_SOURCES = $(FILES)
 
-INCLUDES = -I@top_srcdir@/base/include -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include -I@top_srcdir@/ui/dummy/include -I@top_srcdir@/io/local -I@top_srcdir@/lmc/xingmp3/include
+INCLUDES = -I@top_srcdir@/base/include -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include -I@top_srcdir@/ui/dummy/include -I@top_srcdir@/io/local -I@top_srcdir@/lmc/xingmp3/include -I@top_srcdir@/ui/cmdline
 CXXFLAGS = -D__@target_os@__ $(REENT) $(EXTRA_CXXFLAGS)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../config/config.h
@@ -99,7 +99,8 @@ LIBS = @LIBS@
 libfabase_a_LIBADD = 
 @AM_HAVE_WIN32_TRUE@cond0libfabase_a_OBJECTS = 
 @AM_HAVE_WIN32_FALSE@cond1libfabase_a_OBJECTS =  player.o bootstrap.o \
-@AM_HAVE_WIN32_FALSE@command.o buffer.o playlist.o hashtable.o thread.o
+@AM_HAVE_WIN32_FALSE@command.o buffer.o playlist.o hashtable.o thread.o \
+@AM_HAVE_WIN32_FALSE@registrar.o utility.o
 libfabase_a_OBJECTS =  $(cond0libfabase_a_OBJECTS) \
 $(cond1libfabase_a_OBJECTS)
 AR = ar
@@ -113,7 +114,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/bootstrap.P .deps/buffer.P .deps/command.P \
-.deps/hashtable.P .deps/player.P .deps/playlist.P .deps/thread.P
+.deps/hashtable.P .deps/player.P .deps/playlist.P .deps/registrar.P \
+.deps/thread.P .deps/utility.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfabase_a_SOURCES)
 OBJECTS = $(libfabase_a_OBJECTS)

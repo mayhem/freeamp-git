@@ -1,6 +1,6 @@
 /*____________________________________________________________________________
 	
-	FreeAMP - The Free MP3 Player
+	FreeAmp - The Free MP3 Player
 	Portions copyright (C) 1998 GoodNoise
 
 	This program is free software; you can redistribute it and/or modify
@@ -22,8 +22,11 @@ ____________________________________________________________________________*/
 
 /* System Includes */
 #define STRICT
+#ifdef WIN32
 #include <windows.h>
 #include <commctrl.h>
+#endif // WIN32
+
 #include <stdio.h>
 #include <string.h>
 #include <iostream.h>

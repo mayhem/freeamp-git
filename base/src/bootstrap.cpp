@@ -69,7 +69,9 @@ int main(int argc, char **argv) {
     //cout << "Created dcoo..." << endl;
     pP->RegisterCOO(pDCOO);
     //cout << "Registered DummyCOO" << endl;
-
+    //Event *pe = new Event(CMD_QuitPlayer);
+    //Player::GetPlayer()->AcceptEvent(pe);
+#if 1
     CIO *pCIO = NULL;
     COO *pCOO = NULL;
 #ifdef __linux__
@@ -122,6 +124,8 @@ int main(int argc, char **argv) {
 //    pP->acceptEvent(*pC);
 //    delete pC;
 //    cout << "main: stopping..." << endl;
+
+#endif
 
     termSemaphore->Wait();
 
