@@ -115,6 +115,12 @@ Notes:
 
        freeamp http://206.178.45.2:8000    
 
+    Note on saving HTTP streams: If you are saving a stream that is 
+    being served from a web server, and the stream completes playing,
+    FreeAmp will write a second partial stream file to disk. This is a 
+    bug and will be addressed in the next major release of FreeAmp.
+    This bug does not occur with SHOUTcast or icecast streams.
+
   * To play an RTP/multicast stream, specify the RTP URL on the command
     line. Example:
 
