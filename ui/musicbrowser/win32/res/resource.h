@@ -11,6 +11,7 @@
 #define IDC_NODROP                      106
 #define IDI_BLANK                       107
 #define IDI_ACTIVELIST                  109
+#define IDR_POPUP                       110
 #define IDD_OPENURL                     219
 #define IDC_MUSICTREE                   1000
 #define IDC_PLAYLISTBOX                 1002
@@ -47,14 +48,27 @@
 #define ID_SORT_LOCATION                40016
 #define ID_SORT_RANDOMIZE               40017
 #define ID_SORT_ALBUM                   40018
+#define ID_FILE_SAVEASPLAYLIST          40019
+#define ID_FILE_IMPORT                  40020
+#define ID_EDIT_ADDTRACK                40021
+#define ID_EDIT_EDIT                    40022
+#define ID_EDIT_REMOVE                  40023
+#define ID_EDIT_REMOVEFROMDISK          40024
+#define ID_EDIT_MOVEUP                  40025
+#define ID_EDIT_CLEARPLAYLIST           40027
+#define ID_PLAY                         40029
+#define ID_EDIT                         40031
+#define ID_RENAME                       40032
+#define ID_ADD                          40033
+#define ID_EDIT_MOVEDOWN                40034
 #define IDS_URL                         65535
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        110
-#define _APS_NEXT_COMMAND_VALUE         40019
+#define _APS_NEXT_RESOURCE_VALUE        111
+#define _APS_NEXT_COMMAND_VALUE         40035
 #define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -21,6 +21,7 @@
         $Id$
 ____________________________________________________________________________*/
 
+#include <algorithm>
 #include "Win32MusicBrowser.h"
 #include "debug.h"
 #include "resource.h"
@@ -29,13 +30,14 @@ ____________________________________________________________________________*/
 extern "C" {
 
 UserInterface *Initialize(FAContext *context) {
-    return new MusicBrowserUI(context, NULL, string(""));
+    return new MusicBrowserUI(context, NULL, NULL, string(""));
 }
            }
 
-MusicBrowserUI::MusicBrowserUI(FAContext *context, 
+MusicBrowserUI::MusicBrowserUI(FAContext      *context, 
                                MusicBrowserUI *parent,
-                               const string &oPlaylistName)
+                               HWND            hParent,
+                               const string   &oPlaylistName)
 {
     m_context = context;
     m_initialized = false;
@@ -50,6 +52,8 @@ MusicBrowserUI::MusicBrowserUI(FAContext *context,
     m_currentplaying = -1;
     m_bDragging = false;
     m_pParent = parent;
+    m_hParent = hParent;
+    m_uiThread = NULL;
     if (parent == NULL)
        m_oPlm = m_context->plm;
     else
@@ -62,7 +66,37 @@ MusicBrowserUI::MusicBrowserUI(FAContext *context,
 MusicBrowserUI::~MusicBrowserUI()
 {
     if (m_pParent)
+    {
        delete m_oPlm;
+    }
+    else
+    {
+       vector<MusicBrowserUI *>::iterator i;
+       
+       for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+          delete (*i);
+    }   
+    
+    CloseMainDialog();
+    delete m_uiThread;
+}
+
+// These two functions should never get called on non-parent music browsers
+void MusicBrowserUI::AddMusicBrowserWindow(MusicBrowserUI *pWindow)
+{
+    assert(m_pParent == NULL);
+    m_oWindowList.push_back(pWindow);
+}
+
+void MusicBrowserUI::RemoveMusicBrowserWindow(MusicBrowserUI *pWindow)
+{
+    vector<MusicBrowserUI *>::iterator i;
+
+    assert(m_pParent == NULL);
+    
+    i = find(m_oWindowList.begin(), m_oWindowList.end(), pWindow);
+    if (i != m_oWindowList.end())
+        m_oWindowList.erase(i);
 }
 
 Error MusicBrowserUI::Init(int32 startup_level) 
@@ -80,28 +114,66 @@ Error MusicBrowserUI::Init(int32 startup_level)
     return kError_NoErr;
 }
 
+void MusicBrowserUI::NewPlaylist(void)
+{
+    MusicBrowserUI *pNew;
+    
+    if (m_pParent)
+    {
+       pNew = new MusicBrowserUI(m_context, m_pParent, m_hWnd, string(""));
+       m_pParent->AddMusicBrowserWindow(pNew);
+    }   
+    else   
+    {
+       pNew = new MusicBrowserUI(m_context, this, m_hWnd, string(""));
+       AddMusicBrowserWindow(pNew);
+    }   
+       
+    pNew->Init(SECONDARY_UI_STARTUP);
+}
+
+void MusicBrowserUI::EditPlaylist(const string &oList)
+{
+    MusicBrowserUI *pNew;
+    
+    if (m_pParent)
+    {
+       pNew = new MusicBrowserUI(m_context, m_pParent, m_hWnd, oList);
+       m_pParent->AddMusicBrowserWindow(pNew);
+    }   
+    else   
+    {
+       pNew = new MusicBrowserUI(m_context, this, m_hWnd, oList);
+       AddMusicBrowserWindow(pNew);
+    }   
+       
+    pNew->Init(SECONDARY_UI_STARTUP);
+}
+
 int32 MusicBrowserUI::AcceptEvent(Event *event)
 {
     switch (event->Type()) 
     {
         case CMD_Cleanup: 
         {
-            if (m_currentListName.length() != 0)
-                WritePlaylist();     
-            else
-            {
-                string lastPlaylist = FreeampDir(m_context->prefs);
-                lastPlaylist += "\\currentlist.m3u";
-
-                SaveCurrentPlaylist((char *)lastPlaylist.c_str());  
-            }    
-       
             CloseMainDialog();
+            m_uiThread->Join();
+            
             m_playerEQ->AcceptEvent(new Event(INFO_ReadyToDieUI));
-
             break; 
         }
+
         case INFO_PlaylistItemUpdated:
+        {
+            vector<MusicBrowserUI *>::iterator i;
+            
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+               (*i)->UpdatePlaylistList();
+               
+            UpdatePlaylistList();
+            break; 
+        }
+
         case INFO_PlaylistCurrentItemInfo:
         {
             m_currentplaying = m_oPlm->GetCurrentIndex();
@@ -312,48 +384,4 @@ void MusicBrowserUI::PopUpInfoEditor(void)
 {
 }
 
-void MusicBrowserUI::SaveCurrentPlaylist(char *path)
-{
-    if (path)
-        m_currentListName = path;
-
-    if (m_currentListName.length() == 0)
-        return;
-
-    char *ext = strrchr(m_currentListName.c_str(), '.');
-    if (ext)
-        ext = ext + 1;
-    Error result = kError_NoErr;
-    int i = 0;
-    bool found = false;
-
-    PlaylistFormatInfo format;
-    while (ext && result == kError_NoErr) {
-        result = m_oPlm->GetSupportedPlaylistFormats(&format, i);
-        if (!strcmp(ext, format.GetExtension())) {
-            found = true;
-            break;
-        }
-        i++;
-    }
-    if (!found) {
-        m_oPlm->GetSupportedPlaylistFormats(&format, 0);
-        m_currentListName += "." ;
-        m_currentListName += format.GetExtension();
-    }
-
-    uint32 urlLength = m_currentListName.length() + 20;
-    char *writeURL = new char[urlLength];
-
-    Error err = FilePathToURL(m_currentListName.c_str(), writeURL, &urlLength);
-    if (IsntError(err))
-        m_oPlm->WritePlaylist(writeURL, &format);
-
-    delete [] writeURL;
-}
-
-void MusicBrowserUI::ReadPlaylist(char *path, vector<PlaylistItem *> *plist)
-{
-    m_oPlm->ReadPlaylist(path, plist);
-}
 

@@ -38,12 +38,12 @@ INTDIR=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\simple.ui"
+ALL : ".\simple.ui"
 
 !ELSE 
 
 ALL : "xing - Win32 Release" "soundcard - Win32 Release"\
- "fileinput - Win32 Release" "..\..\..\..\config\config.h" ".\simple.ui"
+ "fileinput - Win32 Release" ".\simple.ui"
 
 !ENDIF 
 
@@ -70,7 +70,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\simple.exp"
 	-@erase "$(OUTDIR)\simple.lib"
 	-@erase ".\simple.ui"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -160,7 +159,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release"\
- "fileinput - Win32 Release" "..\..\..\..\config\config.h" ".\simple.ui"
+ "fileinput - Win32 Release" ".\simple.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                             ..\..\..\..\base\win32\prj\plugins
 	copy simple.ui               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -172,12 +171,12 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\simple.ui"
+ALL : ".\simple.ui"
 
 !ELSE 
 
 ALL : "xing - Win32 Debug" "soundcard - Win32 Debug" "fileinput - Win32 Debug"\
- "..\..\..\..\config\config.h" ".\simple.ui"
+ ".\simple.ui"
 
 !ENDIF 
 
@@ -207,7 +206,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\simple.pdb"
 	-@erase ".\simple.ilk"
 	-@erase ".\simple.ui"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -297,7 +295,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
- "fileinput - Win32 Debug" "..\..\..\..\config\config.h" ".\simple.ui"
+ "fileinput - Win32 Debug" ".\simple.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                             ..\..\..\..\base\win32\prj\plugins
 	copy simple.ui               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -309,12 +307,12 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\simple.ui"
+ALL : ".\simple.ui"
 
 !ELSE 
 
 ALL : "xing - Win32 NASM Debug" "soundcard - Win32 NASM Debug"\
- "fileinput - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\simple.ui"
+ "fileinput - Win32 NASM Debug" ".\simple.ui"
 
 !ENDIF 
 
@@ -344,7 +342,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\simple.pdb"
 	-@erase ".\simple.ilk"
 	-@erase ".\simple.ui"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -434,7 +431,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 NASM Debug" "soundcard - Win32 NASM Debug"\
- "fileinput - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\simple.ui"
+ "fileinput - Win32 NASM Debug" ".\simple.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                             ..\..\..\..\base\win32\prj\plugins
 	copy simple.ui               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -446,12 +443,12 @@ INTDIR=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\simple.ui"
+ALL : ".\simple.ui"
 
 !ELSE 
 
 ALL : "xing - Win32 NASM Release" "soundcard - Win32 NASM Release"\
- "fileinput - Win32 NASM Release" "..\..\..\..\config\config.h" ".\simple.ui"
+ "fileinput - Win32 NASM Release" ".\simple.ui"
 
 !ENDIF 
 
@@ -478,7 +475,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\simple.exp"
 	-@erase "$(OUTDIR)\simple.lib"
 	-@erase ".\simple.ui"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -568,8 +564,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 NASM Release"\
- "soundcard - Win32 NASM Release" "fileinput - Win32 NASM Release"\
- "..\..\..\..\config\config.h" ".\simple.ui"
+ "soundcard - Win32 NASM Release" "fileinput - Win32 NASM Release" ".\simple.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                             ..\..\..\..\base\win32\prj\plugins
 	copy simple.ui               ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -581,8 +576,12 @@ $(DS_POSTBUILD_DEP) : "xing - Win32 NASM Release"\
  || "$(CFG)" == "simple - Win32 NASM Debug" || "$(CFG)" ==\
  "simple - Win32 NASM Release"
 SOURCE=..\src\about.cpp
+DEP_CPP_ABOUT=\
+	"..\..\..\..\config\config.h"\
+	
 
-"$(INTDIR)\about.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\about.obj" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -629,12 +628,14 @@ DEP_CPP_MUTEX=\
 
 SOURCE=..\..\..\..\base\src\playlist.cpp
 DEP_CPP_PLAYL=\
+	"..\..\..\..\base\include\database.h"\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\musicbrowser.h"\
 	"..\..\..\..\base\include\playlist.h"\
 	"..\..\..\..\base\include\playlistformat.h"\
 	"..\..\..\..\base\include\plmevent.h"\
@@ -645,12 +646,15 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\..\lib\gdbm\gdbm_fa.h"\
 	
 NODEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -661,13 +665,15 @@ DEP_CPP_PREFD=\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\config\config.h"\
 	"..\include\prefdialog.h"\
 	
 NODEP_CPP_PREFD=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\prefdialog.obj" : $(SOURCE) $(DEP_CPP_PREFD) "$(INTDIR)"
+"$(INTDIR)\prefdialog.obj" : $(SOURCE) $(DEP_CPP_PREFD) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -675,9 +681,11 @@ SOURCE=..\..\..\..\base\src\preferences.cpp
 DEP_CPP_PREFE=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -689,21 +697,25 @@ DEP_CPP_REGIS=\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\registrar.h"\
 	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\config\config.h"\
 	
 NODEP_CPP_REGIS=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"
+"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\..\..\base\src\registry.cpp
 DEP_CPP_REGIST=\
 	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"
+"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -736,13 +748,15 @@ DEP_CPP_SIMPL=\
 	"..\..\..\..\base\include\utility.h"\
 	"..\..\..\..\base\win32\include\Mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\about.h"\
 	"..\include\prefdialog.h"\
 	"..\include\simpleui.h"\
 	
 
-"$(INTDIR)\simpleui.obj" : $(SOURCE) $(DEP_CPP_SIMPL) "$(INTDIR)"
+"$(INTDIR)\simpleui.obj" : $(SOURCE) $(DEP_CPP_SIMPL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -750,6 +764,7 @@ SOURCE=..\..\..\..\base\src\thread.cpp
 DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
+	"..\..\..\..\config\config.h"\
 	
 NODEP_CPP_THREA=\
 	"..\..\..\..\base\src\beosthread.h"\
@@ -757,7 +772,8 @@ NODEP_CPP_THREA=\
 	"..\..\..\..\base\src\solaristhread.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -766,9 +782,11 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\win32\include\win32prefs.h"\
+	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -776,9 +794,11 @@ SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 DEP_CPP_WIN32T=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
+	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -46,7 +46,7 @@ Window::Window(Theme *pTheme, string &oName)
 
 Window::~Window(void)
 {
-    if (!m_bIsVulcanMindMeldHost)
+    if (m_bIsVulcanMindMeldHost)
     {
        ClearControls();
        delete m_pCanvas;

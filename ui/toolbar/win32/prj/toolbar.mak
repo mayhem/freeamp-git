@@ -32,10 +32,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-MTL=midl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "toolbar - Win32 Release"
 
 OUTDIR=.\Release
@@ -66,6 +62,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -74,7 +71,40 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
@@ -105,8 +135,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\toolbar.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                     ..\..\..\..\base\win32\prj\plugins
-	copy toolbar.ui                                       ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                      ..\..\..\..\base\win32\prj\plugins
+	copy toolbar.ui                                        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
@@ -142,6 +172,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -150,7 +181,40 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
@@ -181,8 +245,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\toolbar.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                     ..\..\..\..\base\win32\prj\plugins
-	copy toolbar.ui                                       ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                      ..\..\..\..\base\win32\prj\plugins
+	copy toolbar.ui                                        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
@@ -218,6 +282,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -226,7 +291,40 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
@@ -257,8 +355,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\toolbar.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                     ..\..\..\..\base\win32\prj\plugins
-	copy toolbar.ui                                       ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                      ..\..\..\..\base\win32\prj\plugins
+	copy toolbar.ui                                        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
@@ -291,6 +389,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -299,42 +398,6 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\include" /I "..\..\include" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "NDEBUG" 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\toolbar.pdb" /machine:I386 /def:".\toolbar.def"\
- /out:"toolbar.ui" /implib:"$(OUTDIR)\toolbar.lib"\
- /libpath:"..\..\..\..\base\win32" 
-DEF_FILE= \
-	".\toolbar.def"
-LINK32_OBJS= \
-	"$(INTDIR)\Toolbar.obj" \
-	"$(INTDIR)\toolbar.res" \
-	"..\..\..\..\base\win32\fabaselib.lib"
-
-".\toolbar.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\toolbar.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                     ..\..\..\..\base\win32\prj\plugins
-	copy toolbar.ui                                       ..\..\..\..\base\win32\prj\plugins
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ENDIF 
 
 .c{$(CPP_OBJS)}.obj::
    $(CPP) @<<
@@ -366,11 +429,53 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\toolbar.ui"
    $(CPP_PROJ) $< 
 <<
 
+MTL=midl.exe
+MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\toolbar.res" /d "NDEBUG" 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\toolbar.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
+ /pdb:"$(OUTDIR)\toolbar.pdb" /machine:I386 /def:".\toolbar.def"\
+ /out:"toolbar.ui" /implib:"$(OUTDIR)\toolbar.lib"\
+ /libpath:"..\..\..\..\base\win32" 
+DEF_FILE= \
+	".\toolbar.def"
+LINK32_OBJS= \
+	"$(INTDIR)\Toolbar.obj" \
+	"$(INTDIR)\toolbar.res" \
+	"..\..\..\..\base\win32\fabaselib.lib"
+
+".\toolbar.ui" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\toolbar.ui"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                      ..\..\..\..\base\win32\prj\plugins
+	copy toolbar.ui                                        ..\..\..\..\base\win32\prj\plugins
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ENDIF 
+
 
 !IF "$(CFG)" == "toolbar - Win32 Release" || "$(CFG)" ==\
  "toolbar - Win32 Debug" || "$(CFG)" == "toolbar - Win32 NASM Debug" || "$(CFG)"\
  == "toolbar - Win32 NASM Release"
 SOURCE=..\Toolbar.cpp
+
+!IF  "$(CFG)" == "toolbar - Win32 Release"
+
 DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
@@ -387,7 +492,7 @@ DEP_CPP_TOOLB=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\Mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\ui.h"\
 	"..\Toolbar.h"\
@@ -396,6 +501,92 @@ DEP_CPP_TOOLB=\
 "$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
+
+DEP_CPP_TOOLB=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\ui.h"\
+	"..\Toolbar.h"\
+	
+
+"$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
+
+DEP_CPP_TOOLB=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\ui.h"\
+	"..\Toolbar.h"\
+	
+
+"$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
+
+DEP_CPP_TOOLB=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\event.h"\
+	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\properties.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\..\..\include\ui.h"\
+	"..\Toolbar.h"\
+	
+
+"$(INTDIR)\Toolbar.obj" : $(SOURCE) $(DEP_CPP_TOOLB) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\toolbar.rc
 DEP_RSC_TOOLBA=\
@@ -406,32 +597,32 @@ DEP_RSC_TOOLBA=\
 
 
 "$(INTDIR)\toolbar.res" : $(SOURCE) $(DEP_RSC_TOOLBA) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i "\TEMP\freeamp\ui\toolbar\win32"\
- /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i\
+ "\FreeAmp\freeamp\ui\toolbar\win32" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
 
 
 "$(INTDIR)\toolbar.res" : $(SOURCE) $(DEP_RSC_TOOLBA) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i "\TEMP\freeamp\ui\toolbar\win32"\
- /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i\
+ "\FreeAmp\freeamp\ui\toolbar\win32" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
 
 
 "$(INTDIR)\toolbar.res" : $(SOURCE) $(DEP_RSC_TOOLBA) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i "\TEMP\freeamp\ui\toolbar\win32"\
- /d "_DEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i\
+ "\FreeAmp\freeamp\ui\toolbar\win32" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
 
 
 "$(INTDIR)\toolbar.res" : $(SOURCE) $(DEP_RSC_TOOLBA) "$(INTDIR)"
-	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i "\TEMP\freeamp\ui\toolbar\win32"\
- /d "NDEBUG" $(SOURCE)
+	$(RSC) /l 0x409 /fo"$(INTDIR)\toolbar.res" /i\
+ "\FreeAmp\freeamp\ui\toolbar\win32" /d "NDEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -439,12 +630,12 @@ DEP_RSC_TOOLBA=\
 !IF  "$(CFG)" == "toolbar - Win32 Release"
 
 "fabaselib - Win32 Release" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
    cd "..\..\..\ui\toolbar\win32\prj"
 
 "fabaselib - Win32 ReleaseCLEAN" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 Release" RECURSE=1 
    cd "..\..\..\ui\toolbar\win32\prj"
@@ -452,12 +643,12 @@ DEP_RSC_TOOLBA=\
 !ELSEIF  "$(CFG)" == "toolbar - Win32 Debug"
 
 "fabaselib - Win32 Debug" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
    cd "..\..\..\ui\toolbar\win32\prj"
 
 "fabaselib - Win32 DebugCLEAN" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak CFG="fabaselib - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\ui\toolbar\win32\prj"
@@ -465,12 +656,12 @@ DEP_RSC_TOOLBA=\
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Debug"
 
 "fabaselib - Win32 NASM Debug" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
    cd "..\..\..\ui\toolbar\win32\prj"
 
 "fabaselib - Win32 NASM DebugCLEAN" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\ui\toolbar\win32\prj"
@@ -478,13 +669,13 @@ DEP_RSC_TOOLBA=\
 !ELSEIF  "$(CFG)" == "toolbar - Win32 NASM Release"
 
 "fabaselib - Win32 NASM Release" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" 
    cd "..\..\..\ui\toolbar\win32\prj"
 
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" RECURSE=1 
    cd "..\..\..\ui\toolbar\win32\prj"

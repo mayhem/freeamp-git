@@ -31,8 +31,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-
 !IF  "$(CFG)" == "fabaselib - Win32 Release"
 
 OUTDIR=.\Release
@@ -74,6 +72,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I\
  "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
  "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
@@ -82,282 +81,6 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I\
  /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"..\fabaselib.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\database.obj" \
-	"$(INTDIR)\debug.obj" \
-	"$(INTDIR)\downloadmanager.obj" \
-	"$(INTDIR)\log.obj" \
-	"$(INTDIR)\musiccatalog.obj" \
-	"$(INTDIR)\mutex.obj" \
-	"$(INTDIR)\player.obj" \
-	"$(INTDIR)\playlist.obj" \
-	"$(INTDIR)\preferences.obj" \
-	"$(INTDIR)\propimpl.obj" \
-	"$(INTDIR)\registrar.obj" \
-	"$(INTDIR)\registry.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\thread.obj" \
-	"$(INTDIR)\updatemanager.obj" \
-	"$(INTDIR)\utility.obj" \
-	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\win32updatemanager.obj"
-
-"..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-OUTDIR=.\Debug
-INTDIR=.\Debug
-
-!IF "$(RECURSE)" == "0" 
-
-ALL : "..\fabaselib.lib"
-
-!ELSE 
-
-ALL : "..\fabaselib.lib"
-
-!ENDIF 
-
-CLEAN :
-	-@erase "$(INTDIR)\database.obj"
-	-@erase "$(INTDIR)\debug.obj"
-	-@erase "$(INTDIR)\downloadmanager.obj"
-	-@erase "$(INTDIR)\log.obj"
-	-@erase "$(INTDIR)\musiccatalog.obj"
-	-@erase "$(INTDIR)\mutex.obj"
-	-@erase "$(INTDIR)\player.obj"
-	-@erase "$(INTDIR)\playlist.obj"
-	-@erase "$(INTDIR)\preferences.obj"
-	-@erase "$(INTDIR)\propimpl.obj"
-	-@erase "$(INTDIR)\registrar.obj"
-	-@erase "$(INTDIR)\registry.obj"
-	-@erase "$(INTDIR)\semaphore.obj"
-	-@erase "$(INTDIR)\thread.obj"
-	-@erase "$(INTDIR)\updatemanager.obj"
-	-@erase "$(INTDIR)\utility.obj"
-	-@erase "$(INTDIR)\vc50.idb"
-	-@erase "$(INTDIR)\win32prefs.obj"
-	-@erase "$(INTDIR)\win32thread.obj"
-	-@erase "$(INTDIR)\win32updatemanager.obj"
-	-@erase "..\fabaselib.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I\
- "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
- "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
- "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include"\
- /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS"\
- /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-CPP_OBJS=.\Debug/
-CPP_SBRS=.
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"..\fabaselib.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\database.obj" \
-	"$(INTDIR)\debug.obj" \
-	"$(INTDIR)\downloadmanager.obj" \
-	"$(INTDIR)\log.obj" \
-	"$(INTDIR)\musiccatalog.obj" \
-	"$(INTDIR)\mutex.obj" \
-	"$(INTDIR)\player.obj" \
-	"$(INTDIR)\playlist.obj" \
-	"$(INTDIR)\preferences.obj" \
-	"$(INTDIR)\propimpl.obj" \
-	"$(INTDIR)\registrar.obj" \
-	"$(INTDIR)\registry.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\thread.obj" \
-	"$(INTDIR)\updatemanager.obj" \
-	"$(INTDIR)\utility.obj" \
-	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\win32updatemanager.obj"
-
-"..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-OUTDIR=.\Debug
-INTDIR=.\Debug
-
-!IF "$(RECURSE)" == "0" 
-
-ALL : "..\fabaselib.lib"
-
-!ELSE 
-
-ALL : "..\fabaselib.lib"
-
-!ENDIF 
-
-CLEAN :
-	-@erase "$(INTDIR)\database.obj"
-	-@erase "$(INTDIR)\debug.obj"
-	-@erase "$(INTDIR)\downloadmanager.obj"
-	-@erase "$(INTDIR)\log.obj"
-	-@erase "$(INTDIR)\musiccatalog.obj"
-	-@erase "$(INTDIR)\mutex.obj"
-	-@erase "$(INTDIR)\player.obj"
-	-@erase "$(INTDIR)\playlist.obj"
-	-@erase "$(INTDIR)\preferences.obj"
-	-@erase "$(INTDIR)\propimpl.obj"
-	-@erase "$(INTDIR)\registrar.obj"
-	-@erase "$(INTDIR)\registry.obj"
-	-@erase "$(INTDIR)\semaphore.obj"
-	-@erase "$(INTDIR)\thread.obj"
-	-@erase "$(INTDIR)\updatemanager.obj"
-	-@erase "$(INTDIR)\utility.obj"
-	-@erase "$(INTDIR)\vc50.idb"
-	-@erase "$(INTDIR)\win32prefs.obj"
-	-@erase "$(INTDIR)\win32thread.obj"
-	-@erase "$(INTDIR)\win32updatemanager.obj"
-	-@erase "..\fabaselib.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I\
- "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
- "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
- "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include"\
- /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS"\
- /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-CPP_OBJS=.\Debug/
-CPP_SBRS=.
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"..\fabaselib.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\database.obj" \
-	"$(INTDIR)\debug.obj" \
-	"$(INTDIR)\downloadmanager.obj" \
-	"$(INTDIR)\log.obj" \
-	"$(INTDIR)\musiccatalog.obj" \
-	"$(INTDIR)\mutex.obj" \
-	"$(INTDIR)\player.obj" \
-	"$(INTDIR)\playlist.obj" \
-	"$(INTDIR)\preferences.obj" \
-	"$(INTDIR)\propimpl.obj" \
-	"$(INTDIR)\registrar.obj" \
-	"$(INTDIR)\registry.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\thread.obj" \
-	"$(INTDIR)\updatemanager.obj" \
-	"$(INTDIR)\utility.obj" \
-	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\win32updatemanager.obj"
-
-"..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-OUTDIR=.\Release
-INTDIR=.\Release
-
-!IF "$(RECURSE)" == "0" 
-
-ALL : "..\fabaselib.lib"
-
-!ELSE 
-
-ALL : "..\fabaselib.lib"
-
-!ENDIF 
-
-CLEAN :
-	-@erase "$(INTDIR)\database.obj"
-	-@erase "$(INTDIR)\debug.obj"
-	-@erase "$(INTDIR)\downloadmanager.obj"
-	-@erase "$(INTDIR)\log.obj"
-	-@erase "$(INTDIR)\musiccatalog.obj"
-	-@erase "$(INTDIR)\mutex.obj"
-	-@erase "$(INTDIR)\player.obj"
-	-@erase "$(INTDIR)\playlist.obj"
-	-@erase "$(INTDIR)\preferences.obj"
-	-@erase "$(INTDIR)\propimpl.obj"
-	-@erase "$(INTDIR)\registrar.obj"
-	-@erase "$(INTDIR)\registry.obj"
-	-@erase "$(INTDIR)\semaphore.obj"
-	-@erase "$(INTDIR)\thread.obj"
-	-@erase "$(INTDIR)\updatemanager.obj"
-	-@erase "$(INTDIR)\utility.obj"
-	-@erase "$(INTDIR)\vc50.idb"
-	-@erase "$(INTDIR)\win32prefs.obj"
-	-@erase "$(INTDIR)\win32thread.obj"
-	-@erase "$(INTDIR)\win32updatemanager.obj"
-	-@erase "..\fabaselib.lib"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I\
- "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
- "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
- "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include"\
- /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS"\
- /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
-CPP_OBJS=.\Release/
-CPP_SBRS=.
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
-BSC32_SBRS= \
-	
-LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"..\fabaselib.lib" 
-LIB32_OBJS= \
-	"$(INTDIR)\database.obj" \
-	"$(INTDIR)\debug.obj" \
-	"$(INTDIR)\downloadmanager.obj" \
-	"$(INTDIR)\log.obj" \
-	"$(INTDIR)\musiccatalog.obj" \
-	"$(INTDIR)\mutex.obj" \
-	"$(INTDIR)\player.obj" \
-	"$(INTDIR)\playlist.obj" \
-	"$(INTDIR)\preferences.obj" \
-	"$(INTDIR)\propimpl.obj" \
-	"$(INTDIR)\registrar.obj" \
-	"$(INTDIR)\registry.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\thread.obj" \
-	"$(INTDIR)\updatemanager.obj" \
-	"$(INTDIR)\utility.obj" \
-	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\win32updatemanager.obj"
-
-"..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
-    $(LIB32) @<<
-  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
-<<
-
-!ENDIF 
 
 .c{$(CPP_OBJS)}.obj::
    $(CPP) @<<
@@ -389,6 +112,379 @@ LIB32_OBJS= \
    $(CPP_PROJ) $< 
 <<
 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
+BSC32_SBRS= \
+	
+LIB32=link.exe -lib
+LIB32_FLAGS=/nologo /out:"..\fabaselib.lib" 
+LIB32_OBJS= \
+	"$(INTDIR)\database.obj" \
+	"$(INTDIR)\debug.obj" \
+	"$(INTDIR)\downloadmanager.obj" \
+	"$(INTDIR)\log.obj" \
+	"$(INTDIR)\musiccatalog.obj" \
+	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\player.obj" \
+	"$(INTDIR)\playlist.obj" \
+	"$(INTDIR)\preferences.obj" \
+	"$(INTDIR)\propimpl.obj" \
+	"$(INTDIR)\registrar.obj" \
+	"$(INTDIR)\registry.obj" \
+	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\updatemanager.obj" \
+	"$(INTDIR)\utility.obj" \
+	"$(INTDIR)\win32prefs.obj" \
+	"$(INTDIR)\win32thread.obj" \
+	"$(INTDIR)\win32updatemanager.obj"
+
+"..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+    $(LIB32) @<<
+  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
+<<
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
+
+OUTDIR=.\Debug
+INTDIR=.\Debug
+
+!IF "$(RECURSE)" == "0" 
+
+ALL : "..\fabaselib.lib"
+
+!ELSE 
+
+ALL : "..\fabaselib.lib"
+
+!ENDIF 
+
+CLEAN :
+	-@erase "$(INTDIR)\database.obj"
+	-@erase "$(INTDIR)\debug.obj"
+	-@erase "$(INTDIR)\downloadmanager.obj"
+	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\musiccatalog.obj"
+	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\player.obj"
+	-@erase "$(INTDIR)\playlist.obj"
+	-@erase "$(INTDIR)\preferences.obj"
+	-@erase "$(INTDIR)\propimpl.obj"
+	-@erase "$(INTDIR)\registrar.obj"
+	-@erase "$(INTDIR)\registry.obj"
+	-@erase "$(INTDIR)\semaphore.obj"
+	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\updatemanager.obj"
+	-@erase "$(INTDIR)\utility.obj"
+	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\win32prefs.obj"
+	-@erase "$(INTDIR)\win32thread.obj"
+	-@erase "$(INTDIR)\win32updatemanager.obj"
+	-@erase "..\fabaselib.lib"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP=cl.exe
+CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I\
+ "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
+ "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
+ "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include"\
+ /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS"\
+ /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_OBJS=.\Debug/
+CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
+BSC32_SBRS= \
+	
+LIB32=link.exe -lib
+LIB32_FLAGS=/nologo /out:"..\fabaselib.lib" 
+LIB32_OBJS= \
+	"$(INTDIR)\database.obj" \
+	"$(INTDIR)\debug.obj" \
+	"$(INTDIR)\downloadmanager.obj" \
+	"$(INTDIR)\log.obj" \
+	"$(INTDIR)\musiccatalog.obj" \
+	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\player.obj" \
+	"$(INTDIR)\playlist.obj" \
+	"$(INTDIR)\preferences.obj" \
+	"$(INTDIR)\propimpl.obj" \
+	"$(INTDIR)\registrar.obj" \
+	"$(INTDIR)\registry.obj" \
+	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\updatemanager.obj" \
+	"$(INTDIR)\utility.obj" \
+	"$(INTDIR)\win32prefs.obj" \
+	"$(INTDIR)\win32thread.obj" \
+	"$(INTDIR)\win32updatemanager.obj"
+
+"..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+    $(LIB32) @<<
+  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
+<<
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
+
+OUTDIR=.\Debug
+INTDIR=.\Debug
+
+!IF "$(RECURSE)" == "0" 
+
+ALL : "..\fabaselib.lib"
+
+!ELSE 
+
+ALL : "..\fabaselib.lib"
+
+!ENDIF 
+
+CLEAN :
+	-@erase "$(INTDIR)\database.obj"
+	-@erase "$(INTDIR)\debug.obj"
+	-@erase "$(INTDIR)\downloadmanager.obj"
+	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\musiccatalog.obj"
+	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\player.obj"
+	-@erase "$(INTDIR)\playlist.obj"
+	-@erase "$(INTDIR)\preferences.obj"
+	-@erase "$(INTDIR)\propimpl.obj"
+	-@erase "$(INTDIR)\registrar.obj"
+	-@erase "$(INTDIR)\registry.obj"
+	-@erase "$(INTDIR)\semaphore.obj"
+	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\updatemanager.obj"
+	-@erase "$(INTDIR)\utility.obj"
+	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\win32prefs.obj"
+	-@erase "$(INTDIR)\win32thread.obj"
+	-@erase "$(INTDIR)\win32updatemanager.obj"
+	-@erase "..\fabaselib.lib"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP=cl.exe
+CPP_PROJ=/nologo /MDd /W3 /GX /Z7 /Od /I "..\..\..\lib\zlib\include" /I\
+ "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
+ "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
+ "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include"\
+ /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS"\
+ /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_OBJS=.\Debug/
+CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
+BSC32_SBRS= \
+	
+LIB32=link.exe -lib
+LIB32_FLAGS=/nologo /out:"..\fabaselib.lib" 
+LIB32_OBJS= \
+	"$(INTDIR)\database.obj" \
+	"$(INTDIR)\debug.obj" \
+	"$(INTDIR)\downloadmanager.obj" \
+	"$(INTDIR)\log.obj" \
+	"$(INTDIR)\musiccatalog.obj" \
+	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\player.obj" \
+	"$(INTDIR)\playlist.obj" \
+	"$(INTDIR)\preferences.obj" \
+	"$(INTDIR)\propimpl.obj" \
+	"$(INTDIR)\registrar.obj" \
+	"$(INTDIR)\registry.obj" \
+	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\updatemanager.obj" \
+	"$(INTDIR)\utility.obj" \
+	"$(INTDIR)\win32prefs.obj" \
+	"$(INTDIR)\win32thread.obj" \
+	"$(INTDIR)\win32updatemanager.obj"
+
+"..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+    $(LIB32) @<<
+  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
+<<
+
+!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
+
+OUTDIR=.\Release
+INTDIR=.\Release
+
+!IF "$(RECURSE)" == "0" 
+
+ALL : "..\fabaselib.lib"
+
+!ELSE 
+
+ALL : "..\fabaselib.lib"
+
+!ENDIF 
+
+CLEAN :
+	-@erase "$(INTDIR)\database.obj"
+	-@erase "$(INTDIR)\debug.obj"
+	-@erase "$(INTDIR)\downloadmanager.obj"
+	-@erase "$(INTDIR)\log.obj"
+	-@erase "$(INTDIR)\musiccatalog.obj"
+	-@erase "$(INTDIR)\mutex.obj"
+	-@erase "$(INTDIR)\player.obj"
+	-@erase "$(INTDIR)\playlist.obj"
+	-@erase "$(INTDIR)\preferences.obj"
+	-@erase "$(INTDIR)\propimpl.obj"
+	-@erase "$(INTDIR)\registrar.obj"
+	-@erase "$(INTDIR)\registry.obj"
+	-@erase "$(INTDIR)\semaphore.obj"
+	-@erase "$(INTDIR)\thread.obj"
+	-@erase "$(INTDIR)\updatemanager.obj"
+	-@erase "$(INTDIR)\utility.obj"
+	-@erase "$(INTDIR)\vc50.idb"
+	-@erase "$(INTDIR)\win32prefs.obj"
+	-@erase "$(INTDIR)\win32thread.obj"
+	-@erase "$(INTDIR)\win32updatemanager.obj"
+	-@erase "..\fabaselib.lib"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP=cl.exe
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lib\zlib\include" /I\
+ "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I\
+ "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I\
+ "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include"\
+ /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS"\
+ /Fp"$(INTDIR)\fabaselib.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_OBJS=.\Release/
+CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\fabaselib.bsc" 
+BSC32_SBRS= \
+	
+LIB32=link.exe -lib
+LIB32_FLAGS=/nologo /out:"..\fabaselib.lib" 
+LIB32_OBJS= \
+	"$(INTDIR)\database.obj" \
+	"$(INTDIR)\debug.obj" \
+	"$(INTDIR)\downloadmanager.obj" \
+	"$(INTDIR)\log.obj" \
+	"$(INTDIR)\musiccatalog.obj" \
+	"$(INTDIR)\mutex.obj" \
+	"$(INTDIR)\player.obj" \
+	"$(INTDIR)\playlist.obj" \
+	"$(INTDIR)\preferences.obj" \
+	"$(INTDIR)\propimpl.obj" \
+	"$(INTDIR)\registrar.obj" \
+	"$(INTDIR)\registry.obj" \
+	"$(INTDIR)\semaphore.obj" \
+	"$(INTDIR)\thread.obj" \
+	"$(INTDIR)\updatemanager.obj" \
+	"$(INTDIR)\utility.obj" \
+	"$(INTDIR)\win32prefs.obj" \
+	"$(INTDIR)\win32thread.obj" \
+	"$(INTDIR)\win32updatemanager.obj"
+
+"..\fabaselib.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+    $(LIB32) @<<
+  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
+<<
+
+!ENDIF 
+
 
 !IF "$(CFG)" == "fabaselib - Win32 Release" || "$(CFG)" ==\
  "fabaselib - Win32 Debug" || "$(CFG)" == "fabaselib - Win32 NASM Debug" ||\
@@ -399,28 +495,28 @@ SOURCE=..\..\..\config\config.win32
 
 InputPath=..\..\..\config\config.win32
 
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
 InputPath=..\..\..\config\config.win32
 
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
 InputPath=..\..\..\config\config.win32
 
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
 
 InputPath=..\..\..\config\config.win32
 
-"..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\config\config.win32 ..\..\..\config\config.h
 
 !ENDIF 
@@ -434,7 +530,7 @@ DEP_CPP_DATAB=\
 	"..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\include\database.h"\
 	"..\..\include\errors.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -451,7 +547,7 @@ DEP_CPP_DATAB=\
 	"..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\include\database.h"\
 	"..\..\include\errors.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"\
@@ -466,7 +562,7 @@ DEP_CPP_DATAB=\
 	"..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\include\database.h"\
 	"..\..\include\errors.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\database.obj" : $(SOURCE) $(DEP_CPP_DATAB) "$(INTDIR)"\
@@ -481,7 +577,7 @@ DEP_CPP_DATAB=\
 	"..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\include\database.h"\
 	"..\..\include\errors.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
 	
@@ -528,7 +624,7 @@ DEP_CPP_DOWNL=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -545,6 +641,7 @@ NODEP_CPP_DOWNL=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
 DEP_CPP_DOWNL=\
+	"..\..\..\config\config.h"\
 	"..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\include\database.h"\
 	"..\..\include\downloadformat.h"\
@@ -565,11 +662,8 @@ DEP_CPP_DOWNL=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
-	
-NODEP_CPP_DOWNL=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"\
@@ -580,6 +674,7 @@ NODEP_CPP_DOWNL=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
 DEP_CPP_DOWNL=\
+	"..\..\..\config\config.h"\
 	"..\..\..\lib\gdbm\gdbm_fa.h"\
 	"..\..\include\database.h"\
 	"..\..\include\downloadformat.h"\
@@ -600,11 +695,8 @@ DEP_CPP_DOWNL=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
-	
-NODEP_CPP_DOWNL=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\downloadmanager.obj" : $(SOURCE) $(DEP_CPP_DOWNL) "$(INTDIR)"\
@@ -636,7 +728,7 @@ DEP_CPP_DOWNL=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -696,7 +788,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -743,7 +835,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	
 
@@ -785,7 +877,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	
 
@@ -827,7 +919,7 @@ DEP_CPP_MUSIC=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -845,7 +937,7 @@ NODEP_CPP_MUSIC=\
 
 SOURCE=..\src\mutex.cpp
 DEP_CPP_MUTEX=\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\mutex.obj" : $(SOURCE) $(DEP_CPP_MUTEX) "$(INTDIR)"
@@ -890,7 +982,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -940,7 +1032,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	
 
@@ -985,7 +1077,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	
 
@@ -1030,7 +1122,7 @@ DEP_CPP_PLAYE=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -1052,12 +1144,15 @@ SOURCE=..\..\src\playlist.cpp
 
 DEP_CPP_PLAYL=\
 	"..\..\..\config\config.h"\
+	"..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\include\database.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\event.h"\
 	"..\..\include\eventdata.h"\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
+	"..\..\include\musicbrowser.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -1067,7 +1162,7 @@ DEP_CPP_PLAYL=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 NODEP_CPP_PLAYL=\
 	"..\..\include\win32impl.h"\
@@ -1097,7 +1192,7 @@ DEP_CPP_PLAYL=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -1124,7 +1219,7 @@ DEP_CPP_PLAYL=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -1136,12 +1231,15 @@ DEP_CPP_PLAYL=\
 
 DEP_CPP_PLAYL=\
 	"..\..\..\config\config.h"\
+	"..\..\..\lib\gdbm\gdbm_fa.h"\
+	"..\..\include\database.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\event.h"\
 	"..\..\include\eventdata.h"\
 	"..\..\include\facontext.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
+	"..\..\include\musicbrowser.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
 	"..\..\include\plmevent.h"\
@@ -1151,7 +1249,7 @@ DEP_CPP_PLAYL=\
 	"..\..\include\registry.h"\
 	"..\..\include\thread.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 NODEP_CPP_PLAYL=\
 	"..\..\include\win32impl.h"\
@@ -1182,11 +1280,9 @@ DEP_CPP_PREFE=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
 DEP_CPP_PREFE=\
+	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\preferences.h"\
-	
-NODEP_CPP_PREFE=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
@@ -1197,11 +1293,9 @@ NODEP_CPP_PREFE=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
 DEP_CPP_PREFE=\
+	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\preferences.h"\
-	
-NODEP_CPP_PREFE=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
@@ -1234,7 +1328,7 @@ DEP_CPP_PROPI=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\properties.h"\
 	"..\..\include\propimpl.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
@@ -1245,14 +1339,12 @@ DEP_CPP_PROPI=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
 DEP_CPP_PROPI=\
+	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\hashtable.h"\
 	"..\..\include\properties.h"\
 	"..\..\include\propimpl.h"\
-	"..\include\mutex.h"\
-	
-NODEP_CPP_PROPI=\
-	"..\..\..\config\config.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
@@ -1263,14 +1355,12 @@ NODEP_CPP_PROPI=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
 DEP_CPP_PROPI=\
+	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\hashtable.h"\
 	"..\..\include\properties.h"\
 	"..\..\include\propimpl.h"\
-	"..\include\mutex.h"\
-	
-NODEP_CPP_PROPI=\
-	"..\..\..\config\config.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
@@ -1286,7 +1376,7 @@ DEP_CPP_PROPI=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\properties.h"\
 	"..\..\include\propimpl.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	
 
 "$(INTDIR)\propimpl.obj" : $(SOURCE) $(DEP_CPP_PROPI) "$(INTDIR)"\
@@ -1375,9 +1465,6 @@ NODEP_CPP_REGIS=\
 !ENDIF 
 
 SOURCE=..\..\src\registry.cpp
-
-!IF  "$(CFG)" == "fabaselib - Win32 Release"
-
 DEP_CPP_REGIST=\
 	"..\..\..\config\config.h"\
 	"..\..\include\registry.h"\
@@ -1387,48 +1474,6 @@ DEP_CPP_REGIST=\
  "..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
-
-DEP_CPP_REGIST=\
-	"..\..\include\registry.h"\
-	
-NODEP_CPP_REGIST=\
-	"..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
-
-DEP_CPP_REGIST=\
-	"..\..\include\registry.h"\
-	
-NODEP_CPP_REGIST=\
-	"..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Release"
-
-DEP_CPP_REGIST=\
-	"..\..\..\config\config.h"\
-	"..\..\include\registry.h"\
-	
-
-"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"\
- "..\..\..\config\config.h"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\src\semaphore.cpp
 DEP_CPP_SEMAP=\
@@ -1529,7 +1574,7 @@ DEP_CPP_UPDAT=\
 	"..\..\include\thread.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -1562,7 +1607,7 @@ DEP_CPP_UPDAT=\
 	"..\..\include\thread.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	
 
@@ -1593,7 +1638,7 @@ DEP_CPP_UPDAT=\
 	"..\..\include\thread.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	
 
@@ -1624,7 +1669,7 @@ DEP_CPP_UPDAT=\
 	"..\..\include\thread.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	{$(INCLUDE)}"sys\stat.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -1658,12 +1703,10 @@ DEP_CPP_UTILI=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
 DEP_CPP_UTILI=\
+	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\preferences.h"\
 	"..\..\include\utility.h"\
-	
-NODEP_CPP_UTILI=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
@@ -1674,12 +1717,10 @@ NODEP_CPP_UTILI=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
 DEP_CPP_UTILI=\
+	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\preferences.h"\
 	"..\..\include\utility.h"\
-	
-NODEP_CPP_UTILI=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"\
@@ -1724,12 +1765,10 @@ DEP_CPP_WIN32=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
 DEP_CPP_WIN32=\
+	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\preferences.h"\
 	"..\include\win32prefs.h"\
-	
-NODEP_CPP_WIN32=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
@@ -1740,12 +1779,10 @@ NODEP_CPP_WIN32=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
 DEP_CPP_WIN32=\
+	"..\..\..\config\config.h"\
 	"..\..\include\errors.h"\
 	"..\..\include\preferences.h"\
 	"..\include\win32prefs.h"\
-	
-NODEP_CPP_WIN32=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
@@ -1787,11 +1824,9 @@ DEP_CPP_WIN32T=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 Debug"
 
 DEP_CPP_WIN32T=\
+	"..\..\..\config\config.h"\
 	"..\..\include\thread.h"\
 	"..\include\win32thread.h"\
-	
-NODEP_CPP_WIN32T=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
@@ -1802,11 +1837,9 @@ NODEP_CPP_WIN32T=\
 !ELSEIF  "$(CFG)" == "fabaselib - Win32 NASM Debug"
 
 DEP_CPP_WIN32T=\
+	"..\..\..\config\config.h"\
 	"..\..\include\thread.h"\
 	"..\include\win32thread.h"\
-	
-NODEP_CPP_WIN32T=\
-	"..\..\..\config\config.h"\
 	
 
 "$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
@@ -1853,7 +1886,7 @@ DEP_CPP_WIN32U=\
 	"..\..\include\thread.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	"..\include\win32updatemanager.h"\
 	{$(INCLUDE)}"sys\types.h"\
@@ -1886,7 +1919,7 @@ DEP_CPP_WIN32U=\
 	"..\..\include\thread.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	"..\include\win32updatemanager.h"\
 	
@@ -1918,7 +1951,7 @@ DEP_CPP_WIN32U=\
 	"..\..\include\thread.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	"..\include\win32updatemanager.h"\
 	
@@ -1950,7 +1983,7 @@ DEP_CPP_WIN32U=\
 	"..\..\include\thread.h"\
 	"..\..\include\updatemanager.h"\
 	"..\..\include\utility.h"\
-	"..\include\mutex.h"\
+	"..\include\Mutex.h"\
 	"..\include\semaphore.h"\
 	"..\include\win32updatemanager.h"\
 	{$(INCLUDE)}"sys\types.h"\

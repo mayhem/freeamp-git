@@ -31,10 +31,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-MTL=midl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "pmp300 - Win32 Release"
 
 OUTDIR=.\Release
@@ -65,6 +61,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\sba" /I "..\..\\" /I "..\..\..\include"\
  /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -73,7 +70,40 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\sba" /I "..\..\\" /I "..\..\..\include"\
  /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\pmp300.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\pmp300.bsc" 
@@ -106,8 +136,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" "riolib - Win32 Release"\
  ".\pmp300.ppp"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
-	copy pmp300.ppp      ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
+	copy pmp300.ppp       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 Debug"
@@ -143,6 +173,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\sba" /I "..\..\\" /I\
  "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -151,7 +182,40 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\sba" /I "..\..\\" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\pmp300.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\pmp300.bsc" 
@@ -184,8 +248,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" "riolib - Win32 Debug"\
  ".\pmp300.ppp"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
-	copy pmp300.ppp      ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
+	copy pmp300.ppp       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Release"
@@ -219,6 +283,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\sba" /I "..\..\\" /I "..\..\..\include"\
  /I "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -227,7 +292,40 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\sba" /I "..\..\\" /I "..\..\..\include"\
  /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\pmp300.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\pmp300.bsc" 
@@ -260,8 +358,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release"\
  "riolib - Win32 NASM Release" ".\pmp300.ppp"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
-	copy pmp300.ppp      ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
+	copy pmp300.ppp       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Debug"
@@ -297,6 +395,7 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\sba" /I "..\..\\" /I\
  "..\..\..\include" /I "..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -305,7 +404,40 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\sba" /I "..\..\\" /I\
  /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\pmp300.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\pmp300.bsc" 
@@ -338,47 +470,20 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug"\
  "riolib - Win32 NASM Debug" ".\pmp300.ppp"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
-	copy pmp300.ppp      ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
+	copy pmp300.ppp       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
 
 
 !IF "$(CFG)" == "pmp300 - Win32 Release" || "$(CFG)" == "pmp300 - Win32 Debug"\
  || "$(CFG)" == "pmp300 - Win32 NASM Release" || "$(CFG)" ==\
  "pmp300 - Win32 NASM Debug"
 SOURCE=..\pmp300.cpp
+
+!IF  "$(CFG)" == "pmp300 - Win32 Release"
+
 DEP_CPP_PMP30=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\facontext.h"\
@@ -392,7 +497,7 @@ DEP_CPP_PMP30=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
+	"..\..\..\..\base\win32\include\Mutex.h"\
 	"..\..\..\..\config\config.h"\
 	"..\pmp300.h"\
 	"..\sba\rio.h"\
@@ -405,6 +510,88 @@ DEP_CPP_PMP30=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 Debug"
+
+DEP_CPP_PMP30=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\pmp300.h"\
+	"..\sba\rio.h"\
+	"..\sba\std.h"\
+	
+
+"$(INTDIR)\pmp300.obj" : $(SOURCE) $(DEP_CPP_PMP30) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Release"
+
+DEP_CPP_PMP30=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\pmp300.h"\
+	"..\sba\rio.h"\
+	"..\sba\std.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+
+"$(INTDIR)\pmp300.obj" : $(SOURCE) $(DEP_CPP_PMP30) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Debug"
+
+DEP_CPP_PMP30=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
+	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\metadata.h"\
+	"..\..\..\..\base\include\playlist.h"\
+	"..\..\..\..\base\include\playlistformat.h"\
+	"..\..\..\..\base\include\plmevent.h"\
+	"..\..\..\..\base\include\portabledevice.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\include\registry.h"\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\include\utility.h"\
+	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\config\config.h"\
+	"..\pmp300.h"\
+	"..\sba\rio.h"\
+	"..\sba\std.h"\
+	
+
+"$(INTDIR)\pmp300.obj" : $(SOURCE) $(DEP_CPP_PMP30) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\res\pmp300.rc
 
 !IF  "$(CFG)" == "pmp300 - Win32 Release"
@@ -412,7 +599,7 @@ SOURCE=..\res\pmp300.rc
 
 "$(INTDIR)\pmp300.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\pmp300.res" /i\
- "\TEMP\freeamp\plm\portable\pmp300\res" /d "NDEBUG" $(SOURCE)
+ "\FreeAmp\freeamp\plm\portable\pmp300\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 Debug"
@@ -420,7 +607,7 @@ SOURCE=..\res\pmp300.rc
 
 "$(INTDIR)\pmp300.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\pmp300.res" /i\
- "\TEMP\freeamp\plm\portable\pmp300\res" /d "_DEBUG" $(SOURCE)
+ "\FreeAmp\freeamp\plm\portable\pmp300\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Release"
@@ -428,7 +615,7 @@ SOURCE=..\res\pmp300.rc
 
 "$(INTDIR)\pmp300.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\pmp300.res" /i\
- "\TEMP\freeamp\plm\portable\pmp300\res" /d "NDEBUG" $(SOURCE)
+ "\FreeAmp\freeamp\plm\portable\pmp300\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Debug"
@@ -436,7 +623,7 @@ SOURCE=..\res\pmp300.rc
 
 "$(INTDIR)\pmp300.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\pmp300.res" /i\
- "\TEMP\freeamp\plm\portable\pmp300\res" /d "_DEBUG" $(SOURCE)
+ "\FreeAmp\freeamp\plm\portable\pmp300\res" /d "_DEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -444,12 +631,12 @@ SOURCE=..\res\pmp300.rc
 !IF  "$(CFG)" == "pmp300 - Win32 Release"
 
 "riolib - Win32 Release" : 
-   cd "\TEMP\freeamp\plm\portable\pmp300\sba\prj"
+   cd "\FreeAmp\freeamp\plm\portable\pmp300\sba\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 Release" 
    cd "..\..\prj"
 
 "riolib - Win32 ReleaseCLEAN" : 
-   cd "\TEMP\freeamp\plm\portable\pmp300\sba\prj"
+   cd "\FreeAmp\freeamp\plm\portable\pmp300\sba\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\riolib.mak CFG="riolib - Win32 Release"\
  RECURSE=1 
    cd "..\..\prj"
@@ -457,12 +644,12 @@ SOURCE=..\res\pmp300.rc
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 Debug"
 
 "riolib - Win32 Debug" : 
-   cd "\TEMP\freeamp\plm\portable\pmp300\sba\prj"
+   cd "\FreeAmp\freeamp\plm\portable\pmp300\sba\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 Debug" 
    cd "..\..\prj"
 
 "riolib - Win32 DebugCLEAN" : 
-   cd "\TEMP\freeamp\plm\portable\pmp300\sba\prj"
+   cd "\FreeAmp\freeamp\plm\portable\pmp300\sba\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\riolib.mak CFG="riolib - Win32 Debug"\
  RECURSE=1 
    cd "..\..\prj"
@@ -470,12 +657,12 @@ SOURCE=..\res\pmp300.rc
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Release"
 
 "riolib - Win32 NASM Release" : 
-   cd "\TEMP\freeamp\plm\portable\pmp300\sba\prj"
+   cd "\FreeAmp\freeamp\plm\portable\pmp300\sba\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 NASM Release" 
    cd "..\..\prj"
 
 "riolib - Win32 NASM ReleaseCLEAN" : 
-   cd "\TEMP\freeamp\plm\portable\pmp300\sba\prj"
+   cd "\FreeAmp\freeamp\plm\portable\pmp300\sba\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\riolib.mak\
  CFG="riolib - Win32 NASM Release" RECURSE=1 
    cd "..\..\prj"
@@ -483,12 +670,12 @@ SOURCE=..\res\pmp300.rc
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Debug"
 
 "riolib - Win32 NASM Debug" : 
-   cd "\TEMP\freeamp\plm\portable\pmp300\sba\prj"
+   cd "\FreeAmp\freeamp\plm\portable\pmp300\sba\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\riolib.mak CFG="riolib - Win32 NASM Debug" 
    cd "..\..\prj"
 
 "riolib - Win32 NASM DebugCLEAN" : 
-   cd "\TEMP\freeamp\plm\portable\pmp300\sba\prj"
+   cd "\FreeAmp\freeamp\plm\portable\pmp300\sba\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\riolib.mak CFG="riolib - Win32 NASM Debug"\
  RECURSE=1 
    cd "..\..\prj"
@@ -498,12 +685,12 @@ SOURCE=..\res\pmp300.rc
 !IF  "$(CFG)" == "pmp300 - Win32 Release"
 
 "fabaselib - Win32 Release" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
    cd "..\..\..\plm\portable\pmp300\prj"
 
 "fabaselib - Win32 ReleaseCLEAN" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 Release" RECURSE=1 
    cd "..\..\..\plm\portable\pmp300\prj"
@@ -511,12 +698,12 @@ SOURCE=..\res\pmp300.rc
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 Debug"
 
 "fabaselib - Win32 Debug" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
    cd "..\..\..\plm\portable\pmp300\prj"
 
 "fabaselib - Win32 DebugCLEAN" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak CFG="fabaselib - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\plm\portable\pmp300\prj"
@@ -524,13 +711,13 @@ SOURCE=..\res\pmp300.rc
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Release"
 
 "fabaselib - Win32 NASM Release" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" 
    cd "..\..\..\plm\portable\pmp300\prj"
 
 "fabaselib - Win32 NASM ReleaseCLEAN" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Release" RECURSE=1 
    cd "..\..\..\plm\portable\pmp300\prj"
@@ -538,12 +725,12 @@ SOURCE=..\res\pmp300.rc
 !ELSEIF  "$(CFG)" == "pmp300 - Win32 NASM Debug"
 
 "fabaselib - Win32 NASM Debug" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
    cd "..\..\..\plm\portable\pmp300\prj"
 
 "fabaselib - Win32 NASM DebugCLEAN" : 
-   cd "\TEMP\freeamp\base\win32\prj"
+   cd "\FreeAmp\freeamp\base\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
  CFG="fabaselib - Win32 NASM Debug" RECURSE=1 
    cd "..\..\..\plm\portable\pmp300\prj"

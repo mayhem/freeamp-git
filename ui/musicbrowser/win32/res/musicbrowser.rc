@@ -27,7 +27,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 IDD_MUSICBROWSER DIALOGEX 0, 0, 359, 180
-STYLE DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Music Browser"
 MENU IDR_MENU1
 FONT 8, "MS Sans Serif"
@@ -112,17 +112,28 @@ IDR_MENU1 MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&New Playlist",               ID_FILE_NEWPLAYLIST
-        MENUITEM "&Open Playlist",              ID_FILE_OPENPLAYLIST
+        MENUITEM "&New Playlist...",            ID_FILE_NEWPLAYLIST
+        MENUITEM "&Open Playlist...",           ID_FILE_OPENPLAYLIST
         MENUITEM "Save Playlist",               ID_FILE_SAVEPLAYLIST
+        MENUITEM "Save &As Playlist...",        ID_FILE_SAVEASPLAYLIST
         MENUITEM SEPARATOR
-        MENUITEM "Search for &Music",           ID_FILE_SEARCHFORMUSIC
+        MENUITEM "&Import...",                  ID_FILE_IMPORT
+        MENUITEM "Search for &Music...",        ID_FILE_SEARCHFORMUSIC
         MENUITEM SEPARATOR
         MENUITEM "&Close",                      ID_FILE_EXIT
     END
     POPUP "E&dit"
     BEGIN
-        MENUITEM "&View Info",                  ID_EDIT_VIEWINFO, GRAYED
+        MENUITEM "&Add Track...",               ID_EDIT_ADDTRACK
+        MENUITEM "&Edit...",                    ID_EDIT_EDIT
+        MENUITEM "&Remove from Catalog",        ID_EDIT_REMOVE
+        MENUITEM "Remove from &Disk",           ID_EDIT_REMOVEFROMDISK
+        MENUITEM SEPARATOR
+        MENUITEM "Move &Up",                    ID_EDIT_MOVEUP
+        MENUITEM "Move &Down",                  ID_EDIT_MOVEDOWN
+        MENUITEM SEPARATOR
+        MENUITEM "&Clear Playlist",             ID_EDIT_CLEARPLAYLIST
+        MENUITEM "Ra&ndomize Playlist",         IDC_RANDOMIZE
     END
     POPUP "&View"
     BEGIN
@@ -139,6 +150,17 @@ BEGIN
         MENUITEM "&Length",                     ID_SORT_LENGTH
         MENUITEM "L&ocation",                   ID_SORT_LOCATION
         MENUITEM "&Random",                     ID_SORT_RANDOMIZE
+    END
+END
+
+IDR_POPUP MENU DISCARDABLE 
+BEGIN
+    POPUP "Sheep?"
+    BEGIN
+        MENUITEM "&Play",                       ID_PLAY
+        MENUITEM "&Add to playlist",            ID_ADD
+        MENUITEM "&Edit",                       ID_EDIT
+        MENUITEM "&Rename",                     ID_RENAME
     END
 END
 

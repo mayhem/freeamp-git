@@ -328,6 +328,9 @@ LIB32_OBJS= \
  || "$(CFG)" == "riolib - Win32 NASM Release" || "$(CFG)" ==\
  "riolib - Win32 NASM Debug"
 SOURCE=..\rio.cpp
+
+!IF  "$(CFG)" == "riolib - Win32 Release"
+
 DEP_CPP_RIO_C=\
 	"..\binary.h"\
 	"..\rio.h"\
@@ -343,6 +346,50 @@ NODEP_CPP_RIO_C=\
 "$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "riolib - Win32 Debug"
+
+DEP_CPP_RIO_C=\
+	"..\binary.h"\
+	"..\rio.h"\
+	"..\std.h"\
+	
+
+"$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "riolib - Win32 NASM Release"
+
+DEP_CPP_RIO_C=\
+	"..\binary.h"\
+	"..\rio.h"\
+	"..\rioioctl.h"\
+	"..\std.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
+	
+NODEP_CPP_RIO_C=\
+	"..\iopl32.h"\
+	
+
+"$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "riolib - Win32 NASM Debug"
+
+DEP_CPP_RIO_C=\
+	"..\binary.h"\
+	"..\rio.h"\
+	"..\std.h"\
+	
+
+"$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 
 !ENDIF 

@@ -67,9 +67,10 @@ class MusicBrowserUI : public UserInterface
 {
  public:
 
-             MusicBrowserUI(FAContext *, 
+             MusicBrowserUI(FAContext      *context, 
                             MusicBrowserUI *parent,
-                            const string &oPlaylistName);
+                            HWND            hParent,
+                            const string   &oPlaylistName);
     virtual ~MusicBrowserUI();
 
     virtual int32 AcceptEvent(Event *);
@@ -80,6 +81,7 @@ class MusicBrowserUI : public UserInterface
     void  InitDialog(HWND hwnd);
     void  ShowBrowser(bool bShowExpanded);
     void  HideBrowser(void);
+    void  Close(void);
 	void  ExpandCollapseEvent(void);
     void  GetMinMaxInfo(MINMAXINFO *pInfo);
     void  SetMinMaxInfo(void);
@@ -89,16 +91,25 @@ class MusicBrowserUI : public UserInterface
     void  MoveUpEvent(void);
     void  MoveDownEvent(void);
     void  AddEvent(void);
+    void  EditEvent(void);
     void  DeleteEvent(void);
     void  DeleteListEvent(void);
     void  PlaylistComboChanged(void);
     void  OpenPlaylist(void);
     void  NewPlaylist(void);
     void  WritePlaylist(void);
+    void  SaveAsPlaylist(void);
     void  SortEvent(int id);
     void  MouseMove(uint32 uFlags, POINT &sPoint);
     void  MouseButtonUp(void);
     void  EmptyDBCheck(void);
+    void  UpdatePlaylistList(void);
+    void  RemoveEvent(void);
+    void  RemoveFromDiskEvent(void);
+    void  ImportEvent(void);
+    
+    void  AddMusicBrowserWindow(MusicBrowserUI *pWindow);
+    void  RemoveMusicBrowserWindow(MusicBrowserUI *pWindow);
  
  protected:
     FAContext *m_context;
@@ -115,9 +126,9 @@ class MusicBrowserUI : public UserInterface
     void PopUpInfoEditor(void);
     void SaveCurrentPlaylist(char *path);
     void UpdateCatalog(void);
-    void UpdatePlaylistList(void);
     void ImportPlaylist(char *path);
     void ReadPlaylist(char *filename, vector<PlaylistItem *> *plist);
+    HTREEITEM GetMusicTreeIndices(int &iTrack, int &iPlaylist);
 
     void ToggleVisEvent(void);
 
@@ -125,8 +136,11 @@ class MusicBrowserUI : public UserInterface
     void AddPlaylist(const string &oName);
     void LoadPlaylist(const string &oPlaylist);
     void SetActivePlaylistIcon(int iImage);
+    bool SaveNewPlaylist(string &oName);
+    void EditPlaylist(const string &oList);
 
     void InitTree(void);
+    void SetTitles(void);
     void FillArtists(void);
     void FillAlbums(TV_ITEM *pItem);
     void FillPlaylists(void);
@@ -135,8 +149,9 @@ class MusicBrowserUI : public UserInterface
     void FillUncatTracks(void);
 
     void  UpdateButtonStates(void);
+    void  UpdateMenuItems(void);
     void  MoveControls(int iPixelsToMove);
-    Error CreateMainDialog(void);
+    bool  CreateMainDialog(void);
     Error CloseMainDialog(void);
 
     void  BeginDrag(NM_TREEVIEW *pTreeView);
@@ -159,6 +174,8 @@ class MusicBrowserUI : public UserInterface
     int                  m_iCollapseMoveAmount;
     HCURSOR              m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
     MusicBrowserUI      *m_pParent;
+    vector<MusicBrowserUI *> m_oWindowList;
+    HWND                 m_hParent;
 };
 
 #endif

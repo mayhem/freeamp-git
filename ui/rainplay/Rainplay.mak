@@ -42,13 +42,12 @@ OutDir=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\config\config.h" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
+ALL : ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
 
 !ELSE 
 
 ALL : "xing - Win32 Release" "soundcard - Win32 Release"\
- "fileinput - Win32 Release" "..\..\config\config.h" ".\rainplay.ui"\
- "$(OUTDIR)\Rainplay.pch"
+ "fileinput - Win32 Release" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
 
 !ENDIF 
 
@@ -85,7 +84,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\rainplay.exp"
 	-@erase "$(OUTDIR)\rainplay.lib"
 	-@erase ".\rainplay.ui"
-	-@erase "..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -186,8 +184,7 @@ OutDir=.\Release
 # End Custom Macros
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release"\
- "fileinput - Win32 Release" "..\..\config\config.h" ".\rainplay.ui"\
- "$(OUTDIR)\Rainplay.pch"
+ "fileinput - Win32 Release" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
    IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                            ..\..\base\win32\prj\plugins
 	copy rainplay.ui     ..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -202,12 +199,12 @@ OutDir=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\config\config.h" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
+ALL : ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
 
 !ELSE 
 
 ALL : "xing - Win32 Debug" "soundcard - Win32 Debug" "fileinput - Win32 Debug"\
- "..\..\config\config.h" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
+ ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
 
 !ENDIF 
 
@@ -247,7 +244,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\rainplay.pdb"
 	-@erase ".\rainplay.ilk"
 	-@erase ".\rainplay.ui"
-	-@erase "..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -348,8 +344,7 @@ OutDir=.\Debug
 # End Custom Macros
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
- "fileinput - Win32 Debug" "..\..\config\config.h" ".\rainplay.ui"\
- "$(OUTDIR)\Rainplay.pch"
+ "fileinput - Win32 Debug" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
    IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                            ..\..\base\win32\prj\plugins
 	copy rainplay.ui     ..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -364,13 +359,12 @@ OutDir=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\config\config.h" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
+ALL : ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
 
 !ELSE 
 
 ALL : "xing - Win32 NASM Debug" "soundcard - Win32 NASM Debug"\
- "fileinput - Win32 NASM Debug" "..\..\config\config.h" ".\rainplay.ui"\
- "$(OUTDIR)\Rainplay.pch"
+ "fileinput - Win32 NASM Debug" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
 
 !ENDIF 
 
@@ -410,7 +404,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\rainplay.pdb"
 	-@erase ".\rainplay.ilk"
 	-@erase ".\rainplay.ui"
-	-@erase "..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -511,8 +504,7 @@ OutDir=.\Debug
 # End Custom Macros
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 NASM Debug" "soundcard - Win32 NASM Debug"\
- "fileinput - Win32 NASM Debug" "..\..\config\config.h" ".\rainplay.ui"\
- "$(OUTDIR)\Rainplay.pch"
+ "fileinput - Win32 NASM Debug" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
    IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                            ..\..\base\win32\prj\plugins
 	copy rainplay.ui     ..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -527,13 +519,12 @@ OutDir=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\config\config.h" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
+ALL : ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
 
 !ELSE 
 
 ALL : "xing - Win32 NASM Release" "soundcard - Win32 NASM Release"\
- "fileinput - Win32 NASM Release" "..\..\config\config.h" ".\rainplay.ui"\
- "$(OUTDIR)\Rainplay.pch"
+ "fileinput - Win32 NASM Release" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
 
 !ENDIF 
 
@@ -570,7 +561,6 @@ CLEAN :
 	-@erase "$(OUTDIR)\rainplay.exp"
 	-@erase "$(OUTDIR)\rainplay.lib"
 	-@erase ".\rainplay.ui"
-	-@erase "..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -672,7 +662,7 @@ OutDir=.\Release
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 NASM Release"\
  "soundcard - Win32 NASM Release" "fileinput - Win32 NASM Release"\
- "..\..\config\config.h" ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
+ ".\rainplay.ui" "$(OUTDIR)\Rainplay.pch"
    IF NOT EXIST ..\..\base\win32\prj\plugins mkdir                            ..\..\base\win32\prj\plugins
 	copy rainplay.ui     ..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -766,12 +756,14 @@ DEP_CPP_MUTEX=\
 
 SOURCE=..\..\base\src\playlist.cpp
 DEP_CPP_PLAYL=\
+	"..\..\base\include\database.h"\
 	"..\..\base\include\errors.h"\
 	"..\..\base\include\event.h"\
 	"..\..\base\include\eventdata.h"\
 	"..\..\base\include\facontext.h"\
 	"..\..\base\include\log.h"\
 	"..\..\base\include\metadata.h"\
+	"..\..\base\include\musicbrowser.h"\
 	"..\..\base\include\playlist.h"\
 	"..\..\base\include\playlistformat.h"\
 	"..\..\base\include\plmevent.h"\
@@ -782,12 +774,15 @@ DEP_CPP_PLAYL=\
 	"..\..\base\include\thread.h"\
 	"..\..\base\include\utility.h"\
 	"..\..\base\win32\include\Mutex.h"\
+	"..\..\config\config.h"\
 	
 NODEP_CPP_PLAYL=\
+	"..\..\base\include\gdbm_fa.h"\
 	"..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -796,6 +791,7 @@ DEP_CPP_RAINP=\
 	"..\..\base\include\errors.h"\
 	"..\..\base\include\preferences.h"\
 	"..\..\base\win32\include\Mutex.h"\
+	"..\..\config\config.h"\
 	".\AboutDlg.h"\
 	".\active.h"\
 	".\BmpSize.h"\
@@ -812,7 +808,8 @@ DEP_CPP_RAINP=\
 	".\VisualView\VisualView.h"\
 	
 
-"$(INTDIR)\Rainplay.obj" : $(SOURCE) $(DEP_CPP_RAINP) "$(INTDIR)"
+"$(INTDIR)\Rainplay.obj" : $(SOURCE) $(DEP_CPP_RAINP) "$(INTDIR)"\
+ "..\..\config\config.h"
 
 
 SOURCE=.\Rainplay.rc
@@ -854,6 +851,7 @@ DEP_CPP_RAINPLA=\
 	"..\..\base\include\utility.h"\
 	"..\..\base\win32\include\Mutex.h"\
 	"..\..\base\win32\include\semaphore.h"\
+	"..\..\config\config.h"\
 	"..\..\io\include\pipeline.h"\
 	"..\..\io\include\pullbuffer.h"\
 	"..\..\lmc\include\lmc.h"\
@@ -879,7 +877,8 @@ NODEP_CPP_RAINPLA=\
 	"..\..\base\include\gdbm_fa.h"\
 	
 
-"$(INTDIR)\RainplayDlg.obj" : $(SOURCE) $(DEP_CPP_RAINPLA) "$(INTDIR)"
+"$(INTDIR)\RainplayDlg.obj" : $(SOURCE) $(DEP_CPP_RAINPLA) "$(INTDIR)"\
+ "..\..\config\config.h"
 
 
 SOURCE=.\RainplayUI.cpp
@@ -909,6 +908,7 @@ DEP_CPP_RAINPLAY=\
 	"..\..\base\include\utility.h"\
 	"..\..\base\win32\include\Mutex.h"\
 	"..\..\base\win32\include\semaphore.h"\
+	"..\..\config\config.h"\
 	"..\..\io\include\pipeline.h"\
 	"..\..\io\include\pullbuffer.h"\
 	"..\..\lmc\include\lmc.h"\
@@ -933,7 +933,8 @@ NODEP_CPP_RAINPLAY=\
 	"..\..\base\include\gdbm_fa.h"\
 	
 
-"$(INTDIR)\RainplayUI.obj" : $(SOURCE) $(DEP_CPP_RAINPLAY) "$(INTDIR)"
+"$(INTDIR)\RainplayUI.obj" : $(SOURCE) $(DEP_CPP_RAINPLAY) "$(INTDIR)"\
+ "..\..\config\config.h"
 
 
 SOURCE=..\..\base\win32\src\semaphore.cpp
@@ -1022,6 +1023,7 @@ SOURCE=..\..\base\src\thread.cpp
 DEP_CPP_THREA=\
 	"..\..\base\include\thread.h"\
 	"..\..\base\win32\include\win32thread.h"\
+	"..\..\config\config.h"\
 	
 NODEP_CPP_THREA=\
 	"..\..\base\src\beosthread.h"\
@@ -1029,7 +1031,8 @@ NODEP_CPP_THREA=\
 	"..\..\base\src\solaristhread.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1037,9 +1040,11 @@ SOURCE=..\..\base\win32\src\win32thread.cpp
 DEP_CPP_WIN32=\
 	"..\..\base\include\thread.h"\
 	"..\..\base\win32\include\win32thread.h"\
+	"..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1070,6 +1075,7 @@ DEP_CPP_EQDLG=\
 	"..\..\base\include\utility.h"\
 	"..\..\base\win32\include\Mutex.h"\
 	"..\..\base\win32\include\semaphore.h"\
+	"..\..\config\config.h"\
 	"..\..\io\include\pipeline.h"\
 	"..\..\io\include\pullbuffer.h"\
 	"..\..\lmc\include\lmc.h"\
@@ -1095,7 +1101,8 @@ NODEP_CPP_EQDLG=\
 	"..\..\base\include\gdbm_fa.h"\
 	
 
-"$(INTDIR)\EQDlg.obj" : $(SOURCE) $(DEP_CPP_EQDLG) "$(INTDIR)"
+"$(INTDIR)\EQDlg.obj" : $(SOURCE) $(DEP_CPP_EQDLG) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1126,6 +1133,7 @@ DEP_CPP_PLAYLI=\
 	"..\..\base\include\utility.h"\
 	"..\..\base\win32\include\Mutex.h"\
 	"..\..\base\win32\include\semaphore.h"\
+	"..\..\config\config.h"\
 	"..\..\io\include\pipeline.h"\
 	"..\..\io\include\pullbuffer.h"\
 	"..\..\lmc\include\lmc.h"\
@@ -1151,7 +1159,8 @@ NODEP_CPP_PLAYLI=\
 	"..\..\base\include\gdbm_fa.h"\
 	
 
-"$(INTDIR)\PlayListDlg.obj" : $(SOURCE) $(DEP_CPP_PLAYLI) "$(INTDIR)"
+"$(INTDIR)\PlayListDlg.obj" : $(SOURCE) $(DEP_CPP_PLAYLI) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1189,6 +1198,7 @@ DEP_CPP_VISUA=\
 
 SOURCE=.\Preferences\optionsetupdlg.cpp
 DEP_CPP_OPTIO=\
+	"..\..\config\config.h"\
 	".\Preferences\optionsetupdlg.h"\
 	".\Rainplay.h"\
 	".\StdAfx.h"\
@@ -1203,7 +1213,8 @@ CPP_SWITCHES=/nologo /G6 /MD /W3 /GX /O2 /Op /Ob2 /I "." /I ".\Equalizer" /I\
  "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "_WINDLL"\
  /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
-"$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"
+"$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) @<<
   $(CPP_SWITCHES) $(SOURCE)
 <<
@@ -1219,7 +1230,8 @@ CPP_SWITCHES=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I\
  /D "_USRDLL" /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
  /FD /c 
 
-"$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"
+"$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) @<<
   $(CPP_SWITCHES) $(SOURCE)
 <<
@@ -1235,7 +1247,8 @@ CPP_SWITCHES=/nologo /G6 /MDd /W3 /Gm /Gi /GR /GX /Zi /Od /I "." /I\
  /D "_USRDLL" /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
  /FD /c 
 
-"$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"
+"$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) @<<
   $(CPP_SWITCHES) $(SOURCE)
 <<
@@ -1250,7 +1263,8 @@ CPP_SWITCHES=/nologo /G6 /MD /W3 /GX /O2 /Op /Ob2 /I "." /I ".\Equalizer" /I\
  "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "_WINDLL"\
  /Fp"$(INTDIR)\Rainplay.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
-"$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"
+"$(INTDIR)\optionsetupdlg.obj" : $(SOURCE) $(DEP_CPP_OPTIO) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) @<<
   $(CPP_SWITCHES) $(SOURCE)
 <<
@@ -1262,9 +1276,11 @@ SOURCE=..\..\base\src\preferences.cpp
 DEP_CPP_PREFE=\
 	"..\..\base\include\errors.h"\
 	"..\..\base\include\preferences.h"\
+	"..\..\config\config.h"\
 	
 
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1272,13 +1288,15 @@ SOURCE=.\Preferences\PreferencesDlg.cpp
 DEP_CPP_PREFER=\
 	"..\..\base\include\errors.h"\
 	"..\..\base\include\preferences.h"\
+	"..\..\config\config.h"\
 	".\Preferences\optionsetupdlg.h"\
 	".\Preferences\PreferencesDlg.h"\
 	".\Rainplay.h"\
 	".\StdAfx.h"\
 	
 
-"$(INTDIR)\PreferencesDlg.obj" : $(SOURCE) $(DEP_CPP_PREFER) "$(INTDIR)"
+"$(INTDIR)\PreferencesDlg.obj" : $(SOURCE) $(DEP_CPP_PREFER) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1287,9 +1305,11 @@ DEP_CPP_WIN32P=\
 	"..\..\base\include\errors.h"\
 	"..\..\base\include\preferences.h"\
 	"..\..\base\win32\include\win32prefs.h"\
+	"..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32P) "$(INTDIR)"\
+ "..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
