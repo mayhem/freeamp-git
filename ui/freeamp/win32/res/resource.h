@@ -132,9 +132,11 @@
 #define IDC_UPDATE                      1044
 #define IDC_CHECK                       1045
 #define IDC_LIST                        1046
+#define IDC_CANCELCHECK                 1047
 #define IDC_DESCRIPTION                 1048
 #define IDC_STATUS                      1049
 #define IDC_AUTOCHECK                   1050
+#define IDC_CANCELUPDATE                1051
 #define IDC_ITEM                        40001
 #define IDC_ABOUT                       40002
 #define IDC_OPEN                        40003

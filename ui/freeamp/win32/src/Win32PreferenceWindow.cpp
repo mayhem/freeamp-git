@@ -1779,6 +1779,7 @@ typedef struct ThreadStruct {
     FAContext* context;
     UpdateManager* um;
     HWND hwndList;
+    bool cancel;
 }ThreadStruct;
 
 static bool callback_function(UMEvent* event, void* userData)
@@ -1870,17 +1871,115 @@ static bool callback_function(UMEvent* event, void* userData)
         }
     }
 
-    return true;
+    return (!ts->cancel);
 }
 
 static void check_function(void* arg)
 {
     ThreadStruct* ts = (ThreadStruct*)arg;
+    HWND hwnd = GetParent(ts->hwndList);
+    HWND hwndPref = GetParent(hwnd);
+    HWND hwndUpdate = GetDlgItem(hwnd, IDC_UPDATE);
+    HWND hwndCheck = GetDlgItem(hwnd, IDC_CHECK);
+    HWND hwndCancel = GetDlgItem(hwnd, IDC_CANCELCHECK);
+    HWND hwndStatus = GetDlgItem(hwnd, IDC_STATUS);
+    HWND hwndPrefOK = GetDlgItem(hwndPref, IDOK);
+    HWND hwndPrefCancel = GetDlgItem(hwndPref, IDCANCEL);
 
-    ts->um->RetrieveLatestVersionInfo(callback_function, ts);
+    //SetWindowText(hwndPrefOK, "Cool!");
+    //SetWindowText(hwndPrefCancel, "Bogus!");
+    EnableWindow(hwndPrefOK, FALSE);
+    EnableWindow(hwndPrefCancel, FALSE);
+    
+    EnableWindow(hwndUpdate, FALSE);
+    EnableWindow(hwndCancel, TRUE);
+    ShowWindow(hwndCheck, SW_HIDE);
+    ShowWindow(hwndCancel, SW_SHOW);
+    
+    
+    Error result;
+    result = ts->um->RetrieveLatestVersionInfo(callback_function, ts);
 
-    // Clear the list
-    ListView_DeleteAllItems(ts->hwndList);
+    if(IsntError(result))
+    {
+        // Add items
+        LV_ITEM lv_item;
+        UpdateItem* item = NULL;
+        uint32 i = 0;
+        uint32 count = ListView_GetItemCount(ts->hwndList);
+
+        while(item = ts->um->ItemAt(i++))
+        {
+            bool newItem = true;
+
+            for(uint32 j = 0; j < count; j++)
+            {
+                lv_item.mask = LVIF_PARAM;
+                lv_item.iItem = j;
+
+                if(ListView_GetItem(ts->hwndList, &lv_item))
+                {
+                    if((UpdateItem*)lv_item.lParam == item)
+                    {
+                        newItem = false;
+                        break;
+                    }
+                }
+            }
+
+            if(newItem)
+            {
+                lv_item.mask = LVIF_PARAM | LVIF_STATE;
+                lv_item.state = 0;
+                lv_item.stateMask = 0;
+                lv_item.iItem = ListView_GetItemCount(ts->hwndList);
+                lv_item.iSubItem = 0;
+                lv_item.lParam = (LPARAM)item;
+
+                ListView_InsertItem(ts->hwndList, &lv_item);
+            }
+        }
+
+        ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
+    }
+    else if(result == kError_UserCancel)
+    {
+        SetWindowText(hwndStatus, " Status: Update cancelled by user."); 
+    }
+
+    EnableWindow(hwndUpdate, TRUE);
+    EnableWindow(hwndCancel, FALSE);
+    ShowWindow(hwndCheck, SW_SHOW);
+    ShowWindow(hwndCancel, SW_HIDE);
+
+    EnableWindow(hwndPrefOK, TRUE);
+    EnableWindow(hwndPrefCancel, TRUE);
+
+    delete ts->thread;
+}
+
+static void update_function(void* arg)
+{
+    ThreadStruct* ts = (ThreadStruct*)arg;
+    Error result;
+    HWND hwnd = GetParent(ts->hwndList);
+    HWND hwndPref = GetParent(hwnd);
+    HWND hwndUpdate = GetDlgItem(hwnd, IDC_UPDATE);
+    HWND hwndCheck = GetDlgItem(hwnd, IDC_CHECK);
+    HWND hwndCancel = GetDlgItem(hwnd, IDC_CANCELUPDATE);
+    HWND hwndStatus = GetDlgItem(hwnd, IDC_STATUS);
+    HWND hwndPrefOK = GetDlgItem(hwndPref, IDOK);
+    HWND hwndPrefCancel = GetDlgItem(hwndPref, IDCANCEL);
+    
+    EnableWindow(hwndPrefOK, FALSE);
+    EnableWindow(hwndPrefCancel, FALSE);
+
+    EnableWindow(hwndCheck, FALSE);
+    EnableWindow(hwndCancel, TRUE);
+    ShowWindow(hwndUpdate, SW_HIDE);
+    ShowWindow(hwndCancel, SW_SHOW);
+
+    ts->um->RetrieveLatestVersionInfo();
 
     // Add items
     LV_ITEM lv_item;
@@ -1922,19 +2021,6 @@ static void check_function(void* arg)
 
     ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
 
-    delete ts->thread;
-    delete ts;
-}
-
-static void update_function(void* arg)
-{
-    ThreadStruct* ts = (ThreadStruct*)arg;
-    Error result;
-
-    ts->um->RetrieveLatestVersionInfo();
-
-    ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
-
     result = ts->um->UpdateComponents(callback_function, ts);
 
     if(IsntError(result))
@@ -1962,9 +2048,19 @@ static void update_function(void* arg)
             WinExec(appPath, SW_NORMAL);
         }
     }
+    else if(result == kError_UserCancel)
+    {
+        SetWindowText(hwndStatus, " Status: Update cancelled by user."); 
+    }
 
+    EnableWindow(hwndCheck, TRUE);
+    EnableWindow(hwndCancel, FALSE);
+    ShowWindow(hwndUpdate, SW_SHOW);
+    ShowWindow(hwndCancel, SW_HIDE);
+
+    EnableWindow(hwndPrefOK, TRUE);
+    EnableWindow(hwndPrefCancel, TRUE);
     delete ts->thread;
-    delete ts;
 }
 
 bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd, 
@@ -1981,6 +2077,7 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
     static HWND hwndUpdate = NULL;
     static HWND hwndCheck = NULL;
     static HWND hwndAutoCheck = NULL;
+    static ThreadStruct ts;
     const char* kNoSelection = "No component is selected.";
 
     
@@ -2052,6 +2149,8 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
             // Don't want this to be blank on startup
             SetWindowText(hwndDescription, kNoSelection);
 
+            Button_SetCheck(hwndAutoCheck, originalValues.checkForUpdates);
+
             break;
         }
 
@@ -2065,14 +2164,13 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
 
                     if(thread)
                     {
-                        ThreadStruct* ts = new ThreadStruct;
+                        ts.thread = thread;
+                        ts.um = um;
+                        ts.hwndList = hwndList;
+                        ts.context = m_pContext;
+                        ts.cancel = false;
 
-                        ts->thread = thread;
-                        ts->um = um;
-                        ts->hwndList = hwndList;
-                        ts->context = m_pContext;
-
-                        thread->Create(update_function, ts);
+                        thread->Create(update_function, &ts);
                     }
                 	break;
                 }
@@ -2083,17 +2181,49 @@ bool Win32PreferenceWindow::PrefPage6Proc(HWND hwnd,
 
                     if(thread)
                     {
-                        ThreadStruct* ts = new ThreadStruct;
+                        ts.thread = thread;
+                        ts.um = um;
+                        ts.hwndList = hwndList;
+                        ts.context = m_pContext;
+                        ts.cancel = false;
 
-                        ts->thread = thread;
-                        ts->um = um;
-                        ts->hwndList = hwndList;
-                        ts->context = m_pContext;
-
-                        thread->Create(check_function, ts);
+                        thread->Create(check_function, &ts);
                     }
                     break;
-                }                
+                }         
+                
+                case IDC_CANCELCHECK:
+                case IDC_CANCELUPDATE:
+                {
+                    ts.cancel = true;
+                    break;
+                }
+
+                case IDC_AUTOCHECK:
+                {
+                    if(Button_GetCheck(hwndAutoCheck) == BST_CHECKED)
+                    {
+                        currentValues.checkForUpdates = true;
+                    }
+                    else
+                    {
+                        currentValues.checkForUpdates = false;
+                    }
+
+                    if(memcmp(  &originalValues, 
+                                &currentValues, 
+                                sizeof(PrefsStruct)))
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
             }
 
             break;

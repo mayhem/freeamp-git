@@ -196,6 +196,10 @@ BEGIN
     CONTROL         "Check for the availability of updates when the application starts.",
                     IDC_AUTOCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,
                     149,216,10
+    PUSHBUTTON      "Cancel Version Check",IDC_CANCELCHECK,23,131,90,14,NOT 
+                    WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "Cancel Update",IDC_CANCELUPDATE,121,131,90,14,NOT 
+                    WS_VISIBLE | WS_DISABLED
 END
 
 

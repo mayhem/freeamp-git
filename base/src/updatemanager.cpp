@@ -149,7 +149,7 @@ Error UpdateManager::RetrieveLatestVersionInfo(UMCallBackFunction function,
                 function(&event, cookie);
             }
         }
-        else
+        else if(result != kError_UserCancel)
         {
             if(function)
             {
@@ -291,7 +291,7 @@ Error UpdateManager::UpdateComponents(UMCallBackFunction function,
                 function(&event, cookie);
             }
         }
-        else
+        else if(result != kError_UserCancel)
         {
             if(function)
             {
