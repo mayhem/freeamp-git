@@ -938,7 +938,7 @@ AC_CHECK_LIB(musicbrainz, mb_New, ,
     echo "*** FreeAmp requires the MusicBrainz client library be installed."
     echo "*** Download the library from http://www.musicbrainz.org/download"
     echo "***"
-  AC_MSG_ERROR(Cannot continue.)],-ldl)
+  AC_MSG_ERROR(Cannot continue.)],-ldl -lm -lstdc++)
 AC_LANG_RESTORE
 
 AC_CONFIG_HEADER(config/config.h)
