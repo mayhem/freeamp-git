@@ -41,7 +41,8 @@ Window::Window(Theme *pTheme, string &oName)
     m_oName = oName;
     m_bExit = false;
     m_pTheme = pTheme;
-    m_bMouseButtonDown = false;
+    m_bWindowMove = false;
+    m_bLButtonDown = false;
     m_bStayOnTop = false;
     m_bLiveInToolbar = false;
 
@@ -77,7 +78,7 @@ Error Window::VulcanMindMeld(Window *pOther)
     m_oName = pOther->m_oName;
     m_pTheme = pOther->m_pTheme;
 
-    m_bMouseButtonDown = pOther->m_bMouseButtonDown;
+    m_bWindowMove = pOther->m_bWindowMove;
     m_bStayOnTop = pOther->m_bLiveInToolbar;
     
     m_pMouseInControl = NULL;
@@ -259,7 +260,7 @@ void Window::HandleMouseMove(Pos &oScreenPos)
     Pos      oPos;
     Rect     oRect;
 
-    if (m_bMouseButtonDown)
+    if (m_bWindowMove)
     {
        m_oMoveStart.x1 += (oScreenPos.x - m_oMovePos.x);
        m_oMoveStart.x2 += (oScreenPos.x - m_oMovePos.x);
@@ -271,6 +272,9 @@ void Window::HandleMouseMove(Pos &oScreenPos)
        
        return; 
     }
+
+    if (m_bLButtonDown && !LButtonDown())
+       m_bLButtonDown = false;
 
     GetWindowPosition(oRect);
     oPos.x = oScreenPos.x - oRect.x1;
@@ -290,12 +294,16 @@ void Window::HandleMouseMove(Pos &oScreenPos)
            m_pMouseInControl->AcceptTransition(CT_MouseLeave);
            m_pMouseInControl = pControl;
            m_pMouseInControl->AcceptTransition(CT_MouseEnter);
+           if (m_bLButtonDown)
+              m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
        }
 
        if (m_pMouseInControl == NULL)
        {
            m_pMouseInControl = pControl;
            m_pMouseInControl->AcceptTransition(CT_MouseEnter);
+           if (m_bLButtonDown)
+              m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
        }
 
        pControl->AcceptTransition(CT_MouseMove, &oPos);
@@ -332,11 +340,12 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     pControl = ControlFromPos(oPos);
     if (pControl)
     {
+       m_bLButtonDown = true;
        pControl->AcceptTransition(CT_MouseLButtonDown, &oPos);
        return;
     }
 
-    m_bMouseButtonDown = true;
+    m_bWindowMove = true;
 #ifndef HAVE_GTK
     CaptureMouse(true);
 #endif
@@ -357,16 +366,17 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     oPos.x = oScreenPos.x - oRect.x1;
     oPos.y = oScreenPos.y - oRect.y1;
 
-    if (m_bMouseButtonDown)
+    if (m_bWindowMove)
     {
-       m_bMouseButtonDown = false;
+       m_bWindowMove = false;
 #ifndef HAVE_GTK
        CaptureMouse(false);
 #endif        
   
        return; 
     }
-    
+
+    m_bLButtonDown = false;
     if (m_pCaptureControl)
     {
        m_pCaptureControl->AcceptTransition(CT_MouseLButtonUp, &oPos);
@@ -381,6 +391,17 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     }
 
     return;
+}
+
+// Do you have any idea how much I wanted to call 
+// this ElvisHasLeftTheBuilding()?
+void Window::MouseHasLeftWindow(void)
+{
+    if (m_pMouseInControl)
+    {
+       m_pMouseInControl->AcceptTransition(CT_MouseLeave);
+       return;
+    }
 }
 
 void Window::TimerEvent(void)

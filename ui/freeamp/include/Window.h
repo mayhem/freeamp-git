@@ -83,6 +83,7 @@ class Window
       virtual void  HandleMouseMove(Pos &oPos);
       virtual void  HandleMouseLButtonDown(Pos &oPos);
       virtual void  HandleMouseLButtonUp(Pos &oPos);
+	  virtual void  MouseHasLeftWindow(void);
 
       virtual Error StartMouseCapture(Control *);
       virtual Error EndMouseCapture(void);
@@ -109,6 +110,7 @@ class Window
       virtual Error HideMouse(bool bHide) = 0;
       virtual Error Minimize(void) = 0;
       virtual Error Restore(void) = 0;
+	  virtual bool  LButtonDown(void) = 0;
       
       // Mouse position is in screen coordinates
       virtual Error SetMousePos(Pos &oMousePos) = 0;
@@ -124,7 +126,7 @@ class Window
       vector<Control *>         m_oControls;
       ControlMap                m_oControlMap;
       Canvas                   *m_pCanvas;
-      bool                      m_bExit, m_bMouseButtonDown;
+      bool                      m_bExit, m_bWindowMove, m_bLButtonDown;
       Theme                    *m_pTheme;
       Control                  *m_pMouseInControl, *m_pCaptureControl;
       Pos                       m_oMovePos;

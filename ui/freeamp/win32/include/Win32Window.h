@@ -60,6 +60,7 @@ class Win32Window : public Window
      virtual Error GetWindowPosition(Rect &oWindowRect);
      virtual Error Minimize(void);
      virtual Error Restore(void);
+     virtual bool  LButtonDown(void);
 
 	 virtual HWND  GetWindowHandle(void);
      LRESULT       WindowProc(HWND hwnd, UINT msg, 
@@ -75,10 +76,12 @@ class Win32Window : public Window
      void  TimerEvent(void);
      void  SetStayOnTop(bool bStay);
      void  SetLiveInToolbar(bool bLive);
+	 void  MouseLeaveCheck(void);
     
      HWND     m_hWnd;
      Pos      m_oWindowPos;
      Mutex   *m_pMindMeldMutex;
+	 bool     m_bMouseInWindow;
 };
 
 #endif
