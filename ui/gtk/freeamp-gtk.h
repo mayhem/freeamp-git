@@ -31,19 +31,20 @@ ____________________________________________________________________________*/
 #include "thread.h"
 #include "playlist.h"
 
-class cmdlineUI : public UserInterface {
+class GtkUI : public UserInterface {
  public:
-    cmdlineUI();
+    GtkUI();
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
-    virtual void Init() {}
-    static void keyboardServiceFunction(void *);
-    virtual ~cmdlineUI();
- private:
+    virtual void Init();
+    static void gtkServiceFunction(void *);
+    virtual ~GtkUI();
+
     EventQueue *m_playerEQ;
+ private:
     void processSwitch(char *);
-    Thread *keyboardListenThread;
+    Thread *gtkListenThread;
     PlayList *mypl;
 };
 

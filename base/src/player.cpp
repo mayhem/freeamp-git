@@ -294,12 +294,12 @@ void Player::Run(){
         {
             if(!CompareNames(item->Name(),name))
             {
-		        m_ui = (UserInterface *)item->InitFunction()();
+		m_ui = (UserInterface *)item->InitFunction()();
 		
-		        m_ui->SetTarget((EventQueue *)this);
+		m_ui->SetTarget((EventQueue *)this);
 		
                 m_ui->SetArgs(m_argc, m_argv);
-		
+		m_ui->Init();
                 RegisterActiveUI(m_ui);
 		        uisActivated++;
                 break;

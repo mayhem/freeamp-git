@@ -85,6 +85,15 @@ AC_ARG_ENABLE(cmdline,
 	      esac])
 AM_CONDITIONAL(AM_ENABLE_CMDLINE, test "$cmdline" = "true")
 
+AC_ARG_ENABLE(gtk,
+	      [  --enable-gtk     Build GTK+ version of FreeAmp],
+              [case "${enableval}" in
+		yes) gtk="true" ;;
+		no)  gtk="false" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-gtk) ;;
+	      esac])
+AM_CONDITIONAL(AM_ENABLE_GTK, test "$gtk" = "true")
+
 AM_CONDITIONAL(AM_HAVE_WIN32, test "$target_os" = "windowsnt")
 AM_CONDITIONAL(AM_HAVE_LINUX, test "$target_os" = "linux")
 AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
@@ -93,7 +102,7 @@ AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
 	  io/local/Makefile ui/cmdline/Makefile lmc/Makefile lmc/xingmp3/Makefile
 	  lmc/xingmp3/src/Makefile lmc/src/Makefile io/src/Makefile ui/src/Makefile
 	  io/soundcard/Makefile io/soundcard/unix/Makefile io/soundcard/unix/linux/Makefile
-	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile
+	  io/soundcard/unix/linux/src/Makefile base/unix/src/Makefile ui/mpg123/Makefile ui/gtk/Makefile
 )
 
 
