@@ -44,8 +44,8 @@ const char* kWindowPositionLeftPref = "WindowPositionLeft";
 const char* kWindowPositionTopPref = "WindowPositionTop";
 const char* kWindowPositionWidthPref = "WindowPositionWidth";
 const char* kWindowPositionHeightPref = "WindowPositionHeight";
-const char* kSaveStreamPref = "SaveStream";
-const char* kSaveStreamDirPref = "SaveStreamDirectory";
+const char* kSaveStreamsPref = "SaveStreams";
+const char* kSaveStreamsDirPref = "SaveStreamsDirectory";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -61,8 +61,8 @@ const int32 kDefaultOutputBufferSize = 512;
 const int32 kDefaultStreamBufferInterval = 3;
 const int32 kDefaultDecoderThreadPriority = 1;
 const bool  kDefaultLogging = false;
-const bool  kDefaultSaveStream = false;
-const char* kDefaultSaveStreamDir = ".";
+const bool  kDefaultSaveStreams = false;
+const char* kDefaultSaveStreamsDir = ".";
 
 Error
 Preferences::
@@ -107,11 +107,11 @@ SetDefaults()
     if (GetPrefBoolean(kLogPerformancePref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
 
-    if (GetPrefBoolean(kSaveStreamPref, &dummyBool) == kError_NoPrefValue)
-        SetPrefBoolean(kSaveStreamPref, kDefaultSaveStream);
+    if (GetPrefBoolean(kSaveStreamsPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kSaveStreamsPref, kDefaultSaveStreams);
 
-    if (GetPrefString(kSaveStreamDirPref, dummyString, &size) == kError_NoPrefValue)
-        SetPrefString(kSaveStreamDirPref, kDefaultSaveStreamDir);
+    if (GetPrefString(kSaveStreamsDirPref, dummyString, &size) == kError_NoPrefValue)
+        SetPrefString(kSaveStreamsDirPref, kDefaultSaveStreamsDir);
 
     return kError_NoErr;
 }
@@ -489,30 +489,30 @@ SetWindowPosition(  int32 left,
 
 Error 
 Preferences::
-GetSaveStream(bool* value)
+GetSaveStreams(bool* value)
 {
-    return GetPrefBoolean(kSaveStreamPref, value);
+    return GetPrefBoolean(kSaveStreamsPref, value);
 }
 
 Error 
 Preferences::
-SetSaveStream(bool value)
+SetSaveStreams(bool value)
 {
-    return SetPrefBoolean(kSaveStreamPref, value);
+    return SetPrefBoolean(kSaveStreamsPref, value);
 }
 
 Error 
 Preferences::
-GetStreamSaveDirectory(char* path, uint32* len)
+GetSaveStreamsDirectory(char* path, uint32* len)
 {
-    return GetPrefString(kSaveStreamDirPref, path, len);
+    return GetPrefString(kSaveStreamsDirPref, path, len);
 }
 
 Error 
 Preferences::
-SetStreamSaveDirectory(char* path)
+SetSaveStreamsDirectory(char* path)
 {
-    return SetPrefString(kSaveStreamDirPref, path);
+    return SetPrefString(kSaveStreamsDirPref, path);
 }
 
 LibDirFindHandle *

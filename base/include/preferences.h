@@ -51,8 +51,8 @@ extern const char* kLogDecodePref;
 extern const char* kLogInputPref;
 extern const char* kLogOutputPref;
 extern const char* kLogPerformancePref;
-extern const char* kSaveStreamPref;
-extern const char* kSaveStreamDirPref;
+extern const char* kSaveStreamsPref;
+extern const char* kSaveStreamsDirPref;
 
 class LibDirFindHandle;
 
@@ -148,11 +148,11 @@ class Preferences {
                             int32 width,
                             int32 height);
 
-    Error GetSaveStream(bool* value);
-    Error SetSaveStream(bool value);
+    Error GetSaveStreams(bool* value);
+    Error SetSaveStreams(bool value);
 
-    Error GetStreamSaveDirectory(char* path, uint32* len);
-    Error SetStreamSaveDirectory(char* path);
+    Error GetSaveStreamsDirectory(char* path, uint32* len);
+    Error SetSaveStreamsDirectory(char* path);
 
 };
 

@@ -118,8 +118,13 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     WSAStartup(0x0002,  &sGawdIHateMicrosoft);
 
     FAContext *context = new FAContext;
-    context->prefs = new Win32Prefs();
+    Win32Prefs* prefs = new Win32Prefs();
+    //prefs->Initialize();
+
+    context->prefs = prefs;
     context->log = new LogFile("freeamp.log");
+
+    
 
     // find all the plug-ins we use
     Registrar* registrar;

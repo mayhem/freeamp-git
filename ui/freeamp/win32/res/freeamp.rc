@@ -47,7 +47,7 @@ BEGIN
                     IDC_STATIC,4,3,211,24
 END
 
-IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 175
+IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 159
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "General"
 FONT 8, "MS Sans Serif"
@@ -62,7 +62,7 @@ BEGIN
     GROUPBOX        "Decoder Priority",IDC_STATIC,3,54,227,52
     CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
                     WS_TABSTOP,9,66,214,15
-    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,110,136,62
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,110,136,46
     EDITTEXT        IDC_INPUT,73,122,25,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Input Buffer Size:",IDC_STATIC,13,124,57,8
     EDITTEXT        IDC_OUTPUT,73,138,25,12,ES_AUTOHSCROLL | ES_NUMBER
@@ -73,78 +73,65 @@ BEGIN
     LTEXT           "Normal",IDC_STATIC,104,84,23,8
     LTEXT           "High",IDC_STATIC,175,84,16,8
     LTEXT           "Realtime",IDC_STATIC,199,84,28,8
-    EDITTEXT        IDC_STREAM_INTERVAL,73,154,25,12,ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    LTEXT           "Buffer Streams For",IDC_STATIC,8,156,59,8
-    LTEXT           "Seconds",IDC_STATIC,103,156,29,8
     CONTROL         "Manifest in Tray instead of Taskbar",IDC_TRAY,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,141,75,
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,135,75,
                     17
     CONTROL         "Stay on top",IDC_STAYONTOP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,153,127,52,10
-    GROUPBOX        "Misc",IDC_STATIC,145,110,85,62
+                    WS_TABSTOP,153,122,52,10
+    GROUPBOX        "Misc",IDC_STATIC,145,110,85,46
     LTEXT           "Idle",IDC_STATIC,10,84,12,8
     CTEXT           "Below Normal",IDC_STATIC,69,84,29,15
     CTEXT           "Above Normal",IDC_STATIC,135,84,27,16
 END
 
-IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 175
+IDD_PREF3 DIALOG DISCARDABLE  0, 0, 233, 159
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Debug"
 FONT 8, "MS Sans Serif"
 BEGIN
-    GROUPBOX        "",IDC_STATIC,3,87,227,84
-    LTEXT           " ",IDC_STATIC,9,87,8,8
+    GROUPBOX        "",IDC_STATIC,3,81,227,74
+    LTEXT           " ",IDC_STATIC,9,81,8,8
     CONTROL         "Enable Logging",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,87,63,10
+                    WS_TABSTOP,11,80,63,10
     LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
-                    IDC_STATIC,3,4,227,24
+                    IDC_STATIC,3,3,227,24
     LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
-                    IDC_STATIC,3,28,227,17
+                    IDC_STATIC,3,27,227,17
     CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
                     IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
-                    115,174,10
+                    105,174,10
     CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",
                     IDC_LOGOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
-                    129,169,10
+                    117,169,10
     CONTROL         "Log decoding process (e.g. MP3, CDDA)",IDC_LOGDECODER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,143,145,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,145,10
     LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
-                    IDC_STATIC,3,48,227,32
+                    IDC_STATIC,3,44,227,32
     CONTROL         "Log performance issues (e.g. Timings, Buffer Under/Overflows)",
                     IDC_LOGPERFORMANCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    13,157,213,10
+                    13,141,213,10
     CONTROL         "Log general player errors (e.g. Loading plugins)",
-                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,
+                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,93,
                     163,10
 END
 
-IDD_PREF1_OLD DIALOG DISCARDABLE  0, 0, 218, 159
+IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 159
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "General"
+CAPTION "Streaming"
 FONT 8, "MS Sans Serif"
 BEGIN
-    COMBOBOX        IDC_UI,73,19,125,50,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    LTEXT           "User Interface:",IDC_STATIC,19,21,48,8
-    COMBOBOX        IDC_PMO,73,37,125,54,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Output:",IDC_STATIC,42,38,25,8
-    GROUPBOX        "Plug-Ins",IDC_STATIC,3,5,212,53
-    GROUPBOX        "Decoder",IDC_STATIC,3,66,212,90
-    CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,48,86,121,15
-    GROUPBOX        "Priority",IDC_STATIC,39,77,138,36
-    EDITTEXT        IDC_INPUT,111,119,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Input Buffer Size:",IDC_STATIC,51,121,57,8
-    EDITTEXT        IDC_OUTPUT,111,137,25,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Output Buffer Size:",IDC_STATIC,46,139,60,8
-    LTEXT           "Kilobytes",IDC_STATIC,141,121,29,8
-    LTEXT           "Kilobytes",IDC_STATIC,141,139,29,8
-    LTEXT           "Low",IDC_STATIC,47,103,14,8
-    LTEXT           "Normal",IDC_STATIC,80,103,23,8
-    LTEXT           "High",IDC_STATIC,119,103,16,8
-    LTEXT           "Realtime",IDC_STATIC,146,103,28,8
+    GROUPBOX        "",IDC_STATIC,3,42,227,69
+    LTEXT           " ",IDC_STATIC,9,42,8,8
+    CONTROL         "Save Streams Locally",IDC_SAVESTREAMS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,42,82,10
+    EDITTEXT        IDC_STREAM_INTERVAL,119,15,25,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "Buffer Streams For",IDC_STATIC,54,17,59,8
+    LTEXT           "Seconds",IDC_STATIC,149,17,29,8
+    EDITTEXT        IDC_STREAMSAVEDIR,11,71,210,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,171,91,50,14
+    LTEXT           "Save Location:",IDC_SAVELOCATION_TEXT,11,57,49,8
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,3,227,32
 END
 
 
@@ -308,7 +295,15 @@ BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
-        BOTTOMMARGIN, 172
+        BOTTOMMARGIN, 156
+    END
+
+    IDD_PREF3, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 155
     END
 
     IDD_PREF2, DIALOG
@@ -316,15 +311,7 @@ BEGIN
         LEFTMARGIN, 3
         RIGHTMARGIN, 230
         TOPMARGIN, 3
-        BOTTOMMARGIN, 171
-    END
-
-    IDD_PREF1_OLD, DIALOG
-    BEGIN
-        LEFTMARGIN, 3
-        RIGHTMARGIN, 215
-        TOPMARGIN, 3
-        BOTTOMMARGIN, 156
+        BOTTOMMARGIN, 155
     END
 END
 #endif    // APSTUDIO_INVOKED

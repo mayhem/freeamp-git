@@ -26,6 +26,7 @@ ____________________________________________________________________________*/
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
+#include <shlobj.h>
 #include <commctrl.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -44,12 +45,16 @@ typedef struct PrefValues {
     char defaultPMO[256];
     int32 inputBufferSize;
     int32 outputBufferSize;
-    int32 streamInterval;
     int32 decoderThreadPriority;
     bool stayOnTop;
     bool liveInTray;
 
-    // page2
+    // page 2
+    int32 streamInterval;
+    bool saveStreams;
+    char saveStreamsDirectory[MAX_PATH + 1];
+    
+    // page 3
     bool enableLogging;
     bool logMain;
     bool logInput;
@@ -61,6 +66,7 @@ typedef struct PrefValues {
     {
         memset(defaultUI, 0x00, sizeof(defaultUI));
         memset(defaultPMO, 0x00, sizeof(defaultPMO));
+        memset(saveStreamsDirectory, 0x00, sizeof(saveStreamsDirectory));
     }
 
 }PrefValues;
@@ -79,9 +85,13 @@ SavePrefValues( Preferences* prefs,
     prefs->SetDecoderThreadPriority(values->decoderThreadPriority);
     prefs->SetInputBufferSize(values->inputBufferSize);
     prefs->SetOutputBufferSize(values->outputBufferSize);
-    prefs->SetStreamBufferInterval(values->streamInterval);
     prefs->SetStayOnTop(values->stayOnTop);
     prefs->SetLiveInTray(values->liveInTray);
+
+    prefs->SetStreamBufferInterval(values->streamInterval);
+    prefs->SetSaveStreams(values->saveStreams);
+    prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory);
+
     prefs->SetUseDebugLog(values->enableLogging);
     prefs->SetLogMain(values->logMain);
     prefs->SetLogDecode(values->logDecoder);
@@ -90,6 +100,7 @@ SavePrefValues( Preferences* prefs,
     prefs->SetLogPerformance(values->logPerformance);
 
 }
+
 
 static
 BOOL 
@@ -107,7 +118,6 @@ PrefPage1Proc(  HWND hwnd,
     static HWND hwndPriority = NULL;
     static HWND hwndInput = NULL;
     static HWND hwndOutput = NULL;
-    static HWND hwndStreamInterval = NULL;
     static HWND hwndStayOnTop = NULL;
     static HWND hwndLiveInTray = NULL;
     
@@ -126,7 +136,6 @@ PrefPage1Proc(  HWND hwnd,
             hwndPriority = GetDlgItem(hwnd, IDC_PRIORITY);
             hwndInput = GetDlgItem(hwnd, IDC_INPUT);
             hwndOutput = GetDlgItem(hwnd, IDC_OUTPUT);
-            hwndStreamInterval = GetDlgItem(hwnd, IDC_STREAM_INTERVAL);
             hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
             hwndLiveInTray = GetDlgItem(hwnd, IDC_TRAY);
 
@@ -175,6 +184,7 @@ PrefPage1Proc(  HWND hwnd,
                     ComboBox_SetCurSel(hwndUI, i-1);
                 }
             }
+
             int32 priority;
 
             prefs->GetDecoderThreadPriority(&priority);
@@ -203,12 +213,6 @@ PrefPage1Proc(  HWND hwnd,
             Edit_LimitText(hwndOutput, 4);
             Edit_SetText(hwndOutput, temp);
             originalValues.outputBufferSize = value;
-
-            prefs->GetStreamBufferInterval(&value);
-            sprintf(temp, "%d", value);
-            Edit_LimitText(hwndStreamInterval, 2);
-            Edit_SetText(hwndStreamInterval, temp);
-            originalValues.streamInterval = value;
 
             prefs->GetStayOnTop(&originalValues.stayOnTop);
             Button_SetCheck(hwndStayOnTop, originalValues.stayOnTop);
@@ -307,31 +311,6 @@ PrefPage1Proc(  HWND hwnd,
                         Edit_GetText(hwndOutput, text, sizeof(text));
 
                         currentValues.outputBufferSize = atoi(text);
-
-                        if(memcmp(  &originalValues, 
-                                    &currentValues, 
-                                    sizeof(PrefValues)))
-                        {
-                            PropSheet_Changed(GetParent(hwnd), hwnd);
-                        }
-                        else
-                        {
-                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
-                        }
-                    }
-
-                    break;
-                }
-
-                case IDC_STREAM_INTERVAL:
-                {
-                    if(HIWORD(wParam) == EN_CHANGE)
-                    {
-                        char text[128];
-
-                        Edit_GetText(hwndStreamInterval, text, sizeof(text));
-
-                        currentValues.streamInterval = atoi(text);
 
                         if(memcmp(  &originalValues, 
                                     &currentValues, 
@@ -505,6 +484,249 @@ static
 BOOL 
 CALLBACK 
 PrefPage2Proc(  HWND hwnd, 
+                UINT msg, 
+                WPARAM wParam, 
+                LPARAM lParam)
+{
+    UINT result = 0;
+    static PROPSHEETPAGE* psp = NULL;
+    static Preferences* prefs = NULL;
+    static HWND hwndStreamInterval = NULL;
+    static HWND hwndSaveStreams = NULL;
+    static HWND hwndSaveStreamsDirectory = NULL;
+    static HWND hwndBrowse = NULL;
+    static HWND hwndSaveLocationText = NULL;
+   
+    switch(msg)
+    {
+        case WM_INITDIALOG:
+        {
+            // remember these for later...
+            psp = (PROPSHEETPAGE*)lParam;
+            prefs = (Preferences*)psp->lParam;
+
+            // get the handles to all our controls
+            hwndStreamInterval = GetDlgItem(hwnd, IDC_STREAM_INTERVAL);
+            hwndSaveStreams = GetDlgItem(hwnd, IDC_SAVESTREAMS);
+            hwndSaveStreamsDirectory = GetDlgItem(hwnd, IDC_STREAMSAVEDIR);
+            hwndBrowse = GetDlgItem(hwnd, IDC_BROWSE);
+            hwndSaveLocationText = GetDlgItem(hwnd, IDC_SAVELOCATION_TEXT);
+
+            // initialize our controls
+            int32 value;
+            char temp[256];
+            uint32 size = sizeof(temp);
+
+            prefs->GetStreamBufferInterval(&value);
+            sprintf(temp, "%d", value);
+            Edit_LimitText(hwndStreamInterval, 2);
+            Edit_SetText(hwndStreamInterval, temp);
+            originalValues.streamInterval = value;
+
+            prefs->GetSaveStreams(&originalValues.saveStreams);
+            Button_SetCheck(hwndSaveStreams, originalValues.saveStreams);
+
+            size = MAX_PATH;
+            prefs->GetSaveStreamsDirectory( 
+                                        originalValues.saveStreamsDirectory, 
+                                        &size);
+
+            if(!strcmp(originalValues.saveStreamsDirectory, "."))
+            {
+                Edit_SetText(hwndSaveStreamsDirectory, "(Current Directory)");
+            }
+            else
+            {
+                Edit_SetText(   hwndSaveStreamsDirectory, 
+                                originalValues.saveStreamsDirectory);
+            }
+
+            Button_Enable(  hwndSaveStreamsDirectory, 
+                            originalValues.saveStreams);
+
+            Button_Enable(  hwndBrowse, 
+                            originalValues.saveStreams);
+
+            Button_Enable(  hwndSaveLocationText,
+                            originalValues.saveStreams);
+
+            currentValues = originalValues;
+            
+            break;
+        }
+
+        case WM_COMMAND:
+        {
+            switch(LOWORD(wParam))
+            {
+                case IDC_STREAM_INTERVAL:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char text[128];
+
+                        Edit_GetText(hwndStreamInterval, text, sizeof(text));
+
+                        currentValues.streamInterval = atoi(text);
+
+                        if(memcmp(  &originalValues, 
+                                    &currentValues, 
+                                    sizeof(PrefValues)))
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
+
+                case IDC_SAVESTREAMS:
+                {
+                    BOOL enabled;
+
+                    if(Button_GetCheck(hwndSaveStreams) == BST_CHECKED)
+                    {
+                        currentValues.saveStreams = true;
+                    }
+                    else
+                    {
+                        currentValues.saveStreams = false;
+                    }
+
+                    enabled = (currentValues.saveStreams ? TRUE : FALSE);
+
+                    Button_Enable(hwndSaveStreamsDirectory, enabled); 
+                    Button_Enable(hwndBrowse, enabled);
+                    Button_Enable(  hwndSaveLocationText,enabled);
+
+
+                    if(memcmp(  &originalValues, 
+                                &currentValues, 
+                                sizeof(PrefValues)))
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_STREAMSAVEDIR:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        memset(currentValues.saveStreamsDirectory, 0x00, MAX_PATH);
+                        Edit_GetText(   hwndSaveStreamsDirectory, 
+                                        currentValues.saveStreamsDirectory,
+                                        MAX_PATH);
+
+                        if(memcmp(  &originalValues, 
+                                    &currentValues, 
+                                    sizeof(PrefValues)))
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
+
+                case IDC_BROWSE:
+                {
+                    LPMALLOC pMalloc;
+
+                    if(SUCCEEDED(SHGetMalloc(&pMalloc)))
+                    {
+                        BROWSEINFO bi; 
+                        LPITEMIDLIST browseId;
+                        char displayName[MAX_PATH + 1];
+
+                        bi.hwndOwner = hwnd;
+                        bi.pidlRoot = NULL;
+                        bi.pszDisplayName = displayName;
+                        bi.lpszTitle = "Please select the folder to which you want to save streams.";
+                        bi.ulFlags = BIF_RETURNONLYFSDIRS;
+                        bi.lpfn = NULL;
+
+                        browseId = SHBrowseForFolder(&bi);
+
+                        if(browseId)
+                        {
+                            memset( currentValues.saveStreamsDirectory, 
+                                    0x00, 
+                                    MAX_PATH);
+
+                            SHGetPathFromIDList(browseId,
+                                                currentValues.saveStreamsDirectory);
+                            
+                            Edit_SetText(   hwndSaveStreamsDirectory, 
+                                            currentValues.saveStreamsDirectory);
+
+                            pMalloc->Free(browseId);
+                        }
+                    }
+                
+                    break;
+                } 
+            }
+
+            break;
+        }
+
+
+        case WM_NOTIFY:
+        {
+            NMHDR* notify = (NMHDR*)lParam;
+
+            switch(notify->code)
+            {
+                case PSN_SETACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_APPLY:
+                {
+                    SavePrefValues(prefs, &currentValues);
+                    break;
+                }
+
+                case PSN_KILLACTIVE:
+                {
+                    
+                    break;
+                }
+
+                case PSN_RESET:
+                {
+                    SavePrefValues(prefs, &originalValues);
+                    break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+static
+BOOL 
+CALLBACK 
+PrefPage3Proc(  HWND hwnd, 
                 UINT msg, 
                 WPARAM wParam, 
                 LPARAM lParam)
@@ -782,7 +1004,7 @@ PrefPage2Proc(  HWND hwnd,
 bool DisplayPreferences(HWND hwndParent, Preferences* prefs)
 {
     bool result = false;
-    PROPSHEETPAGE psp[2];
+    PROPSHEETPAGE psp[3];
     PROPSHEETHEADER psh;
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwndParent, GWL_HINSTANCE);
 
@@ -803,6 +1025,15 @@ bool DisplayPreferences(HWND hwndParent, Preferences* prefs)
     psp[1].pfnDlgProc = PrefPage2Proc;
     psp[1].pszTitle = NULL;
     psp[1].lParam = (LPARAM)prefs;
+
+    psp[2].dwSize = sizeof(PROPSHEETPAGE);
+    psp[2].dwFlags = 0;
+    psp[2].hInstance = hinst;
+    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_PREF3);
+    psp[2].pszIcon = NULL;
+    psp[2].pfnDlgProc = PrefPage3Proc;
+    psp[2].pszTitle = NULL;
+    psp[2].lParam = (LPARAM)prefs;
 
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE;

@@ -387,7 +387,7 @@ Error HttpBuffer::Open(void)
 
     bool bSave;
     unsigned  size = 255;
-    m_context->prefs->GetPrefBoolean(kSaveStreamPref, &bSave);
+    m_context->prefs->GetPrefBoolean(kSaveStreamsPref, &bSave);
     if (bSave)
     {
         char szPath[255], szFile[255];
@@ -400,7 +400,7 @@ Error HttpBuffer::Open(void)
         if (szStreamName[0] == 0)
            sprintf(szStreamName, "%s:%d", szHostName, iPort);
 
-        if (m_context->prefs->GetPrefString(kSaveStreamDirPref, szPath, &size) == 
+        if (m_context->prefs->GetPrefString(kSaveStreamsDirPref, szPath, &size) == 
             kError_NoPrefValue)
            strcpy(szPath, ".");
         if (szPath[strlen(szPath) - 1] == '/' ||

@@ -65,10 +65,10 @@ Win32Prefs()
 
     delete [] prefsKey;
 
-    if(result == ERROR_SUCCESS)
-		Initialize();
-	else
+    if(result != ERROR_SUCCESS)
         m_prefsKey = NULL;
+
+    Initialize();
 }
 
 Win32Prefs::
@@ -134,7 +134,7 @@ Win32Prefs(const char* componentName)
 
             if(result == ERROR_SUCCESS)
             {
-                // create the version key under the freeamp key
+                // create the component key under the version key
                 result = RegCreateKeyEx(versionKey,
                                         componentName,
                                         NULL, 
@@ -151,7 +151,6 @@ Win32Prefs(const char* componentName)
                 m_prefsKey = NULL;
             }
         }
-		Initialize();
     }
 }
 
@@ -185,15 +184,15 @@ Initialize()
         error = GetInstallDirectory(path, &length);
 
 		char foo[MAX_PATH] = {0x00};
-		sprintf(foo,"%s\\plugins",cwd);
+		sprintf(foo,"%s\\freeamp.exe",cwd);
 		WIN32_FIND_DATA win32fd;
 
-        // check for plugins directory in cwd
-		HANDLE h = FindFirstFile(foo,&win32fd);
+        // check for freeamp exe in cwd
+		HANDLE h = FindFirstFile(foo, &win32fd);
 
 		if (h != INVALID_HANDLE_VALUE) 
         {
-			if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) 
+			//if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) 
             {
 				if(IsError(error) || strcmp(cwd, path))
 				{
@@ -275,6 +274,8 @@ SetDefaults()
     char cwd[MAX_PATH]= {0x00};
     char buf[1024];
     uint32 size;
+    bool dummyBool;
+    int32 dummyInt32;
 
     // Where are we starting the program from?
     GetCurrentDirectory(sizeof(cwd), cwd);
@@ -282,34 +283,39 @@ SetDefaults()
     // set install directory value
     size = sizeof(buf);
     if (GetPrefString(kInstallDirPref, buf, &size) == kError_NoPrefValue)
-	SetPrefString(kInstallDirPref, cwd);
+	    SetPrefString(kInstallDirPref, cwd);
     
     // set default ui value
     size = sizeof(buf);
     if (GetPrefString(kUIPref, buf, &size) == kError_NoPrefValue)
-	SetPrefString(kUIPref, kDefaultUI);
+	    SetPrefString(kUIPref, kDefaultUI);
     
     // set default pmo value
     size = sizeof(buf);
     if (GetPrefString(kPMOPref, buf, &size) == kError_NoPrefValue)
-	SetPrefString(kPMOPref, kDefaultPMO);
+	    SetPrefString(kPMOPref, kDefaultPMO);
 
     // set default open/save dlg path value
     size = sizeof(buf);
     if (GetPrefString(kOpenSaveDirPref, buf, &size) == kError_NoPrefValue)
-	SetPrefString(kOpenSaveDirPref, cwd);
+	    SetPrefString(kOpenSaveDirPref, cwd);
 
     // set default for window staying on top
-    SetPrefBoolean(kStayOnTopPref, kDefaultStayOnTop);
+    if (GetPrefBoolean(kStayOnTopPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kStayOnTopPref, kDefaultStayOnTop);
 
     // set default for minimizing to tray
-    SetPrefBoolean(kLiveInTrayPref, kDefaultLiveInTray);
+    if (GetPrefBoolean(kLiveInTrayPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kLiveInTrayPref, kDefaultLiveInTray);
 
     // set default for window position
-    SetPrefInt32(kWindowPositionLeftPref, kDefaultWindowPosition);
-    SetPrefInt32(kWindowPositionTopPref, kDefaultWindowPosition);
-    SetPrefInt32(kWindowPositionWidthPref, kDefaultWindowPosition);
-    SetPrefInt32(kWindowPositionHeightPref, kDefaultWindowPosition);
+    if (GetPrefInt32(kWindowPositionLeftPref, &dummyInt32) == kError_NoPrefValue)
+    {
+        SetPrefInt32(kWindowPositionLeftPref, kDefaultWindowPosition);
+        SetPrefInt32(kWindowPositionTopPref, kDefaultWindowPosition);
+        SetPrefInt32(kWindowPositionWidthPref, kDefaultWindowPosition);
+        SetPrefInt32(kWindowPositionHeightPref, kDefaultWindowPosition);
+    }
 
     Preferences::SetDefaults();
 
@@ -360,11 +366,13 @@ GetPrefString(const char* pref, char* buf, uint32* len)
             error = kError_NoErr;
         else if(result == ERROR_MORE_DATA)
             error = kError_BufferTooSmall;    
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
 	    
     }
     else
     {
-        error = kError_NoPrefValue;
+        error = kError_NoPrefs;
     }
   
     return error;
@@ -398,7 +406,7 @@ SetPrefString(const char* pref, const char* buf)
     }
     else
     {
-        error = kError_NoPrefValue;
+        error = kError_NoPrefs;
     }
   
     return error;
@@ -436,11 +444,13 @@ GetPrefBoolean(const char* pref, bool* value)
             *value = (buf == 0 ? false : true);
         }
         else if(result == ERROR_MORE_DATA)
-            error = kError_BufferTooSmall;    
+            error = kError_BufferTooSmall;   
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
     }
     else
     {
-        error = kError_NoPrefValue;
+        error = kError_NoPrefs;
     }
   
     return error;
@@ -476,7 +486,7 @@ SetPrefBoolean(const char* pref, bool value)
     }
     else
     {
-        error = kError_NoPrefValue;
+        error = kError_NoPrefs;
     }
   
     return error;
@@ -515,10 +525,12 @@ GetPrefInt32(const char* pref, int32* value)
         }
         else if(result == ERROR_MORE_DATA)
             error = kError_BufferTooSmall;    
+        else if(result == ERROR_FILE_NOT_FOUND)
+            error = kError_NoPrefValue;
     }
     else
     {
-        error = kError_NoPrefValue;
+        error = kError_NoPrefs;
     }
   
     return error;
@@ -554,7 +566,7 @@ SetPrefInt32(const char* pref, int32 value)
     }
     else
     {
-        error = kError_NoPrefValue;
+        error = kError_NoPrefs;
     }
   
     return error;
