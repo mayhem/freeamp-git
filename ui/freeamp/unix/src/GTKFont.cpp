@@ -252,7 +252,6 @@ Error GTKFont::Load(int iFontHeight, bool bBold, bool bItalic)
                     }
                 }
             } 
-            gdk_threads_leave();
         }
     }
 #ifdef HAVE_FREETYPE
