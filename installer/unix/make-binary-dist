@@ -1,0 +1,41 @@
+#!/bin/sh
+
+version=$1
+osname=`uname | tr A-Z a-z`
+
+if test $# -eq 0
+then
+   echo "Usage: make-binary-dist <freeamp version number> [extra info]"
+   exit
+fi
+
+if test $# -eq 1
+then
+   if test $osname = "linux"
+   then
+      extra="x86-glibc2"
+   fi
+else
+   extra=$2
+fi
+
+echo Creating freeamp-$version-$osname-$extra.tar.gz 
+
+if test ! -f freeamp
+then
+   echo "This script should be run in the FreeAmp main directory."
+else
+   if test ! -d plugins
+   then
+       echo "This script should be run in the FreeAmp main directory."
+   else
+       mkdir freeamp-$version
+       mkdir freeamp-$version/plugins
+       cp freeamp freeamp-$version
+       cp plugins/*.pmo plugins/*.pmi plugins/*.lmc freeamp-$version/plugins
+       cp AUTHORS CHANGES COPYING ChangeLog INSTALL NEWS README freeamp-$version
+       tar -czf freeamp-$version-$osname-$extra.tar.gz freeamp-$version
+       rm -rf freeamp-$version
+   fi
+fi
+
