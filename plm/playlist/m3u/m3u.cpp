@@ -247,8 +247,11 @@ Error M3U::WritePlaylist(const char* url, PlaylistFormatInfo* format,
                 {
                     PlaylistItem* item = (*list)[index];
 
-                    fprintf(fp, "%s%s", item->URL().c_str(), 
-                                        LINE_END_MARKER_STR);
+                    length = sizeof(path);
+
+                    URLToFilePath(item->URL().c_str(), path, &length);
+
+                    fprintf(fp, "%s%s", path, LINE_END_MARKER_STR);
                 }
 
                 fclose(fp);
