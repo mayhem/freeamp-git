@@ -53,7 +53,7 @@ ____________________________________________________________________________*/
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
 const char *szURL = "http://www.slashdot.org/slashdot.xml";
-const int iDownloadInterval = 3600;
+const int iDownloadInterval = 20;
 const int iHeadlineChangeInterval = 10;
 
 Slashdot::Slashdot(FAContext * context)
@@ -104,7 +104,7 @@ void Slashdot::WorkerThread(void)
            m_pWakeSem->Wait();
 
         time(&t);
-        if (lLastDownload > t + iDownloadInterval || m_oHeadlines.size() == 0)
+        if (lLastDownload + iDownloadInterval < t || m_oHeadlines.size() == 0)
         {
             if (IsntError(Download()))
                 lLastDownload = t;
