@@ -727,6 +727,10 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 EnableMenuItem(subMenu,
                                ID_POPUP_RENAME,
                                MF_BYCOMMAND|MF_GRAYED);
+
+                EnableMenuItem(subMenu,
+                               ID_POPUP_EDITINFO,
+                               MF_BYCOMMAND|MF_GRAYED);
             }
 
             if(trackCount == 0)

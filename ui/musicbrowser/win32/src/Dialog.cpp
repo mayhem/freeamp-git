@@ -1494,7 +1494,11 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         if(treeSelect != m_hNewPlaylistItem && treeSelect != m_hAllItem &&
            treeSelect != m_hCatalogItem && treeSelect != m_hUncatItem &&
            treeSelect != m_hPlaylistItem && treeSelect != m_hPortableItem &&
-           treeSelect != m_hNewPortableItem)
+           m_hPlaylistItem != TreeView_GetParent(m_hMusicCatalog, treeSelect) &&
+           treeSelect != m_hNewPortableItem &&
+           !IsItemSelected(m_hCatalogItem) &&
+           !IsItemSelected(m_hUncatItem) &&
+           !IsItemSelected(m_hAllItem))
         {
             EnableMenuItem(hMenu, ID_EDIT_EDITINFO, MF_ENABLED);
             SendMessage(m_hToolbar, TB_ENABLEBUTTON, 

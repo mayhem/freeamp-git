@@ -368,6 +368,9 @@ Error PlaylistManager::SetCurrentIndex(uint32 index)
 
     if(index != kInvalidIndex)
     {
+        if(m_shuffle)
+            index = InternalIndexOf(&m_shuffleList, ItemAt(index));
+
         InternalSetCurrentIndex(index);
         
         result = kError_NoErr;
@@ -383,14 +386,19 @@ void PlaylistManager::InternalSetCurrentIndex(uint32 index)
     m_context->target->AcceptEvent(new PlaylistCurrentItemInfoEvent(GetCurrentItem(), this));
 }
 
-uint32 PlaylistManager::GetCurrentIndex() const
+uint32 PlaylistManager::GetCurrentIndex()
 {
     uint32 result = kInvalidIndex;
 
     if(m_masterList.size())
-        result = m_current;
+    {
+        if(m_shuffle)
+            result = IndexOf(m_shuffleList[m_current]);
+        else
+            result = m_current;
+    }
 
-    return m_current;
+    return result;
 }
 
 

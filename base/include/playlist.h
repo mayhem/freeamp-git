@@ -215,7 +215,7 @@ class PlaylistManager {
     const PlaylistItem* GetCurrentItem();
     
     Error SetCurrentIndex(uint32 index);
-    uint32 GetCurrentIndex() const;
+    uint32 GetCurrentIndex();
 
     Error GotoNextItem(bool userAction = false);
     Error GotoPreviousItem(bool userAction = false);
