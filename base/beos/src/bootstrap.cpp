@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 
 #include <iostream>
 
+#include <be/app/Roster.h>
 #include <be/storage/Entry.h>
 #include <be/storage/Path.h>
 #define DEBUG 1

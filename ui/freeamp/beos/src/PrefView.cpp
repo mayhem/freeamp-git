@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 #include "ThemeManager.h"
 #include "facontext.h"
 #include "event.h"
+#include <be/interface/Window.h>
 #include <be/interface/TabView.h>
 #include <be/interface/Button.h>
 #include <be/interface/TextView.h>

@@ -77,9 +77,9 @@ const char*
 ResourceManager::GetString( int32 id )
 {
     size_t size;
-    const void* data;
 
-    return m_resources.LoadResource( B_STRING_TYPE, id, &size );
+    return static_cast<const char*>
+           ( m_resources.LoadResource( B_STRING_TYPE, id, &size ) );
 }
 
 status_t

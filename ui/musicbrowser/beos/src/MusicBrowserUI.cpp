@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "player.h"
 #include "utility.h"
+#include <be/app/Message.h>
 #include <be/support/Debug.h>
 
 extern "C" {

@@ -74,7 +74,7 @@ PlaylistView::InitiateDrag( BPoint point, int32 index, bool wasSelected )
         DragMessage( &msg, dragRect, NULL );
         if ( wasSelected )
         {
-            BMessage sm( SelectionMessage() );
+            BMessage sm( *SelectionMessage() );
             sm.AddPointer( "source", this );
             Messenger().SendMessage( &sm );
         }

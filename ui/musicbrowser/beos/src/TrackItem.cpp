@@ -24,6 +24,7 @@ ____________________________________________________________________________*/
 #include "TrackItem.h"
 #include "metadata.h"
 #include "playlist.h"
+#include <be/interface/View.h>
 #define DEBUG 1
 #include <be/support/Debug.h>
 #include <stdio.h>

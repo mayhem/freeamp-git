@@ -22,6 +22,7 @@
 ____________________________________________________________________________*/
 
 #include "TooltipFilter.h"
+#include <be/app/Message.h>
 #include <be/app/Looper.h>
 #include <be/interface/View.h>
 #include <stdio.h>
@@ -53,14 +54,14 @@ TooltipFilter::Filter( BMessage* message, BHandler** target )
     {
         case B_ENTERED_VIEW:
         {
-            BMessage tip( m_template );
+            BMessage tip( *m_template );
             tip.AddString( "text", m_text.String() );
             Looper()->PostMessage( &tip );
             break;
         }
         case B_EXITED_VIEW:
         {
-            BMessage tip( m_template );
+            BMessage tip( *m_template );
             tip.AddString( "text", "" );
             Looper()->PostMessage( &tip );
             break;

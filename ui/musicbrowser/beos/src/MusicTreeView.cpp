@@ -82,7 +82,7 @@ MusicTreeView::InitiateDrag( BPoint point, int32 index, bool wasSelected )
         DragMessage( &msg, dragRect, NULL );
         if ( wasSelected )
         {
-            BMessage sm( SelectionMessage() );
+            BMessage sm( *SelectionMessage() );
             sm.AddPointer( "source", this );
             Messenger().SendMessage( &sm );
         }
@@ -199,7 +199,8 @@ MusicTreeView::AddPlaylistListItem( PlaylistListItem* item )
 }
 
 TrackItem*
-MusicTreeView::FindTrackItemUnder( PlaylistItem* item, CollectionItem* group  )
+MusicTreeView::FindTrackItemUnder( const PlaylistItem* item,
+                                   CollectionItem* group  )
 {
     TrackItem* ti = NULL;
     bool found = false;
@@ -225,7 +226,7 @@ MusicTreeView::FindTrackItemUnder( PlaylistItem* item, CollectionItem* group  )
 }
 
 TrackItem*
-MusicTreeView::FindTrackItemInArtistGroup( PlaylistItem* item )
+MusicTreeView::FindTrackItemInArtistGroup( const PlaylistItem* item )
 {
     int32 head, tail;
     GetArtistGroupRange( &head, &tail );

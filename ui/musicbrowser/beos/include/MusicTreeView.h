@@ -59,9 +59,9 @@ public:
     bool            RemoveTrack( const char* artist, const char* album,
                                  const PlaylistItem* item );
     void            UpdateTrack( PlaylistItem* oldItem, PlaylistItem* newItem );
-    TrackItem*      FindTrackItemUnder( PlaylistItem* item,
+    TrackItem*      FindTrackItemUnder( const PlaylistItem* item,
                                         CollectionItem* group );
-    TrackItem*      FindTrackItemInArtistGroup( PlaylistItem* item );
+    TrackItem*      FindTrackItemInArtistGroup( const PlaylistItem* item );
     CollectionItem* FindArtistGroup( const char* artist );
 
     uint32          ArtistOutlineLevel( void ) const;
