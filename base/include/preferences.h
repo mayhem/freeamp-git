@@ -95,6 +95,7 @@ extern const char* kEqualizerSettingsPref;
 extern const char* kSavedPlaylistPositionPref;
 extern const char* kMusicBrowserPositionPref;
 extern const char* kMusicBrowserHeaderWidthsPref;
+extern const char* kCloseDLMOnCompletePref;
 
 extern const int32 kDefaultWatchThisDirTimeout;
 
@@ -304,6 +305,9 @@ class Preferences {
 
     Error GetSavedPlaylistPosition(uint32* value);
     Error SetSavedPlaylistPosition(uint32  value);
+
+    Error GetCloseDLMOnComplete(bool* value);
+    Error SetCloseDLMOnComplete(bool value);
 };
 
 #endif /* _PREFERENCES_H */

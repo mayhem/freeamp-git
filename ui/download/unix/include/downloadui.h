@@ -96,6 +96,7 @@ class DownloadUI : public UserInterface {
     GtkWidget *m_CloseButton;
     GtkWidget *m_hwndProgress;
     GtkWidget *m_helpButton;
+    GtkWidget *m_closeComplete;
 
     bool m_resumeLabelIsStart;
 

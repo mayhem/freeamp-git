@@ -89,6 +89,7 @@ const char* kEqualizerSettingsPref = "EqualizerSettings";
 const char* kSavedPlaylistPositionPref = "SavedPlaylistPosition";
 const char* kMusicBrowserPositionPref = "MusicBrowserPosition";
 const char* kMusicBrowserHeaderWidthsPref = "MusicBrowserHeaderWidths";
+const char* kCloseDLMOnCompletePref = "CloseDLMOnComplete";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -154,6 +155,7 @@ const char* kDefaultEqualizerSettings = "1,50,50,50,50,50,50,50,50,50,50";
 const uint32 kDefaultSavedPlaylistPosition = 0;
 const char* kDefaultMusicBrowserPosition = "-1,-1,-1,-1,-1";
 const char* kDefaultMusicBrowserHeaderWidths = "-1,-1,-1.-1";
+const bool  kDefaultCloseDLMOnComplete = false;
 
 Error
 Preferences::
@@ -350,6 +352,10 @@ SetDefaults()
 
     if (GetPrefBoolean(kWriteID3v2Pref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kWriteID3v2Pref, kDefaultWriteID3v2);
+
+    if (GetPrefBoolean(kCloseDLMOnCompletePref, &dummyBool) == 
+        kError_NoPrefValue)
+        SetPrefBoolean(kCloseDLMOnCompletePref, kDefaultCloseDLMOnComplete);
 
 	dummyInt = 255;
     if (GetPrefString(kEqualizerSettingsPref, dummyString, 
@@ -1228,6 +1234,20 @@ Preferences::
 SetSavedPlaylistPosition(uint32 value)
 {
     return SetPrefInt32(kSavedPlaylistPositionPref, (int32)value);
+}
+
+Error
+Preferences::
+GetCloseDLMOnComplete(bool* value)
+{
+    return GetPrefBoolean(kCloseDLMOnCompletePref, value);
+}
+
+Error
+Preferences::
+SetCloseDLMOnComplete(bool value)
+{
+    return SetPrefBoolean(kCloseDLMOnCompletePref, value);
 }
 
 LibDirFindHandle *

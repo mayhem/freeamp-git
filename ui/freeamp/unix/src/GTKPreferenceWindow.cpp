@@ -629,7 +629,7 @@ void GTKPreferenceWindow::ConvertUnderscoresToggle(int active)
 static void convert_underscores_toggle(GtkWidget *w, GTKPreferenceWindow *p)
 {
     int i = GTK_TOGGLE_BUTTON(w)->active;
-    p->AllowMultipleToggle(i);
+    p->ConvertUnderscoresToggle(i);
 }
 
 void GTKPreferenceWindow::ReclaimTypesToggle(int active)
