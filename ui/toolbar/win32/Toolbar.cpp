@@ -251,7 +251,7 @@ AcceptEvent(Event* event)
             case INFO_PlaylistItemsUpdated:
             {
                PlaylistItemsUpdatedEvent *pInfo =
-                  (PlaylistItemsUpdatedEvent *)e;
+                  (PlaylistItemsUpdatedEvent *)event;
       
                vector<PlaylistItem*>::const_iterator i = 
                           pInfo->Items()->begin();
@@ -307,7 +307,6 @@ AcceptEvent(Event* event)
 
 void ToolbarUI::UpdateMetaData(const PlaylistItem *pItem)
 {
-    bool bEnable;
     string oTitle("");
 
     if (pItem->GetMetaData().Title().length() > 0 ||
@@ -324,12 +323,12 @@ void ToolbarUI::UpdateMetaData(const PlaylistItem *pItem)
         uint32 len = MAX_PATH;
 
         url = pItem->URL();
-        URLToFilePath(url.c_str(), path, len);
+        URLToFilePath(url.c_str(), path, &len);
         oTitle = string(path);
     }
 
     oTitle = string(BRANDING": ") + oTitle;
-    SetTrayTooltip(m_oTitle.c_str());
+    SetTrayTooltip((char*)oTitle.c_str());
 }
 
 void ToolbarUI::SetupToolIcon(void)
