@@ -51,6 +51,8 @@ class MediaVitalInfo {
     int32 m_freq; // is Hz
     float m_totalTime;
     Id3TagInfo m_tagInfo;
+    int32 indexOfSong;
+    int32 totalSongs;
 
     MediaVitalInfo( const char *t,
                     const char *fn, 
@@ -67,6 +69,8 @@ class MediaVitalInfo {
         m_bps = bitspersecond;
         m_freq = fr;
         m_totalTime = tt;
+        indexOfSong = 0;
+        totalSongs = 0;
 
         if (t) {
 	        strncpy(m_songTitle,t,511);

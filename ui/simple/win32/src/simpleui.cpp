@@ -212,7 +212,7 @@ AcceptEvent(Event* event)
 						        1, 
 						        (LPARAM) szTemp);
 
-                    sprintf(szTemp, "%d of %d", 0,0);
+                    sprintf(szTemp, "%d of %d", pmvi->indexOfSong,pmvi->totalSongs);
 			        SendMessage(m_hwndStatus, 
 						        SB_SETTEXT, 
 						        2, 
@@ -504,11 +504,13 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 
 				case IDC_NEXTSONG:
 				{
+                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_NextMediaPiece));
 					break;
 				}
 
 				case IDC_LASTSONG:
 				{
+                    m_ui->m_target->AcceptEvent( m_ui->m_target, new Event(CMD_PrevMediaPiece));
 					break;
 				}
 
