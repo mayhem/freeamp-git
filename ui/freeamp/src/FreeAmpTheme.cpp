@@ -106,6 +106,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_iVolume = -1;
    m_iBalance = -1;
    m_iSeekPos = -1;
+   m_iMuteVolume = -1;
    m_bPlayShown = true;
    m_oTitle = string("");
    m_eTimeDisplayState = kNormal;
@@ -342,6 +343,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
    
          bEnable = true;
          m_pWindow->ControlEnable(string("Volume"), true, bEnable);
+         m_pWindow->ControlEnable(string("Mute"), true, bEnable);
          m_pWindow->ControlEnable(string("Balance"), true, bEnable);
          
          bEnable = false;
@@ -403,6 +405,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
             bEnable = false;
             m_pWindow->ControlEnable(string("Volume"), true, bEnable);
             m_pWindow->ControlEnable(string("Balance"), true, bEnable);
+            m_pWindow->ControlEnable(string("Mute"), true, bEnable);
             m_pWindow->ControlEnable(string("StereoIndicator"), true, bEnable);
             m_pWindow->ControlEnable(string("MonoIndicator"), true, bEnable);
 
@@ -700,6 +703,12 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          m_pWindow->ControlIntValue(string("Volume"), true, m_iVolume);
          m_pWindow->ControlIntValue(string("Balance"), true, m_iBalance);
+
+         if (iLeft > 0 || iRight > 0)
+         {
+   	       int iState = 0;
+             m_pWindow->ControlIntValue(string("Mute"), false, iState);
+         }
          break;
       }
 
@@ -853,6 +862,28 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            
        return kError_NoErr;
    }    
+   if (oControlName == string("Mute") && eMesg == CM_Pressed)
+   {
+       int iState;
+
+       m_pWindow->ControlIntValue(oControlName, false, iState);
+       if (iState == 0)
+       {
+           m_iMuteVolume = m_iVolume;
+           m_iVolume = 0;
+           iState = 1;
+       }
+       else
+       {
+           m_iVolume = m_iMuteVolume;
+           m_iMuteVolume = -1;
+           iState = 0;
+       }
+       SetVolume(m_iVolume, m_iBalance);
+       m_pWindow->ControlIntValue(oControlName, true, iState);
+       return kError_NoErr;
+   }
+  
    
    if (oControlName == string("Seek") && eMesg == CM_ValueChanged)
    {
@@ -936,7 +967,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }
    if (oControlName == string("MPause") && eMesg == CM_Pressed)
    {
-   	   int iState = 0;
+   	 int iState = 0;
        m_pWindow->ControlIntValue(oControlName, false, iState);
        if (iState == 0)
            m_pContext->target->AcceptEvent(new Event(CMD_Pause));
@@ -1286,6 +1317,10 @@ void FreeAmpTheme::InitControls(void)
 
     iState = m_eq->IsEnabled() == true; 
     m_pWindow->ControlIntValue(string("EqEnable"), true, iState);
+
+    iState = m_iMuteVolume != -1; 
+    m_pWindow->ControlIntValue(string("Mute"), true, iState);
+
     m_eq->InitControls(m_pWindow);
 }
 
@@ -1369,6 +1404,12 @@ void FreeAmpTheme::SetVolume(int iVolume, int iBalance)
         iRight = iVolume;
     }
 
+    if (m_iMuteVolume != -1 && iVolume != 0)
+    {
+        int iState = 0;
+        m_iMuteVolume = -1;
+        m_pWindow->ControlIntValue(string("Mute"), true, iState);
+    }
     m_iVolume = iVolume;
     m_iBalance = iBalance;
 

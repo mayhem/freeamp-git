@@ -97,8 +97,8 @@ class FreeAmpTheme : public UserInterface, public Theme
 
         FAContext       *m_pContext;
         int              m_iCurrentSeconds, m_iTotalSeconds, m_iSeekSeconds;
-        float			 m_fSecondsPerFrame;
-        int              m_iStartupType, m_iVolume, m_iBalance;
+        float			    m_fSecondsPerFrame;
+        int              m_iStartupType, m_iVolume, m_iBalance, m_iMuteVolume;
         int              m_iSeekPos, m_iFramesSinceSeek;
         Thread          *m_uiThread, *m_pUpdateThread;
         Thread          *m_pOptionsThread;
