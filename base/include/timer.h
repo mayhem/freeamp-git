@@ -1,8 +1,7 @@
 /*____________________________________________________________________________
 	
-	FreeAmp - The Free MP3 Player
-
-	Portions Copyright (C) 1998-1999 EMusic.com
+	FreeAMP - The Free MP3 Player
+	Portions copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,38 +20,32 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#include "config.h"
+#ifndef INCLUDED_TIMER_H_
+#define INCLUDED_TIMER_H_
+
 #include "thread.h"
+#include "semaphore.h"
 
-#ifdef __LINUX__
-    #include "linuxthread.h"
-#elif WIN32
-    #include "win32thread.h"
-#elif defined(solaris)
-    #include "solaristhread.h"
-#elif defined(__BEOS__)
-    #include "beosthread.h"
-#else
-    #error thread class needs to be defined for this platform
-#endif
+class Timer {
+ public:
+    Timer(uint32 milliseconds);
+    virtual ~Timer();
 
+    void Set(uint32 milliseconds);
+    void Start();
+    void Stop();
 
+    virtual void Tick() = 0;
 
+    static void thread_function(void* arg);
+    void ThreadFunction();
 
-Thread* Thread::CreateThread()
-{
-    Thread* thread = NULL;
-#ifdef __linux__
-    thread = new linuxThread();
-#elif defined(WIN32)
-    thread = new win32Thread();
-#elif defined(solaris)
-    thread = new solarisThread();
-#elif defined(__BEOS__)
-    thread = new beosThread();
-#else
-    #error thread class needs to be defined for this platform
-#endif
+ private:
+    uint32 m_ticks;
+    Thread* m_thread;
+    bool m_alive;
+    Semaphore m_semaphore;
 
-    return thread;
-}
+};
+
+#endif // INCLUDED_TIMER_H_

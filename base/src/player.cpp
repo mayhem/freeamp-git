@@ -831,6 +831,9 @@ Run()
    m_eventServiceThread = Thread::CreateThread();
    m_eventServiceThread->Create(Player::EventServiceThreadFunc, this);
 
+
+
+
    delete[] name;
    delete[] musicBrowserName;
    delete[] downloadName;
