@@ -105,7 +105,7 @@ BEGIN
             VALUE "FileDescription", "This is the primary FreeAmp application.\0"
             VALUE "FileVersion", "2.1.0.3\0"
             VALUE "InternalName", "FreeAmp\0"
-            VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
+            VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000 (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "freeamp.exe\0"
             VALUE "PrivateBuild", "\0"

@@ -75,7 +75,7 @@ BEGIN
             VALUE "FileDescription", "The Obsequiem Input plugin is an implementation of the RTP streaming  protocol and provides FreeAmp with an interface to Obsequiem MP3 Jukeboxes.\0"
             VALUE "FileVersion", "2.1.0.3\0"
             VALUE "InternalName", "obsinput\0"
-            VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
+            VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000 (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "obsinput.pmi\0"
             VALUE "PrivateBuild", "\0"

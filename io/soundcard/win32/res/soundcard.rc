@@ -75,7 +75,7 @@ BEGIN
             VALUE "FileDescription", "The SoundCard Input plugin allows FreeAmp to play sound through your computer's soundcard.\0"
             VALUE "FileVersion", "2.1.0.3\0"
             VALUE "InternalName", "soundcard\0"
-            VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
+            VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000 (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "soundcard.pmo\0"
             VALUE "PrivateBuild", "\0"

@@ -617,7 +617,7 @@ BEGIN
             VALUE "FileDescription", "The Music Browser user interface enables you to organize your music collection and select music to listen to.\0"
             VALUE "FileVersion", "2.1.0.3\0"
             VALUE "InternalName", "MusicBrowser\0"
-            VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
+            VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000 (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "musicbrowser.ui\0"
             VALUE "PrivateBuild", "\0"
