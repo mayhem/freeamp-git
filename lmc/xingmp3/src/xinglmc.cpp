@@ -279,9 +279,6 @@ Error XingLMC::CanDecode()
       return kError_PluginNotInitialized;
    }
 
-   if (!m_pPmi->IsStreaming())
-       m_pPmi->Seek(dummy, 0, SEEK_FROM_START);
-
    Err = GetHeadInfo();
    if (Err == kError_Interrupt)
       return Err;
