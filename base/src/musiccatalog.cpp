@@ -188,21 +188,40 @@ Error MusicCatalog::RemoveSong(const char *url)
         vector<PlaylistItem *>::iterator i = m_unsorted->begin();
         for (; i != m_unsorted->end(); i++)
             if (url == (*i)->URL())
+            {
                 m_unsorted->erase(i);
+                break;
+            }
     }
-    else {
-        vector<ArtistList *>::iterator i = m_artistList->begin();
-        for (; i != m_artistList->end(); i++) {
-            if (meta->Artist() == (*i)->name) {
-                vector<AlbumList *> *alList = (*i)->m_albumList;
-                vector<AlbumList *>::iterator j = alList->begin();
-                for (; j != alList->end(); j++) {
-                    if (meta->Album() == (*j)->name) {
-                        vector<PlaylistItem *> *trList = (*j)->m_trackList;
-                        vector<PlaylistItem *>::iterator k = trList->begin();
-                        for (; k != trList->end(); k++)
+    else 
+    {
+        vector<ArtistList *>::iterator    i;
+        vector<AlbumList *>              *alList;
+        vector<AlbumList *>::iterator     j;
+        vector<PlaylistItem *>           *trList;
+        vector<PlaylistItem *>::iterator  k;
+        bool                              found = false;
+        
+        i = m_artistList->begin();
+        for (; i != m_artistList->end() && !found; i++) 
+        {
+            if (meta->Artist() == (*i)->name) 
+            {
+                alList = (*i)->m_albumList;
+                j = alList->begin();
+                for (; j != alList->end() && !found; j++) 
+                {
+                    if (meta->Album() == (*j)->name) 
+                    {
+                        trList = (*j)->m_trackList;
+                        k = trList->begin();
+                        for (; k != trList->end() && !found; k++)
                             if (url == (*k)->URL())
+                            {
                                 trList->erase(k);
+                                found = true;
+                                break;
+                            }    
 
                         if (trList->size() == 0)
                             alList->erase(j);
