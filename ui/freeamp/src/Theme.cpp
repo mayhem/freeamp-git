@@ -988,6 +988,8 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            m_oAuthorEMail = oAttrMap["EMail"];
 	   if (oAttrMap.find("WebPage") != oAttrMap.end())
            m_oAuthorWebPage = oAttrMap["WebPage"];
+	   if (oAttrMap.find("Misc") != oAttrMap.end())
+           m_oMiscInfo = oAttrMap["Misc"];
        
        return kError_NoErr;
     }
@@ -1250,6 +1252,9 @@ void Theme::ShowThemeCredits(void)
 
         if (m_oAuthorWebPage.size() > 0)
            oText += string(" (") + m_oAuthorWebPage + string(")");     
+           
+        if (m_oAuthorWebPage.size() > 0)
+           oText += string(" ") + m_oMiscInfo + string(" ");     
     }   
     else
        oText = "<No theme credit info available>";

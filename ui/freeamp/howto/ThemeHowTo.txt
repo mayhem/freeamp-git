@@ -4,6 +4,7 @@
                             Robert Kaye
                          (rob@emusic.com)
         $Id$
+                    (Updated for version 2.0.2)
 
 INTRODUCTION
 
@@ -49,7 +50,9 @@ A theme consists of at least four files that get packaged into one
   3) theme.xml, which is an XML document that describes the layout 
      of the theme
   4) A title.txt file which contains a descriptive name of the
-     theme. Only the first line of this file is used.
+     theme. Please place only a simple descriptive name in this file.
+     Use the ThemeInfo tag in theme.xml for giving detailed theme credits.
+     Only the first line of this file is used.
 
 Don't be scared by the XML -- in this case you might as well call it
 an HTML-like syntax, which sounds less intimidating. :-)
@@ -311,11 +314,14 @@ TextControl:
 
 A text control is an area where some information is displayed:
 
-    <TextControl Name="Title">
+    <TextControl Name="Time">
 
 The name of the TextControl is used to identify what information gets
 displayed in the field. You can specify Title, Info, BufferInfo, and
-Time TextControls.
+Time TextControls. NOTE: For the Time field, you can hit the '@' key and
+FreeAmp will put the time '23:59:59' into the time field so you can test
+the size of the time field. (Time fields that are too small end up 
+marqueeing back and forth and that looks nasty)
 
 A TextControl will need to include the <Position> and <Style> tags.
 
@@ -468,16 +474,45 @@ ThemeInfo:
 The ThemeInfo tag allows the theme designers to give the theme a
 name and to give themselves some credit. Pressing 'C' in the theme
 ui or clicking on the Credits button brings up the credits in the
-title TextControl:
+Title TextControl:
 
    <ThemeInfo Name="FreeAmp Theme" Author="Bill Bull & Robert Kaye" 
-              EMail="info@freeamp.org" WebPage="http://www.freeamp.org"/>
+              EMail="info@freeamp.org" WebPage="http://www.freeamp.org"
+              Misc="Based on artwork made from scanning my butt"/>
 
 The Name attribute is the name of the theme, and the Author attribute
 is the name of the Author(s). The EMail and WebPage attributes are
 for authors to let the theme users know where to contact them and
-which web page may have more info about the author/theme. Only the
-Name attribute is required.
+which web page may have more info about the author/theme. The Misc
+field is for whatever miscellaneous credit information you'd like to
+include. Only the Name attribute is required.
+
+
+Headlines: (Added for 2.0.2)
+----------
+
+FreeAmp now has the capabilities to download headlines from popular
+websites such as Slashdot. The Headlines tag defines where to download
+the headlines and what data to display:
+
+<Headlines URL="http://www.slashdot.org/slashdot.xml"
+           XMLPath="/backslash/story/title"
+		   DownloadInterval="3600"
+		   ChangeInterval="10"/>
+
+This Headlines tag shows the headlines from Slashdot in the 'HeadlineInfo'
+TextField. The URL attribute specifies the location of the XML document that 
+contains the headlines. This currently only works with XML documents! The 
+XMLPath attribute defines which text fields to show as headlines. In this 
+case each <title> tag that is nested inside of a <story> tag, which is in 
+turn nested inside a <backslash> tag will be considered a headline. The 
+DownloadInterval attribute detemines how often the headlines should be 
+downloaded, and the ChangeInterval attribute determines how quickly FreeAmp 
+should flip through the headlines. Both intervals are specified in seconds, 
+and in the example above, the headlines are grabbed once an hour and each 
+headline is displayed for 10 seconds. All 4 attributes are required.
+
+The headlines are actually displayed in a TextField called HeadlineInfo.
 
 
 QUICK REFERENCE
@@ -736,7 +771,7 @@ Info          -- The area where button info and status messages get displayed
 StreamInfo    -- Shows the bitrate, sample rate and stereo mode for the
                  current mp3.
 BufferInfo    -- The input and output buffer states (for streaming only)
-Time          -- The time display
+Time          -- The time display (use '@' key to test the size of the field)
 TimeRemaining -- The time display used when in TimeRemaining mode 
         
 SliderControls,VSliderControls:        

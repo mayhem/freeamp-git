@@ -121,7 +121,7 @@ class Theme : public Parse
       string            m_oDefaultFont;
 	  string            m_oThemeName, m_oThemeAuthor;
 	  string            m_oAuthorEMail, m_oAuthorWebPage;
-	  string            m_oSavedText;
+	  string            m_oSavedText, m_oMiscInfo;
 	  bool              m_bCreditsShown;
 };
 
