@@ -710,7 +710,7 @@ MPause        -- Multistate Pause button. State 0 is shown when the player
 				 paused to give the user visual feedback that the player is
 				 paused.
 
-Buttons:
+ButtonControls:
 
 Play          -- The play button that gets disabled during playback
 Pause         -- The pause button that gets disabled during non playback
@@ -726,7 +726,8 @@ Logo          -- FreeAmp logo, clicking it will open a web browser to
 Minimize      -- Minimizes FreeAmp
 ReloadTheme   -- Reload the current theme
 Credits       -- Shows the theme credits in the title field
-
+Help          -- Show the FreeAmp help files.
+Files         -- Allows the user to select a file to play.
 
 TextControls:
 
