@@ -303,15 +303,21 @@ class     MediaTimeInfoEvent:public Event
 class     VolumeEvent:public Event
 {
    private:
-   int32 m_volume;
+   int32 m_left, m_right;
    public:
-   VolumeEvent(int32 t, int32 v = 0):m_volume(v)
+   VolumeEvent(int32 t, int32 left = 0, int32 right = 0)
    {
       m_type = t;
+      m_left = left;
+      m_right = right;
    }
-   int32     GetVolume()
+   int32     GetLeftVolume()
    {
-      return m_volume;
+      return m_left;
+   }
+   int32     GetRightVolume()
+   {
+      return m_right;
    }
    virtual ~ VolumeEvent()
    {

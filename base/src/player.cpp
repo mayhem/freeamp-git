@@ -1495,13 +1495,13 @@ void
 Player::
 GetVolume(Event *pEvent)
 {
-    int iVolume = -1;
+    int32 left = -1, right = -1;
 
     delete pEvent;
     if (m_pmo) 
     {
-       iVolume = m_pmo->GetVolume();
-       SendToUI(new VolumeEvent(INFO_VolumeInfo,iVolume));
+       m_pmo->GetVolume(left, right);
+       SendToUI(new VolumeEvent(INFO_VolumeInfo,left, right));
     }   
 }
 
@@ -1509,9 +1509,10 @@ void
 Player::
 SetVolume(Event *pEvent)
 {
-    int32 v=((VolumeEvent *) pEvent)->GetVolume();
+    int32 left=((VolumeEvent *) pEvent)->GetLeftVolume();
+    int32 right=((VolumeEvent *) pEvent)->GetRightVolume();
     if (m_pmo) 
-        m_pmo->SetVolume(v);
+        m_pmo->SetVolume(left, right);
     delete pEvent;
 }
 

@@ -76,7 +76,6 @@ const char *szCantFindHelpError = "Cannot find the help files. Please make "
                                   "installed, and you are not running "
                                   the_BRANDING" from the build directory.";
 const char *szKeepThemeMessage = "Would you like to keep this theme?";
-const int iVolumeChangeIncrement = 10;
 
 struct OptionsArgs
 {
@@ -105,6 +104,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_bSeekInProgress = false;
    m_bVolumeChangeInProgress = false;
    m_iVolume = -1;
+   m_iBalance = -1;
    m_iSeekPos = -1;
    m_bPlayShown = true;
    m_oTitle = string("");
@@ -342,8 +342,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
    
          bEnable = true;
          m_pWindow->ControlEnable(string("Volume"), true, bEnable);
-         m_pWindow->ControlEnable(string("VolumePlus"), true, bEnable);
-         m_pWindow->ControlEnable(string("VolumeMinus"), true, bEnable);
+         m_pWindow->ControlEnable(string("Balance"), true, bEnable);
          
          bEnable = false;
          m_pWindow->ControlEnable(string("StopIndicator"), true, bEnable);
@@ -403,8 +402,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
             
             bEnable = false;
             m_pWindow->ControlEnable(string("Volume"), true, bEnable);
-            m_pWindow->ControlEnable(string("VolumePlus"), true, bEnable);
-            m_pWindow->ControlEnable(string("VolumeMinus"), true, bEnable);
+            m_pWindow->ControlEnable(string("Balance"), true, bEnable);
             m_pWindow->ControlEnable(string("StereoIndicator"), true, bEnable);
             m_pWindow->ControlEnable(string("MonoIndicator"), true, bEnable);
 
@@ -684,8 +682,24 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
       }
       case INFO_VolumeInfo:
       {
-         m_iVolume = ((VolumeEvent *) e)->GetVolume();
+         int iLeft, iRight;
+         
+         iLeft = ((VolumeEvent *) e)->GetLeftVolume();
+         iRight = ((VolumeEvent *) e)->GetRightVolume();
+
+         if (iLeft > iRight)
+         {
+             m_iVolume = iLeft;
+             m_iBalance = iRight * 50 / iLeft ;
+         }
+         else
+         {
+             m_iVolume = iRight;
+             m_iBalance = 50 + (50 - (iLeft * 50 / iRight)); 
+         }
+
          m_pWindow->ControlIntValue(string("Volume"), true, m_iVolume);
+         m_pWindow->ControlIntValue(string("Balance"), true, m_iBalance);
          break;
       }
 
@@ -825,25 +839,17 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
            m_bVolumeChangeInProgress = false;
 
        m_pWindow->ControlIntValue(oControlName, false, iVol);
-       SetVolume(iVol);
+       SetVolume(iVol, m_iBalance);
            
        return kError_NoErr;
    }    
-   if (oControlName == string("VolumePlus") && eMesg == CM_Pressed)
+   if (oControlName == string("Balance") && 
+       (eMesg == CM_ValueChanged || eMesg == CM_SliderUpdate))
    {
-       int iVol;
-       
-       iVol = min(m_iVolume + iVolumeChangeIncrement, 100);
-       SetVolume(iVol);
-           
-       return kError_NoErr;
-   }    
-   if (oControlName == string("VolumeMinus") && eMesg == CM_Pressed)
-   {
-       int iVol;
-       
-       iVol = max(m_iVolume - iVolumeChangeIncrement, 0);
-       SetVolume(iVol);
+       int iBal;
+
+       m_pWindow->ControlIntValue(oControlName, false, iBal);
+       SetVolume(m_iVolume, iBal);
            
        return kError_NoErr;
    }    
@@ -1182,24 +1188,24 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
 
 void FreeAmpTheme::InitControls(void)
 {
-	bool   bSet, bEnable;
+    bool   bSet, bEnable;
     int    iState;
     string oWelcome(szWelcomeMsg);
     
     assert(m_pWindow);
     
     // Set the volume control
-	if (m_iVolume >= 0)
+    if (m_iVolume >= 0)
     {  
        bSet = true;
        m_pWindow->ControlIntValue(string("Volume"), true, m_iVolume);
+       m_pWindow->ControlIntValue(string("Balance"), true, m_iBalance);
     }
     else 
        bSet = false;   
        
     m_pWindow->ControlEnable(string("Volume"), true, bSet);
-    m_pWindow->ControlEnable(string("VolumePlus"), true, bSet);
-    m_pWindow->ControlEnable(string("VolumeMinus"), true, bSet);
+    m_pWindow->ControlEnable(string("Balance"), true, bSet);
 
     // Set the seek control
     bSet = (m_iTotalSeconds < 0) ? false : true;
@@ -1346,20 +1352,50 @@ void FreeAmpTheme::ReloadTheme(void)
     delete [] szTemp;
 }
 
-void FreeAmpTheme::SetVolume(int iVolume)
+void FreeAmpTheme::SetVolume(int iVolume, int iBalance)
 {       
     string oVol("Volume: ");
-    char   szPercent[10];
-    
+    char   szPercent[40];
+    int    iLeft, iRight, iLastBal = m_iBalance;
+
+    if (iBalance < 50) // more focus on left channel
+    {
+        iLeft = iVolume;
+        iRight = iVolume - (iVolume * (50 - iBalance) * 2 / 100);
+    }
+    else
+    {
+        iLeft = iVolume - (iVolume * (iBalance - 50) * 2 / 100);
+        iRight = iVolume;
+    }
+
     m_iVolume = iVolume;
+    m_iBalance = iBalance;
+
     m_pContext->target->AcceptEvent(new 
-        VolumeEvent(CMD_SetVolume, m_iVolume));
+        VolumeEvent(CMD_SetVolume, iLeft, iRight));
 
     m_pWindow->ControlIntValue(string("Volume"), true, m_iVolume);
+    m_pWindow->ControlIntValue(string("Balance"), true, m_iBalance);
 
-    sprintf(szPercent, "%d%%", iVolume);
-    oVol += string(szPercent);
-    m_pWindow->ControlStringValue(string("Info"), true, oVol);
+    if (m_iBalance == iLastBal)
+    {
+        sprintf(szPercent, "%d%%", iVolume);
+        oVol += string(szPercent);
+        m_pWindow->ControlStringValue(string("Info"), true, oVol);
+    }
+    else
+    {
+        if (m_iBalance == 50)
+           strcpy(szPercent, "Equal balance");
+        else
+        if (m_iBalance < 50)
+           sprintf(szPercent, "%d%% Left", 100 - m_iBalance * 2);
+        else
+           sprintf(szPercent, "%d%% Right", (m_iBalance - 50) * 2);
+        oVol = string("Balance: ") + string(szPercent);
+        m_pWindow->ControlStringValue(string("Info"), true, oVol);
+    }
 }    
 
 void FreeAmpTheme::HandleKeystroke(unsigned char cKey)

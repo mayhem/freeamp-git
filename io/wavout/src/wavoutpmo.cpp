@@ -84,16 +84,16 @@ WavOutPMO::
   }
 }
 
-int32
+void
 WavOutPMO::
-GetVolume(void)
+GetVolume(int32 &left, int32 &right)
 {
-    return 0;
+    left = right = -1;
 }
 
 void
 WavOutPMO::
-SetVolume(int32 v)
+SetVolume(int32 left, int32 right)
 {
     ;
 }

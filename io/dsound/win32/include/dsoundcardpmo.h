@@ -80,8 +80,8 @@ public:
   void            Pause(void);
   void            Resume(void);
 
-  virtual int32   GetVolume(void);
-  virtual void    SetVolume(int32);
+  virtual void    GetVolume(int32 &left, int32 &right);
+  virtual void    SetVolume(int32 left, int32 right);
 
   static  void    StartWorkerThread(void *);
 

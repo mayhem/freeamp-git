@@ -56,8 +56,8 @@ public:
   void            Resume(void);
   void            Quit(void);
 
-  virtual int32   GetVolume(void);
-  virtual void    SetVolume(int32);
+  virtual void    GetVolume(int32 &, int32 &);
+  virtual void    SetVolume(int32, int32);
 
   static  void    StartWorkerThread(void *);
 

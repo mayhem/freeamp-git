@@ -65,7 +65,6 @@ EsounDPMO::EsounDPMO(FAContext *context) :
    m_iBytesPerSample = 0;
    m_iLastFrame = -1;
    m_iDataSize = 0;
-   m_iVolume = 100;
    audio_fd = -1;
    mixer_fd = -1;
    m_espeaker = NULL;
@@ -115,8 +114,10 @@ EsounDPMO::~EsounDPMO()
    }
 }
 
-int32 EsounDPMO::GetVolume()
+void EsounDPMO::GetVolume(int32 &left, int32 &right)
 {
+   left = right = -1;
+
    if (mixer_fd > 0)
    {
       esd_info_t *info;
@@ -125,27 +126,28 @@ int32 EsounDPMO::GetVolume()
       info = esd_get_all_info(mixer_fd);
 
       if (!info) 
-         return m_iVolume;
+         return;
 
       for (plr = info->player_list; plr; plr = plr->next)
           if (!strncmp(stream_name, plr->name, ESD_NAME_MAX))
           {
-             m_iVolume = (plr->left_vol_scale + plr->right_vol_scale) / 2;
+             left = plr->left_vol_scale;
+             right = plr->right_vol_scale;
              break;
           }
-      m_iVolume = 50 * m_iVolume / ESD_VOLUME_BASE;
+      left = 50 * left / ESD_VOLUME_BASE;
+      right = 50 * right / ESD_VOLUME_BASE;
       esd_free_all_info(info);
    }
-   return m_iVolume;
 }
 
-void EsounDPMO::SetVolume(int32 v)
+void EsounDPMO::SetVolume(int32 left, int32 right)
 {
    if (mixer_fd > 0)
    {
-      m_iVolume = v;
-      v = ESD_VOLUME_BASE * (v & 0xff) / 50;
-      esd_set_stream_pan(mixer_fd, stream_id, v, v);
+      left = ESD_VOLUME_BASE * (left & 0xff) / 50;
+      right = ESD_VOLUME_BASE * (right & 0xff) / 50;
+      esd_set_stream_pan(mixer_fd, stream_id, left, right);
    }
 }
 

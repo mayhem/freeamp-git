@@ -72,8 +72,8 @@ public:
     virtual ~PhysicalMediaOutput();
 
     virtual Error Init(OutputInfo* /*info*/) = 0;
-    virtual int32 GetVolume(void) = 0;
-    virtual void  SetVolume(int32) = 0;
+    virtual void  GetVolume(int32 &left, int32 &right) = 0;
+    virtual void  SetVolume(int32 left, int32 right) = 0;
 
     virtual Error Reset(bool bUserReset) = 0;
     virtual void  Pause(void);

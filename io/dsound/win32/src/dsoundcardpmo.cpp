@@ -268,97 +268,100 @@ DSoundCardPMO::
 
 bool DSoundCardPMO::SetupVolumeControl(void)
 {
-	MIXERLINE mxl;
-	MIXERCONTROL mxc;
-	MIXERLINECONTROLS mxlc;
+    MIXERLINE mxl;
+    MIXERCONTROL mxc;
+    MIXERLINECONTROLS mxlc;
     
-	m_oDstLineName = "";
-	m_oVolumeControlName = "";
+    m_oDstLineName = "";
+    m_oVolumeControlName = "";
 
-	if (m_hmixer == NULL)
-		return FALSE;
+    if (m_hmixer == NULL)
+        return FALSE;
 
-	mxl.cbStruct = sizeof(MIXERLINE);
-	mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT;
-	if (mixerGetLineInfo((HMIXEROBJ)m_hmixer,
+    mxl.cbStruct = sizeof(MIXERLINE);
+    mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT;
+    if (mixerGetLineInfo((HMIXEROBJ)m_hmixer,
                          &mxl,
                          MIXER_OBJECTF_HMIXER |
                          MIXER_GETLINEINFOF_COMPONENTTYPE)
-		!= MMSYSERR_NOERROR)
-		return false;
+        != MMSYSERR_NOERROR)
+        return false;
 
-	mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
-	mxlc.dwLineID = mxl.dwLineID;
-	mxlc.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
-	mxlc.cControls = 1;
-	mxlc.cbmxctrl = sizeof(MIXERCONTROL);
-	mxlc.pamxctrl = &mxc;
+    mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
+    mxlc.dwLineID = mxl.dwLineID;
+    mxlc.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
+    mxlc.cControls = 1;
+    mxlc.cbmxctrl = sizeof(MIXERCONTROL);
+    mxlc.pamxctrl = &mxc;
 
-	if (mixerGetLineControls((HMIXEROBJ)m_hmixer,
-		     				 &mxlc,
-							 MIXER_OBJECTF_HMIXER |
-							 MIXER_GETLINECONTROLSF_ONEBYTYPE)
-		!= MMSYSERR_NOERROR)
-		return false;
+    if (mixerGetLineControls((HMIXEROBJ)m_hmixer,
+                             &mxlc,
+                             MIXER_OBJECTF_HMIXER |
+                             MIXER_GETLINECONTROLSF_ONEBYTYPE)
+        != MMSYSERR_NOERROR)
+        return false;
 
-	// record dwControlID
-	m_oDstLineName = mxl.szName;
-	m_oVolumeControlName = mxc.szName;
-	m_dwMinimum = mxc.Bounds.dwMinimum;
-	m_dwMaximum = mxc.Bounds.dwMaximum;
-	m_dwVolumeControlID = mxc.dwControlID;
+    // record dwControlID
+    m_oDstLineName = mxl.szName;
+    m_oVolumeControlName = mxc.szName;
+    m_dwMinimum = mxc.Bounds.dwMinimum;
+    m_dwMaximum = mxc.Bounds.dwMaximum;
+    m_dwVolumeControlID = mxc.dwControlID;
 
-	return TRUE;
+    return TRUE;
 }
 
 
-int32
+void
 DSoundCardPMO::
-GetVolume(void)
+GetVolume(int32 left, int32 right)
 {
-	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume;
-	MIXERCONTROLDETAILS mxcd;
+    MIXERCONTROLDETAILS_UNSIGNED mxcdVolume;
+    MIXERCONTROLDETAILS mxcd;
     int                 ret;
     
-	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
-	mxcd.dwControlID = m_dwVolumeControlID;
-	mxcd.cChannels = 1;
-	mxcd.cMultipleItems = 0;
-	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-	mxcd.paDetails = &mxcdVolume;
-	ret = mixerGetControlDetails((HMIXEROBJ)m_hmixer,
-								 &mxcd,
-								 MIXER_OBJECTF_HMIXER |
-								 MIXER_GETCONTROLDETAILSF_VALUE);
-	if (ret != MMSYSERR_NOERROR)
-		return false;
+    mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
+    mxcd.dwControlID = m_dwVolumeControlID;
+    mxcd.cChannels = 2;
+    mxcd.cMultipleItems = 0;
+    mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+    mxcd.paDetails = &mxcdVolume;
+    ret = mixerGetControlDetails((HMIXEROBJ)m_hmixer,
+                                 &mxcd,
+                                 MIXER_OBJECTF_HMIXER |
+                                 MIXER_GETCONTROLDETAILSF_VALUE);
+    if (ret != MMSYSERR_NOERROR)
+        return false;
 
-    return  (int)(((float)((mxcdVolume.dwValue - m_dwMinimum) * 100) /  
+    left = (int)(((float)((mxcdVolume.dwValue[0] - m_dwMinimum) * 100) /  
                   (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
+    right = (int)(((float)((mxcdVolume.dwValue[1] - m_dwMinimum) * 100) /  
+                   (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
 }
 
 void
 DSoundCardPMO::
-SetVolume(int32 volume)
+SetVolume(int32 left, int32 right)
 {
-    DWORD dwVal;
+    DWORD dwLeft, dwRight;
     
-    dwVal = (volume * (m_dwMaximum - m_dwMinimum) / 100);
+    dwLeft = (left * (m_dwMaximum - m_dwMinimum) / 100);
+    dwRight = (right * (m_dwMaximum - m_dwMinimum) / 100);
 
-	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
-	MIXERCONTROLDETAILS mxcd;
+    MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
+    MIXERCONTROLDETAILS mxcd;
     
-    memcpy(&mxcdVolume[0], &dwVal, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
-    memcpy(&mxcdVolume[1], &dwVal, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
+    memcpy(&mxcdVolume[0], &dwLeft, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
+    memcpy(&mxcdVolume[1], &dwRight, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
     
-	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
-	mxcd.dwControlID = m_dwVolumeControlID;
-	mxcd.cChannels = 2;
-	mxcd.cMultipleItems = 0;
-	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-	mxcd.paDetails = &mxcdVolume;
+    mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
+    mxcd.dwControlID = m_dwVolumeControlID;
+    mxcd.cChannels = 2;
+    mxcd.cMultipleItems = 0;
+    mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+    mxcd.paDetails = &mxcdVolume;
     
-	mixerSetControlDetails((HMIXEROBJ)m_hmixer, &mxcd, 
+    mixerSetControlDetails((HMIXEROBJ)m_hmixer, &mxcd, 
                            MIXER_OBJECTF_HMIXER | 
                            MIXER_SETCONTROLDETAILSF_VALUE);
 }
@@ -403,7 +406,7 @@ Init(OutputInfo* info)
     // Should set cooperative level here to set primary buffer format
     // but we need a handle to a window ... need to talk to Mark about that
     hResult = m_DSBufferManager.pDSDevice->pDSObject->SetCooperativeLevel( m_hMainWndHandle,
-																																						DSSCL_PRIORITY);
+                                                                                                                                                        DSSCL_PRIORITY);
     if (FAILED(hResult))
     {
       m_pContext->log->Log(LogOutput, "error cannot set DirectSound DSSCL_PRIORITY Cooperative Level...\n");
@@ -470,7 +473,7 @@ Init(OutputInfo* info)
                                       DSBCAPS_CTRLPAN             |
                                       DSBCAPS_CTRLVOLUME          |
                                       DSBCAPS_GETCURRENTPOSITION2 |
-									  DSBCAPS_GLOBALFOCUS;
+                                      DSBCAPS_GLOBALFOCUS;
   DSBufferInfo.dwBufferBytes      = m_DSBufferManager.dwBufferSize;
   DSBufferInfo.lpwfxFormat        = m_wfex;
 
@@ -646,12 +649,12 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
   m_pDSWriteSem->Wait();
 
   // get a lock to a memory region to write to
-  hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	m_DSBufferManager.dwWritePtr,
-														length,
-														&ptr1,
-														&dwBytes1,
-														&ptr2,																											&dwBytes2,
-														0);
+  hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock( m_DSBufferManager.dwWritePtr,
+                                                        length,
+                                                        &ptr1,
+                                                        &dwBytes1,
+                                                        &ptr2,                                                                                                          &dwBytes2,
+                                                        0);
   if (hResult == DSERR_BUFFERLOST)
   {
     hResult = m_DSBufferManager.pDSSecondaryBuffer->Restore();
@@ -662,13 +665,13 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
       m_pContext->log->Log(LogOutput, "Exiting DSWriteToSecBuffer with DSound error\n");
       return result;
     }
-    hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	m_DSBufferManager.dwWritePtr,
-															length,
-															&ptr1,
-															&dwBytes1,
-															&ptr2,
-															&dwBytes2,
-															0);
+    hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(   m_DSBufferManager.dwWritePtr,
+                                                            length,
+                                                            &ptr1,
+                                                            &dwBytes1,
+                                                            &ptr2,
+                                                            &dwBytes2,
+                                                            0);
   }
 
   if (FAILED(hResult))
@@ -700,7 +703,7 @@ DSWriteToSecBuffer(int32& wrote, void *pBuffer, int32 length)
   }
 
   // unlock the memory region
-  m_DSBufferManager.pDSSecondaryBuffer->Unlock(	ptr1, dwBytes1, ptr2, dwBytes2);
+  m_DSBufferManager.pDSSecondaryBuffer->Unlock( ptr1, dwBytes1, ptr2, dwBytes2);
   if (FAILED(hResult))
   {
     wrote = 0;
@@ -738,7 +741,7 @@ DSMonitorBufferState()
   new_state = m_DSBufferManager.state;
 
   m_DSBufferManager.pDSSecondaryBuffer->GetCurrentPosition( &dwReadPos,
-															&dwWritePos);
+                                                            &dwWritePos);
   if (m_DSBufferManager.dwWritePtr >= dwReadPos)
   {
     dwBuffered = m_DSBufferManager.dwWritePtr - dwReadPos;
@@ -776,7 +779,7 @@ DSMonitorBufferState()
 
         // restart the buffer
         if (m_bLMCsaidToPlay && m_bIsBufferEmptyNow)
-        m_DSBufferManager.pDSSecondaryBuffer->Play(	0, 0, DSBPLAY_LOOPING);
+        m_DSBufferManager.pDSSecondaryBuffer->Play( 0, 0, DSBPLAY_LOOPING);
 
         m_bIsBufferEmptyNow = false;
       }
@@ -861,20 +864,20 @@ DSClear()
   m_DSBufferManager.pDSSecondaryBuffer->SetCurrentPosition(0);
 
   // write zeros into secondary buffer
-  hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock(	0,
-														m_DSBufferManager.dwBufferSize,
-														&ptr,
-														&dwBytes,
-														NULL,
-														NULL,
-														0);
+  hResult = m_DSBufferManager.pDSSecondaryBuffer->Lock( 0,
+                                                        m_DSBufferManager.dwBufferSize,
+                                                        &ptr,
+                                                        &dwBytes,
+                                                        NULL,
+                                                        NULL,
+                                                        0);
   if (SUCCEEDED(hResult))
   {
     memset(ptr, 0, m_DSBufferManager.dwBufferSize);
-    m_DSBufferManager.pDSSecondaryBuffer->Unlock(	ptr,
-													dwBytes,
-													NULL,
-													0);
+    m_DSBufferManager.pDSSecondaryBuffer->Unlock(   ptr,
+                                                    dwBytes,
+                                                    NULL,
+                                                    0);
   }
   m_bIsBufferEmptyNow = true;
 
@@ -935,7 +938,7 @@ WorkerThread(void)
                   delete pEvent;
                   break;
               }
-		  }
+          }
           delete pEvent;
 
           continue;
@@ -945,11 +948,11 @@ WorkerThread(void)
       // available, sleep for a little while and try again.
       for(;;)
       {
-		  if (m_bPause || m_bExit)
-			  break;
-		  
+          if (m_bPause || m_bExit)
+              break;
+          
           eErr = GetData(pBuffer);
-		  if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
+          if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
              break;
 
 
@@ -966,8 +969,8 @@ WorkerThread(void)
           if (eErr == kError_EventPending)
           {
               pEvent = ((EventBuffer *)m_pInputBuffer)->GetEvent();
-			  if (pEvent == NULL)
-				  continue;
+              if (pEvent == NULL)
+                  continue;
 
               if (pEvent->Type() == PMO_Init)
                   Init(((PMOInitEvent *)pEvent)->GetInfo());
@@ -982,7 +985,7 @@ WorkerThread(void)
               {
                   delete pEvent;
                   m_pTarget->AcceptEvent(new Event(INFO_DoneOutputting));
-				  
+                  
                   return;
               }
  
@@ -1000,11 +1003,11 @@ WorkerThread(void)
           }
           break;
       }
-	  if (m_bPause || m_bExit)
-		 continue;
+      if (m_bPause || m_bExit)
+         continue;
 
       Write(pBuffer);
-	  m_pLmc->Wake();
+      m_pLmc->Wake();
       UpdateBufferStatus();
   }
 

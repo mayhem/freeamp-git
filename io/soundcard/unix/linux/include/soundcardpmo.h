@@ -64,8 +64,8 @@ class SoundCardPMO:public PhysicalMediaOutput
    virtual Error Init(OutputInfo * info);
 
    static void   StartWorkerThread(void *);
-          int32  GetVolume(void);
-          void   SetVolume(int32);
+          void   GetVolume(int32 &left, int32 &right);
+          void   SetVolume(int32 left, int32 right);
 
  private:
    void          WorkerThread(void); 

@@ -133,9 +133,9 @@ SoundCardPMO::~SoundCardPMO()
       for(int iLoop = 0; iLoop < m_num_headers; iLoop++)
       {
           if ((int)m_wavehdr_array[iLoop].dwUser < 0)
-		  {
+          {
               waveOutUnprepareHeader(m_hwo, &m_wavehdr_array[iLoop], sizeof(WAVEHDR));
-		  }
+          }
       }
 
       while (waveOutClose(m_hwo) == WAVERR_STILLPLAYING)
@@ -160,94 +160,97 @@ SoundCardPMO::~SoundCardPMO()
 
 bool SoundCardPMO::SetupVolumeControl(void)
 {
-	MIXERLINE mxl;
-	MIXERCONTROL mxc;
-	MIXERLINECONTROLS mxlc;
+    MIXERLINE mxl;
+    MIXERCONTROL mxc;
+    MIXERLINECONTROLS mxlc;
     
-	m_oDstLineName = "";
-	m_oVolumeControlName = "";
+    m_oDstLineName = "";
+    m_oVolumeControlName = "";
 
-	if (m_hmixer == NULL)
-		return FALSE;
+    if (m_hmixer == NULL)
+        return FALSE;
 
-	mxl.cbStruct = sizeof(MIXERLINE);
-	mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT;
-	if (mixerGetLineInfo((HMIXEROBJ)m_hmixer,
+    mxl.cbStruct = sizeof(MIXERLINE);
+    mxl.dwComponentType = MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT;
+    if (mixerGetLineInfo((HMIXEROBJ)m_hmixer,
                          &mxl,
                          MIXER_OBJECTF_HMIXER |
                          MIXER_GETLINEINFOF_COMPONENTTYPE)
-		!= MMSYSERR_NOERROR)
-		return false;
+        != MMSYSERR_NOERROR)
+        return false;
 
-	mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
-	mxlc.dwLineID = mxl.dwLineID;
-	mxlc.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
-	mxlc.cControls = 1;
-	mxlc.cbmxctrl = sizeof(MIXERCONTROL);
-	mxlc.pamxctrl = &mxc;
+    mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
+    mxlc.dwLineID = mxl.dwLineID;
+    mxlc.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
+    mxlc.cControls = 1;
+    mxlc.cbmxctrl = sizeof(MIXERCONTROL);
+    mxlc.pamxctrl = &mxc;
 
-	if (mixerGetLineControls((HMIXEROBJ)m_hmixer,
-		     				 &mxlc,
-							 MIXER_OBJECTF_HMIXER |
-							 MIXER_GETLINECONTROLSF_ONEBYTYPE)
-		!= MMSYSERR_NOERROR)
-		return false;
+    if (mixerGetLineControls((HMIXEROBJ)m_hmixer,
+                             &mxlc,
+                             MIXER_OBJECTF_HMIXER |
+                             MIXER_GETLINECONTROLSF_ONEBYTYPE)
+        != MMSYSERR_NOERROR)
+        return false;
 
-	// record dwControlID
-	m_oDstLineName = mxl.szName;
-	m_oVolumeControlName = mxc.szName;
-	m_dwMinimum = mxc.Bounds.dwMinimum;
-	m_dwMaximum = mxc.Bounds.dwMaximum;
-	m_dwVolumeControlID = mxc.dwControlID;
+    // record dwControlID
+    m_oDstLineName = mxl.szName;
+    m_oVolumeControlName = mxc.szName;
+    m_dwMinimum = mxc.Bounds.dwMinimum;
+    m_dwMaximum = mxc.Bounds.dwMaximum;
+    m_dwVolumeControlID = mxc.dwControlID;
 
-	return TRUE;
+    return TRUE;
 }
 
-int32 SoundCardPMO::GetVolume() 
+void SoundCardPMO::GetVolume(int32 &left, int32 &right) 
 {
-	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume;
-	MIXERCONTROLDETAILS mxcd;
+    MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
+    MIXERCONTROLDETAILS mxcd;
     int                 ret;
     
-	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
-	mxcd.dwControlID = m_dwVolumeControlID;
-	mxcd.cChannels = 1;
-	mxcd.cMultipleItems = 0;
-	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-	mxcd.paDetails = &mxcdVolume;
-	ret = mixerGetControlDetails((HMIXEROBJ)m_hmixer,
-								 &mxcd,
-								 MIXER_OBJECTF_HMIXER |
-								 MIXER_GETCONTROLDETAILSF_VALUE);
-	if (ret != MMSYSERR_NOERROR)
-		return false;
+    mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
+    mxcd.dwControlID = m_dwVolumeControlID;
+    mxcd.cChannels = 2;
+    mxcd.cMultipleItems = 0;
+    mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+    mxcd.paDetails = &mxcdVolume;
+    ret = mixerGetControlDetails((HMIXEROBJ)m_hmixer,
+                                 &mxcd,
+                                 MIXER_OBJECTF_HMIXER |
+                                 MIXER_GETCONTROLDETAILSF_VALUE);
+    if (ret != MMSYSERR_NOERROR)
+        return false;
 
-    return  (int)(((float)((mxcdVolume.dwValue - m_dwMinimum) * 100) /  
+    left = (int)(((float)((mxcdVolume[0].dwValue - m_dwMinimum) * 100) /  
+                  (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
+    right = (int)(((float)((mxcdVolume[1].dwValue - m_dwMinimum) * 100) /  
                   (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
 }
 
-void SoundCardPMO::SetVolume(int32 volume) 
+void SoundCardPMO::SetVolume(int32 left, int32 right) 
 {
-    DWORD dwVal;
+    DWORD dwValLeft, dwValRight;
     
-    dwVal = (volume * (m_dwMaximum - m_dwMinimum) / 100);
+    dwValLeft = (left * (m_dwMaximum - m_dwMinimum) / 100);
+    dwValRight = (right * (m_dwMaximum - m_dwMinimum) / 100);
 
-	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
-	MIXERCONTROLDETAILS mxcd;
+    MIXERCONTROLDETAILS_UNSIGNED mxcdVolume[2];
+    MIXERCONTROLDETAILS mxcd;
     
-    memcpy(&mxcdVolume[0], &dwVal, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
-    memcpy(&mxcdVolume[1], &dwVal, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
+    memcpy(&mxcdVolume[0], &dwValLeft, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
+    memcpy(&mxcdVolume[1], &dwValRight, sizeof(MIXERCONTROLDETAILS_UNSIGNED));
     
-	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
-	mxcd.dwControlID = m_dwVolumeControlID;
-	mxcd.cChannels = 2;
-	mxcd.cMultipleItems = 0;
-	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-	mxcd.paDetails = &mxcdVolume;
+    mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
+    mxcd.dwControlID = m_dwVolumeControlID;
+    mxcd.cChannels = 2;
+    mxcd.cMultipleItems = 0;
+    mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+    mxcd.paDetails = &mxcdVolume;
     
-	mixerSetControlDetails((HMIXEROBJ)m_hmixer, &mxcd, 
-                           MIXER_OBJECTF_HMIXER | 
-                           MIXER_SETCONTROLDETAILSF_VALUE);
+    mixerSetControlDetails((HMIXEROBJ)m_hmixer, &mxcd, 
+                              MIXER_OBJECTF_HMIXER | 
+                              MIXER_SETCONTROLDETAILSF_VALUE);
 }
 
 Error SoundCardPMO::Init(OutputInfo * info)
@@ -343,8 +346,8 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    minutes = (iTotalTime - 
                 (hours * 3600)) / 60;
    seconds = iTotalTime - 
-			    (hours * 3600) - 
-			    (minutes * 60);
+                (hours * 3600) - 
+                (minutes * 60);
 
    if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59)
       return;
@@ -362,18 +365,18 @@ bool SoundCardPMO::WaitForDrain(void)
    {   
        g_pHeaderMutex->Acquire();
 
-	   for(iLoop = 0, iNumHeadersPending = 0; iLoop < m_num_headers; iLoop++)
+       for(iLoop = 0, iNumHeadersPending = 0; iLoop < m_num_headers; iLoop++)
        {
            if ((int)m_wavehdr_array[iLoop].dwUser > 0)
                iNumHeadersPending++;
-	   }
-	   g_pHeaderMutex->Release();
+       }
+       g_pHeaderMutex->Release();
    
        if (iNumHeadersPending == 0)
-	   {
-		  return true;
-	   }
-	   WasteTime();
+       {
+          return true;
+       }
+       WasteTime();
        HandleTimeInfoEvent(NULL);
    }
 
@@ -389,19 +392,19 @@ void SoundCardPMO::Pause(void)
 
 void SoundCardPMO::Resume(void)
 {
-	if (m_initialized)
-	   waveOutRestart(m_hwo);
-	
-	PhysicalMediaOutput::Resume();
+    if (m_initialized)
+       waveOutRestart(m_hwo);
+    
+    PhysicalMediaOutput::Resume();
 }
 
 void SoundCardPMO::Clear(void)
 {
-	if (m_initialized)
+    if (m_initialized)
     {
        int i;
        
-	   waveOutReset(m_hwo);
+       waveOutReset(m_hwo);
        g_pHeaderMutex->Acquire();
        for (i = 0; i < m_num_headers; i++)
        {
@@ -415,8 +418,8 @@ void SoundCardPMO::Clear(void)
        m_iHead = m_iTail = 0;
        g_pHeaderMutex->Release();
     }   
-	
-	PhysicalMediaOutput::Clear();
+    
+    PhysicalMediaOutput::Clear();
 }
 
 Error SoundCardPMO::Reset(bool user_stop)
@@ -625,7 +628,7 @@ void SoundCardPMO::WorkerThread(void)
                   delete pEvent;
                   break;
               }
-		  }
+          }
           delete pEvent;
 
           continue;
@@ -635,11 +638,11 @@ void SoundCardPMO::WorkerThread(void)
       // available, sleep for a little while and try again.
       for(;;)
       {
-		  if (m_bPause || m_bExit)
-			  break;
-	      
+          if (m_bPause || m_bExit)
+              break;
+          
           eErr = AllocHeader(pBuffer, uSize);
-		  if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
+          if (eErr == kError_EndOfStream || eErr == kError_Interrupt)
              break;
 
           if (eErr == kError_NoDataAvail)
@@ -650,8 +653,8 @@ void SoundCardPMO::WorkerThread(void)
               // cleans up the pending headers so the bytes in use
               // value is correct.
               NextHeader(true);
-			  if (m_iHead == m_iTail)
-				 Debug_v("Underflow!");
+              if (m_iHead == m_iTail)
+                 Debug_v("Underflow!");
     
               WasteTime();
               continue;
@@ -710,11 +713,11 @@ void SoundCardPMO::WorkerThread(void)
           }
           break;
       }
-	  if (m_bPause || m_bExit)
-		 continue;
+      if (m_bPause || m_bExit)
+         continue;
 
       Write(pBuffer, uSize);
-	  m_pLmc->Wake();
+      m_pLmc->Wake();
 
       UpdateBufferStatus();
    }
