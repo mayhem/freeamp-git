@@ -80,6 +80,7 @@
 #define IDC_TEXT1                       1034
 #define IDC_CAPTION2                    1035
 #define IDC_TEXT2                       1036
+#define IDC_LOCATIONTEXT                1039
 #define IDC_BROWSE                      1110
 #define IDC_DRIVES                      1231
 #define IDC_ALBUM                       1462
@@ -88,6 +89,7 @@
 #define IDC_TRACK                       1466
 #define IDC_TITLE                       1476
 #define IDC_COMMENT                     1477
+#define IDC_LOCATION                    1478
 #define IDC_DIRECTORY                   1531
 #define ID_FILE_NEWPLAYLIST             40001
 #define ID_FILE_OPENPLAYLIST            40002
@@ -164,7 +166,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         40076
-#define _APS_NEXT_CONTROL_VALUE         1038
+#define _APS_NEXT_CONTROL_VALUE         1040
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

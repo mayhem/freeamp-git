@@ -41,9 +41,11 @@ ____________________________________________________________________________*/
 EditTrackInfoDialog::EditTrackInfoDialog(FAContext* context,
                                          HWND hwnd, 
                                          const vector<ArtistList*>* artistList,
-                                         MetaData* editMetaData):
+                                         MetaData* editMetaData,
+                                         const char* location):
     m_hwnd(hwnd), m_artistList(artistList), 
-    m_editMetaData(editMetaData), m_context(context)
+    m_editMetaData(editMetaData), m_context(context), 
+    m_location(location)
 {
 
 }
@@ -117,6 +119,7 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
             HWND hwndYear = GetDlgItem(hwnd, IDC_YEAR);
             HWND hwndSpinYear = GetDlgItem(hwnd, IDC_SPINYEAR);
             HWND hwndComment = GetDlgItem(hwnd, IDC_COMMENT);
+            HWND hwndLocation = GetDlgItem(hwnd, IDC_LOCATION);
             HWND hwndTitleText =  FindWindowEx(hwnd, NULL, NULL, "Title:");
             HWND hwndTrackText =  FindWindowEx(hwnd, NULL, NULL, "Track #:");
             
@@ -161,6 +164,9 @@ BOOL EditTrackInfoDialog::DialogProc(HWND hwnd,
 
             // track comment
             Edit_SetText(hwndComment, m_editMetaData->Comment().c_str());
+
+            // location
+            Edit_SetText(hwndLocation, m_location);
 
 
             // add artists

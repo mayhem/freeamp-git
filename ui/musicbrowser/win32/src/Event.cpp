@@ -376,6 +376,7 @@ const char* kMultipleComments = "<Enter a new comment for all selected tracks.>"
 void MusicBrowserUI::EditInfoEvent()
 {
     MetaData metadata;
+    char location[MAX_PATH];
 
     vector<PlaylistItem*> items;
 
@@ -429,12 +430,21 @@ void MusicBrowserUI::EditInfoEvent()
         metadata.SetTitle(kMultipleTracks);
         metadata.SetTrack(-1);
         metadata.SetComment(kMultipleComments);
+        strcpy(location, kMultipleTracks);
+    }
+    else
+    {
+        uint32 size = sizeof(location);
+        if(IsError(URLToFilePath(items[0]->URL().c_str(), location, &size)))
+            strcpy(location, items[0]->URL().c_str());
+
     }
 
     EditTrackInfoDialog editTrackInfo(m_context,
                                       m_hWnd,
                                       m_context->catalog->GetMusicList(),
-                                      &metadata);
+                                      &metadata,
+                                      location);
     if(editTrackInfo.Show())
     {
         for(track = items.begin(); track != items.end(); track++)

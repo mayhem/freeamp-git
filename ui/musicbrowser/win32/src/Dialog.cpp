@@ -53,6 +53,11 @@ TBBUTTON tbButtons[] = {
     { 8, ID_EDIT_MOVEDOWN, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0L, -1} 
 };
 
+#define kNumPanes       2
+#define kControlsWidth  104
+#define kTimeWidth      70
+int32   panes[kNumPanes]= {0, /*0,*/ -1};
+
 static BOOL CALLBACK MainDlgProc(HWND hwnd, UINT msg, 
                                  WPARAM wParam, LPARAM lParam )
 {
@@ -609,9 +614,9 @@ void MusicBrowserUI::SizeWindow(int iType, int iWidth, int iHeight)
                            controlHeight,
                            SWP_NOZORDER);
 
-    int32 panes[2]= {0, -1};
-    panes[0] = clientRect.right - clientRect.left - 70;
-    SendMessage(m_hStatus, SB_SETPARTS, 2, (LPARAM) panes);
+    panes[0] = clientRect.right - clientRect.left /*- kControlsWidth*/ - kTimeWidth;
+    //panes[1] = panes[0] + kControlsWidth;
+    SendMessage(m_hStatus, SB_SETPARTS, kNumPanes, (LPARAM) panes);
 
     // Tool Bar
     GetWindowRect(m_hRebar, &controlRect); 
@@ -812,8 +817,7 @@ void MusicBrowserUI::SetMinMaxInfo()
 void MusicBrowserUI::InitDialog(HWND hWnd)
 {
     HIMAGELIST      hList;
-    const int32     kNumPanes = 2;
-    int32           panes[kNumPanes]= {500, -1};
+    
 
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE);
     HICON appIcon = LoadIcon(hinst, MAKEINTRESOURCE(IDI_EXE_ICON));
@@ -948,9 +952,25 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
 
     GetClientRect(m_hWnd, &rect);
 
-    panes[0] = rect.right - rect.left - 70;
+    panes[0] = rect.right - rect.left /*- kControlsWidth*/ - kTimeWidth;
+    //panes[1] = panes[0] + kControlsWidth;
     SendMessage(m_hStatus, SB_SETPARTS, kNumPanes, (LPARAM) panes);
-    SendMessage(m_hStatus, SB_SETTEXT, 1, (LPARAM) "0:00");
+    //SendMessage(m_hStatus, SB_SETTEXT, 1|SBT_NOBORDERS , (LPARAM) "");
+    SendMessage(m_hStatus, SB_SETTEXT, kNumPanes - 1, (LPARAM) "0:00");
+
+    GetClientRect(m_hStatus, &rect);
+
+    /*CreateWindow("BUTTON",
+                 "button",
+                 WS_VISIBLE|WS_CHILD,
+                 panes[0] + 2,
+                 rect.top + 1,
+                 kControlsWidth - 2,
+                 rect.bottom - rect.top,
+                 m_hStatus,
+                 NULL,
+                 g_hinst,
+                 NULL);*/
 
     UpdateButtonStates();
     m_context->target->AcceptEvent(new Event(CMD_QueryPlayerState));

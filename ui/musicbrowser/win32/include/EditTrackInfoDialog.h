@@ -51,7 +51,8 @@ class EditTrackInfoDialog
     EditTrackInfoDialog(FAContext* context,
                         HWND hwnd, 
                         const vector<ArtistList*>* artistList, 
-                        MetaData* editMetaData);
+                        MetaData* editMetaData,
+                        const char* location);
 
     virtual ~EditTrackInfoDialog();
 
@@ -73,6 +74,7 @@ class EditTrackInfoDialog
     HWND m_hwnd;
     const vector<ArtistList*>* m_artistList; 
     MetaData* m_editMetaData;
+    const char* m_location;
 };
 
 #endif
