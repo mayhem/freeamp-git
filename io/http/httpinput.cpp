@@ -80,6 +80,7 @@ const int iBufferUpInterval = 3;
 const int iInitialBufferSize = 1024;
 const int iHeaderSize = 1024;
 const int iICY_OK = 200;
+const int iICY_REDIRECT = 302;
 const int iTransmitTimeout = 60;
 
 #ifdef WIN32
@@ -734,6 +735,35 @@ HttpInput::Open(void)
    {
       void     *pData;
 
+      if (iRet == iICY_REDIRECT)
+      {
+         char *redir;
+
+         redir = strstr(pInitialBuffer, "Location: ");
+         if (redir)
+         {
+             int port, ret;
+             char url[MAX_PATH];
+
+             ret = sscanf(redir, "Location: %255[0-9.]:%d", url, &port);
+             if (ret == 0)
+                 ret = sscanf(redir, "Location: http://%255[0-9.]:%d", url, &port);
+             if (ret)
+             {
+                 if (ret == 2)
+                    sprintf(m_path, "http://%s:%d", url, port);
+                 else
+                    sprintf(m_path, "http://%s", url);
+
+                 sprintf(url, "Redirected to: %s", m_path);
+                 ReportStatus(url);
+
+                 delete    pInitialBuffer;
+                 closesocket(m_hHandle);
+                 return Open(); 
+             }
+         } 
+      }
       if (iRet != iICY_OK)
       {
          ReportStatus("");
@@ -814,7 +844,6 @@ HttpInput::Open(void)
          szStreamName = new char[strlen(pPtr) + 1];
 
          sscanf(pPtr, " %[^\r\n]", szStreamName);
-         printf("'%s'\n", szStreamName);
       }
 
       pPtr = strstr(pHeaderData, "icy-url");

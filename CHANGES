@@ -11,6 +11,7 @@ Changes for version 2.1.0 rc4
   character encoding function was a bit too overzealous.
 - The mouse wheel/middle button mute was not working properly on themes
   without a mute button.
+- Added support for redirects for http streaming
 
 Changes for version 2.1.0 rc3
 --------------------------------------------------------------------
