@@ -248,7 +248,7 @@ void MusicBrowserUI::GenSLPlaylistEvent(vector<PlaylistItem*>* pSeed, float fMax
             APSPlaylist::iterator j;
 
             for (j = returnList.begin(); j.isvalid(); j.next()) {
-                strFilename = m_context->catalog->GetFilename(j.first);
+                strFilename = m_context->catalog->GetFilename(j.first());
                 if (strFilename != "")
                     newitems.push_back(strFilename.c_str());
             }

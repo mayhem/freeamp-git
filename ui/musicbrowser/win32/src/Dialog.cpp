@@ -271,26 +271,6 @@ BOOL MusicBrowserUI::DialogProc(HWND hwnd, UINT msg,
                     SubmitPlaylistEvent();
                     return 1;
 
-				case ID_SL_QUERY_500:
-					GenSLPlaylistEvent(500);
-					return 1;
-
-				case ID_SL_QUERY_1000:
-					GenSLPlaylistEvent(1000);
-					return 1;
-
-				case ID_SL_QUERY_5000:
-					GenSLPlaylistEvent(5000);
-					return 1;
-
-				case ID_SL_QUERY_10000:
-					GenSLPlaylistEvent(10000);
-					return 1;
-
-				case ID_SL_QUERY_20000:
-					GenSLPlaylistEvent(20000);
-					return 1;
-
 				case ID_SL_QUERY_NOMAX:
 					GenSLPlaylistEvent(-1.0);
 					return 1;
