@@ -1423,8 +1423,7 @@ GenerateSigsWork(set<string> *items)
         decInfo.sendInfo = false;
 
         lmc->SetDecodeInfo(decInfo);
-        lmc->SetEQData(m_eqValues, m_eqPreamp);
-        lmc->SetEQData(m_eqEnabled);
+        lmc->SetEQData(false);
 
         error = pmo->SetTo(url.c_str());
         if (error == kError_FileNotFound) {
