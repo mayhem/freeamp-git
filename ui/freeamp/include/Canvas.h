@@ -73,10 +73,9 @@ class Canvas
 
     protected:
 
-     Bitmap *m_pBGBitmap, *m_pMaskBitmap;
+     Bitmap *m_pBGBitmap, *m_pMaskBitmap, *m_pCompleteBGBitmap;
      Rect    m_oBGRect;
      string  m_oDefaultFont;
-     bool    m_bDeleteBitmap;
 };
 
 #endif

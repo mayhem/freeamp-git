@@ -111,6 +111,7 @@ class Theme : public Parse
       void    ClearWindows(void);
       void    ClearBitmaps(void);
       void    ClearFonts(void);
+      void    ClearPanels(void);
 
       void    ConvertForeignFormat(string &oDir);
       ForeignTheme    *m_pForeignThemes;

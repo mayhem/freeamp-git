@@ -43,7 +43,7 @@ class GTKBitmap : public Bitmap
     public:
 
               GTKBitmap(string &oName);
-	      GTKBitmap(int iWidth, int iHeight, const string &oName);
+	      GTKBitmap(int iWidth, int iHeight, string &oName);
      virtual ~GTKBitmap(void);
 
      virtual Error LoadBitmapFromDisk(string &oFile);

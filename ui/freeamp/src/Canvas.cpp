@@ -21,34 +21,22 @@
    $Id$
 ____________________________________________________________________________*/ 
 
-#include <algorithm>
 #include "Canvas.h"
 #include "Window.h"
-
-#ifdef WIN32
-#include "Win32Bitmap.h"
-#elif defined(HAVE_GTK)
-#include "GTKBitmap.h"
-#elif defined(__BEOS__)
-#include "BeOSBitmap.h"
-#endif  
-
 #include "debug.h"
-
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
 
 Canvas::Canvas(void)
 {
     m_pBGBitmap = NULL;
+    m_pCompleteBGBitmap = NULL;
     m_pMaskBitmap = NULL;
-    m_bDeleteBitmap = false;
 }
 
 Canvas::~Canvas(void)
 {
 	// The bitmap that was loaded by the theme will be destroyed by the theme
 	// However, if we created any clones, we need to kill those...
-	if (m_bDeleteBitmap)
+	if (m_pCompleteBGBitmap)
 		delete m_pBGBitmap;
 }
 
@@ -60,7 +48,9 @@ void Canvas::SetBackgroundRect(Rect &oRect)
 void Canvas::SetBackgroundBitmap(Bitmap *pBitmap)
 {
     delete m_pBGBitmap;
-    m_pBGBitmap = pBitmap;
+    delete m_pCompleteBGBitmap;
+    m_pCompleteBGBitmap = pBitmap;
+    m_pBGBitmap = NULL;
 }
 
 void Canvas::SetMaskBitmap(Bitmap *pBitmap)
@@ -82,85 +72,41 @@ Bitmap *Canvas::GetBackgroundBitmap(void)
 void Canvas::InitBackgrounds(vector<Panel *> *pPanels)
 {
     vector<Panel *>::iterator i;
-    Rect                      oDestRect, oSrcRect, oUnion, oTemp;
-    Pos                       oOffset, oBitmapPos;
-    int                       iLoop;
-    Color                     oColor;
+    Rect                      oDestRect;
 
-    // if we have a complete background bitmap, then this is an old
-    // theme that uses an implied panel, which means there is nothing
-    // to do here.
-    if (m_pBGBitmap)
+    if (m_pCompleteBGBitmap == NULL)
+       return;
+
+    if (pPanels->size() == 0)
     {
-        printf("Have complete bitmap -- do I want this?\n");
+        m_pBGBitmap = m_pCompleteBGBitmap;
+        m_pCompleteBGBitmap = NULL;
         return;
     }
-	 if (m_pBGBitmap)
+
+	if (m_pBGBitmap)
 	   delete m_pBGBitmap;
 
-    // Calculate the bounding rectangle of all the panels
-    for(i = pPanels->begin(), iLoop = 0; i != pPanels->end(); i++, iLoop++)
-    {
-        (*i)->GetRect(oTemp);
-        if (iLoop == 0)
-           oUnion = oTemp;
-        else
-           oUnion.Union(oTemp);
-    }
-
-    oOffset.x = oUnion.x1;
-    oOffset.y = oUnion.y1;
-
-    // If the bounding rectangle does not start at the origin, move 
-    // all controls relative to the origin
-    if (oOffset.x != 0 && oOffset.y != 0)
-    {
-        oUnion.x1 -= oOffset.x;
-        oUnion.y1 -= oOffset.y;
-        oUnion.x2 -= oOffset.x;
-        oUnion.y2 -= oOffset.y;
-    }
-    m_bDeleteBitmap = true;
-
-#ifdef WIN32
-    m_pBGBitmap = new Win32Bitmap(oUnion.Width(), oUnion.Height(), 
-                              string("Background"));
-#elif defined(HAVE_GTK)
-    m_pBGBitmap = new GTKBitmap(oUnion.Width(), oUnion.Height(), 
-                            string("Background"));
-#elif defined(__BEOS__)
-    m_pBGBitmap = new BeOSBitmap(oUnion.Width(), oUnion.Height(), 
-                             string("Background"));
-#endif 
-DB
-    (*(pPanels->begin()))->GetPanelBitmap()->GetTransColor(oColor);
-DB
-    m_pBGBitmap->SetTransColor(oColor);
-DB
-    m_pBGBitmap->MakeTransparent(oUnion);
-DB
-
-    // Sort the panels in ascending Zorder
-    sort(pPanels->begin(), pPanels->end());
-
-DB
-    // And now blit the panel bitmaps to the background bitmap
+    m_pBGBitmap = m_pCompleteBGBitmap->Clone();
     for(i = pPanels->begin(); i != pPanels->end(); i++)
     {
-        printf("Zorder: %d\n", (*i)->GetZOrder());
-
-        (*i)->MoveControls(oOffset);
-        (*i)->GetRect(oSrcRect);
-        (*i)->GetPos(oBitmapPos);
-        oDestRect.x1 -= oBitmapPos.x - oOffset.x; 
-        oDestRect.y1 -= oBitmapPos.y - oOffset.y; 
-        oDestRect.x2 = oDestRect.x1 + oSrcRect.Width();
-        oDestRect.y2 = oDestRect.y1 + oSrcRect.Height();
-DB
-        m_pBGBitmap->BlitRect((*i)->GetPanelBitmap(), oSrcRect, oDestRect);
-DB
-        m_pBGBitmap->BlitRectMaskBitmap((*i)->GetPanelBitmap(), 
-                                        oSrcRect, oDestRect);
-DB
+        if (!(*i)->m_bIsOpen)
+        {
+            m_pBGBitmap->MakeTransparent((*i)->m_oOpenRect);
+            if ((*i)->m_pClosedBitmap)
+            {
+                oDestRect.x1 = (*i)->m_oOffset.x;
+                oDestRect.y1 = (*i)->m_oOffset.y;
+                oDestRect.x2 = oDestRect.x1 + (*i)->m_oClosedRect.Width();
+                oDestRect.y2 = oDestRect.y1 + (*i)->m_oClosedRect.Height();
+                m_pBGBitmap->BlitRect((*i)->m_pClosedBitmap, 
+                                      (*i)->m_oClosedRect,
+                                      oDestRect);
+                m_pBGBitmap->BlitRectMaskBitmap((*i)->m_pClosedBitmap, 
+                                                (*i)->m_oClosedRect,
+                                                oDestRect);
+            }
+        }
     }
 }
+
