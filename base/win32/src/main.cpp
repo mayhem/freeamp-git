@@ -49,6 +49,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
    if(GetLastError() == ERROR_ALREADY_EXISTS)
    {
+        CloseHandle(runOnceMutex);
         return 0;
    }
 
@@ -113,6 +114,8 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     // clean up our act
     delete player;
+
+    CloseHandle(runOnceMutex);
 
 	return 0;
 }
