@@ -45,6 +45,14 @@ const char* kOutputBufferSizePref = "OutputBufferSize";
 const char* kStreamBufferIntervalPref = "StreamBufferInterval";
 const char* kDecoderThreadPriorityPref = "DecoderThreadPriority";
 
+//logging
+const char* kUseDebugLogPref = "UseDebugLog";
+const char* kLogMainPref = "LogMain";
+const char* kLogDecodePref = "LogDecode";
+const char* kLogInputPref = "LogInput";
+const char* kLogOutputPref = "LogOutput";
+const char* kLogPerformancePref = "LogPerformance";
+
 // default values
 const char*  kDefaultUI = "freeamp.ui";
 const char*  kDefaultPMO = "soundcard.pmo";
@@ -54,6 +62,7 @@ const int32  kDefaultInputBufferSize = 64;
 const int32  kDefaultOutputBufferSize = 512;
 const int32  kDefaultStreamBufferInterval = 3;
 const int32  kDefaultDecoderThreadPriority = 1;
+const int32  kDefaultLogging = false;
 
 
 
@@ -306,6 +315,14 @@ Initialize()
             SetPrefInt32(   kDecoderThreadPriorityPref, 
                             kDefaultDecoderThreadPriority);
 
+            // set defaults for logging
+            SetPrefBoolean(kUseDebugLogPref, kDefaultLogging);
+            SetPrefBoolean(kLogMainPref, kDefaultLogging);
+            SetPrefBoolean(kLogDecodePref, kDefaultLogging);
+            SetPrefBoolean(kLogInputPref, kDefaultLogging);
+            SetPrefBoolean(kLogOutputPref, kDefaultLogging);
+            SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
+
             error = kError_NoErr;
         }
         else
@@ -406,7 +423,6 @@ SetMinimizeToTray(bool value)
     return SetPrefBoolean(kMinimizeToTrayPref, value);
 }
 
-
 Error 
 Preferences::
 GetInputBufferSize(int32* value)
@@ -462,6 +478,91 @@ SetDecoderThreadPriority(int32 value)
 {
     return SetPrefInt32(kDecoderThreadPriorityPref, value);
 }
+
+Error 
+Preferences::
+SetUseDebugLog(bool value)
+{
+    return SetPrefBoolean(kUseDebugLogPref, value);
+}
+
+Error 
+Preferences::
+GetUseDebugLog(bool* value)
+{
+    return GetPrefBoolean(kUseDebugLogPref, value);
+}
+
+Error 
+Preferences::
+SetLogMain(bool value)
+{
+    return SetPrefBoolean(kLogMainPref, value);
+}
+
+Error 
+Preferences::
+GetLogMain(bool* value)
+{
+    return GetPrefBoolean(kLogMainPref, value);
+}
+
+Error 
+Preferences::
+SetLogDecode(bool value)
+{
+    return SetPrefBoolean(kLogDecodePref, value);
+}
+
+Error 
+Preferences::
+GetLogDecode(bool* value)
+{
+    return GetPrefBoolean(kLogDecodePref, value);
+}
+
+Error 
+Preferences::
+SetLogInput(bool value)
+{
+    return SetPrefBoolean(kLogInputPref, value);
+}
+
+Error 
+Preferences::
+GetLogInput(bool* value)
+{
+    return GetPrefBoolean(kLogInputPref, value);
+}
+
+Error 
+Preferences::
+SetLogOutput(bool value)
+{
+    return SetPrefBoolean(kLogOutputPref, value);
+}
+
+Error 
+Preferences::
+GetLogOutput(bool* value)
+{
+    return GetPrefBoolean(kLogOutputPref, value);
+}
+
+Error 
+Preferences::
+SetLogPerformance(bool value)
+{
+    return SetPrefBoolean(kLogPerformancePref, value);
+}
+
+Error 
+Preferences::
+GetLogPerformance(bool* value)
+{
+    return GetPrefBoolean(kLogPerformancePref, value);
+}
+
 
 Error
 Preferences::
