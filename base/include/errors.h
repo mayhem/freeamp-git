@@ -23,7 +23,7 @@ ____________________________________________________________________________*/
 #ifndef ERROR_H
 #define ERROR_H
 
-#include <config.h>
+#include "config.h"
 
 
 typedef enum Error
