@@ -533,30 +533,30 @@ Error HttpInput::Open(void)
 #ifndef WIN32
         int error = errno;
 
-	if (error != EINPROGRESS)
+        if (error != EINPROGRESS)
 #else
-	int error = WSAGetLastError();
+        int error = WSAGetLastError();
 
-	if (error != WSAEINPROGRESS)
+        if (error != WSAEINPROGRESS && error != WSAEWOULDBLOCK) 
 #endif
-	{
-	    ReportError("Cannot connect to host: %s", szHostName);
-	    closesocket(m_hHandle);
-	    return (Error)httpError_CannotConnect;
-	}	
+		{
+            ReportError("Cannot connect to host: %s", szHostName);
+            closesocket(m_hHandle);
+            return (Error)httpError_CannotConnect;
+		}	
 
         int conattempt = 0;
         for(; iConnect && !m_bExit;)
         {
-	    if (conattempt > 50)
-	    {
-	    cout << "timed out\n";
-	       ReportError("Host not answering: %s", szHostName);
-	       closesocket(m_hHandle);
-	       return (Error)httpError_CannotConnect;
-	    }
+	        if (conattempt > 50)
+			{
+	            cout << "timed out\n";
+	            ReportError("Host not answering: %s", szHostName);
+	            closesocket(m_hHandle);
+	            return (Error)httpError_CannotConnect;
+			}
 	    
-	    conattempt++;
+	        conattempt++;
             sTv.tv_sec = 0; sTv.tv_usec = 0;
             FD_ZERO(&sSet); FD_SET(m_hHandle, &sSet);
             iRet = select(m_hHandle + 1, NULL, &sSet, NULL, &sTv);
