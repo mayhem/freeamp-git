@@ -477,6 +477,19 @@ void both_selected(GtkWidget *w, GTKPreferenceWindow *p)
         p->SetToolbar(true, true);
 }
 
+void GTKPreferenceWindow::SaveOnExitToggle(int active)
+{
+    proposedValues.savePlaylistOnExit = active;
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
+}
+    
+void save_onexit_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->SaveOnExitToggle(i);
+}
+
 GtkWidget *GTKPreferenceWindow::CreatePage1(void)
 {
     firsttime = true;
@@ -564,6 +577,23 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     if (!setSomething)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
+    frame = gtk_frame_new("Miscellaneous");
+    gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
+    gtk_widget_show(frame);
+
+    temphbox = gtk_hbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(temphbox), 5);
+    gtk_container_add(GTK_CONTAINER(frame), temphbox);
+    gtk_widget_show(temphbox);
+
+    GtkWidget *check = gtk_check_button_new_with_label("Save current playlist when exiting the application");
+    gtk_box_pack_start(GTK_BOX(temphbox), check, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(check), "toggled",
+                       GTK_SIGNAL_FUNC(save_onexit_toggle), this);
+    if (originalValues.savePlaylistOnExit)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
+    gtk_widget_show(check);
+    
     return pane;
 }
 
@@ -755,7 +785,7 @@ GtkWidget *GTKPreferenceWindow::CreatePage2(void)
     gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 5);
     gtk_widget_show(label);
 
-    GtkWidget *check = gtk_check_button_new_with_label("Save Streams Locally");
+    GtkWidget *check = gtk_check_button_new_with_label("Save SHOUTCast/icecast Streams Locally");
     gtk_container_add(GTK_CONTAINER(pane), check);
     gtk_signal_connect(GTK_OBJECT(check), "toggled",
                        GTK_SIGNAL_FUNC(save_local_toggle), this);

@@ -227,6 +227,7 @@ class GTKPreferenceWindow : public PreferenceWindow
 
       void SaveMusicSet(char *newpath, bool set);
       void SetToolbar(bool text, bool pics);
+      void SaveOnExitToggle(int active);
 
       FAContext *GetContext(void) { return m_pContext; }
 };
