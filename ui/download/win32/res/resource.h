@@ -15,7 +15,7 @@
 #define IDC_OVERALL_PROGRESS            1006
 #define IDC_URL                         1007
 #define IDC_ADDURL                      1008
-#define IDC_HELP                        1009
+#define IDC_SHOWHELP                    1009
 
 // Next default values for new objects
 // 

@@ -1146,6 +1146,12 @@ BOOL DownloadUI::Command(int32 command, HWND src)
 {
     switch(command)
 	{
+        case IDC_SHOWHELP:
+        {
+            ShowHelp(Download_Manager);
+            break;
+        }
+
         case IDC_RESUME:
 		case IDC_PAUSE:
         case IDC_CANCEL:
@@ -1163,7 +1169,7 @@ BOOL DownloadUI::Command(int32 command, HWND src)
 
                     for(uint32 i = 0; i < itemCount; i++)
                     {
-                        if(ListView_GetItemState(m_hwndList, i, LVIS_FOCUSED) & LVIS_FOCUSED)
+                        if(ListView_GetItemState(m_hwndList, i, LVIS_SELECTED) & LVIS_SELECTED)
                         {
                             item.mask = LVIF_PARAM;
                             item.iItem = i;
