@@ -86,7 +86,6 @@ extern "C" FreeAmpUI *Initialize()
     return new FreeAmpUI();
 }
 
-
 INT 
 WINAPI 
 DllMain (   HINSTANCE hInstance,
