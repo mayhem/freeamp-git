@@ -55,28 +55,6 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON1               ICON    DISCARDABLE     "icon1.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-12029 DIALOG FIXED IMPURE  104, 74, 315, 204
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Just thought you might like to know..."
-FONT 8, "MS Sans Serif"
-BEGIN
-    EDITTEXT        301,11,34,295,120,ES_MULTILINE | ES_READONLY | 
-                    WS_VSCROLL | WS_GROUP
-    PUSHBUTTON      "< &Back",12,206,185,50,14,WS_GROUP
-    DEFPUSHBUTTON   "&Cool !",6,256,185,50,14
-    LTEXT           "This software is being developed under the terms of the GNU General Public License (GPL).  The terms of the GPL are provided below for your viewing pleasure.",
-                    711,43,8,262,19,SS_NOPREFIX
-    LTEXT           "Unlike other licenses you do not have to agree to the GPL in order to use  this software. However, if you wish to modify and redistribute this product you will have to do so under the terms of the GPL.",
-                    712,11,158,293,23,SS_NOPREFIX
-    ICON            10000,1003,14,7,20,20,WS_GROUP
-END
-
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
