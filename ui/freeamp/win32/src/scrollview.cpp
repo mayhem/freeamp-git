@@ -200,7 +200,7 @@ MouseMove(int32 x, int32 y, int32 modifiers)
 
                 index += proportion;*/
 
-                if(index > m_max - m_largeStep)
+                if(index > (int32)(m_max - m_largeStep))
                     index = m_max - m_largeStep;
 
                 m_position = index;
