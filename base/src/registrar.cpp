@@ -119,7 +119,7 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
                     {
                         error = kError_NoErr;
                         item->SetInitFunction(init);
-			totalFilesFound++;
+			            totalFilesFound++;
                     }
                 }
                 
@@ -132,23 +132,25 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 
                     delete item;
                 }
-
-                //MessageBox(NULL, file, "Found File", MB_OK);
                 
             }while(FindNextFile(handle, &find));
 
             FindClose(handle);
         }
 #ifndef WIN32
-	error = prefs->GetNextLibDir(libDirHandle,dir,&len);
+	    error = prefs->GetNextLibDir(libDirHandle,dir,&len);
 #endif
     }
+
 #ifndef WIN32
-    if (libDirHandle) prefs->GetLibDirClose(libDirHandle);
+    if (libDirHandle) 
+        prefs->GetLibDirClose(libDirHandle);
 #endif
-    if (totalFilesFound == 0) {
-	return kError_NoFiles;
-    }
+
+    if (totalFilesFound == 0) 
+	    error = kError_NoFiles;
+
+    return error;
 }
 
 Error 
