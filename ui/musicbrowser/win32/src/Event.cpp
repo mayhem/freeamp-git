@@ -1115,7 +1115,8 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent)
                        "Add Tracks and Playlists",
                        szFilter, 
                        &oFileList,
-                       m_context->prefs))
+                       m_context->prefs,
+                       true) )
     {
         // we know that we are gonna be adding a 
         // bunch of items so let windows know.

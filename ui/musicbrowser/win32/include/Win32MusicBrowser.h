@@ -65,7 +65,8 @@ bool FileOpenDialog(HWND hwnd,
                     const char* title,
                     const char* filter,
                     vector<string>* fileList,
-                    Preferences* prefs);
+                    Preferences* prefs, 
+                    bool allowURL);
 
 LRESULT WINAPI 
 ListViewWndProc(HWND hwnd, 

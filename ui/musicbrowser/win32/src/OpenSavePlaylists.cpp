@@ -448,7 +448,8 @@ void MusicBrowserUI::ImportTracksAndPlaylists(void)
     if (FileOpenDialog(m_hWnd, "Import Tracks and Playlists",
                        szFilter, 
                        &oFileList,
-                       m_context->prefs))
+                       m_context->prefs, 
+                       false) )
     {
         vector<string>::iterator i;
 
