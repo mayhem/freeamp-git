@@ -33,33 +33,34 @@ ____________________________________________________________________________*/
 class beosThread : public Thread
 {
 public:
-						beosThread();
-	virtual				~beosThread();
+                        beosThread();
+    virtual             ~beosThread();
 
-	virtual bool		Create(thread_function function, void* arg);
-	virtual void		Destroy();
-	virtual void		Suspend();
-	virtual void		Resume();
-	virtual void		Join();
-	virtual uint32      GetPriority( void ) const;
-	virtual uint32      SetPriority( uint32 priority );
-	virtual void		DumpThreadInfo( void ) const;
+    virtual bool        Create(thread_function function, void* arg,
+                               bool detach = false);
+    virtual void        Destroy();
+    virtual void        Suspend();
+    virtual void        Resume();
+    virtual void        Join();
+    virtual uint32      GetPriority( void ) const;
+    virtual uint32      SetPriority( uint32 priority );
+    virtual void        DumpThreadInfo( void ) const;
 
-	static int32		internalThreadFunction(void *);
-	void *				InternalThreadFunction();
+    static int32        internalThreadFunction(void *);
+    void *              InternalThreadFunction();
 
 protected:
-	bool				Lock( void );
-	void				Unlock( void );
+    bool                Lock( void );
+    void                Unlock( void );
 
 private:
-	uint32              m_priority;
-	thread_id			m_threadHandle;
-	unsigned			m_threadId;
-	bool				m_suspended;
-	BLocker				m_lock;
-	thread_function		m_function;
-	void *				m_arg;
+    uint32              m_priority;
+    thread_id           m_threadHandle;
+    unsigned            m_threadId;
+    bool                m_suspended;
+    BLocker             m_lock;
+    thread_function     m_function;
+    void *              m_arg;
 };
 
 // Inline functions
@@ -67,13 +68,13 @@ private:
 inline bool
 beosThread::Lock( void )
 {
-	return m_lock.Lock();
+    return m_lock.Lock();
 }
 
 inline void
 beosThread::Unlock( void )
 {
-	m_lock.Unlock();
+    m_lock.Unlock();
 }
 
 // Utility functions.
@@ -83,34 +84,34 @@ int32
 beos_priority( uint32 freeamp_prio )
 {
 #if 0
-	switch ( freeamp_prio ) {
-	case Idle:
-		return B_NORMAL_PRIORITY;
-		break;
-	case Low:
-		return B_NORMAL_PRIORITY;
-		break;
-	case BelowNormal:
-		return B_NORMAL_PRIORITY;
-		break;
-	case Normal:
-		return B_NORMAL_PRIORITY;
-		break;
-	case AboveNormal:
-		return B_NORMAL_PRIORITY;
-		break;
-	case High:
-		return B_NORMAL_PRIORITY;
-		break;
-	case Critical:
-		return B_NORMAL_PRIORITY;
-		break;
-	default:
-		return B_NORMAL_PRIORITY;
-		break;
-	}
+    switch ( freeamp_prio ) {
+    case Idle:
+        return B_NORMAL_PRIORITY;
+        break;
+    case Low:
+        return B_NORMAL_PRIORITY;
+        break;
+    case BelowNormal:
+        return B_NORMAL_PRIORITY;
+        break;
+    case Normal:
+        return B_NORMAL_PRIORITY;
+        break;
+    case AboveNormal:
+        return B_NORMAL_PRIORITY;
+        break;
+    case High:
+        return B_NORMAL_PRIORITY;
+        break;
+    case Critical:
+        return B_NORMAL_PRIORITY;
+        break;
+    default:
+        return B_NORMAL_PRIORITY;
+        break;
+    }
 #endif
-	return B_NORMAL_PRIORITY;
+    return B_NORMAL_PRIORITY;
 }
 
-#endif /* _BEOS_THREAD_H */
+#endif /* _BEOS_THREAD_H */ vi: set ts=4:

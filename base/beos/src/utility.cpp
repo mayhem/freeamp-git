@@ -35,7 +35,7 @@ ____________________________________________________________________________*/
 #define UI          "UI"
 #define DEFAULT_UI  "freeamp"
 
-Error GetPrefString(kInstallDirPref, char* path, int32 len)
+Error GetInstallDirectory(char* path, int32 len)
 {
     getcwd(path,len);
     return kError_NoErr;

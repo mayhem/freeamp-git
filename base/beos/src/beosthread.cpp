@@ -36,44 +36,35 @@ ____________________________________________________________________________*/
 void
 beosThread::Join()
 {
-	status_t	thread_return_value;
-	PRINT(( "beosThread::Join\n" ));
+    status_t    thread_return_value;
+    PRINT(( "beosThread::Join\n" ));
 
-	BAutolock	autolock( m_lock );
-	if ( !autolock.IsLocked() )
-	{
-		perror( "beosThread::Join:coulnd't lock the thread" );
-	}
+    BAutolock    autolock( m_lock );
+    if ( !autolock.IsLocked() )
+    {
+        perror( "beosThread::Join:coulnd't lock the thread" );
+    }
 
-	if ( wait_for_thread( m_threadHandle, &thread_return_value ) < B_NO_ERROR )
-	{
-		PRINT(( "Thread::Join failed\n" ));
-	}
+    if ( wait_for_thread( m_threadHandle, &thread_return_value ) < B_NO_ERROR )
+    {
+        PRINT(( "Thread::Join failed\n" ));
+    }
 }
 
 beosThread::
 beosThread():
 Thread()
 {
-//    m_priority		= Normal;
-    m_priority		= B_NORMAL_PRIORITY; // FIXME!!
-    m_threadHandle	= (thread_id) NULL;
-    m_threadId		= 0;
-    m_suspended		= false;
-//    m_suspendMutex	= new Mutex();
+    m_priority        = B_NORMAL_PRIORITY; // FIXME!!
+    m_threadHandle    = (thread_id) NULL;
+    m_threadId        = 0;
+    m_suspended        = false;
 }
 
 beosThread::
 ~beosThread()
 {
-	//pthread_cancel(m_threadHandle);
-	Destroy();
-#if 0
-	if ( m_suspendMutex ) {
-		delete m_suspendMutex;
-		m_suspendMutex = NULL;
-	}
-#endif
+    Destroy();
 }
 
 int32
@@ -89,96 +80,97 @@ void *
 beosThread::
 InternalThreadFunction()
 {
-	if ( !m_function ) {
-		return 0;
-	}
-	m_function( m_arg );
+    if ( !m_function )
+    {
+        return 0;
+    }
+    m_function( m_arg );
 
-	return (void *)0;
+    return (void *)0;
 }
 
 bool 
 beosThread::
-Create( thread_function function, void* arg )
+Create( thread_function function, void* arg, bool detach )
 {
-	BAutolock	autolock( m_lock );
-	if ( !autolock.IsLocked() )
-	{
-		perror( "beosThread::Create:couldn't lock the thread" );
-	}
+    BAutolock    autolock( m_lock );
+    if ( !autolock.IsLocked() )
+    {
+        perror( "beosThread::Create:couldn't lock the thread" );
+    }
 
-	bool	result = true;
-	m_function = function;
-	m_arg = arg;
-	m_threadHandle = spawn_thread(
-						beosThread::internalThreadFunction,
-						BRANDING,
-						beos_priority( m_priority ),
-						this
-						);
-	if ( m_threadHandle < B_NO_ERROR ) {
-		PRINT(( "Thread creation failed\n" ));
-		result = false;
-	}
+    bool    result = true;
+    m_function = function;
+    m_arg = arg;
+    m_threadHandle = spawn_thread(
+                        beosThread::internalThreadFunction,
+                        BRANDING,
+                        beos_priority( m_priority ),
+                        this
+                        );
+    if ( m_threadHandle < B_NO_ERROR ) {
+        PRINT(( "Thread creation failed\n" ));
+        result = false;
+    }
 
-	PRINT(( "Thread successfully created\n" ));
+    PRINT(( "Thread successfully created\n" ));
 
-	if ( resume_thread( m_threadHandle ) < B_NO_ERROR ) {
-		PRINT(( "couldn't start(resume) thread\n" ));
-		result = false;
-	}
+    if ( resume_thread( m_threadHandle ) < B_NO_ERROR ) {
+        PRINT(( "couldn't start(resume) thread\n" ));
+        result = false;
+    }
 
-	PRINT(( "Thread started successfully\n" ));
+    PRINT(( "Thread started successfully\n" ));
 
-	return result;
+    return result;
 }
 
 void 
 beosThread::
 Destroy()
 {
-	kill_thread( m_threadHandle );
+    kill_thread( m_threadHandle );
 }
 
 void 
 beosThread::
 Suspend()
 {
-	PRINT(( "beosThread::Suspend\n" ));
-	if ( Lock() )
-	{
-		if ( !m_suspended ) {
-			suspend_thread( m_threadHandle );
-			m_suspended = true;
-		}
-		Unlock();
-	}
-	else
-	{
-		perror( "beosThread::Suspend:couldn't lock the thread" );
-	}
-	PRINT(( "beosThread::Suspend done\n" ));
+    PRINT(( "beosThread::Suspend\n" ));
+    if ( Lock() )
+    {
+        if ( !m_suspended ) {
+            suspend_thread( m_threadHandle );
+            m_suspended = true;
+        }
+        Unlock();
+    }
+    else
+    {
+        perror( "beosThread::Suspend:couldn't lock the thread" );
+    }
+    PRINT(( "beosThread::Suspend done\n" ));
 }
 
 void 
 beosThread::
 Resume()
 {
-	PRINT(( "beosThread::Resume\n" ));
-	if ( Lock() )
-	{
-		if ( m_suspended )
-		{
-			resume_thread( m_threadHandle );
-			m_suspended = false;
-		}
-		Unlock();
-	}
-	else
-	{
-		perror( "beosThread::Resume:couldn't lock the thread" );
-	}
-	PRINT(( "beosThread::Resume done\n" ));
+    PRINT(( "beosThread::Resume\n" ));
+    if ( Lock() )
+    {
+        if ( m_suspended )
+        {
+            resume_thread( m_threadHandle );
+            m_suspended = false;
+        }
+        Unlock();
+    }
+    else
+    {
+        perror( "beosThread::Resume:couldn't lock the thread" );
+    }
+    PRINT(( "beosThread::Resume done\n" ));
 }
 
 
@@ -214,5 +206,5 @@ void
 beosThread::
 DumpThreadInfo( void ) const
 {
-	//printf( "Thread ID = %d, %x\n", m_threadHandle, m_threadHandle );
+    //printf( "Thread ID = %d, %x\n", m_threadHandle, m_threadHandle );
 }
