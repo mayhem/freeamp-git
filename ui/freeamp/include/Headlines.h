@@ -2,7 +2,7 @@
         
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999 EMusic.com
+   Copyright (C) 2000 EMusic.com
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,18 +33,37 @@ ____________________________________________________________________________*/
 
 #include <vector>
 #include <string>
+#include <time.h>
 #include "thread.h" 
 #include "semaphore.h" 
 #include "Parse.h" 
 #include "facontext.h"
 
-class Slashdot : public Parse
+class HeadlineInfo
 {
     public:
 
-        Slashdot(FAContext* context);
-        virtual ~Slashdot();
+        HeadlineInfo(void) { ; };
+        HeadlineInfo(const string &oUrl,
+                     const string &oXMLPath, 
+                     int iDownloadInterval,
+                     int iHeadlineChangeInterval);
+        virtual ~HeadlineInfo();
 
+        void   operator=(const HeadlineInfo &oOther);
+
+        string m_oUrl, m_oXMLPath;
+        int    m_iDownloadInterval, m_iHeadlineChangeInterval;
+};
+
+class Headlines : public Parse
+{
+    public:
+
+        Headlines(FAContext * context);
+        virtual ~Headlines();
+
+        void        SetInfo(HeadlineInfo &oInfo);
         void        Pause(void);
         void        Resume(void);
         static void worker_thread(void*);
@@ -57,7 +76,7 @@ class Slashdot : public Parse
 
         void   WorkerThread(void);
         Error  Download(void);
-        Error  DownloadHeadlines(string &oPage);
+        Error  DownloadHeadlines(string &oUrl, string &oPage);
 
         FAContext       *m_pContext;
         Thread          *m_pThread;
@@ -65,6 +84,9 @@ class Slashdot : public Parse
         vector<string>   m_oHeadlines;
         bool             m_bPause;
         Semaphore       *m_pWakeSem;
+		HeadlineInfo     m_oInfo;
+		time_t           m_lLastDownload;
+		int              m_iIndex;
 };
 
 #endif

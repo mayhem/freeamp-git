@@ -38,7 +38,6 @@ ____________________________________________________________________________*/
 #include "playlist.h"
 #include "Theme.h"
 #include "ThemeManager.h"
-#include "Slashdot.h"
 
 enum TimeDisplayState
 {
@@ -80,7 +79,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         virtual void  PostWindowCreate(void);
                 void  ShowOptions(uint32 defaultPage = 0);
 
-        void  WorkerThread(void);
+                void  WorkerThread(void);
 
         static void update_thread(void*);
         static void options_thread(void*);
@@ -107,7 +106,6 @@ class FreeAmpTheme : public UserInterface, public Theme
         string           m_oCurrentWindow, m_oTitle, m_oStreamInfo;
         TimeDisplayState m_eTimeDisplayState;
         UpdateManager   *m_pUpdateMan;
-        Slashdot        *m_pSlashdot;
 };
 
 #endif

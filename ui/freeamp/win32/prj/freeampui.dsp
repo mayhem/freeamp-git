@@ -62,8 +62,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                                     ..\..\..\..\base\win32\prj\plugins
+                                                       ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                                      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 Debug"
@@ -95,8 +95,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                                     ..\..\..\..\base\win32\prj\plugins
+                                                       ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                                      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
@@ -130,8 +130,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                                     ..\..\..\..\base\win32\prj\plugins
+                                                       ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                                      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Release"
@@ -163,8 +163,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                      ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
-                                     ..\..\..\..\base\win32\prj\plugins
+                                                       ..\..\..\..\base\win32\prj\plugins	copy freeamp.ui\
+                                      ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -256,6 +256,10 @@ SOURCE=..\..\src\FreeAmpTheme.cpp
 # Begin Source File
 
 SOURCE=.\freeampui.def
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\Headlines.cpp
 # End Source File
 # Begin Source File
 

@@ -170,21 +170,22 @@ void SliderControl::HandleJump(ControlTransitionEnum  eTrans,
 {
     int     iNewPos;
 
-//    Debug_v("Handle jump: %d (%d - %d)", pPos->x, m_oRect.x1, m_oRect.x2);
+    //Debug_v("Handle jump: %d (%d - %d)", pPos->x, m_oRect.x1, m_oRect.x2);
 
     iNewPos = pPos->x - m_oRect.x1 - (m_iThumbWidth / 2);
     iNewPos = min(max(iNewPos, 0), m_iRange);
     if (iNewPos == m_iCurrentPos)
        return;
 
-//    Debug_v("iNewPos: %d Range: %d", iNewPos, m_iRange);
+    //Debug_v("iCurPos: %d iNewPos: %d Range: %d", 
+    //        m_iCurrentPos, iNewPos, m_iRange);
     MoveThumb(m_iCurrentPos, iNewPos);
 
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
     m_iValue = (m_iCurrentPos * 100) / m_iRange;
-//    Debug_v("new value: %d", m_iValue);
+    //Debug_v("new value: %d", m_iValue);
     m_bIsDrag = true;
 }
 

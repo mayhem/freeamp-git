@@ -109,7 +109,6 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_pOptionsThread = NULL;
    m_bInOptions = false;
    m_bPaused = false;
-   m_pSlashdot = NULL;
 
 #if defined( WIN32 )
     m_pUpdateMan = new Win32UpdateManager(m_pContext);
@@ -143,7 +142,6 @@ FreeAmpTheme::~FreeAmpTheme()
 #if defined( WIN32 )
     delete m_pUpdateMan;
 #endif // WIN32
-    delete m_pSlashdot;
 }
 
 Error FreeAmpTheme::Init(int32 startup_type)
@@ -1018,21 +1016,23 @@ void FreeAmpTheme::InitControls(void)
 
     m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
 
-    if (m_pWindow->DoesControlExist("HeadlineInfo"))
+    if (m_pWindow->DoesControlExist("HeadlineInfo") && m_pHeadlines)
     {
-        if (m_pSlashdot == NULL)
+        if (m_pHeadlineGrabber)
         {
-            m_pSlashdot = new Slashdot(m_pContext);
-        }
+           m_pHeadlineGrabber->SetInfo(*m_pHeadlines);
+           m_pHeadlineGrabber->Resume();
+        }   
         else
         {
-            m_pSlashdot->Resume();
-        }
+           m_pHeadlineGrabber = new Headlines(m_pContext);   
+           m_pHeadlineGrabber->SetInfo(*m_pHeadlines);
+        }   
     }
     else
     {
-        if (m_pSlashdot)
-           m_pSlashdot->Pause();
+        if (m_pHeadlineGrabber)
+           m_pHeadlineGrabber->Pause();
     }
 }
 

@@ -24,7 +24,6 @@ ____________________________________________________________________________*/
 #include <stdio.h> 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <time.h>
 #include <fcntl.h>    
 
 #ifdef WIN32
@@ -46,57 +45,84 @@ ____________________________________________________________________________*/
 #define O_BINARY 0
 #endif  
 
-#include "Slashdot.h"
+#include "Headlines.h"
 #include "eventdata.h"
 #include "event.h"
+#include "debug.h"
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
-const char *szURL = "http://www.slashdot.org/slashdot.xml";
-const int iDownloadInterval = 20;
-const int iHeadlineChangeInterval = 10;
+HeadlineInfo::HeadlineInfo(const string &oUrl,
+                           const string &oXMLPath, 
+                           int iDownloadInterval,
+                           int iHeadlineChangeInterval)
+{
+    m_oUrl = oUrl;
+    m_oXMLPath = oXMLPath;
+    m_iDownloadInterval = iDownloadInterval;
+    m_iHeadlineChangeInterval = iHeadlineChangeInterval;
+}
 
-Slashdot::Slashdot(FAContext * context)
+HeadlineInfo::~HeadlineInfo(void)
+{
+
+}
+
+void HeadlineInfo::operator=(const HeadlineInfo &oOther)
+{
+    m_oUrl = oOther.m_oUrl;
+    m_oXMLPath = oOther.m_oXMLPath;
+    m_iDownloadInterval = oOther.m_iDownloadInterval;
+    m_iHeadlineChangeInterval = oOther.m_iHeadlineChangeInterval;
+}
+
+Headlines::Headlines(FAContext * context)
 {
     m_pContext = context;
     m_pWakeSem = new Semaphore();
     m_bPause = false;
+    m_lLastDownload = 0;
+    m_iIndex = 0;
 
     m_pThread = Thread::CreateThread();
     m_pThread->Create(worker_thread, this);
 }
 
-Slashdot::~Slashdot()
+Headlines::~Headlines()
 {
-    // Ok, the thread is not getting cleaned up here because it might
-    // end up blocking on a network function. If it does that during
-    // exit, the player will hang until the function returns. Complete
-    // and utter suck. 
-    // So instead, we exit and let the OS terminate the thread
+
     delete m_pThread;
     delete m_pWakeSem;
 }
 
-void Slashdot::Pause(void)
+void Headlines::SetInfo(HeadlineInfo &oInfo)
+{
+    m_oInfo = oInfo;
+    m_lLastDownload = 0;
+    m_iIndex = 0;
+}
+
+void Headlines::Pause(void)
 {
     m_bPause = true;    
 }
 
-void Slashdot::Resume(void)
+void Headlines::Resume(void)
 {
     m_bPause = false;    
     m_pWakeSem->Signal();
 }
 
-void Slashdot::worker_thread(void* arg)
+void Headlines::worker_thread(void* arg)
 {
-    ((Slashdot *)arg)->WorkerThread();
+    ((Headlines *)arg)->WorkerThread();
 }
 
-void Slashdot::WorkerThread(void)
+void Headlines::WorkerThread(void)
 {
-    time_t lLastDownload = 0, t;
-    int    iIndex = 0;
+    time_t t;
+
+    m_pWakeSem->Wait();
 
     for(;;)
     {
@@ -104,56 +130,60 @@ void Slashdot::WorkerThread(void)
            m_pWakeSem->Wait();
 
         time(&t);
-        if (lLastDownload + iDownloadInterval < t || m_oHeadlines.size() == 0)
+        if (m_lLastDownload + m_oInfo.m_iDownloadInterval < t || m_oHeadlines.size() == 0)
         {
             if (IsntError(Download()))
-                lLastDownload = t;
+                m_lLastDownload = t;
         }
 
         if (m_oHeadlines.size())
         {
-            iIndex = iIndex % m_oHeadlines.size();
+            m_iIndex = m_iIndex % m_oHeadlines.size();
             m_pContext->target->AcceptEvent(new HeadlineMessageEvent(
-                                       m_oHeadlines[iIndex].c_str()));
-            iIndex++;
+                                       m_oHeadlines[m_iIndex].c_str()));
+            m_iIndex++;
         }
-        sleep(iHeadlineChangeInterval);
+        Sleep(m_oInfo.m_iHeadlineChangeInterval * 1000);
     }
 }
 
-Error Slashdot::Download(void)
+Error Headlines::Download(void)
 {
     string oPage;
     Error  eRet;
 
-    eRet = DownloadHeadlines(oPage);
+    m_pContext->target->AcceptEvent(new StatusMessageEvent("Downloading headlines..."));
+    eRet = DownloadHeadlines(m_oInfo.m_oUrl, oPage);
     if (eRet != kError_NoErr)
+    {
+       m_pContext->target->AcceptEvent(new StatusMessageEvent("Headline download failed."));
        return eRet;
+    }   
+
+    m_pContext->target->AcceptEvent(new StatusMessageEvent(""));
+    m_oHeadlines.clear(); 
     
     return ParseString(oPage);
 }
 
-Error Slashdot::BeginElement(string &oElement, AttrMap &oAttrMap)
+Error Headlines::BeginElement(string &oElement, AttrMap &oAttrMap)
 {
     m_oPath += string("/") + oElement;
-
-    if (oElement == string("backslash"))
-        m_oHeadlines.clear(); 
 
     return kError_NoErr;
 }
 
-Error Slashdot::PCData(string &oData)
+Error Headlines::PCData(string &oData)
 {
-    if (m_oPath == string("/backslash/story/title"))
+    if (m_oPath == m_oInfo.m_oXMLPath)
     {
-        m_oHeadlines.push_back(string("/. -- ") + oData + string("  "));
+        m_oHeadlines.push_back(oData);
         return kError_NoErr;
     }
     return kError_NoErr;
 } 
 
-Error Slashdot::EndElement(string &oElement)
+Error Headlines::EndElement(string &oElement)
 {
     char *pPtr;
     int   iOffset;
@@ -171,7 +201,7 @@ Error Slashdot::EndElement(string &oElement)
 const uint8 kHttpPort = 80;
 const uint32 kMaxHostNameLen = 64;
 
-Error Slashdot::DownloadHeadlines(string &oPage)
+Error Headlines::DownloadHeadlines(string &oUrl, string &oPage)
 {
     Error result = kError_InvalidParam;
 
@@ -199,13 +229,13 @@ Error Slashdot::DownloadHeadlines(string &oPage)
     {
          numFields = sscanf(proxyname, "http://%[^:/]:%hu", hostname, &port);
 
-         strcpy(proxyname, szURL);
+         strcpy(proxyname, oUrl.c_str());
          file = proxyname;
     }
     else
     {
-         numFields = sscanf(szURL, "http://%[^:/]:%hu", hostname, &port);
-         file = strchr(szURL + 7, '/');
+         numFields = sscanf(oUrl.c_str(), "http://%[^:/]:%hu", hostname, &port);
+         file = strchr(oUrl.c_str() + 7, '/');
     }
 
     if(numFields < 1)

@@ -43,6 +43,7 @@ using namespace std;
 #include "Bitmap.h"
 #include "Font.h"
 #include "ThemeManager.h"
+#include "Headlines.h"
 
 typedef map<string, string, less<string> > AttrMap;
 
@@ -92,6 +93,8 @@ class Theme : public Parse
       string        m_oThemePath;
       Window       *m_pWindow;
       FAContext    *m_pContext;
+	  Headlines    *m_pHeadlineGrabber;
+	  HeadlineInfo *m_pHeadlines, *m_pParsedHeadlines;
 
     private:
 

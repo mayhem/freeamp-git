@@ -93,6 +93,7 @@ Theme::Theme(FAContext *context)
     m_pParsedWindows = m_pWindows = NULL;
     m_pParsedBitmaps = m_pBitmaps = NULL;
     m_pParsedFonts = m_pFonts = NULL;
+    m_pParsedHeadlines = m_pHeadlines = NULL;
     m_bReloadTheme = false;
     m_bReloadWindow = false;
     m_oReloadWindow = string("");
@@ -100,6 +101,7 @@ Theme::Theme(FAContext *context)
     m_pThemeMan = new ThemeManager(m_pContext);
     m_bThemeLoaded = false;
     m_bCreditsShown = false;
+	m_pHeadlineGrabber = NULL;
     
     string funkyName = "Frunobulax"; 
 #ifdef WIN32
@@ -123,6 +125,10 @@ Theme::~Theme(void)
     ClearWindows();
     ClearBitmaps();
     ClearFonts();
+
+    // We're not going to delete the headline grabber, since it might
+    // be blocked in a read. The OS will clean up after us. Naughty...
+    delete m_pHeadlines;
 
 #ifdef HAVE_GTK
     ShutdownGTK();
@@ -291,9 +297,11 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           // Accept the new bitmaps and font.
           m_pBitmaps = m_pParsedBitmaps;
           m_pFonts = m_pParsedFonts;
+          m_pHeadlines = m_pParsedHeadlines;
           m_pParsedWindows = NULL;
           m_pParsedBitmaps = NULL;
           m_pParsedFonts = NULL;
+          m_pParsedHeadlines = NULL;
          
 #ifdef WIN32         
           ((Win32Window *)m_pWindow)->ConvertTo256Color(m_pBitmaps);
@@ -312,9 +320,11 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
           m_pWindows = m_pParsedWindows;
           m_pBitmaps = m_pParsedBitmaps;
           m_pFonts = m_pParsedFonts;
+          m_pHeadlines = m_pParsedHeadlines;
           m_pParsedWindows = NULL;
           m_pParsedBitmaps = NULL;
           m_pParsedFonts = NULL;
+          m_pParsedHeadlines = NULL;
 
           for(i = m_pWindows->begin(); i != m_pWindows->end(); i++)
           {
@@ -976,6 +986,51 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
        return kError_NoErr;
     }
 
+    if (oElement == string("Headlines"))
+    {
+       if (m_pCurrentWindow)
+       {
+           m_oLastError = string("A Headlines tag must be outside any Window tags.");
+           return kError_InvalidParam;
+       }
+
+       if (m_pParsedHeadlines)
+       {
+           m_oLastError = string("Each theme file can only have one Headlines tag.");
+           return kError_InvalidParam;
+       }
+
+	   if (oAttrMap.find("URL") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Headlines> tag needs a URL attribute");
+           return kError_ParseError;
+       }        
+
+	   if (oAttrMap.find("XMLPath") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Headlines> tag needs a XMLPath attribute");
+           return kError_ParseError;
+       }        
+
+	   if (oAttrMap.find("DownloadInterval") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Headlines> tag needs a DownloadInterval attribute");
+           return kError_ParseError;
+       }        
+
+	   if (oAttrMap.find("ChangeInterval") == oAttrMap.end())
+       {
+           m_oLastError = string("the <Headlines> tag needs a ChangeInterval attribute");
+           return kError_ParseError;
+       }        
+
+       m_pParsedHeadlines = new HeadlineInfo(oAttrMap["URL"],
+                                             oAttrMap["XMLPath"],
+                                             atoi(oAttrMap["DownloadInterval"].c_str()),
+                                             atoi(oAttrMap["ChangeInterval"].c_str()));
+       return kError_NoErr;
+    }
+
     m_oLastError = string("Invalid tag: ") + oElement;
 
     return kError_InvalidParam;
@@ -988,6 +1043,7 @@ Error Theme::EndElement(string &oElement)
         oElement == string("Font") ||
         oElement == string("ChangeWindow") ||
         oElement == string("ThemeInfo") ||
+        oElement == string("Headlines") ||
         oElement == string("MaskBitmap"))
        return kError_NoErr;
 
