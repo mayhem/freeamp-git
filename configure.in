@@ -313,6 +313,7 @@ AC_OUTPUT(Makefile base/Makefile base/src/Makefile io/Makefile
 	  ui/lcd/Makefile ui/lcd/src/Makefile
  	  io/alsa/Makefile io/alsa/unix/Makefile io/alsa/unix/linux/Makefile
  	  io/alsa/unix/linux/src/Makefile
+	  ui/irman/Makefile ui/irman/src/Makefile
 )
 
 
