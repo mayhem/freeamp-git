@@ -68,7 +68,8 @@ typedef enum {
    kTreeCDHead,
    kTreeStreamsHead,
    kTreeFavoriteStreamsHead,
-   kTreeStreamFolder
+   kTreeStreamFolder,
+   kTreeRelatableHead
 } TreeNodeType;
 
 enum {
@@ -119,6 +120,7 @@ class GTKMusicBrowser {
 
     vector<PlaylistItem *> *CDTracks;
 
+    void FillRelatable(bool force = false);
     void FillStreams(void);
     void CloseStreams(void);
     void HandleStreamList(vector<FreeAmpStreamInfo> & list);
@@ -206,6 +208,7 @@ class GTKMusicBrowser {
     GtkItemFactory *trackPopup;
     GtkItemFactory *playlistCatPopup;
     GtkItemFactory *otherPopup;
+    GtkItemFactory *relatablePopup;
     
     GtkCTreeNode *mainTree;
     GtkCTreeNode *allTree;
@@ -215,7 +218,10 @@ class GTKMusicBrowser {
     GtkCTreeNode *streamTree;
     GtkCTreeNode *favoritesTree;
     GtkCTreeNode *streamSpace;
+    GtkCTreeNode *relatableTree;
+    GtkCTreeNode *relatableSpace;
 
+    bool relatableExpanded;
     bool streamExpanded;
  
     GtkWidget *NewPixmap(char **data);

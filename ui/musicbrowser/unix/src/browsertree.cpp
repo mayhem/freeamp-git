@@ -963,6 +963,23 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     gtk_ctree_node_set_row_data_full(musicBrowserTree, favoritesTree, data,
                                      (GtkDestroyNotify)kill_treedata);
 
+    pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                          &style->bg[GTK_STATE_NORMAL],
+                                          favorites_pix);
+    name[0] = "Recommended Streams";
+    relatableTree = gtk_ctree_insert_node(musicBrowserTree, streamTree, NULL,
+                                          name, 5, pixmap, mask, pixmap, mask, 
+                                          false, false);
+    data = NewTreeData(kTreeRelatableHead, NULL, NULL, NULL, NULL, NULL,
+                       "This tree item contains recommended streams, personalized to you");
+    gtk_ctree_node_set_row_data_full(musicBrowserTree, relatableTree, data,
+                                     (GtkDestroyNotify)kill_treedata);
+
+    name[0] = "Getting Recommendations...";
+    relatableSpace = gtk_ctree_insert_node(musicBrowserTree, relatableTree, NULL,
+                                           name, 5, NULL, NULL, NULL, NULL, true,
+                                           false);
+    
     name[0] = "Searching for Stations...";
     streamSpace = gtk_ctree_insert_node(musicBrowserTree, streamTree, NULL,
                                         name, 5, NULL, NULL, NULL, NULL, true,
@@ -979,6 +996,7 @@ void GTKMusicBrowser::CreateMainTreeItems(void)
     gtk_ctree_node_set_row_data_full(musicBrowserTree, CDTree, data,
                                      (GtkDestroyNotify)kill_treedata);
 
+    relatableExpanded = false;
     streamExpanded = false;
 
     gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
@@ -1200,8 +1218,10 @@ void GTKMusicBrowser::HandleStreamList(vector<FreeAmpStreamInfo> &list)
     GtkCTreeRow *row = GTK_CTREE_ROW(streamTree);
     int expanded = row->expanded;
     GtkCTreeNode *sib = row->children;
+    sib = GTK_CTREE_ROW(sib)->sibling;
 
     GtkCTreeNode *todelete = GTK_CTREE_ROW(sib)->sibling;
+
     while (todelete) {
         gtk_ctree_remove_node(musicBrowserTree, todelete);
         todelete = GTK_CTREE_ROW(sib)->sibling;
@@ -1326,6 +1346,52 @@ void GTKMusicBrowser::FillStreams(void)
     streamExpanded = true;
 }
 
+void GTKMusicBrowser::FillRelatable(bool force)
+{
+    if (relatableExpanded && !force)
+        return;
+
+    StreamList listoStreams;
+    m_context->aps->APSGetStreams(&listoStreams);
+
+    if (relatableSpace)
+        gtk_ctree_remove_node(musicBrowserTree, relatableSpace);
+    relatableSpace = NULL;
+    relatableExpanded = true;
+
+    char *name[1];
+    GdkPixmap *pixmap;
+    GdkBitmap *mask;
+    GtkStyle *style = gtk_widget_get_style(musicBrowserWindow);
+    TreeData *data;
+    GtkCTreeNode *stream;
+    
+    gtk_clist_freeze(GTK_CLIST(musicBrowserTree));
+
+    StreamList::iterator i = listoStreams.begin();
+    for (; i != listoStreams.end(); i++) {
+        PlaylistItem *newitem = new PlaylistItem;
+        MetaData metadata;
+
+        newitem->SetURL((*i).second.c_str());
+        metadata.SetTitle((*i).first.c_str());
+        newitem->SetMetaData(&metadata);
+
+        name[0] = (char *)((*i).first.c_str());
+
+        pixmap = gdk_pixmap_create_from_xpm_d(musicBrowserWindow->window, &mask,
+                                              &style->bg[GTK_STATE_NORMAL],
+                                              streams_pix);
+        stream = gtk_ctree_insert_node(musicBrowserTree, relatableTree, NULL,
+                                       name, 5, pixmap, mask, pixmap, mask,
+                                       true, false);
+        data = NewTreeData(kTreeStream, NULL, NULL, NULL, newitem);
+        gtk_ctree_node_set_row_data_full(musicBrowserTree, stream, data,
+                                         (GtkDestroyNotify)kill_treedata);
+    }
+    gtk_clist_thaw(GTK_CLIST(musicBrowserTree));
+}
+
 void GTKMusicBrowser::CloseStreams(void)
 {
     if (!streamExpanded)
@@ -1345,6 +1411,9 @@ static void ctree_expand(GtkWidget *widget, GList *list, GTKMusicBrowser *p)
         switch (data->type) {
             case kTreeStreamsHead: {
                 p->FillStreams();
+                break; }
+            case kTreeRelatableHead: {
+                p->FillRelatable();
                 break; }
             default:
                 break;
@@ -1402,6 +1471,8 @@ void GTKMusicBrowser::TreeRightClick(int x, int y, uint32 time)
         case kTreeFavoriteStreamsHead:
             itemfact = genstreamPopup;
             break;
+        case kTreeRelatableHead:
+            itemfact = relatablePopup;
         default:
             break;
     }
@@ -1410,6 +1481,11 @@ void GTKMusicBrowser::TreeRightClick(int x, int y, uint32 time)
         return;
 
     gtk_item_factory_popup(itemfact, x, y, 3, time);
+}
+
+static void refresh_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->FillRelatable(true);
 }
 
 static void add_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
@@ -1451,6 +1527,16 @@ static void edit_info_pop(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 void GTKMusicBrowser::CreateTreePopups(void)
 {
+    GtkItemFactoryEntry relatable_items[] = {
+     {"/Refresh Recommendations", NULL, (void(*)(...))refresh_pop, 0, 0}
+    };
+    int nrstream_items = sizeof(relatable_items) / sizeof(relatable_items[0]);
+
+    relatablePopup = gtk_item_factory_new(GTK_TYPE_MENU, "<relatable_popup>",
+                                          NULL);
+    gtk_item_factory_create_items(relatablePopup, nrstream_items,
+                                  relatable_items, (void*)this);
+
     GtkItemFactoryEntry genstream_items[] = {
      {"/Add New Stream", NULL,    (void(*)(...))add_stream_pop, 0, 0 }
     };
