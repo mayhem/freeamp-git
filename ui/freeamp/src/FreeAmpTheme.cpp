@@ -60,6 +60,10 @@ void WorkerThreadStart(void* arg);
 
 const char *szWelcomeMsg = "Welcome to the "BRANDING" player!";
 const char *szParseError = "Parsing the Theme description failed. Cause: ";
+const char *szCantFindHelpError = "Cannot find the help files. Please make "
+                                  "sure that the help files are properly "
+                                  "installed, and you are not running "
+                                  BRANDING" from the build directory.";
 const int iVolumeChangeIncrement = 10;
 
 extern    "C"
@@ -1075,7 +1079,7 @@ void FreeAmpTheme::ShowHelp(void)
     
     m_pContext->prefs->GetInstallDirectory(dir, &len);
     oHelpFile = string(dir);
-    oHelpFile += string("\\");    
+    oHelpFile += string(DIR_MARKER_STR);    
     oHelpFile += string(HELP_FILE);    
     
 #ifdef WIN32   
@@ -1088,5 +1092,18 @@ void FreeAmpTheme::ShowHelp(void)
        hWnd = (HWND)pProp->GetInt32();
     
     WinHelp(hWnd, oHelpFile.c_str(), HELP_FINDER, FreeAmp_Main_Window);
+#endif
+#ifdef HAVE_GTK   
+    struct _stat   st;
+
+    if (_stat(oHelpFile.c_str(), &st) == 0 && st.st_mode & S_IFREG)
+        LaunchBrowser((char *)oHelpFile.c_str());
+    else
+    {
+        MessageDialog oBox;
+        string        oMessage(szCantFindHelpError);
+
+        oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
+    }
 #endif
 }
