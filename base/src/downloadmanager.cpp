@@ -775,15 +775,15 @@ Error DownloadManager::Download(DownloadItem* item)
 
             if(IsntError(result))
             {
-                const char* kHTTPQuery = "GET %s HTTP/1.1\r\n"
-                                         "Host: %s\r\n"
-                                         "Accept: */*\r\n" 
-                                         "User-Agent: FreeAmp/%s\r\n";
+                const char* kHTTPQuery = "GET %s HTTP/1.1\n"
+                                         "Host: %s\n"
+                                         "Accept: */*\n" 
+                                         "User-Agent: FreeAmp/%s\n";
 
-                const char* kRange = "Range: bytes=%lu-\r\n";
-                const char* kIfRange = "If-Range: %s\r\n";
+                const char* kRange = "Range: bytes=%lu-\n";
+                const char* kIfRange = "If-Range: %s\n";
 
-                const char* kCookie = "Cookie: %s\r\n";
+                const char* kCookie = "Cookie: %s\n";
 
                 // the magic 256 is enough for a time field that
                 // we got from the server
@@ -1195,6 +1195,8 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
             MetaData tempdata = (MetaData)(newtrack->GetMetaData());
             m_context->catalog->WriteMetaDataToDatabase(url, tempdata);
             m_context->catalog->AddSong(url);
+
+            delete newtrack;
         }
 
         delete [] url;
