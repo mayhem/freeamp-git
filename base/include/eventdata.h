@@ -33,7 +33,7 @@ ____________________________________________________________________________*/
 //#include "playlist.h"
 #include "event.h"
 #include "id3v1.h"
-#include "vector.h"
+#include "list.h"
 
 class LogicalMediaConverter; 
 
@@ -62,7 +62,7 @@ class UserMessageEvent : public Event {
 
 class MediaInfoEvent : public Event {
  public:
-    Vector<Event *> *m_childEvents;
+    List<Event *> *m_childEvents;
     bool m_filled;
     float m_totalSeconds;
     int32 m_indexOfSong;
@@ -78,12 +78,12 @@ class MediaInfoEvent : public Event {
     }
     MediaInfoEvent() { 
 	m_type = INFO_MediaInfo; m_filled = false; m_filename[0] = '\0'; 
-	m_childEvents = new Vector<Event *>();
+	m_childEvents = new List<Event *>();
     }
     MediaInfoEvent( const char *fn, 
                     float ts)
     {
-	m_childEvents = new Vector<Event *>();
+	m_childEvents = new List<Event *>();
 	m_filled = true;
 	m_type = INFO_MediaInfo;
         m_totalSeconds = ts;

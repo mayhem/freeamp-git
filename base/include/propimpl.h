@@ -28,7 +28,7 @@ ____________________________________________________________________________*/
 
 #include "config.h"
 #include "hashtable.h"
-#include "vector.h"
+#include "list.h"
 #include "mutex.h"
 #include "properties.h"
 
@@ -38,7 +38,7 @@ class PropertiesImpl : public Properties {
     public:
 	PropElem() { m_val = NULL; }
 	~PropElem() {if (m_val) delete m_val; }
-	Vector<PropertyWatcher *> m_propWatchers;
+	List<PropertyWatcher *> m_propWatchers;
 	PropValue *m_val;
     };
     HashTable<PropElem *> *m_props;

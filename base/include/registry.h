@@ -25,7 +25,7 @@ ____________________________________________________________________________*/
 #define _REGISTRY_H_
 
 #include "config.h"
-#include "vector.h"
+#include "list.h"
 #include "log.h"
 
 typedef void *(*InitializeFunction)(LogFile *);
@@ -64,7 +64,7 @@ class RegistryItem {
 
 class Registry {
  private:
-    Vector<RegistryItem*> *m_elements;
+    List<RegistryItem*> *m_elements;
     int32 m_count;
     
  public:
