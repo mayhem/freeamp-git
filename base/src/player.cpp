@@ -43,8 +43,6 @@ ____________________________________________________________________________*/
 Player   *Player::m_thePlayer = NULL;
 LogFile *g_Log = NULL;
 
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
-
 const char *szPlaylistExt = ".M3U";
 
 #define SEND_NORMAL_EVENT(e) { Event *ev = new Event(e); GetUIManipLock();    \
@@ -64,10 +62,8 @@ Player *Player::GetPlayer()
 Player::Player():
 EventQueue()
 {
-DB
    g_Log = new LogFile("freeamp.log");
    assert(g_Log);
-DB
    // cout << "Creating player..." << endl;
    m_eventSem = new Semaphore();
    m_eventQueue = new Queue < Event * >();
@@ -94,7 +90,6 @@ DB
 
    m_lmc = NULL;
    m_ui = NULL;
-DB
 
    m_argUIList = new List < char *>();
 
@@ -106,7 +101,6 @@ DB
    m_didUsage = false;
    m_autoplay = true;
 
-DB
    m_props.RegisterPropertyWatcher("pcm_volume", (PropertyWatcher *) this);
 }
 
@@ -179,7 +173,6 @@ SetArgs(int32 argc, char **argv)
    char     *arg = NULL;
    char     *argUI = NULL;
 
-DB
 #ifndef WIN32
    
    if (argc == 1)
@@ -206,7 +199,6 @@ DB
    justGotArgvZero = true;
 #endif
 
-DB
    argList.AddItem(argv[0]);
    for (int32 i = 1; i < argc; i++)
    {
@@ -326,7 +318,6 @@ DB
       }
    }
 
-DB
    return true;
 }
 
@@ -414,7 +405,6 @@ SetPreferences(Preferences * pP)
 void      Player::
 Run()
 {
-DB
    int32     uiListIndex = 0;
    Preferences *prefs;
    char     *name = NULL;
@@ -467,7 +457,6 @@ DB
       strcpy(name, m_argUIList->ItemAt(uiListIndex));
    }
 
-DB
    if (IsntError(error))
    {
       while (*name)
@@ -512,7 +501,6 @@ DB
             *name = '\0';
          }
       }
-DB
       if (!uisActivated)
       {
 #ifdef WIN32
@@ -538,7 +526,6 @@ DB
          AcceptEvent(e);
       }
    }
-DB
    m_eventServiceThread = Thread::CreateThread();
    m_eventServiceThread->Create(Player::EventServiceThreadFunc, this);
 
