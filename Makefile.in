@@ -77,7 +77,7 @@ target_os = @target_os@
 SUBDIRS = base io ui lmc
 
 @AM_HAVE_WIN32_TRUE@PRG =
-@AM_HAVE_WIN32_FALSE@PRG = freeamp decspeed
+@AM_HAVE_WIN32_FALSE@PRG = freeamp
 @AM_HAVE_WIN32_FALSE@ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/io/local/*.o \
 @AM_HAVE_WIN32_FALSE@	  @top_srcdir@/ui/cmdline/*.o \
@@ -99,10 +99,6 @@ freeamp_SOURCES = freeamp.cpp
 freeamp_LDADD = $(FALDADD)
 freeamp_DEPENDENCIES = $(MYDEPS)
 
-decspeed_SOURCES = decoder_speed.cpp
-decspeed_LDADD = $(DSLDADD)
-decspeed_DEPENDENCIES = $(MYDEPS)
-
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -118,8 +114,6 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 freeamp_OBJECTS =  freeamp.o
 freeamp_LDFLAGS = 
-decspeed_OBJECTS =  decoder_speed.o
-decspeed_LDFLAGS = 
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
@@ -130,10 +124,10 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/decoder_speed.P .deps/freeamp.P
+DEP_FILES =  .deps/freeamp.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(freeamp_SOURCES) $(decspeed_SOURCES)
-OBJECTS = $(freeamp_OBJECTS) $(decspeed_OBJECTS)
+SOURCES = $(freeamp_SOURCES)
+OBJECTS = $(freeamp_OBJECTS)
 
 all: all-recursive all-am
 
@@ -198,10 +192,6 @@ maintainer-clean-compile:
 freeamp: $(freeamp_OBJECTS) $(freeamp_DEPENDENCIES)
 	@rm -f freeamp
 	$(CXXLINK) $(freeamp_LDFLAGS) $(freeamp_OBJECTS) $(freeamp_LDADD) $(LIBS)
-
-decspeed: $(decspeed_OBJECTS) $(decspeed_DEPENDENCIES)
-	@rm -f decspeed
-	$(CXXLINK) $(decspeed_LDFLAGS) $(decspeed_OBJECTS) $(decspeed_LDADD) $(LIBS)
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 

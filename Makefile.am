@@ -29,7 +29,7 @@ SUBDIRS = base io ui lmc
 if AM_HAVE_WIN32
 PRG =
 else
-PRG = freeamp decspeed
+PRG = freeamp
 ALLLDADD = @top_srcdir@/base/unix/@target_os@/src/*.o \
 	  @top_srcdir@/io/local/*.o \
 	  @top_srcdir@/ui/cmdline/*.o \
@@ -53,10 +53,12 @@ freeamp_SOURCES = freeamp.cpp
 freeamp_LDADD = $(FALDADD)
 freeamp_DEPENDENCIES = $(MYDEPS)
 
-decspeed_SOURCES = decoder_speed.cpp
-decspeed_LDADD = $(DSLDADD)
-decspeed_DEPENDENCIES = $(MYDEPS)
+## decspeed_SOURCES = decoder_speed.cpp
+## decspeed_LDADD = $(DSLDADD)
+## decspeed_DEPENDENCIES = $(MYDEPS)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@target_os@__
+
+
 
