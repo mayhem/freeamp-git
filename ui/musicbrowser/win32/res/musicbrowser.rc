@@ -334,6 +334,7 @@ BEGIN
         MENUITEM "by &Genre",                   ID_SORT_GENRE
         MENUITEM "by &Length",                  ID_SORT_LENGTH
         MENUITEM "by L&ocation",                ID_SORT_LOCATION
+        MENUITEM "by &Filename",                ID_SORT_FILENAME
         MENUITEM "&Randomly",                   ID_SORT_RANDOMIZE
     END
     POPUP "&Help"

@@ -54,6 +54,7 @@ typedef enum {
     kPlaylistSortKey_Genre,
     kPlaylistSortKey_Time,
     kPlaylistSortKey_Location,
+    kPlaylistSortKey_FileName,
     kPlaylistSortKey_LastKey,
     kPlaylistSortKey_Random // not used with normal sort function
 

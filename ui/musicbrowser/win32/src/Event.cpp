@@ -1055,33 +1055,36 @@ void MusicBrowserUI::SortEvent(int id)
     switch(id)
     {
         case ID_SORT_ARTIST:
-             newKey = kPlaylistSortKey_Artist;
-        break;     
+            newKey = kPlaylistSortKey_Artist;
+            break;     
         case ID_SORT_ALBUM:
-             newKey = kPlaylistSortKey_Album;
-        break;     
+            newKey = kPlaylistSortKey_Album;
+            break;     
         case ID_SORT_TITLE:
-             newKey = kPlaylistSortKey_Title;
-        break;     
+            newKey = kPlaylistSortKey_Title;
+            break;     
         case ID_SORT_LENGTH:
-             newKey = kPlaylistSortKey_Time;
-        break;     
+            newKey = kPlaylistSortKey_Time;
+            break;     
         case ID_SORT_YEAR:
-             newKey = kPlaylistSortKey_Year;
-        break;     
+            newKey = kPlaylistSortKey_Year;
+            break;     
         case ID_SORT_TRACK:
-             newKey = kPlaylistSortKey_Track;
-        break;     
+            newKey = kPlaylistSortKey_Track;
+            break;     
         case ID_SORT_GENRE:
-             newKey = kPlaylistSortKey_Genre;
-        break;     
+            newKey = kPlaylistSortKey_Genre;
+            break;     
         case ID_SORT_LOCATION:
-             newKey = kPlaylistSortKey_Location;
-        break;     
+            newKey = kPlaylistSortKey_Location;
+            break;
+        case ID_SORT_FILENAME:
+            newKey = kPlaylistSortKey_FileName;
+            break;  
         case IDC_RANDOMIZE:
         case ID_SORT_RANDOMIZE:
-             newKey = kPlaylistSortKey_Random;
-        break;     
+            newKey = kPlaylistSortKey_Random;
+            break;     
         default:
              return;
     }

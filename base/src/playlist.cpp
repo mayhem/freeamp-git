@@ -165,6 +165,21 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
                 break;
             }
 
+            case kPlaylistSortKey_FileName:
+            {
+                string file1, file2;
+                string::size_type pos;
+
+                pos = item1->URL().find_last_of('/');
+                file1 = item1->URL().substr(pos + 1);
+
+                pos = item2->URL().find_last_of('/');
+                file2 = item2->URL().substr(pos + 1);
+
+                result = file1 < file2;
+                break;
+            }
+
             default:
             {
                 cerr << "Whoa! Why are we here?" << endl;
