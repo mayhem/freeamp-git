@@ -642,11 +642,11 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
          if (info->GetBitRate() == 1411200)
               sprintf(text, "CD Audio");
          else if (info->GetBitRate() == 0)
-              sprintf(text, "VBR %ldkhz %s", 
+              sprintf(text, "VBR %ldkHz %s", 
                    (long int)(info->GetSampleRate() / 1000), 
                    info->GetChannels() ? "Stereo" : "Mono");
          else
-              sprintf(text, "%ldkbps %ldkhz %s", 
+              sprintf(text, "%ldkbps %ldkHz %s", 
                    (long int)(info->GetBitRate() / 1000),
                    (long int)(info->GetSampleRate() / 1000), 
                    info->GetChannels() ? "Stereo" : "Mono");
@@ -677,7 +677,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          text = new char[100];
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
-              sprintf(text, "%ldkbps %ldkhz %s Vorbis", 
+              sprintf(text, "%ldkbps %ldkHz %s Vorbis", 
                    (long int)(info->GetBitRate() / 1000),
                    (long int)(info->GetSampleRate() / 1000), 
                    info->GetChannels() ? "Stereo" : "Mono");

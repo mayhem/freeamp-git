@@ -259,7 +259,7 @@ BEGIN
     LTEXT           "Seconds",IDC_STATIC,149,111,29,8
     GROUPBOX        "Default Values",IDC_STATIC,3,132,227,38
     PUSHBUTTON      "Use &Defaults",IDC_USEDEFAULTS,170,146,50,14
-    LTEXT           "To reset this tab to use the recommended default values, click on ""Use Defaults.""",
+    LTEXT           "To reset this tab to use the recommended default values, click ""Use Defaults"".",
                     IDC_STATIC,9,146,153,20
 END
 
