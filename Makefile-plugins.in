@@ -29,7 +29,7 @@ uninstall_plugins uninstall-plugins:
 OSDEPPLUGINS = @OSDEPPLUGINS@
 
 clean-plugins plugins-clean:
-	-rm -f $(CORBAUIOBJ) $(VORBISLIBOBJ) $(VORBISOBJ) $(VORBISMDFOBJ) $(SIGNATUREPMOOBJ) $(LIBHTTPOBJ) $(KJOFOLOBJ) $(WINAMPOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(UNZIPOBJ) $(CDDBOBJ) $(PLSOBJ) $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) $(WAVPMOOBJ) MakeTheme plugins/*.*
+	-rm -f $(CORBAUIOBJ) $(VORBISLIBOBJ) $(VORBISOBJ) $(VORBISMDFOBJ) $(SIGNATUREPMOOBJ) $(LIBHTTPOBJ) $(KJOFOLOBJ) $(WINAMPOBJ) $(CDPMOOBJ) $(CDLMCOBJ) $(UNZIPOBJ) $(CDDBOBJ) $(MBCDOBJ) $(PLSOBJ) $(RMPOBJ) $(MISCOBJ) $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) $(WAVPMOOBJ) MakeTheme plugins/*.*
 
 PLUGINS =  lib/zlib/lib/libzlib.la
 PLUGINS += lib/unzip/lib/libunzip.la
@@ -50,6 +50,7 @@ PLUGINS += plugins/irman.ui
 PLUGINS += plugins/xingmp3.lmc
 PLUGINS += plugins/vorbis.lmc
 
+PLUGINS += plugins/mbcd.mdf
 PLUGINS += plugins/id3v1.mdf
 PLUGINS += plugins/id3v2.mdf
 PLUGINS += plugins/vorbis.mdf
@@ -402,6 +403,12 @@ CDDBOBJ = plm/metadata/cddb/cddb.o plm/metadata/cddb/cddb_proto.o
 
 plugins/cddb.mdf: $(CDDBOBJ)
 	$(LINKMOD) -o $@ $(CDDBOBJ) $(STATICLD)
+
+#mbcd
+MBCDOBJ = plm/metadata/mbcd/mbcd.o 
+
+plugins/mbcd.mdf: $(MBCDOBJ)
+	$(LINKMOD) -o $@ $(MBCDOBJ) $(STATICLD) -lmusicbrainz
 
 # PLF section
 
