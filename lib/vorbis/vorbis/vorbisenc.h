@@ -33,6 +33,13 @@ extern int vorbis_encode_init(vorbis_info *vi,
 			      long nominal_bitrate,
 			      long min_bitrate);
 
+extern int vorbis_encode_init_vbr(vorbis_info *vi,
+				  long channels,
+				  long rate,
+				  
+				  float /* quality level from 0. (lo) to 1. (hi) */
+				  );
+
 extern int vorbis_encode_ctl(vorbis_info *vi,int number,void *arg);
 
 

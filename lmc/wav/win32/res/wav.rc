@@ -54,8 +54,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,1,5
- PRODUCTVERSION 2,1,1,5
+ FILEVERSION 2,1,1,6
+ PRODUCTVERSION 2,1,1,6
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -72,10 +72,10 @@ BEGIN
         BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
-            VALUE "FileDescription", "The Xing MP3 Decoder plugin enables FreeAmp to play MP3 files.\0"
-            VALUE "FileVersion", "2.1.1.5\0"
+            VALUE "FileDescription", "A WAV pass-thru to enable playing wav files.\0"
+            VALUE "FileVersion", "2.1.1.6\0"
             VALUE "InternalName", "xing\0"
-            VALUE "LegalCopyright", "Copyright © Xing 1999, Copyright © EMusic.com 1999-2000  (http://www.gnu.org/copyleft/gpl.html)\0"
+            VALUE "LegalCopyright", "Copyright © EMusic.com 1999-2000  (http://www.gnu.org/copyleft/gpl.html)\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic, Xing\0"
             VALUE "OriginalFilename", "xing.lmc\0"
             VALUE "PrivateBuild", "\0"
