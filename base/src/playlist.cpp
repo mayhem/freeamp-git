@@ -1817,7 +1817,7 @@ bool PlaylistManager::IsSupportedPlaylistFormat(const char *extension)
         }
     }
 
-    m_mutex.Acquire();
+    m_mutex.Release();
   
     return retvalue;
 }
