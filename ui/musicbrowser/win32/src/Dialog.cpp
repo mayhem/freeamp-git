@@ -513,32 +513,47 @@ void MusicBrowserUI::Close()
 
 void MusicBrowserUI::Destroy()
 {
-    RECT rect, controlRect;
+    RECT  controlRect;
     char buf[256];
     int32 h,w, s;
+    int32 screenX, screenY;
+    WINDOWPLACEMENT wp;
 
-    GetWindowRect(m_hWnd, &rect);
+    screenX = GetSystemMetrics(SM_CXSCREEN);
+    screenY = GetSystemMetrics(SM_CYSCREEN);
+
+    wp.length = sizeof(WINDOWPLACEMENT);
+    GetWindowPlacement(m_hWnd, &wp);
+    
+    //GetWindowRect(m_hWnd, &rect);
     GetWindowRect(m_hMusicView, &controlRect);
 
-    h = rect.bottom - rect.top;
-    w = rect.right - rect.left;
+    h = wp.rcNormalPosition.bottom - wp.rcNormalPosition.top;
+    w = wp.rcNormalPosition.right - wp.rcNormalPosition.left;
     s = controlRect.right - controlRect.left;
 
-    if(rect.left >= 0 && rect.top >= 0 && h >= 0  && w >= 0 && s >= 0)
-    {
-        sprintf(buf, "%d,%d,%d,%d,%d", rect.left, rect.top, w, h, s);
-        m_context->prefs->SetPrefString(kMusicBrowserPositionPref, buf);
+    // some sanity checking
+    if(wp.rcNormalPosition.left < 0)
+        wp.rcNormalPosition.left = 0;
+    
+    if(wp.rcNormalPosition.top < 0)
+        wp.rcNormalPosition.top = 0;
+    
+    if(s >= w)
+        s = w/3;
 
-        int a,b,c,d;
+    sprintf(buf, "%d,%d,%d,%d,%d", wp.rcNormalPosition.left, wp.rcNormalPosition.top, w, h, s);
+    m_context->prefs->SetPrefString(kMusicBrowserPositionPref, buf);
 
-        a = ListView_GetColumnWidth(m_hPlaylistView, 1);
-        b = ListView_GetColumnWidth(m_hPlaylistView, 2);
-        c = ListView_GetColumnWidth(m_hPlaylistView, 3);
-        d = ListView_GetColumnWidth(m_hPlaylistView, 4);
+    int a,b,c,d;
 
-        sprintf(buf, "%d,%d,%d,%d", a,b,c,d);
-        m_context->prefs->SetPrefString(kMusicBrowserHeaderWidthsPref, buf);
-    }
+    a = ListView_GetColumnWidth(m_hPlaylistView, 1);
+    b = ListView_GetColumnWidth(m_hPlaylistView, 2);
+    c = ListView_GetColumnWidth(m_hPlaylistView, 3);
+    d = ListView_GetColumnWidth(m_hPlaylistView, 4);
+
+    sprintf(buf, "%d,%d,%d,%d", a,b,c,d);
+    m_context->prefs->SetPrefString(kMusicBrowserHeaderWidthsPref, buf);
 
     RevokeDragDrop(m_hPlaylistView);
     OleUninitialize(); 
@@ -1062,8 +1077,18 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     m_context->prefs->GetPrefString(kMusicBrowserPositionPref, buf, &size);
     sscanf(buf, " %d , %d , %d , %d, %d", &x, &y, &w, &h, &s);
 
-    if(x >= 0 && y >= 0 && h >= 0  && w >= 0 && s >= 0)
+    if(x >= 0 && y >= 0 && h >= 0  && w >= 0 && s >= 0 && s < w)
     {
+        int32 screenX, screenY;
+
+        screenX = GetSystemMetrics(SM_CXSCREEN);
+        screenY = GetSystemMetrics(SM_CYSCREEN);
+
+        if(x > screenX)
+            x = 0;
+        if(y > screenY)
+            y = 0;
+
         MoveWindow(hWnd, x, y, w, h, TRUE);
 
         /*RECT controlRect;

@@ -307,6 +307,21 @@ bool ID3v2::WriteMetaData(const char* url, const MetaData& metadata)
         ID3Field_SetASCII(pField, dummy);
     }
 
+    sprintf(dummy, "%d", metadata.Track());
+    pFrame = ID3Tag_FindFrameWithID(pTag, ID3FID_TRACKNUM);
+    if (!pFrame)
+    {
+        pFrame = ID3Frame_NewID(ID3FID_TRACKNUM);
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
+        ID3Tag_AttachFrame(pTag, pFrame);
+    }
+    else
+    {
+        pField = ID3Frame_GetField(pFrame, ID3FN_TEXT);
+        ID3Field_SetASCII(pField, dummy);
+    }
+
     err = ID3Tag_UpdateByTagType(pTag, whichTags);
 
     ID3Tag_Delete(pTag);

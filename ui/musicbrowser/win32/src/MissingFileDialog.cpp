@@ -211,8 +211,11 @@ BOOL MissingFileDialog::DialogProc(HWND hwnd,
                 }
 
                 case IDCANCEL:
+                {
+                    m_context->target->AcceptEvent(new Event(CMD_Stop));
                     EndDialog(hwnd, FALSE);
                     break;
+                }
 
                 case IDOK:
                 {

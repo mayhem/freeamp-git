@@ -124,6 +124,7 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
             {
                 //result = m1.Artist() < m2.Artist();
                 result = (lstrcmpi(m1.Artist().c_str(), m2.Artist().c_str()) < 0);
+                //result = (lstrcmpi(m1.Comment().c_str(), m2.Comment().c_str()) < 0);
                 break;
             }
 
