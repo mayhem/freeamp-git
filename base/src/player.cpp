@@ -258,20 +258,20 @@ void Player::Run(){
         RegistryItem* item = NULL;
 		UserInterface *ui = NULL;
         int32 i = 0;
-	int32 uisActivated = 0;
+	    int32 uisActivated = 0;
 	
         while(item = m_uiRegistry->GetItem(i++))
         {
             if(!CompareNames(item->Name(),name))
             {
-		m_ui = (UserInterface *)item->InitFunction()();
+		        m_ui = (UserInterface *)item->InitFunction()();
 		
-		m_ui->SetTarget((EventQueue *)this);
-		m_ui->SetPlayListManager(m_plm);
+		        m_ui->SetTarget((EventQueue *)this);
+		        m_ui->SetPlayListManager(m_plm);
                 m_ui->SetArgs(m_argc, m_argv);
-		m_ui->Init();
+		        m_ui->Init();
                 RegisterActiveUI(m_ui);
-		uisActivated++;
+		        uisActivated++;
                 break;
             }
         }

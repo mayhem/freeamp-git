@@ -191,52 +191,19 @@ SOURCE=..\res\big_font.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=..\res\dials.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\lcd.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\leftside.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\logo.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\player.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\player_buttons.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\player_mask.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\rightside.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\small_font.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\system_buttons.bmp
-# End Source File
-# End Group
-# Begin Source File
-
 SOURCE=..\res\big_font256.bmp
 # End Source File
 # Begin Source File
 
 SOURCE=..\res\close_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\close_buttons256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\dials.bmp
 # End Source File
 # Begin Source File
 
@@ -252,11 +219,27 @@ SOURCE=..\res\last_buttons.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\last_buttons256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\lcd.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\lcd256.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\leftside.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\leftside256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\logo.bmp
 # End Source File
 # Begin Source File
 
@@ -268,7 +251,15 @@ SOURCE=..\res\minimize_buttons.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\minimize_buttons256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\mode_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\mode_buttons256.bmp
 # End Source File
 # Begin Source File
 
@@ -276,7 +267,15 @@ SOURCE=..\res\next_buttons.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\next_buttons256.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\pause_buttons.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\pause_buttons256.bmp
 # End Source File
 # Begin Source File
 
@@ -284,11 +283,27 @@ SOURCE=..\res\play_buttons.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=..\res\player_buttons256.bmp
+SOURCE=..\res\play_buttons256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\player.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\player_mask.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\rightside.bmp
 # End Source File
 # Begin Source File
 
 SOURCE=..\res\rightside256.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\small_font.bmp
 # End Source File
 # Begin Source File
 
@@ -300,7 +315,8 @@ SOURCE=..\res\stop_buttons.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=..\res\system_buttons256.bmp
+SOURCE=..\res\stop_buttons256.bmp
 # End Source File
+# End Group
 # End Target
 # End Project

@@ -980,7 +980,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                                         50);
             g_buttonStateArray[9].region = tempRegion;
 
-            hwndTooltip = CreateWindow( TOOLTIPS_CLASS, 
+            hwndTooltip = CreateWindowEx( WS_EX_TOPMOST,
+                                        TOOLTIPS_CLASS, 
                                         NULL, 
                                         0, 
                                         CW_USEDEFAULT, 
@@ -991,36 +992,6 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                                         (HMENU) NULL, 
                                         g_hInst, 
                                         NULL);
-            RECT toolRect;
-            TOOLINFO ti;
-
-            for(i = 0; i < kNumControls; i++)
-            {
-                GetRgnBox(g_buttonStateArray[i].region, &toolRect);
-
-                ti.cbSize = sizeof(TOOLINFO); 
-                ti.uFlags = 0; 
-                ti.hwnd = hwnd; 
-                ti.hinst = g_hInst; 
-                ti.uId = (UINT) i; 
-                ti.lpszText = (LPSTR) LPSTR_TEXTCALLBACK; 
-                ti.rect.left = toolRect.left; 
-                ti.rect.top = toolRect.top; 
-                ti.rect.right = toolRect.right; 
-                ti.rect.bottom = toolRect.bottom; 
-
-                if(i != kStopControl)
-                {
-                    SendMessage(hwndTooltip, 
-                            TTM_ADDTOOL, 
-                            0, 
-                            (LPARAM) &ti);
-                }
-            }
-
-
-            
-
 
             // display
             int32 displayOffset = LEFT_SECTION + DIAL_SECTION + 19;
@@ -1041,6 +1012,53 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&g_displayInfo.volume);
 
             g_displayInfo.volume = (int32)(100 * ((float)LOWORD(g_displayInfo.volume)/(float)0xffff));
+
+
+            // tooltip support
+            RECT toolRect;
+            TOOLINFO ti;
+
+            for(i = 0; i < kNumControls; i++)
+            {
+                GetRgnBox(g_buttonStateArray[i].region, &toolRect);
+
+                ti.cbSize = sizeof(TOOLINFO); 
+                ti.uFlags =  TTF_SUBCLASS; 
+                ti.hwnd = hwnd; 
+                ti.hinst = g_hInst; 
+                ti.uId = (UINT) i; 
+                ti.lpszText = (LPSTR) LPSTR_TEXTCALLBACK; 
+                ti.rect.left = toolRect.left; 
+                ti.rect.top = toolRect.top; 
+                ti.rect.right = toolRect.right; 
+                ti.rect.bottom = toolRect.bottom; 
+
+                if(i != kStopControl)
+                {
+                    SendMessage(hwndTooltip, 
+                            TTM_ADDTOOL, 
+                            0, 
+                            (LPARAM) &ti);
+                }
+            }
+
+            // don't forget display area!
+            GetRgnBox(displayRegion, &toolRect);
+            ti.cbSize = sizeof(TOOLINFO); 
+            ti.uFlags =  TTF_SUBCLASS; 
+            ti.hwnd = hwnd; 
+            ti.hinst = g_hInst; 
+            ti.uId = (UINT) kDisplayControl; 
+            ti.lpszText = (LPSTR) LPSTR_TEXTCALLBACK; 
+            ti.rect.left = toolRect.left; 
+            ti.rect.top = toolRect.top; 
+            ti.rect.right = toolRect.right; 
+            ti.rect.bottom = toolRect.bottom; 
+
+            SendMessage(hwndTooltip, 
+                        TTM_ADDTOOL, 
+                        0, 
+                        (LPARAM) &ti);
 
             xPos = (GetSystemMetrics (SM_CXFULLSCREEN) - (PLAYER_WINDOW_WIDTH)) / 2;
 			yPos = (GetSystemMetrics (SM_CYFULLSCREEN) - PLAYER_WINDOW_HEIGHT) / 2;
@@ -1292,10 +1310,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             relayMsg.wParam = wParam; 
             relayMsg.message = msg; 
             relayMsg.hwnd = hwnd; 
-            SendMessage(hwndTooltip, 
+            /*SendMessage(hwndTooltip, 
                         TTM_RELAYEVENT, 
                         0, 
-                        (LPARAM) &relayMsg); 
+                        (LPARAM) &relayMsg); */
             break;
         }
 
@@ -1359,10 +1377,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
             relayMsg.wParam = wParam; 
             relayMsg.message = msg; 
             relayMsg.hwnd = hwnd; 
-            SendMessage(hwndTooltip, 
+            /*SendMessage(hwndTooltip, 
                         TTM_RELAYEVENT, 
                         0, 
-                        (LPARAM) &relayMsg); 
+                        (LPARAM) &relayMsg); */
                 
             break;
         }
@@ -1408,10 +1426,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 relayMsg.message = WM_MOUSEMOVE; 
                 relayMsg.hwnd = hwnd; 
 
-                SendMessage(hwndTooltip, 
-                            TTM_RELAYEVENT, 
-                            0, 
-                            (LPARAM) &relayMsg); 
+                /*SendMessage(hwndTooltip, 
+                        TTM_RELAYEVENT, 
+                        0, 
+                        (LPARAM) &relayMsg); */
                 
             }
             
@@ -1534,13 +1552,16 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         lpttt->lpszText = "Close"; 
                         break;
                     case kPlayControl:
-                        if(g_ui->m_state != STATE_Playing)
+                        if(g_ui->m_state == STATE_Stopped)
                             lpttt->lpszText = "Play"; 
                         else
                             lpttt->lpszText = "Stop";
                         break;
                     case kPauseControl:
-                        lpttt->lpszText = "Pause"; 
+                        if(g_ui->m_state == STATE_Paused)
+                            lpttt->lpszText = "Continue Playing"; 
+                        else
+                            lpttt->lpszText = "Pause"; 
                         break;
                     case kNextControl:
                         lpttt->lpszText = "Next Song"; 
