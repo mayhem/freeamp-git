@@ -63,7 +63,7 @@ bool FindNextFile(HANDLE hFindFile, WIN32_FIND_DATA *lpFindFileData);
 bool FindClose(HANDLE hFindFile);
 HINSTANCE LoadLibrary(char *lpLibFileName);
 bool FreeLibrary(HMODULE hLibModule);
-FARPROC GetProcAddress(HMODULE hModule, char *lpProcName);
+FARPROC GetProcAddress(HMODULE hModule, const char *lpProcName);
 
 
 #endif

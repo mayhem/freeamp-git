@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #include "fileselector.h"
 #include <unistd.h>
 
-FileSelector::FileSelector(char *windowtitle)
+FileSelector::FileSelector(const char *windowtitle)
 {
     title = windowtitle;
     returnpath = "";

@@ -33,7 +33,7 @@ ____________________________________________________________________________*/
 
 class GTKFileSelector {
  public:
-    GTKFileSelector(char *);
+    GTKFileSelector(const char *);
   
     bool Run(bool runMain = true);
     void SetExtended() { extended = true; }

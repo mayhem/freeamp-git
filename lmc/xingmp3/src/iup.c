@@ -184,8 +184,8 @@ void i_sbt_mono(SAMPLEINT * sample, short *pcm, int n);
 void i_sbt_dual(SAMPLEINT * sample, short *pcm, int n);
 static SBT_FUNCTION sbt = i_sbt_mono;
 
-typedef void (*UNPACK_FUNCTION) ();
-static void unpack();
+typedef void (*UNPACK_FUNCTION) (void);
+static void unpack(void);
 static UNPACK_FUNCTION unpack_routine = unpack;
 
 /*======================================================================*/
@@ -254,7 +254,7 @@ static void skip(int n)
          bitbuf -= bitval << bits,     \
          bitval )
 /*======================================================================*/
-static void unpack_ba()
+static void unpack_ba(void)
 {
    int i, j, k;
    static int nbit[4] =
@@ -292,7 +292,7 @@ static void unpack_ba()
 
 }
 /*-------------------------------------------------------------------------*/
-static void unpack_sfs()	/* unpack scale factor selectors */
+static void unpack_sfs(void)	/* unpack scale factor selectors */
 {
    int i;
 
@@ -309,7 +309,7 @@ static void unpack_sfs()	/* unpack scale factor selectors */
 /*-------------------------------------------------------------------------*/
 /*--- multiply note -------------------------------------------------------*/
 /*--- 16bit x 16bit mult --> 32bit >> 15 --> 16 bit  or better  -----------*/
-static void unpack_sf()		/* unpack scale factor */
+static void unpack_sf(void)	/* unpack scale factor */
 {				/* combine dequant and scale factors */
    int i, n;
    INT32 tmp;			/* only reason tmp is 32 bit is to get 32 bit mult result */
@@ -389,7 +389,7 @@ static void unpack_sf()		/* unpack scale factor */
     k++;       /* skip right chan dispatch */                \
     goto dispatch;
 /*-------------------------------------------------------------------------*/
-static void unpack_samp()	/* unpack samples */
+static void unpack_samp(void)	/* unpack samples */
 {
    int i, j, k;
    SAMPLEINT *s;
@@ -531,7 +531,7 @@ static void unpack_samp()	/* unpack samples */
 
 }
 /*-------------------------------------------------------------------------*/
-static void unpack()
+static void unpack(void)
 {
    int prot;
 

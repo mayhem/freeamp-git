@@ -75,7 +75,7 @@ bool Database::Working(void)
     return true;
 }
 
-int Database::Insert(const char *key, char *content)
+int Database::Insert(const char *key, const char *content)
 {
     datum gdbmKey;
     datum gdbmContent;
@@ -83,7 +83,7 @@ int Database::Insert(const char *key, char *content)
 
     gdbmKey.dptr = (char *)key;
     gdbmKey.dsize = strlen(key) + 1;
-    gdbmContent.dptr = content;
+    gdbmContent.dptr = (char *)content;
     gdbmContent.dsize = strlen(content) + 1;
 
     m_lock->Acquire();

@@ -120,7 +120,7 @@ void IRManUI::irServiceFunction(void *pclcio) {
     if (pv) {
 	pDevice = (char *)((StringPropValue *)pv)->GetString();
     } else {
-	pDevice = DEFAULT_DEVICE;
+	pDevice = (char *)DEFAULT_DEVICE;
     }
     if (ir_init(pDevice) < 0) {
 	cerr << "error initializing IRman: `" << strerror(errno) << "'" << endl;

@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 #include <assert.h>
 
 #include "log.h"
+#include "utility.h"
 
 const int iMaxLogLineLen = 2048;
 const char *szLogLevelNames[] = 
@@ -38,9 +39,9 @@ const char *szLogLevelNames[] =
     "Perf"
 };
 
-LogFile::LogFile(char *m_szLogFileArg)
+LogFile::LogFile(const char *m_szLogFileArg)
 {
-    m_szLogFile = strdup(m_szLogFileArg);
+    m_szLogFile = strdup_new(m_szLogFileArg);
     m_fpLog = NULL;
 
     // Log nothing but errors on default
@@ -51,8 +52,8 @@ LogFile::~LogFile(void)
 {
     if (m_fpLog)
        fclose(m_fpLog);
-	if (m_szLogFile)
-	   free(m_szLogFile);
+    if (m_szLogFile)
+        delete [] m_szLogFile;
 }
 
 bool LogFile::Open(void)
@@ -85,7 +86,7 @@ void LogFile::AddLogLevel(int iLogLevelFlags)
     m_iLogLevelFlags |= 1 << iLogLevelFlags;
 }
 
-void LogFile::Error(char *format, ...)
+void LogFile::Error(const char *format, ...)
 {
     char *szBuffer;
     va_list argptr;
@@ -105,7 +106,7 @@ void LogFile::Error(char *format, ...)
     delete szBuffer;
 }
 
-void LogFile::Log(int iLogLevel, char *format, ...)
+void LogFile::Log(int iLogLevel, const char *format, ...)
 {
     char *szBuffer;
     va_list argptr;

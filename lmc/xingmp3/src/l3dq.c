@@ -90,22 +90,22 @@ typedef float ARRAY3[3];
 
 
 /*=============================================================*/
-float *quant_init_global_addr()
+float *quant_init_global_addr(void)
 {
    return look_global;
 }
 /*-------------------------------------------------------------*/
-LS *quant_init_scale_addr()
+LS *quant_init_scale_addr(void)
 {
    return look_scale;
 }
 /*-------------------------------------------------------------*/
-float *quant_init_pow_addr()
+float *quant_init_pow_addr(void)
 {
    return look_pow;
 }
 /*-------------------------------------------------------------*/
-float *quant_init_subblock_addr()
+float *quant_init_subblock_addr(void)
 {
    return look_subblock;
 }

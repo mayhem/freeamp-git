@@ -44,31 +44,31 @@ ____________________________________________________________________________*/
 
 /*---------- quant ---------------------------------*/
 /* 8 bit lookup x = pow(2.0, 0.25*(global_gain-210)) */
-float *quant_init_global_addr();
+float *quant_init_global_addr(void);
 
 
 /* x = pow(2.0, -0.5*(1+scalefact_scale)*scalefac + preemp) */
 typedef float LS[4][32];
-LS *quant_init_scale_addr();
+LS *quant_init_scale_addr(void);
 
 
-float *quant_init_pow_addr();
-float *quant_init_subblock_addr();
+float *quant_init_pow_addr(void);
+float *quant_init_subblock_addr(void);
 
 typedef int iARRAY22[22];
-iARRAY22 *quant_init_band_addr();
+iARRAY22 *quant_init_band_addr(void);
 
 /*---------- antialias ---------------------------------*/
 typedef float PAIR[2];
-PAIR *alias_init_addr();
+PAIR *alias_init_addr(void);
 
 static const float Ci[8] =
 {
    -0.6f, -0.535f, -0.33f, -0.185f, -0.095f, -0.041f, -0.0142f, -0.0037f};
 
 
-void hwin_init();		/* hybrid windows -- */
-void imdct_init();
+void hwin_init(void);		/* hybrid windows -- */
+void imdct_init(void);
 typedef struct
 {
    float *w;
@@ -77,11 +77,11 @@ typedef struct
 }
 IMDCT_INIT_BLOCK;
 
-void msis_init();
-void msis_init_MPEG2();
+void msis_init(void);
+void msis_init_MPEG2(void);
 
 /*=============================================================*/
-int L3table_init()
+int L3table_init(void)
 {
    int i;
    float *x;
@@ -157,10 +157,10 @@ int L3table_init()
 }
 /*====================================================================*/
 typedef float ARRAY36[36];
-ARRAY36 *hwin_init_addr();
+ARRAY36 *hwin_init_addr(void);
 
 /*--------------------------------------------------------------------*/
-void hwin_init()
+void hwin_init(void)
 {
    int i, j;
    double pi;
@@ -217,11 +217,11 @@ void hwin_init()
 }
 /*=============================================================*/
 typedef float ARRAY4[4];
-IMDCT_INIT_BLOCK *imdct_init_addr_18();
-IMDCT_INIT_BLOCK *imdct_init_addr_6();
+IMDCT_INIT_BLOCK *imdct_init_addr_18(void);
+IMDCT_INIT_BLOCK *imdct_init_addr_6(void);
 
 /*-------------------------------------------------------------*/
-void imdct_init()
+void imdct_init(void)
 {
    int k, p, n;
    double t, pi;
@@ -280,7 +280,7 @@ void imdct_init()
 }
 /*===============================================================*/
 typedef float ARRAY8_2[8][2];
-ARRAY8_2 *msis_init_addr();
+ARRAY8_2 *msis_init_addr(void);
 
 /*-------------------------------------------------------------*/
 void msis_init()
@@ -327,7 +327,7 @@ for(i=0;i<12;i++) nBand[1][i] =
 /*-------------------------------------------------------------*/
 /*===============================================================*/
 typedef float ARRAY2_64_2[2][64][2];
-ARRAY2_64_2 *msis_init_addr_MPEG2();
+ARRAY2_64_2 *msis_init_addr_MPEG2(void);
 
 /*-------------------------------------------------------------*/
 void msis_init_MPEG2()

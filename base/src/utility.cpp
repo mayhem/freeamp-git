@@ -462,7 +462,7 @@ void ToLower(char *s)
 #include <be/app/Roster.h>
 #include <be/be_apps/NetPositive/NetPositive.h>
 
-void LaunchBrowser(char* url)
+void LaunchBrowser(const char* url)
 {
     status_t err;
 
@@ -488,7 +488,7 @@ void LaunchBrowser(char* url)
 }
 
 #else
-void LaunchBrowser(char* url)
+void LaunchBrowser(const char* url)
 {
     char         url2[_MAX_PATH];
     char         lockfile[255];
@@ -496,19 +496,25 @@ void LaunchBrowser(char* url)
     struct stat  sb;
     char        *home, *browser;
 
-    browser = "netscape";
+    browser = new char[10];
+    strcpy(browser, "netscape");
 
     sprintf(url2, "openURL(%s)", url);
 
     if (!strcmp(browser, "netscape"))
     {
         home = getenv("HOME");
-        if (!home)
-            home = "/";
+        if (!home) {
+            home = new char[5];
+            strcpy(home, "/");
+        }
 
         sprintf(lockfile,"%.200s/.netscape/lock",home);
-        if (fork() > 0)
+        if (fork() > 0) {
+            delete [] browser;
+            delete [] home;
             return;
+        }
 
         if ((lockfile_fd = lstat(lockfile, &sb))!=-1)
         {
@@ -523,8 +529,10 @@ void LaunchBrowser(char* url)
     }
     else
     {
-        if (fork() > 0)
+        if (fork() > 0) {
+            delete [] browser;
 	    return;
+        }
 	    
         char *command = new char[strlen(browser) + strlen(url) + 10];
         sprintf(command, "%s \"%s\"", browser, url);

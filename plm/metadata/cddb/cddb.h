@@ -63,7 +63,7 @@ class CDDB : public MetaDataFormat {
     int cddb_quit(int sock);
     int cddb_read(int sock, int mode, struct cddb_entry *entry, 
                   struct disc_data *data, char *http_string = NULL);
-    char *cddb_genre(int genre);
+    const char *cddb_genre(int genre);
     int cddb_genre_value(char *genre);
     int cddb_read_line(int sock, char *inbuffer, int len);
     int cddb_read_token(int sock, int token[3]);

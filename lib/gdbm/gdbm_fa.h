@@ -120,8 +120,6 @@ extern int gdbm_fdesc __P((GDBM_FILE));
 #define	GDBM_ILLEGAL_DATA	18
 #define	GDBM_OPT_ALREADY_SET	19
 #define	GDBM_OPT_ILLEGAL	29
-typedef int gdbm_error;		/* For compatibilities sake. */
-
 
 /* extra prototypes */
 
@@ -130,9 +128,9 @@ typedef int gdbm_error;		/* For compatibilities sake. */
 extern "C" {
 #endif
 
-extern gdbm_error gdbm_errno;
+extern int gdbm_errno;
 
-extern char *gdbm_strerror __P((gdbm_error));
+extern const char *gdbm_strerror __P((int));
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

@@ -49,7 +49,7 @@ class     UserMessageEvent:public Event
    {
       if (m_info)
       {
-         delete    m_info;
+         delete [] m_info;
                    m_info = NULL;
       }
    }
@@ -79,19 +79,19 @@ class StatusMessageEvent:public Event
    {
       if (m_info)
       {
-         free(m_info);
+         delete [] m_info;
          m_info = NULL;
       }
    }
    StatusMessageEvent()
    {
       m_type = INFO_StatusMessage;
-      m_info = "";
+      m_info = NULL;
    }
    StatusMessageEvent(const char *info)
    {
       m_type = INFO_StatusMessage;
-      m_info = strdup(info);
+      m_info = strdup_new(info);
    }
    const char *GetStatusMessage()
    {
@@ -109,19 +109,19 @@ class ErrorMessageEvent:public Event
    {
       if (m_info)
       {
-         free(m_info);
+         delete [] m_info;
          m_info = NULL;
       }
    }
    ErrorMessageEvent()
    {
       m_type = INFO_ErrorMessage;
-      m_info = "";
+      m_info = NULL;
    }
    ErrorMessageEvent(const char *info)
    {
       m_type = INFO_ErrorMessage;
-      m_info = strdup(info);
+      m_info = strdup_new(info);
    }
    const char *GetErrorMessage()
    {
@@ -140,13 +140,13 @@ class     BrowserMessageEvent:public Event
    {
       if (m_info)
       {
-         delete    m_info;
+         delete [] m_info;
       }
    }
    BrowserMessageEvent()
    {
       m_type = INFO_BrowserMessage;
-      m_info = "";
+      m_info = NULL;
    }
    BrowserMessageEvent(const char *info)
    {
@@ -169,18 +169,18 @@ class     HeadlineMessageEvent:public Event
    {
       if (m_info)
       {
-         delete    m_info;
+         delete [] m_info;
       }
       if (m_url)
       {
-         delete    m_url;
+         delete [] m_url;
       }
    }
    HeadlineMessageEvent()
    {
       m_type = INFO_HeadlineText;
-      m_info = "";
-      m_url = "";
+      m_info = NULL;
+      m_url = NULL;
    }
    HeadlineMessageEvent(const char *info, const char *url)
    {
@@ -606,14 +606,20 @@ public:
              StreamInfoEvent(char *szTitle, char *szURL)
    {
       m_type = INFO_StreamInfo;
-      m_streamURL = strdup(szURL);
-      m_streamTitle = strdup(szTitle);
+      if (szURL)
+          m_streamURL = strdup_new(szURL);
+      else
+          m_streamURL = strdup_new("");
+      if (szTitle)
+          m_streamTitle = strdup_new(szTitle);
+      else
+          m_streamTitle = strdup_new("");
    };
 
    virtual ~ StreamInfoEvent()
    {
-      free(m_streamURL);
-      free(m_streamTitle);
+      delete [] m_streamURL;
+      delete [] m_streamTitle;
    };
 
    void      GetURL(char *szUrl, int iSize)
@@ -634,7 +640,7 @@ private:
     uint32 m_cddb;
     string m_cdindex;
 public:
-    CDInfoEvent(const uint32 numtracks, const uint32 cddb, char *cdindex)
+    CDInfoEvent(const uint32 numtracks, const uint32 cddb, const char *cdindex)
     { m_type = INFO_CDDiscStatus; m_totalTracks = numtracks; 
       m_cddb = cddb; m_cdindex = cdindex; }
     virtual ~CDInfoEvent() {}
@@ -933,11 +939,14 @@ class LoadThemeEvent : public Event {
 public:
     LoadThemeEvent(const char *url, const char *saved) 
          { m_type = CMD_LoadTheme; 
-           m_url = strdup(url); 
-           m_saved = strdup(saved);
+           m_url = strdup_new(url); 
+           m_saved = strdup_new(saved);
          }
 	virtual ~LoadThemeEvent() 
-         { free((void *)m_url); }
+        { 
+            if (m_url) delete [] m_url; 
+            if (m_saved) delete [] m_saved;
+        }
 
    const char *URL(void) { return m_url; };
    const char *SavedTheme(void) { return m_saved; };

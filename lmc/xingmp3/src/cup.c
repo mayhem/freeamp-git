@@ -237,7 +237,7 @@ static void skip(int n)
          bitbuf -= bitval << bits,     \
          bitval )
 /*======================================================================*/
-static void unpack_ba()
+static void unpack_ba(void)
 {
    int i, j, k;
    static int nbit[4] =
@@ -272,7 +272,7 @@ static void unpack_ba()
 
 }
 /*-------------------------------------------------------------------------*/
-static void unpack_sfs()	/* unpack scale factor selectors */
+static void unpack_sfs(void)	/* unpack scale factor selectors */
 {
    int i;
 
@@ -287,7 +287,7 @@ static void unpack_sfs()	/* unpack scale factor selectors */
    sf_dispatch[i] = 5;		/* terminate dispatcher */
 }
 /*-------------------------------------------------------------------------*/
-static void unpack_sf()		/* unpack scale factor */
+static void unpack_sf(void)	/* unpack scale factor */
 {				/* combine dequant and scale factors */
    int i;
 
@@ -350,7 +350,7 @@ static void unpack_sf()		/* unpack scale factor */
     k++;       /* skip right chan dispatch */                \
     goto dispatch;
 /*-------------------------------------------------------------------------*/
-static void unpack_samp()	/* unpack samples */
+static void unpack_samp(void)	/* unpack samples */
 {
    int i, j, k;
    float *s;

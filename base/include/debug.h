@@ -29,6 +29,6 @@ ____________________________________________________________________________*/
 void debug_string(char*);
 
 void DebugInit_v(void);
-void Debug_v(char * format, ...);
+void Debug_v(const char * format, ...);
 
 #endif // _DEBUG_H_

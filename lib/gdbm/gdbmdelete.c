@@ -49,7 +49,7 @@ gdbm_delete (dbf, key)
   char *find_data;	/* Return pointer from findkey. */
   int   hash_val;	/* Returned by findkey. */
   off_t free_adr;       /* Temporary stroage for address and size. */
-  int   free_size;
+  unsigned int free_size;
 
   /* First check to make sure this guy is a writer. */
   if (dbf->read_write != GDBM_WRITER)

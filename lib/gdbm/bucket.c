@@ -145,9 +145,9 @@ _gdbm_split_bucket (dbf, next_insert)
 
   off_t       *new_dir;		/* Pointer to the new directory. */
   off_t        dir_adr; 	/* Address of the new directory. */
-  int          dir_size;	/* Size of the new directory. */
+  unsigned int dir_size;	/* Size of the new directory. */
   off_t        old_adr[31]; 	/* Address of the old directories. */
-  int          old_size[31]; 	/* Size of the old directories. */
+  unsigned int old_size[31]; 	/* Size of the old directories. */
   int	       old_count;	/* Number of old directories. */
 
   int          index;		/* Used in array indexing. */

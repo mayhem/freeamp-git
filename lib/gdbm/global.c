@@ -43,4 +43,4 @@ datum _gdbm_memory = {NULL, 0};	/* Used by firstkey and nextkey. */
 char *_gdbm_fetch_val = NULL;	/* Used by fetch. */
 
 /* The dbm error number is placed in the variable GDBM_ERRNO. */
-gdbm_error gdbm_errno = GDBM_NO_ERROR;
+int gdbm_errno = GDBM_NO_ERROR;

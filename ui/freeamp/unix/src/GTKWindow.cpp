@@ -124,8 +124,10 @@ void drop_file(GtkWidget *w, GdkDragContext *context, gint x, gint y,
     gdk_threads_enter();
 }
       
-static gint do_timeout(GTKWindow *ui)
+static gint do_timeout(void *p)
 {
+    GTKWindow *ui = (GTKWindow *)p;
+
     ui->m_pMindMeldMutex->Acquire();
     ui->TimerEvent();
     ui->m_pMindMeldMutex->Release();

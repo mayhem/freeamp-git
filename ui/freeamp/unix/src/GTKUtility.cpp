@@ -58,11 +58,13 @@ void WarpPointer(GdkWindow *win, int x, int y)
     XWarpPointer(GDK_DISPLAY(), window, window, 0, 0, 0, 0, x, y);
 }
 
-static int theme_timeout(void *c)
+static gint theme_timeout(void *c)
 {
     ourContext->gtkRunning = true;
     if (doQuitNow)
         gtk_main_quit();
+
+    return TRUE;
 }
 
 static void runGTK(void *c)

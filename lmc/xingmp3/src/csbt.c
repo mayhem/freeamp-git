@@ -54,9 +54,9 @@ void window16(float *vbuf, int vb_ptr, short *pcm);
 void window16_dual(float *vbuf, int vb_ptr, short *pcm);
 void window8(float *vbuf, int vb_ptr, short *pcm);
 void window8_dual(float *vbuf, int vb_ptr, short *pcm);
-float *dct_coef_addr();
+float *dct_coef_addr(void);
 
-float *dct_coef_addr();
+float *dct_coef_addr(void);
 
 /*-------------------------------------------------------------------------*/
 /* circular window buffers */
@@ -65,10 +65,10 @@ static signed int vb2_ptr;
 static float vbuf[512];
 static float vbuf2[512];
 
-float *dct_coef_addr();
+float *dct_coef_addr(void);
 
 /*======================================================================*/
-static void gencoef()		/* gen coef for N=32 (31 coefs) */
+static void gencoef(void)	/* gen coef for N=32 (31 coefs) */
 {
    int p, n, i, k;
    double t, pi;
@@ -90,7 +90,7 @@ static void gencoef()		/* gen coef for N=32 (31 coefs) */
    }
 }
 /*------------------------------------------------------------*/
-void sbt_init()
+void sbt_init(void)
 {
    int i;
    static int first_pass = 1;

@@ -745,7 +745,8 @@ void HttpInput::WorkerThread(void)
                          if (pNull)
                          {
                              *pNull = 0;
-                             m_pTarget->AcceptEvent(new StreamInfoEvent(pPtr, ""));
+                             m_pTarget->AcceptEvent(new StreamInfoEvent(pPtr, 
+                                                                        NULL));
                          }
 
                      }

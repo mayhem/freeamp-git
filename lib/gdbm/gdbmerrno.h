@@ -50,6 +50,4 @@
 #define	GDBM_OPT_ALREADY_SET	19
 #define	GDBM_OPT_ILLEGAL	29
 
-typedef int gdbm_error;		/* For compatibilities sake. */
-
-extern gdbm_error gdbm_errno;
+extern int gdbm_errno;

@@ -53,7 +53,7 @@ class Theme;
 
 struct Panel
 {
-    Panel::Panel() 
+    Panel() 
     { 
         memset(&m_oOpenRect, 0, sizeof(Rect));
         memset(&m_oClosedRect, 0, sizeof(Rect));

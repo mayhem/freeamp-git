@@ -50,7 +50,7 @@ extern void asm_fdct32(float *in, float *out);
 float coef32[31];	/* 32 pt dct coefs */
 
 /*------------------------------------------------------------*/
-float *dct_coef_addr()
+float *dct_coef_addr(void)
 {
    return coef32;
 }

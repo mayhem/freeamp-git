@@ -37,7 +37,7 @@ class Database
    ~Database();
    bool  Working(void);
    
-   int   Insert(const char *key, char *content);
+   int   Insert(const char *key, const char *content);
    void  Remove(const char *key);
    char *Value(const char *key);
    int   Exists(const char *key);

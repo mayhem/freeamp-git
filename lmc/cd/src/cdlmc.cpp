@@ -65,9 +65,9 @@ void CDLMC::Clear()
 {
 }
 
-vector<char *> *CDLMC::GetExtensions(void)
+vector<const char *> *CDLMC::GetExtensions(void)
 {
-   vector<char *> *extList = new vector<char *>;
+   vector<const char *> *extList = new vector<const char *>;
 
    extList->push_back("CDA");
 

@@ -42,7 +42,7 @@ class musicsearchUI {
     Error AcceptEvent(Event *);
  
     void SetSearchPath(string &newpath) { searchPath = newpath; }
-    void SetSearchPath(char *newpath) { searchPath = newpath; }
+    void SetSearchPath(const char *newpath) { searchPath = newpath; }
 
     void UpdateEntry(void);
 

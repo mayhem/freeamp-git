@@ -60,7 +60,7 @@ class LogicalMediaConverter : public PipelineUnit
     virtual Error SetEQData(float *) = 0;
     virtual Error SetEQData(bool) = 0;
     
-    virtual vector<char *> *GetExtensions(void) = 0;
+    virtual vector<const char *> *GetExtensions(void) = 0;
 
     virtual uint32 CalculateSongLength(const char *) = 0;
 

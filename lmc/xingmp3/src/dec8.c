@@ -252,7 +252,7 @@ static int ucomp3(int x)	/* re analog devices CCITT G.711 */
    return u;
 }
 /*------------------------------------------------------------------*/
-static void table_init()
+static void table_init(void)
 {
    int i;
 

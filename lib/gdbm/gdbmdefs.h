@@ -34,7 +34,7 @@
 
 typedef struct {
 	char *dptr;
-	int   dsize;
+	unsigned int dsize;
       } datum;
 
 
@@ -46,15 +46,15 @@ typedef struct {
 
 /* The following structure is the element of the avaliable table.  */
 typedef struct {
-  	int   av_size;		/* The size of the available block. */
+  	unsigned int   av_size;	/* The size of the available block. */
 	off_t  av_adr;		/* The file address of the available block. */
       } avail_elem;
 
 /* This is the actual table. The in-memory images of the avail blocks are
    allocated by malloc using a calculated size.  */
 typedef struct {
-	int   size;		/* The number of avail elements in the table.*/
-	int   count;		/* The number of entries in the table. */
+	unsigned int size;	/* The number of avail elements in the table.*/
+	unsigned int count;	/* The number of entries in the table. */
 	off_t next_block;	/* The file address of the next avail block. */
 	avail_elem av_table[1]; /* The table.  Make it look like an array.  */
       } avail_block;
@@ -64,11 +64,11 @@ typedef struct {
 
 typedef struct {
 	int   header_magic;  /* 0x13579ace to make sure the header is good. */
-	int   block_size;    /* The  optimal i/o blocksize from stat. */
+	unsigned int block_size;    /* The  optimal i/o blocksize from stat. */
 	off_t dir;	     /* File address of hash directory table. */
-	int   dir_size;	     /* Size in bytes of the table.  */
+	unsigned int dir_size;	     /* Size in bytes of the table.  */
 	int   dir_bits;	     /* The number of address bits used in the table.*/
-	int   bucket_size;   /* Size in bytes of a hash bucket struct. */
+	unsigned int bucket_size;   /* Size in bytes of a hash bucket struct. */
 	int   bucket_elems;  /* Number of elements in a hash bucket. */
 	off_t next_block;    /* The next unallocated block address. */
 	avail_block avail;   /* This must be last because of the psuedo
@@ -167,7 +167,7 @@ typedef struct {
 	int file_locking;
 
 	/* The fatal error handling routine. */
-	void (*fatal_err) ();
+	void (*fatal_err)(void);
 
 	/* The gdbm file descriptor which is set in gdbm_open.  */
 	int desc;

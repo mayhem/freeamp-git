@@ -196,7 +196,7 @@ static void bitget_init_end(unsigned char *buf_end)
    bitdat.bs_ptr_end = buf_end;
 }
 /*------------- get n bits from bitstream -------------*/
-int bitget_bits_used()
+int bitget_bits_used(void)
 {
    int n;			/* compute bits used from last init call */
 
@@ -234,7 +234,7 @@ unsigned int bitget(int n)
    return x;
 }
 /*------------- get 1 bit from bitstream -------------*/
-unsigned int bitget_1bit()
+unsigned int bitget_1bit(void)
 {
    unsigned int x;
 
@@ -385,7 +385,7 @@ static void Xform_dual_mono(void *pcm, int igr)
 }
 /*--------------------------------------------------------------------*/
 /*====================================================================*/
-static int unpack_side_MPEG1()
+static int unpack_side_MPEG1(void)
 {
    int prot;
    int br_index;
@@ -1059,10 +1059,10 @@ static SBT_FUNCTION sbt_table[2][3][2] =
 };
 
 
-void Xform_mono(void *pcm, int igr);
-void Xform_dual(void *pcm, int igr);
-void Xform_dual_mono(void *pcm, int igr);
-void Xform_dual_right(void *pcm, int igr);
+static void Xform_mono(void *pcm, int igr);
+static void Xform_dual(void *pcm, int igr);
+static void Xform_dual_mono(void *pcm, int igr);
+static void Xform_dual_right(void *pcm, int igr);
 
 static XFORM_FUNCTION xform_table[5] =
 {
@@ -1072,12 +1072,12 @@ static XFORM_FUNCTION xform_table[5] =
    Xform_mono,			/* left */
    Xform_dual_right,
 };
-int L3table_init();
-void msis_init();
-void sbt_init();
+int L3table_init(void);
+void msis_init(void);
+void sbt_init(void);
 typedef int iARRAY22[22];
-iARRAY22 *quant_init_band_addr();
-iARRAY22 *msis_init_band_addr();
+iARRAY22 *quant_init_band_addr(void);
+iARRAY22 *msis_init_band_addr(void);
 
 /*---------------------------------------------------------*/
 /* mpeg_head defined in mhead.h  frame bytes is without pad */

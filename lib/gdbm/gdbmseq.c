@@ -42,10 +42,7 @@ extern char *_gdbm_read_entry __P((gdbm_file_info *, int));
    put the data that is found. */
 
 static void
-get_next_key (dbf, elem_loc, return_val)
-     gdbm_file_info *dbf;
-     int elem_loc;
-     datum *return_val;
+get_next_key (gdbm_file_info *dbf, int elem_loc, datum *return_val)
 {
   int   found;			/* Have we found the next key. */
   char  *find_data;		/* Data pointer returned by find_key. */

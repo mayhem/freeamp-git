@@ -230,10 +230,12 @@ Error ThemeManager::AddTheme(string &oThemeFile, bool bRename)
             *ext = '\0';
             ext++;
         }
-        if (!filename) 
-            filename = "unknown";
 
-        oThemeDest += string("/") + string(filename);
+        oThemeDest += string("/");
+        if (!filename)
+            oThemeDest += string("unknown");
+        else
+            oThemeDest += string(filename);
         if (ext)
             oThemeDest += string(".") + string(ext);   
     }

@@ -38,7 +38,7 @@ static int sock_init_sockaddr (sockaddr_in *name,
   struct hostent *hostinfo;
      
   name->sin_family = AF_INET;
-  name->sin_port = htons (port);
+  name->sin_port = htons(port);
   hostinfo = gethostbyname (hostname);
   if (hostinfo == NULL)
     {
@@ -52,7 +52,7 @@ static int sock_init_sockaddr (sockaddr_in *name,
 }
 
  // Client functions...
-int sock_connect(char *host, unsigned short int port)
+int sock_connect(const char *host, unsigned short int port)
 {
   struct sockaddr_in servername;
   int sock;
@@ -96,7 +96,7 @@ int sock_close(int fd)
 }
 
 // Send/receive lines of text
-int sock_send_string(int fd, char *string)
+int sock_send_string(int fd, const char *string)
 {
    int err;
 

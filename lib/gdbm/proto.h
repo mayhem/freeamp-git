@@ -42,8 +42,8 @@ void _gdbm_split_bucket  __P((gdbm_file_info *, int));
 void _gdbm_write_bucket  __P((gdbm_file_info *, cache_elem *));
 
 /* From falloc.c */
-off_t _gdbm_alloc       __P((gdbm_file_info *, int));
-void _gdbm_free         __P((gdbm_file_info *, off_t, int));
+off_t _gdbm_alloc       __P((gdbm_file_info *, unsigned int));
+void _gdbm_free         __P((gdbm_file_info *, off_t, unsigned int));
 int  _gdbm_put_av_elem  __P((avail_elem, avail_elem [], int *, int));
 
 /* From findkey.c */
@@ -55,7 +55,7 @@ int _gdbm_hash __P((datum));
 
 /* From update.c */
 void _gdbm_end_update   __P((gdbm_file_info *));
-void _gdbm_fatal         __P((gdbm_file_info *, char *));
+void _gdbm_fatal         __P((gdbm_file_info *, const char *));
 
 /* From gdbmopen.c */
 int _gdbm_init_cache	__P((gdbm_file_info *, int));
@@ -64,7 +64,8 @@ int _gdbm_init_cache	__P((gdbm_file_info *, int));
 void  gdbm_close	  __P((gdbm_file_info *));
 int   gdbm_delete	  __P((gdbm_file_info *, datum));
 datum gdbm_fetch	  __P((gdbm_file_info *, datum));
-gdbm_file_info *gdbm_open __P((char *, int, int, int, void (*) (void)));
+gdbm_file_info *gdbm_open __P((char *, unsigned int, int, unsigned int, 
+                               void (*)(void)));
 int   gdbm_reorganize	  __P((gdbm_file_info *));
 datum gdbm_firstkey       __P((gdbm_file_info *));
 datum gdbm_nextkey        __P((gdbm_file_info *, datum));

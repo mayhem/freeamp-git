@@ -41,7 +41,7 @@ static float look_c_valueL1[16];
 static int nbatL1 = 32;
 
 /*======================================================================*/
-static void unpack_baL1()
+static void unpack_baL1(void)
 {
    int j;
    int nstereo;
@@ -93,7 +93,7 @@ static void unpack_sfL1(void)	/* unpack scale factor */
     k++;                                                     \
     goto dispatch;
 /*-------------------------------------------------------------------------*/
-static void unpack_sampL1()	/* unpack samples */
+static void unpack_sampL1(void)	/* unpack samples */
 {
    int j, k;
    float *s;

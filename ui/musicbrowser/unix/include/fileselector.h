@@ -33,7 +33,7 @@ ____________________________________________________________________________*/
 
 class FileSelector {
  public:
-    FileSelector(char *);
+    FileSelector(const char *);
   
     bool Run(bool runMain = true);
     void SetExtended() { extended = true; }

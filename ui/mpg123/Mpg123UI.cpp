@@ -241,13 +241,13 @@ DisplayStuff()
    } */
    cerr << endl;
 
-   static char *mpeg_string[4] =
+   static const char *mpeg_string[4] =
    {"1.0", "1.0", "2.0", "2.5"};
-   static char *mpeg_layer[4] =
+   static const char *mpeg_layer[4] =
    {"Unknown", "I", "II", "III"};
-   static char *mpeg_stereo[4] =
+   static const char *mpeg_stereo[4] =
    {"Stereo", "Joint-Stereo", "Dual-Channel", "Single-Channel"};
-   static char *mpeg_short_stereo[4] =
+   static const char *mpeg_short_stereo[4] =
    {"stereo", "joint-stereo", "dual-channel", "mono"};
 
    if (verboseMode == false)

@@ -36,8 +36,8 @@ using namespace std;
 #include "m3u.h"
 
 typedef struct FormatInfoStruct {
-    char* extension;
-    char* description;
+    const char* extension;
+    const char* description;
 
 } FormatInfoStruct; 
 

@@ -44,8 +44,8 @@ const int iMaxPCDataLength = 4096;
 
 struct EntityDefs
 {
-    char *szEntity;
-    char *szReplacement;
+    const char *szEntity;
+    const char *szReplacement;
 };
 
 EntityDefs pEntities[] =

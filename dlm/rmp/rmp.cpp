@@ -34,8 +34,8 @@ using namespace std;
 #include "rmp.h"
 
 typedef struct FormatInfoStruct {
-    char* extension;
-    char* description;
+    const char* extension;
+    const char* description;
 
 } FormatInfoStruct; 
 

@@ -30,7 +30,7 @@ void DebugInit_v(void)
   Function: 
      Notes:
 \*-------------------------------------------------------------------------------*/
-void Debug_v(char * format, ...)
+void Debug_v(const char * format, ...)
 {
     if (hDebugWind == NULL) 
        {
@@ -61,7 +61,7 @@ void DebugInit_v(void)
 {
 }
 
-void Debug_v(char * format, ...)
+void Debug_v(const char * format, ...)
 {
     char szBuffer[4096];
     va_list argptr;

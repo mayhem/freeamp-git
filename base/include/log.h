@@ -41,7 +41,7 @@ class LogFile
 {
     public:
 
-                 LogFile(char *szLogFileArg);
+                 LogFile(const char *szLogFileArg);
         virtual ~LogFile(void);
 
         bool     Open(void);
@@ -50,8 +50,8 @@ class LogFile
                  { m_iLogLevelFlags = 0; };
         void     AddLogLevel(int iLogLevelFlags);
 
-        void     Error(char *Format, ...);
-        void     Log(int Section, char *Format, ...);
+        void     Error(const char *Format, ...);
+        void     Log(int Section, const char *Format, ...);
 
     private:
 

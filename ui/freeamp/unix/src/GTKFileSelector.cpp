@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #include "GTKFileSelector.h"
 #include <unistd.h>
 
-GTKFileSelector::GTKFileSelector(char *windowtitle)
+GTKFileSelector::GTKFileSelector(const char *windowtitle)
 {
     title = windowtitle;
     returnpath = "";

@@ -224,10 +224,10 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     gtk_widget_set_usize(scrolledWindow, 100, 300);
     gtk_widget_show(scrolledWindow);
 
-    char *name[1];
+    const char *name[1];
     name[0] = "Category";
 
-    prefTree = GTK_CTREE(gtk_ctree_new_with_titles(1, 0, name));
+    prefTree = GTK_CTREE(gtk_ctree_new_with_titles(1, 0, (gchar **)name));
     gtk_container_add(GTK_CONTAINER(scrolledWindow), GTK_WIDGET(prefTree));
     gtk_signal_connect(GTK_OBJECT(prefTree), "button_press_event",
                        GTK_SIGNAL_FUNC(pref_tree_clicked), this);
@@ -1086,10 +1086,7 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
     char *ip[4];
     int32 i = 1;
 
-    if (originalValues.alternateIP.length() == 0) {
-        ip[0] = ip[1] = ip[2] = ip[3] = "0";
-    }
-    else {
+    if (originalValues.alternateIP.length() != 0) {
         strncpy(tempstr, originalValues.alternateIP.c_str(), 256);
         ip[0] = tempstr;
         dot = tempstr;
@@ -1103,7 +1100,10 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
     }
 
     ipOneBox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(ipOneBox), ip[0]);
+    if (originalValues.alternateIP.length() == 0)
+        gtk_entry_set_text(GTK_ENTRY(ipOneBox), "0");
+    else 
+        gtk_entry_set_text(GTK_ENTRY(ipOneBox), ip[0]);
     gtk_entry_set_max_length(GTK_ENTRY(ipOneBox), 3);
     gtk_widget_set_usize(ipOneBox, 32, 0);
     gtk_signal_connect(GTK_OBJECT(ipOneBox), "changed",
@@ -1116,7 +1116,10 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
     gtk_widget_show(ipPeriod1);
 
     ipTwoBox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(ipTwoBox), ip[1]);
+    if (originalValues.alternateIP.length() == 0)
+        gtk_entry_set_text(GTK_ENTRY(ipTwoBox), "0");
+    else
+        gtk_entry_set_text(GTK_ENTRY(ipTwoBox), ip[1]);
     gtk_entry_set_max_length(GTK_ENTRY(ipTwoBox), 3);
     gtk_widget_set_usize(ipTwoBox, 32, 0);
     gtk_signal_connect(GTK_OBJECT(ipOneBox), "changed",
@@ -1129,7 +1132,10 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
     gtk_widget_show(ipPeriod2);
 
     ipThreeBox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(ipThreeBox), ip[2]);
+    if (originalValues.alternateIP.length() == 0)
+        gtk_entry_set_text(GTK_ENTRY(ipThreeBox), "0");
+    else
+        gtk_entry_set_text(GTK_ENTRY(ipThreeBox), ip[2]);
     gtk_entry_set_max_length(GTK_ENTRY(ipThreeBox), 3);
     gtk_widget_set_usize(ipThreeBox, 32, 0);
     gtk_signal_connect(GTK_OBJECT(ipThreeBox), "changed",
@@ -1142,7 +1148,10 @@ GtkWidget *GTKPreferenceWindow::CreateStreaming(void)
     gtk_widget_show(ipPeriod3);
 
     ipFourBox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(ipFourBox), ip[3]);
+    if (originalValues.alternateIP.length() == 0)
+        gtk_entry_set_text(GTK_ENTRY(ipFourBox), "0");
+    else
+        gtk_entry_set_text(GTK_ENTRY(ipFourBox), ip[3]);
     gtk_entry_set_max_length(GTK_ENTRY(ipFourBox), 3);
     gtk_widget_set_usize(ipFourBox, 32, 0);
     gtk_signal_connect(GTK_OBJECT(ipFourBox), "changed",

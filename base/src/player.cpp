@@ -977,8 +977,8 @@ RegisterLMCs(Registry * registry)
       RegistryItem* temp = registry->GetItem(iLoop);
 
       lmc = (LogicalMediaConverter *)temp->InitFunction()(m_context);
-      vector<char *> *extList = lmc->GetExtensions();
-      vector<char *>::iterator i;
+      vector<const char *> *extList = lmc->GetExtensions();
+      vector<const char *>::iterator i;
 
       for (i = extList->begin(); i != extList->end(); i++)
       {
@@ -1999,7 +1999,7 @@ ServiceEvent(Event * pC)
 
         default:
             m_context->log->Error("serviceEvent: Unknown event: %d\n",
-            pC->Type());
+                                  pC->Type());
             delete  pC;
             break;
     }

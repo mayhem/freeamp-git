@@ -59,8 +59,8 @@ gdbm_store (dbf, key, content, flags)
   off_t file_pos;		/* The position after a lseek. */
   int  num_bytes;		/* Used for error detection. */
   off_t free_adr;		/* For keeping track of a freed section. */
-  int  free_size;
-  int   new_size;		/* Used in allocating space. */
+  unsigned int free_size;
+  unsigned int new_size;	/* Used in allocating space. */
   char *temp;			/* Used in _gdbm_findkey call. */
 
 

@@ -70,7 +70,7 @@ Misc::Misc(FAContext* context):MetaDataFormat(context)
         RegistryItem* temp = m_lmcReg.GetItem(i);
 
         lmc = (LogicalMediaConverter *)temp->InitFunction()(m_context);
-        vector<char*>* extList = lmc->GetExtensions();
+        vector<const char*>* extList = lmc->GetExtensions();
 
         for (uint32 j = 0; j < extList->size(); j++)
         {

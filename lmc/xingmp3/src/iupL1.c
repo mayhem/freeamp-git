@@ -44,7 +44,7 @@ static int look_c_valueL1[16];	/* built by init */
 static int look_c_shiftL1[16];	/* built by init */
 
 /*======================================================================*/
-static void unpack_baL1()
+static void unpack_baL1(void)
 {
    int k;
    int nstereo;
@@ -75,7 +75,7 @@ static void unpack_baL1()
 
 }
 /*-------------------------------------------------------------------------*/
-static void unpack_sfL1()	/* unpack scale factor */
+static void unpack_sfL1(void)	/* unpack scale factor */
 {				/* combine dequant and scale factors */
    int i, n;
    INT32 tmp;			/* only reason tmp is 32 bit is to get 32 bit mult result */
@@ -102,7 +102,7 @@ static void unpack_sfL1()	/* unpack scale factor */
     k++;       /* skip right chan dispatch */                \
     goto dispatch;
 /*-------------------------------------------------------------------------*/
-static void unpack_sampL1()	/* unpack samples */
+static void unpack_sampL1(void)	/* unpack samples */
 {
    int j, k;
    SAMPLEINT *s;
@@ -191,7 +191,7 @@ static void unpack_sampL1()	/* unpack samples */
 /*-- done --*/
 }
 /*-------------------------------------------------------------------------*/
-static void unpackL1()
+static void unpackL1(void)
 {
    int prot;
 

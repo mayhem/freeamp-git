@@ -56,20 +56,20 @@
 gdbm_file_info *
 gdbm_open (file, block_size, flags, mode, fatal_func)
      char *file;
-     int  block_size;
+     unsigned int block_size;
      int  flags;
-     int  mode;
-     void (*fatal_func) ();
+     unsigned int mode;
+     void (*fatal_func)(void);
 {
   gdbm_file_info *dbf;		/* The record to return. */
   struct stat file_stat;	/* Space for the stat information. */
-  int         len;		/* Length of the file name. */
-  int         num_bytes;	/* Used in reading and writing. */
-  off_t       file_pos;		/* Used with seeks. */
-  int	      lock_val = 0;     /* Returned by the flock call. */
-  int	      file_block_size;	/* Block size to use for a new file. */
-  int 	      index;		/* Used as a loop index. */
-  char        need_trunc;	/* Used with GDBM_NEWDB and locking to avoid
+  unsigned int len;		/* Length of the file name. */
+  int          num_bytes;	/* Used in reading and writing. */
+  off_t        file_pos;	/* Used with seeks. */
+  int	       lock_val = 0;     /* Returned by the flock call. */
+  unsigned int file_block_size;	/* Block size to use for a new file. */
+  int 	       index;		/* Used as a loop index. */
+  char         need_trunc;	/* Used with GDBM_NEWDB and locking to avoid
 				   truncating a file from under a reader. */
 
   /* Initialize the gdbm_errno variable. */

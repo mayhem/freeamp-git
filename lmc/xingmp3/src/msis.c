@@ -74,12 +74,12 @@ extern void antialias_asm(float x[], int n);
 
 
 /*===============================================================*/
-ARRAY2 *alias_init_addr()
+ARRAY2 *alias_init_addr(void)
 {
    return csa;
 }
 /*-----------------------------------------------------------*/
-ARRAY8_2 *msis_init_addr()
+ARRAY8_2 *msis_init_addr(void)
 {
 /*-------
 pi = 4.0*atan(1.0);
@@ -106,7 +106,7 @@ lr[1][i][1] = 1.0f;
    return lr;
 }
 /*-------------------------------------------------------------*/
-ARRAY2_64_2 *msis_init_addr_MPEG2()
+ARRAY2_64_2 *msis_init_addr_MPEG2(void)
 {
    return lr2;
 }

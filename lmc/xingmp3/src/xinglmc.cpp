@@ -314,9 +314,9 @@ Error XingLMC::GetHeadInfo()
    return (Error)lmcError_DecodeFailed;
 }
 
-vector<char *> *XingLMC::GetExtensions(void)
+vector<const char *> *XingLMC::GetExtensions(void)
 {
-   vector<char *> *extList = new vector<char *>;
+   vector<const char *> *extList = new vector<const char *>;
 
    extList->push_back("MP3");
    extList->push_back("MP2");

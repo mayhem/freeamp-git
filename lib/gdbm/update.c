@@ -116,10 +116,10 @@ _gdbm_end_update (dbf)
 void
 _gdbm_fatal (dbf, val)
      gdbm_file_info *dbf;
-     char *val;
+     const char *val;
 {
   if ((dbf != NULL) && (dbf->fatal_err != NULL))
-    (*dbf->fatal_err) (val);
+    (*dbf->fatal_err)();
   else
     {
       write (STDERR_FILENO, "gdbm fatal: ", 12);

@@ -34,11 +34,11 @@ ____________________________________________________________________________*/
 
 #include "downloadmanager.h"
 
-#if defined(unix) || defined(__BEOS__)
+#if defined(unix) || defined(__BEOS__) || defined(_BSD_SOURCE)
 #define SOCKET int
 #endif
 
-#if defined(unix)
+#if defined(unix) || defined(_BSD_SOURCE)
 #include <arpa/inet.h>
 #define closesocket(x) close(x)
 #define O_BINARY 0

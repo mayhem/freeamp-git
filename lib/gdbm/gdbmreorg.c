@@ -79,7 +79,7 @@ gdbm_reorganize (dbf)
 {
   gdbm_file_info *new_dbf;		/* The new file. */
   char *new_name;			/* A temporary name. */
-  int  len;				/* Used in new_name construction. */
+  unsigned int len;			/* Used in new_name construction. */
   datum key, nextkey, data;		/* For the sequential sweep. */
   struct stat fileinfo;			/* Information about the file. */
   int  index;				/* Use in moving the bucket cache. */

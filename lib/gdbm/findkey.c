@@ -41,9 +41,9 @@ _gdbm_read_entry (dbf, elem_loc)
      gdbm_file_info *dbf;
      int elem_loc;
 {
-  int num_bytes;		/* For seeking and reading. */
-  int key_size;
-  int data_size;
+  unsigned int num_bytes;		/* For seeking and reading. */
+  unsigned int key_size;
+  unsigned int data_size;
   off_t file_pos;
   data_cache_elem *data_ca;
 
@@ -98,7 +98,7 @@ _gdbm_findkey (dbf, key, dptr, new_hash_val)
   char  *file_key;		/* The complete key as stored in the file. */
   int    elem_loc;		/* The location in the bucket. */
   int    home_loc;		/* The home location in the bucket. */
-  int    key_size;		/* Size of the key on the file.  */
+  unsigned int key_size;	/* Size of the key on the file.  */
 
   /* Compute hash value and load proper bucket.  */
   *new_hash_val = _gdbm_hash (key);

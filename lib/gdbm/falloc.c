@@ -36,8 +36,8 @@
 /* The forward definitions for this file.  See the functions for
    the definition of the function. */
 
-static avail_elem get_elem __P((int, avail_elem [], int *));
-static avail_elem get_block __P((int, gdbm_file_info *));
+static avail_elem get_elem __P((unsigned int, avail_elem [], int *));
+static avail_elem get_block __P((unsigned int, gdbm_file_info *));
 static void push_avail_block __P((gdbm_file_info *));
 static void pop_avail_block __P((gdbm_file_info *));
 static void adjust_bucket_avail __P((gdbm_file_info *));
@@ -61,7 +61,7 @@ static void adjust_bucket_avail __P((gdbm_file_info *));
 off_t
 _gdbm_alloc (dbf, num_bytes)
      gdbm_file_info *dbf;
-     int num_bytes;
+     unsigned int num_bytes;
 {
   off_t file_adr;		/* The address of the block. */
   avail_elem av_el;		/* For temporary use. */
@@ -112,7 +112,7 @@ void
 _gdbm_free (dbf, file_adr, num_bytes)
      gdbm_file_info *dbf;
      off_t file_adr;
-     int num_bytes;
+     unsigned int num_bytes;
 {
   avail_elem temp;
 
@@ -224,7 +224,7 @@ push_avail_block (dbf)
      gdbm_file_info *dbf;
 {
   int  num_bytes;
-  int  av_size;
+  unsigned int  av_size;
   off_t av_adr;
   int  index;
   off_t file_pos;
@@ -286,7 +286,7 @@ push_avail_block (dbf)
 
 static avail_elem
 get_elem (size, av_table, av_count)
-     int size;
+     unsigned int size;
      avail_elem av_table[];
      int *av_count;
 {
@@ -409,7 +409,7 @@ _gdbm_put_av_elem (new_el, av_table, av_count, can_merge)
 
 static avail_elem
 get_block (size, dbf)
-     int size;
+     unsigned int size;
      gdbm_file_info *dbf;
 {
   avail_elem val;

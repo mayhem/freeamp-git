@@ -305,12 +305,12 @@ void set_current_sel_internal(GtkWidget *widget, int row, int column,
 
 void DownloadUI::CreateDownloadList(GtkWidget *box)
 {
-    static char *titles[] =
+    static const char *titles[] =
     {
       "Song Title", "Status"
     };
 
-    m_List = gtk_clist_new_with_titles(2, titles);
+    m_List = gtk_clist_new_with_titles(2, (gchar **)titles);
     gtk_container_add(GTK_CONTAINER(box), m_List);
     gtk_clist_set_column_width(GTK_CLIST(m_List), 0, 200);
     gtk_signal_connect(GTK_OBJECT(m_List), "select_row",
