@@ -500,7 +500,7 @@ void MusicBrowserUI::ImportTracksAndPlaylists(void)
         for(i = oFileList.begin(); i != oFileList.end(); i++)
         {
             char* ext = NULL;
-            char url[MAX_PATH + 7];
+            char url[MAX_PATH + 7];    
             uint32 size = sizeof(url);
 
             ext = strrchr((*i).c_str(), '.');

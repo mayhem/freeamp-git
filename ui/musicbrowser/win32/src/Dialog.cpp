@@ -1469,6 +1469,24 @@ void MusicBrowserUI::MouseButtonUp(int keys, int x, int y)
 
 void MusicBrowserUI::UpdateButtonStates()
 {
+    // start off disabling everything, then enable only what 
+    // should be.
+
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON,
+                ID_EDIT_REMOVE, MAKELPARAM(FALSE, 0));
+
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON,
+                ID_EDIT_EDITINFO, MAKELPARAM(FALSE, 0));
+
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON,
+                ID_EDIT_ADDTRACK, MAKELPARAM(FALSE, 0));    
+
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON,
+                ID_EDIT_MOVEUP, MAKELPARAM(FALSE, 0));
+
+    SendMessage(m_hToolbar, TB_ENABLEBUTTON,
+                ID_EDIT_MOVEDOWN, MAKELPARAM(FALSE, 0));
+
     // File Menu
     SendMessage(m_hToolbar, TB_ENABLEBUTTON, 
                     ID_FILE_SAVEPLAYLIST, MAKELPARAM(m_bListChanged, 0)); 
