@@ -119,7 +119,8 @@ void IRManUI::irServiceFunction(void *pclcio) {
     unsigned char *code;
     char *text;
     int32 lastCmd = -1;  // we'll attempt to debounce here...
-    int32 lastTime = 0;
+    int32 lastTimeMill = 0;
+    int32 lastTimeSec = 0;
     struct timeval tv;
     struct timezone tz;
     while (!pMe->m_quitIRListen) {
@@ -133,10 +134,17 @@ void IRManUI::irServiceFunction(void *pclcio) {
 	    if (cmd) {
 		//cout << "command: " << *cmd << endl;
 		if ((*cmd != lastCmd) ||
-		    ((*cmd == lastCmd) && ( ((tv.tv_usec > lastTime) && ((tv.tv_usec - lastTime) > 300000)) ||
-					    ((tv.tv_usec < lastTime) && ((tv.tv_usec + 1000000 - lastTime) > 300000)) ) ) ) {
+
+		    ((*cmd == lastCmd) && ((tv.tv_sec - lastTimeSec) > 2)) ||
+		    
+		    ((*cmd == lastCmd) && ((tv.tv_sec - lastTimeSec) == 1) && (tv.tv_usec > lastTimeMill)) ||
+
+		    ((*cmd == lastCmd) && ( ((tv.tv_usec > lastTimeMill) && ((tv.tv_usec - lastTimeMill) > 300000)) ||
+					    ((tv.tv_usec < lastTimeMill) && ((tv.tv_usec + 1000000 - lastTimeMill) > 300000)) ) ) ) {
+
 		    lastCmd = *cmd;
-		    lastTime = tv.tv_usec;
+		    lastTimeMill = tv.tv_usec;
+		    lastTimeSec = tv.tv_sec;
 		    switch (*cmd) {
 			    
 			default:
