@@ -13,7 +13,8 @@ XINGLMCOBJS = lmc/xingmp3/src/cdct.o lmc/xingmp3/src/cupl3.o \
   lmc/xingmp3/src/upsf.o lmc/xingmp3/src/iwinm.o
 XINGLMCOBJS += @XINGASM@
 
-ID3V2OBJ = plm/metadata/id3v2/id3v2.o
+ID3V2OBJ  = plm/metadata/id3v2/id3v2.o
+ID3V2OBJ += plm/metadata/id3v2/c_wrapper.o
 ID3V2OBJ += plm/metadata/id3v2/field.o
 ID3V2OBJ += plm/metadata/id3v2/field_binary.o
 ID3V2OBJ += plm/metadata/id3v2/field_integer.o

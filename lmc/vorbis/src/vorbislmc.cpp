@@ -437,41 +437,43 @@ void VorbisLMC::DecodeWork()
           if (comment)
           {
               PlaylistItem *plItem = m_pContext->plm->GetCurrentItem();
-              MetaData mdata = plItem->GetMetaData();
-
-              char *temp;
-              temp = vorbis_comment_query(comment, "title", 0);
-              if (temp)
+              if (plItem)
               {
+                  MetaData mdata = plItem->GetMetaData();
                   string iso;
-                  iso = ConvertToISO(temp);
-                  mdata.SetTitle(iso);
+
+                  char *temp;
+                  temp = vorbis_comment_query(comment, "title", 0);
+                  if (temp)
+                  {
+                      iso = ConvertToISO(temp);
+                      mdata.SetTitle(iso);
+                  }
+ 
+                  temp = vorbis_comment_query(comment, "artist", 0);
+                  if (temp)
+                  {
+                      iso = ConvertToISO(temp);
+                      mdata.SetArtist(iso);
+                  }
+
+                  temp = vorbis_comment_query(comment, "album", 0);
+                  if (temp)
+                  {
+                      iso = ConvertToISO(temp);
+                      mdata.SetAlbum(iso);
+                  }
+
+                  temp = vorbis_comment_query(comment, "tracknumber", 0);
+                  if (temp)
+                      mdata.SetTrack(atoi(temp));
+
+                  plItem->SetMetaData(&mdata);
+                  m_pContext->target->AcceptEvent(
+                             new PlaylistCurrentItemInfoEvent(plItem, 
+                                                              m_pContext->plm));
+
               }
-
-              temp = vorbis_comment_query(comment, "artist", 0);
-              if (temp)
-              {
-                  string iso;
-                  iso = ConvertToISO(temp);
-                  mdata.SetArtist(iso);
-              }
-
-              temp = vorbis_comment_query(comment, "album", 0);
-              if (temp)
-              {
-                  string iso;
-                  iso = ConvertToISO(temp);
-                  mdata.SetAlbum(iso);
-              }
-
-              temp = vorbis_comment_query(comment, "tracknumber", 0);
-              if (temp)
-                  mdata.SetTrack(atoi(temp));
-
-              plItem->SetMetaData(&mdata);
-              m_pContext->target->AcceptEvent(
-                     new PlaylistCurrentItemInfoEvent(plItem, m_pContext->plm));
-
           }
       }
       m_pOutputBuffer->EndWrite(ret);
