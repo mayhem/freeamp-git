@@ -36,6 +36,20 @@ ____________________________________________________________________________*/
 #include "unixprefs.h"
 #include "prefixprefs.h"
 
+// WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+// THis module uses the strdup function  to pass strings to the lists class 
+// (among others) which will in turn use delete to reclaim the memory.
+// This is NOT VALID! A strdup()ed string must be free()ed, not deleted!
+// WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+char *strdup_new(char *str)
+{
+    char *n;
+
+    n = new char[strlen(str) + 1];
+    strcpy(n, str);
+
+    return n;
+}
 
 // default values
 const char*  kDefaultLibraryPath = ".:~/.freeamp:" UNIX_LIBDIR "/freeamp";
@@ -681,9 +695,9 @@ GetFirstLibDir(char *path, uint32 *len)
     char *pPath = NULL;
     if (pEnv) {
 //      cout << "Using env: " << pEnv << endl;
-        pPath = strdup(pEnv);
+        pPath = strdup_new(pEnv);
     } else {
-        pPath = strdup(GetLibDirs());
+        pPath = strdup_new(GetLibDirs());
     }
     pEnv = pPath;
     LibDirFindHandle *hLibDirFind = new LibDirFindHandle();
@@ -695,7 +709,7 @@ GetFirstLibDir(char *path, uint32 *len)
     while (pCol) {
         pCol = strchr(pPart,':');
         if (pCol) *pCol = '\0';
-        char *pFoo = strdup(pPart);
+        char *pFoo = strdup_new(pPart);
         hLibDirFind->m_pLibDirs->AddItem(pFoo);
         pPart = pCol + sizeof(char);
     }
