@@ -52,6 +52,7 @@ ____________________________________________________________________________*/
 #define __BYTE_ORDER    __LITTLE_ENDIAN
 #define usleep(x) ::Sleep(x/1000)
 #define strcasecmp(a,b) stricmp(a,b)
+#define strncasecmp(a,b,c) strnicmp(a,b,c)
 #endif
 
 /* define our datatypes */
