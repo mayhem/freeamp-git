@@ -615,7 +615,6 @@ void GTKMusicBrowser::UpdateCatalog(void)
     gtk_tree_item_set_subtree(GTK_TREE_ITEM(playlistSubTree), item_subtree1);
 
     vector<string>::const_iterator m = playlists->begin();
-    m++;
     for (; m != playlists->end(); m++) {
         char *fullname = new char[(*m).length() + 1];
         strcpy(fullname, (*m).c_str());
@@ -641,10 +640,12 @@ static void music_search(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->StartMusicSearch();
 }
 
+/*
 static void music_search_tool(GtkWidget *w, GTKMusicBrowser *p)
 {
     p->StartMusicSearch();
 }
+*/
 
 static void import_tool(GtkWidget *w, GTKMusicBrowser *p)
 {
@@ -696,6 +697,10 @@ static void remove_tool(GtkWidget *w, GTKMusicBrowser *p)
         }
         p->UpdateCatalog();
     }
+}
+
+static void help_tool(GtkWidget *w, GTKMusicBrowser *p)
+{
 }
 
 static void edit_tool(GtkWidget *w, GTKMusicBrowser *p)
@@ -1149,8 +1154,14 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
 
         if (mdata.Time() == 0)
             sprintf(length, "Unknown");
-        else
-            sprintf(length, "%d", mdata.Time());
+        else {
+            int secs = mdata.Time();
+            if (secs > 3600)
+                sprintf(length, "%d:%02d:%02d", secs / 3600, (secs / 60) % 60, 
+                        secs % 60);
+            else
+                sprintf(length, "%d:%02d", (secs / 60) % 60, secs % 60);
+        }
 
         iText[0] = position;
         iText[1] = title;
@@ -1160,7 +1171,13 @@ void GTKMusicBrowser::UpdatePlaylistList(void)
         gtk_clist_append(GTK_CLIST(playlistList), iText);
     }
 
-    gtk_clist_columns_autosize(GTK_CLIST(playlistList));
+    if (iLoop == 0) {
+        gtk_clist_set_column_width(GTK_CLIST(playlistList), 0, 10);
+        gtk_clist_set_column_width(GTK_CLIST(playlistList), 1, 45);
+        gtk_clist_set_column_width(GTK_CLIST(playlistList), 2, 45);
+    }
+    else
+        gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_clist_select_row(GTK_CLIST(playlistList), m_currentindex, 0);
     gtk_clist_moveto(GTK_CLIST(playlistList), m_currentindex, 0, 0.5, -1);
     gtk_clist_thaw(GTK_CLIST(playlistList));
@@ -1314,13 +1331,13 @@ void GTKMusicBrowser::CreatePlaylist(void)
                                          GTK_TOOLBAR_BOTH);
     gtk_toolbar_set_button_relief(GTK_TOOLBAR(toolbar), GTK_RELIEF_NONE);
 
-    gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Music Search", 
+/*    gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Music Search", 
                             "Search for Music Files on your System", 
                             "Toolbar/MusicSearch", new_pixmap(musicBrowser),
                             GTK_SIGNAL_FUNC(music_search_tool), this);
 
     gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
-
+*/
     gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "New Playlist",
                             "Start Editing a new Playlist",
                             "Toolbar/New", new_pixmap(musicBrowser),
@@ -1340,6 +1357,13 @@ void GTKMusicBrowser::CreatePlaylist(void)
                             "Edit a Track or Playlist",
                             "Toolbar/Edit", new_pixmap(musicBrowser),
                             GTK_SIGNAL_FUNC(edit_tool), this);
+
+    gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
+
+    gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Help",
+                            "Help me!",
+                            "Toolbar/Help", new_pixmap(musicBrowser),
+                            GTK_SIGNAL_FUNC(help_tool), this);
 
     gtk_box_pack_start(GTK_BOX(vbox), toolbar, FALSE, TRUE, 0);
     gtk_widget_show(toolbar);

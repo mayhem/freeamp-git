@@ -429,8 +429,10 @@ void MusicBrowser::SetDatabase(const char *path)
 
     PruneDatabase();
 
-    if (m_database)
+    if (m_database) {
         m_catalog->RePopulateFromDatabase();
+        m_catalog->Sort();
+    }
 }
 
 void MusicBrowser::PruneDatabase(void)
