@@ -62,8 +62,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                                                 ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
-                                                                   ..\..\..\..\base\win32\prj\plugins
+                                                                                  ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
+                                                                    ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 Debug"
@@ -95,8 +95,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                                                 ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
-                                                                   ..\..\..\..\base\win32\prj\plugins
+                                                                                  ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
+                                                                    ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Debug"
@@ -130,8 +130,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                                                 ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
-                                                                   ..\..\..\..\base\win32\prj\plugins
+                                                                                  ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
+                                                                    ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "musicbrowser - Win32 NASM Release"
@@ -163,8 +163,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                                                                 ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
-                                                                   ..\..\..\..\base\win32\prj\plugins
+                                                                                  ..\..\..\..\base\win32\prj\plugins	copy musicbrowser.ui\
+                                                                    ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -236,6 +236,10 @@ SOURCE=..\src\MusicTree.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\OpenSavePlaylists.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\PlaylistView.cpp
 # End Source File
 # Begin Source File
@@ -304,6 +308,10 @@ SOURCE=..\res\playlist.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=..\res\splitter.cur
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\toolbar.bmp
 # End Source File
 # Begin Source File
@@ -311,9 +319,5 @@ SOURCE=..\res\toolbar.bmp
 SOURCE=..\res\track.bmp
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\res\splitter.cur
-# End Source File
 # End Target
 # End Project
