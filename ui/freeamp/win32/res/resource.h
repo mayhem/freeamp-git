@@ -2,6 +2,7 @@
 // Microsoft Developer Studio generated include file.
 // Used by freeamp.rc
 //
+#define IDI_EXE_ICON                    101
 #define IDB_DIALS                       104
 #define IDC_DIAL                        104
 #define IDB_PLAYER_MASK                 105

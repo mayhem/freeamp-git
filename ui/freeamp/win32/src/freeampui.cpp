@@ -362,7 +362,7 @@ CreateUI()
     wc.cbWndExtra = 0;
     wc.hInstance = g_hInst;
     wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-    wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+    wc.hIcon = LoadIcon( g_hInst, MAKEINTRESOURCE(IDI_EXE_ICON) );
     wc.hbrBackground = (HBRUSH)NULL;//( COLOR_WINDOW + 1 );
     wc.lpszMenuName = (LPSTR)0;
     wc.lpszClassName = "nonrect";
