@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by m3u.rc
+// Used by pls.rc
 //
 
 // Next default values for new objects
