@@ -1296,11 +1296,8 @@ CreatePMO(const PlaylistItem * pc, Event * pC)
 
    lmc_item = ChooseLMC(pc->URL().c_str());
    if (!lmc_item)
-   {
-      printf("Using default LMC!\n");
    // FIXME: Should probably have a user definable default LMC
       lmc_item = m_lmcRegistry->GetItem(0);
-   }
   
    if (pmi_item)
    {
@@ -1582,7 +1579,6 @@ Play(Event *pEvent)
     }
     else
     {
-        printf("Calling resume\n");
         m_pmo->Resume();
         if (SetState(PlayerState_Playing))
         {
