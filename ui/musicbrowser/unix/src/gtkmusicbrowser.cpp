@@ -71,9 +71,135 @@ void sort_year(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void sort_title(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void sort_album(GTKMusicBrowser *p, guint action, GtkWidget *w);
 void sort_artist(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void options_show(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void pause_menu(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void play_menu(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void next_menu(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void prev_menu(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void repeat_none(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void repeat_one(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void repeat_all(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void show_help(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void freeamp_web(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void emusic_web(GTKMusicBrowser *p, guint action, GtkWidget *w);
+void show_about(GTKMusicBrowser *p, guint action, GtkWidget *w);
 }
 
 FAContext *BADContext = NULL;
+
+void repeat_none(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+   p->SetRepeat(0);
+}
+
+void repeat_one(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+   p->SetRepeat(1);
+}
+
+void repeat_all(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+   p->SetRepeat(2);
+}
+
+void GTKMusicBrowser::SetRepeat(int numrepeat)
+{
+   switch(numrepeat) {
+       case 0: {
+           m_plm->SetRepeatMode(kPlaylistMode_RepeatNone);
+           break; }
+       case 1: {
+           m_plm->SetRepeatMode(kPlaylistMode_RepeatOne);
+           break; }
+       case 2: {
+           m_plm->SetRepeatMode(kPlaylistMode_RepeatAll);
+           break; }
+   }
+}
+
+void show_help(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+}
+
+void freeamp_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    LaunchBrowser("http://www.freeamp.org/");
+}
+
+void emusic_web(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    LaunchBrowser("http://www.emusic.com/");
+}
+
+void show_about(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+}
+
+void pause_menu(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->PauseMenu();
+}
+
+void GTKMusicBrowser::PauseMenu()
+{
+    if (pauseState) {
+        m_context->target->AcceptEvent(new Event(CMD_Play));
+        pauseState = 0;
+    }
+    else {
+        m_context->target->AcceptEvent(new Event(CMD_Pause));
+        pauseState = 1;
+    }
+    UpdatePlayPause();
+}
+
+void play_menu(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->PlayMenu();
+}
+
+void GTKMusicBrowser::PlayMenu()
+{
+    if (playState) {
+        m_context->target->AcceptEvent(new Event(CMD_Stop));
+        playState = 0;
+    }
+    else {
+        m_context->target->AcceptEvent(new Event(CMD_Play));
+        playState = 1;
+    }
+    UpdatePlayPause();
+}
+
+void next_menu(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->NextMenu();
+}
+
+void GTKMusicBrowser::NextMenu(void)
+{
+    m_context->target->AcceptEvent(new Event(CMD_NextMediaPiece));
+}
+
+void prev_menu(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->PrevMenu();
+}
+
+void GTKMusicBrowser::PrevMenu(void)
+{
+    m_context->target->AcceptEvent(new Event(CMD_PrevMediaPiece));
+}
+
+void options_show(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->ShowOptions();
+}
+
+void GTKMusicBrowser::ShowOptions()
+{
+    m_context->target->AcceptEvent(new ShowPreferencesEvent());
+}
 
 struct {
     void *data;
@@ -843,6 +969,22 @@ void set_label_menu(GtkWidget *w, gchar *newtitle)
     }
 }
 
+void GTKMusicBrowser::UpdatePlayPause(void)
+{
+    GtkWidget *w = gtk_item_factory_get_widget(menuFactory, "/Control/Play");
+    if (playState) 
+        gtk_container_foreach(GTK_CONTAINER(w), set_label_menu, (gpointer)"Stop");
+    else
+        gtk_container_foreach(GTK_CONTAINER(w), set_label_menu, (gpointer)"Play");
+    w = gtk_item_factory_get_widget(menuFactory, "/Control/Pause");
+    if (!playState) 
+        gtk_widget_set_sensitive(w, FALSE); 
+    else if (pauseState)
+        gtk_container_foreach(GTK_CONTAINER(w), set_label_menu, (gpointer)"Play");
+    else
+        gtk_container_foreach(GTK_CONTAINER(w), set_label_menu, (gpointer)"Pause");
+}
+
 void GTKMusicBrowser::ExpandCollapseEvent(void)
 {
     if (m_state == kStateCollapsed) {
@@ -1500,6 +1642,22 @@ void GTKMusicBrowser::SetClickState(ClickState newState)
         gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
                                  "/Edit/Move Down"), FALSE);
     }
+    if (!master) {
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Controls/Pause"), FALSE);
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Controls/Play"), FALSE);
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Controls/Next Song"), FALSE);
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Controls/Previous Song"), FALSE);
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Controls/Repeat None"), FALSE);
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Controls/Repeat One"), FALSE);
+        gtk_widget_set_sensitive(gtk_item_factory_get_widget(menuFactory,
+                                 "/Controls/Repeat All"), FALSE);
+    }
 }
 
 void GTKMusicBrowser::DeleteEvent(void)
@@ -1690,6 +1848,8 @@ GTKMusicBrowser::GTKMusicBrowser(FAContext *context, MusicBrowserUI *masterUI,
     m_browserCreated = false;
     lastPanedPosition = -1;
     lastPanedHandle = -1;
+    playState = 0;
+    pauseState = 0;
 
     parentUI = masterUI;
  
@@ -1785,6 +1945,27 @@ int32 GTKMusicBrowser::AcceptEvent(Event *e)
         case CMD_AddFiles: {
             AddFileCMD();
             break; }
+        case INFO_Playing: {
+            playState = 1;
+            pauseState = 0;
+            gdk_threads_enter();
+            UpdatePlayPause();
+            gdk_threads_leave();
+            break; }
+        case INFO_Stopped: {
+            playState = 0;
+            pauseState = 0;
+            gdk_threads_enter();
+            UpdatePlayPause();
+            gdk_threads_leave();
+            break; }
+        case INFO_Paused: {
+            playState = 1;
+            pauseState = 1;
+            gdk_threads_enter();
+            UpdatePlayPause();
+            gdk_threads_leave();
+            break; }         
         default:
             break;
     }

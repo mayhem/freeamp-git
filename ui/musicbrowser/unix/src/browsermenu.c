@@ -49,6 +49,18 @@ extern void sort_year();
 extern void sort_title();
 extern void sort_album();
 extern void sort_artist();
+extern void options_show();
+extern void pause_menu();
+extern void play_menu();
+extern void next_menu();
+extern void prev_menu();
+extern void repeat_none();
+extern void repeat_one();
+extern void repeat_all();
+extern void show_help();
+extern void freeamp_web();
+extern void emusic_web();
+extern void show_about();
 
 void CreateMenuItems(GtkItemFactory *item_factory, void *p)
 {
@@ -59,14 +71,13 @@ void CreateMenuItems(GtkItemFactory *item_factory, void *p)
      {"/File/_Save Playlist",   "<control>S",   save_list, 0, 0 },
      {"/File/Save Playlist _As...","<control>A",saveas_list,0, 0 },
      {"/File/sep1",             NULL,           0,         0, "<Separator>" },
-     {"/File/_Import...", "<control>I",         import_list, 0, 0 },
+     {"/File/_Import Tracks and Playlists...","<control>I", import_list, 0, 0 },
      {"/File/Search for Music...", NULL,        music_search, 0, 0 },
      {"/File/sep2",             NULL,           0,         0, "<Separator>" },
      {"/File/_Close",           "<control>Q",   quit_menu, 0, 0 }, 
 
      {"/_Edit",                 NULL,           0,         0, "<Branch>" },
-     {"/_Edit/Add Track...",    NULL,           add_track, 0, 0 },
-     {"/_Edit/Edit..",          NULL,           infoedit,  0, 0 },
+     {"/_Edit/Add Files from Disk...",    NULL, add_track, 0, 0 },
      {"/_Edit/Remove from Catalog", NULL,       delete_sel,0, 0 },
      {"/_Edit/Remove from Disk",NULL,           realdelete_sel, 0, 0},
      {"/_Edit/sep3",            NULL,           0,         0, "<Separator>" },
@@ -75,9 +86,25 @@ void CreateMenuItems(GtkItemFactory *item_factory, void *p)
      {"/_Edit/sep4",            NULL,           0,         0, "<Separator>" },
      {"/_Edit/Clear Playlist",  NULL,           clear_list, 0, 0 },
      {"/_Edit/Randomize Playlist",NULL,         sort_random, 0, 0 },
+     {"/_Edit/sep5",            NULL,           0,         0, 0 },
+     {"/_Edit/Edit Track Info and Playlists..", NULL, infoedit,  0, 0 },
 
      {"/_View",                 NULL,           0,         0, "<Branch>" },
      {"/_View/View Music Browser",NULL,         catalog_tog, 0, 0 },
+     {"/_View/Options",         NULL,           options_show, 0, 0 },
+ 
+     {"/_Controls",             NULL,           0,         0, "<Branch>" },
+     {"/_Controls/Pause",       NULL,           pause_menu,0, 0 },
+     {"/_Controls/Play",        NULL,           play_menu, 0, 0 },
+     {"/_Controls/sep6",        NULL,           0,         0, "<Separator>" },
+     {"/_Controls/Next Song",   NULL,           next_menu, 0, 0 },
+     {"/_Controls/Previous Song", NULL,         prev_menu, 0, 0 },
+     {"/_Controls/sep7",        NULL,           0,         0, "<Separator>" },
+     {"/_Controls/Shuffle",     NULL,           sort_random, 0, 0 },
+     {"/_Controls/sep8",        NULL,           0,         0, "<Separator>" },
+     {"/_Controls/Repeat None", NULL,           repeat_none, 0, "<RadioItem>" },
+     {"/_Controls/Repeat One",  NULL,  repeat_one, 0, "/Controls/Repeat None" },
+     {"/_Controls/Repeat All",  NULL,  repeat_all, 0, "/Controls/Repeat None" },
 
      {"/_Sort",                 NULL,           0,         0, "<Branch>" },
      {"/_Sort/Artist",          NULL,           sort_artist, 0, 0 },
@@ -88,6 +115,14 @@ void CreateMenuItems(GtkItemFactory *item_factory, void *p)
      {"/_Sort/Genre",           NULL,           sort_genre, 0, 0 },
      {"/_Sort/Length",          NULL,           sort_time,  0, 0 },
      {"/_Sort/Location",        NULL,           sort_location, 0, 0 },
+
+     {"/_Help",                 NULL,           0,          0, "<Branch>" },
+     {"/_Help/Contents",        NULL,           show_help,  0, 0 },
+     {"/_Help/sep9",            NULL,           0,          0, "<Separator>" },
+     {"/_Help/FreeAmp Website", NULL,           freeamp_web, 0, 0 },
+     {"/_Help/EMusic.com Website", NULL,        emusic_web, 0, 0 }, 
+     {"/_Help/sep10",           NULL,           0,          0, "<Separator>" },
+     {"/_Help/About",           NULL,           show_about, 0, 0 }
     };
     
     int nmenu_items = sizeof(menu_items) / sizeof(menu_items[0]);

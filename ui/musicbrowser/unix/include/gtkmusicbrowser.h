@@ -78,6 +78,9 @@ class GTKMusicBrowser {
     FAContext *GetContext(void) { return m_context; }
     void UpdateCatalog(void);
 
+    int pauseState;
+    int playState;
+
  protected:
     FAContext *m_context;
 
@@ -133,6 +136,7 @@ class GTKMusicBrowser {
     GtkWidget *artistSubTree;
     GtkWidget *playlistSubTree;
   
+    void UpdatePlayPause();
   public:
     ClickState GetClickState() { return m_clickState; }
     void SetClickState(ClickState newState);
@@ -165,6 +169,13 @@ class GTKMusicBrowser {
     void ImportPlaylist(char *path);
 
     void CreateNewEditor(char *playlisturl);
+
+    void ShowOptions(void);
+    void PauseMenu(void);
+    void PlayMenu(void);
+    void NextMenu(void);
+    void PrevMenu(void);
+    void SetRepeat(int numrepeat);
 };
 
 #endif
