@@ -39,6 +39,7 @@ class Semaphore {
     Semaphore(int cnt = 1);
     ~Semaphore();
     void Wait();
+    bool TimedWait(int iMilliSecs);
     void Signal();
 
 };

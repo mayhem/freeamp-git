@@ -76,6 +76,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
     void      Run();
     bool      SetArgs(int32 argc, char **argv);
+    void      HandleSingleArg(char *arg);
+    void      AddTheme(char *url);
     void      SetTerminationSemaphore(Semaphore *);
     void      testQueue();
     static void EventServiceThreadFunc(void *);

@@ -191,7 +191,7 @@ bool SoundCardPMO::SetupVolumeControl(void)
 							 MIXER_OBJECTF_HMIXER |
 							 MIXER_GETLINECONTROLSF_ONEBYTYPE)
 		!= MMSYSERR_NOERROR)
-		return FALSE;
+		return false;
 
 	// record dwControlID
 	m_oDstLineName = mxl.szName;
@@ -220,7 +220,7 @@ int32 SoundCardPMO::GetVolume()
 								 MIXER_OBJECTF_HMIXER |
 								 MIXER_GETCONTROLDETAILSF_VALUE);
 	if (ret != MMSYSERR_NOERROR)
-		return 0;
+		return false;
 
     return  (int)(((float)((mxcdVolume.dwValue - m_dwMinimum) * 100) /  
                   (float)(m_dwMaximum - m_dwMinimum)) + 0.5); 
@@ -237,7 +237,7 @@ void SoundCardPMO::SetVolume(int32 volume)
     
 	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
 	mxcd.dwControlID = m_dwVolumeControlID;
-	mxcd.cChannels = 2;
+	mxcd.cChannels = 1;
 	mxcd.cMultipleItems = 0;
 	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
 	mxcd.paDetails = &mxcdVolume;

@@ -1433,7 +1433,7 @@ void GTKPreferenceWindow::DeleteThemeEvent(void)
     }
     Error err = m_pThemeMan->DeleteTheme(m_oThemeList[themeToDelete]);
 
-    if (IsntError(err)) {
+    if (IsError(err)) {
         MessageDialog oBox(m_pContext);
         string        oErr, oMessage;
 
@@ -1461,6 +1461,9 @@ void GTKPreferenceWindow::UpdateThemeList(void)
     m_pThemeMan->GetCurrentTheme(originalValues.currentTheme);
     m_oThemeList.clear();
 
+    gtk_clist_freeze(GTK_CLIST(themeList));
+    gtk_clist_clear(GTK_CLIST(themeList));
+
     m_pThemeMan->GetThemeList(m_oThemeList);
     for (i = m_oThemeList.begin(); i != m_oThemeList.end(); i++, iLoop++) {
          char *Text[1];
@@ -1472,6 +1475,8 @@ void GTKPreferenceWindow::UpdateThemeList(void)
     }
 
     gtk_clist_select_row(GTK_CLIST(themeList), proposedValues.listboxIndex, 0);
+
+    gtk_clist_thaw(GTK_CLIST(themeList));
 }
 
 void GTKPreferenceWindow::SetFont()

@@ -118,9 +118,13 @@ class MusicCatalog : public EventQueue
 
  protected:
     static void musicsearch_thread_function(void *arg);
+    static void prune_thread_function(void *arg);
+
+    void PruneThread(bool sendmessages);
+
     void DoSearchMusic(char *path);
     void DoSearchPaths(vector<string> &pathList);
-    void PruneDatabase(void);
+    void PruneDatabase(bool sendmessages = false, bool spawn = false);
 
     bool m_exit;
     Mutex *m_mutex;
@@ -128,6 +132,8 @@ class MusicCatalog : public EventQueue
     FAContext *m_context;
 
  private:
+    bool CaseCompare(string s1, string s2);
+
     Mutex *m_catMutex;
 
     vector<ArtistList *> *m_artistList;

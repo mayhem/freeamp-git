@@ -1,23 +1,23 @@
 [Data]
 THE_PRODUCT_NAME_UC=FreeAmp
-VERSION_STRING_SPECIAL=
-ERROR_COMPONENT=Component:
 COMPANY_NAME=FreeAmp
-ERROR_FILEGROUP=File Group:
+ERROR_COMPONENT=Component:
+VERSION_STRING_SPECIAL=
+PRODUCT_VERSION=2.0.4
 ERROR_MOVEDATA=An error occurred during the move data process: %d
-PRODUCT_VERSION=2.0.3
-MAIN_REGISTRY_KEY=Software\FreeAmp\FreeAmp v2.0\Main
+ERROR_FILEGROUP=File Group:
 UNINST_KEY=FreeAmp
+MAIN_REGISTRY_KEY=Software\FreeAmp\FreeAmp v2.0\Main
 TITLE_CAPTIONBAR=FreeAmp Setup
-THE_PRODUCT_NAME_LC=FreeAmp
-DEFAULT_THEME=FreeAmp.fat
-FOLDER_NAME=FreeAmp
-ERROR_FILE=File:
 ERROR_VGARESOLUTION=This program requires VGA or better resolution.
-PRODUCT_KEY=freeamp.exe
+ERROR_FILE=File:
+FOLDER_NAME=FreeAmp
+DEFAULT_THEME=FreeAmp.fat
+THE_PRODUCT_NAME_LC=FreeAmp
 UNINST_DISPLAY_NAME=FreeAmp
-ERROR_UNINSTSETUP=unInstaller setup failed to initialize.  You may not be able to uninstall this product.
+PRODUCT_KEY=freeamp.exe
 PRODUCT_NAME=FreeAmp
+ERROR_UNINSTSETUP=unInstaller setup failed to initialize.  You may not be able to uninstall this product.
 
 [General]
 Language=0009

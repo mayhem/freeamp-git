@@ -48,7 +48,7 @@ class ThemeManager
       virtual Error GetDefaultTheme(string &oThemePath);
 	  virtual Error GetThemeList   (map<string, string> &oThemeFileList);
       virtual Error UseTheme       (string &oThemeFile);
-      virtual Error AddTheme       (string &oThemeFile);
+      virtual Error AddTheme       (string &oThemeFile, bool bRename = false);
       virtual Error DeleteTheme    (string &oThemeFile);
       virtual Error GetCurrentTheme(string &oTheme);
 

@@ -76,6 +76,8 @@ const char* kPlayImmediatelyPref = "PlayImmediately";
 const char* kNumberOfURLsToRememberPref = "NumberOfURLsToRemember";
 const char* kCDDevicePathPref = "CDDevice";
 const char* kCDDBServerPref = "CDDBServer";
+const char* kConvertUnderscoresToSpacesPref = "ConvertUnderscoresToSpaces";
+const char* kAllowMultipleInstancesPref = "AllowMultipleInstances";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -129,6 +131,8 @@ const bool kDefaultWelcome = true;
 const bool kDefaultPlayImmediately = true;
 const int32 kDefaultNumberOfURLsToRemember = 10;
 const char* kDefaultCDDBServer = "http://www2.freedb.org/cgi-bin/cddb.cgi";
+const bool kDefaultConvertUnderscoresToSpaces = true;
+const bool kDefaultAllowMultipleInstances = false;
 
 Error
 Preferences::
@@ -297,6 +301,12 @@ SetDefaults()
 
     if (GetPrefInt32(kNumberOfURLsToRememberPref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kNumberOfURLsToRememberPref, kDefaultNumberOfURLsToRemember);
+
+    if (GetPrefBoolean(kConvertUnderscoresToSpacesPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kConvertUnderscoresToSpacesPref, kDefaultConvertUnderscoresToSpaces);
+
+    if (GetPrefBoolean(kAllowMultipleInstancesPref, &dummyBool) == kError_NoPrefValue)
+        SetPrefBoolean(kAllowMultipleInstancesPref, kDefaultAllowMultipleInstances);
 
     return kError_NoErr;
 }
@@ -1003,6 +1013,34 @@ Preferences::
 SetNumberOfURLsToRemember(int32 value)
 {
     return SetPrefInt32(kNumberOfURLsToRememberPref, value);
+}
+
+Error
+Preferences::
+GetConvertUnderscoresToSpaces(bool* value)
+{
+    return GetPrefBoolean(kConvertUnderscoresToSpacesPref, value);
+}
+
+Error
+Preferences::
+SetConvertUnderscoresToSpaces(bool value)
+{
+    return SetPrefBoolean(kConvertUnderscoresToSpacesPref, value);
+}
+
+Error
+Preferences::
+GetAllowMultipleInstances(bool* value)
+{
+    return GetPrefBoolean(kAllowMultipleInstancesPref, value);
+}
+
+Error
+Preferences::
+SetAllowMultipleInstances(bool value)
+{
+    return SetPrefBoolean(kAllowMultipleInstancesPref, value);
 }
 
 LibDirFindHandle *

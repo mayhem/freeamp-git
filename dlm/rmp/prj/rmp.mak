@@ -29,6 +29,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "rmp - Win32 Release"
 
 OUTDIR=.\Release
@@ -60,7 +64,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lmc\include" /I "..\\" /I\
  "..\..\include" /I "..\include" /I "..\..\..\io\include" /I\
  "..\..\..\base\include" /I "..\..\..\base\win32\include" /I "..\..\..\config"\
@@ -69,40 +72,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lmc\include" /I "..\\" /I\
  /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\rmp.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\rmp.bsc" 
@@ -111,9 +81,9 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\rmp.pdb" /machine:I386 /def:".\rmp.def" /out:"rmp.dlf"\
- /implib:"$(OUTDIR)\rmp.lib" /libpath:"..\..\..\base\win32" 
+ odbc32.lib odbccp32.lib /nologo /base:"0x11300000" /subsystem:windows /dll\
+ /incremental:no /pdb:"$(OUTDIR)\rmp.pdb" /machine:I386 /def:".\rmp.def"\
+ /out:"rmp.dlf" /implib:"$(OUTDIR)\rmp.lib" /libpath:"..\..\..\base\win32" 
 DEF_FILE= \
 	".\rmp.def"
 LINK32_OBJS= \
@@ -171,7 +141,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\lmc\include" /I "..\\"\
  /I "..\..\include" /I "..\include" /I "..\..\..\io\include" /I\
  "..\..\..\base\include" /I "..\..\..\base\win32\include" /I "..\..\..\config"\
@@ -180,40 +149,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\lmc\include" /I "..\\"\
  /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\rmp.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\rmp.bsc" 
@@ -222,9 +158,10 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\rmp.pdb" /debug /machine:I386 /def:".\rmp.def" /out:"rmp.dlf"\
- /implib:"$(OUTDIR)\rmp.lib" /pdbtype:sept /libpath:"..\..\..\base\win32" 
+ odbc32.lib odbccp32.lib /nologo /base:"0x11300000" /subsystem:windows /dll\
+ /incremental:yes /pdb:"$(OUTDIR)\rmp.pdb" /debug /machine:I386 /def:".\rmp.def"\
+ /out:"rmp.dlf" /implib:"$(OUTDIR)\rmp.lib" /pdbtype:sept\
+ /libpath:"..\..\..\base\win32" 
 DEF_FILE= \
 	".\rmp.def"
 LINK32_OBJS= \
@@ -279,7 +216,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lmc\include" /I "..\\" /I\
  "..\..\include" /I "..\include" /I "..\..\..\io\include" /I\
  "..\..\..\base\include" /I "..\..\..\base\win32\include" /I "..\..\..\config"\
@@ -288,40 +224,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\..\..\lmc\include" /I "..\\" /I\
  /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\rmp.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\rmp.bsc" 
@@ -330,9 +233,9 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\rmp.pdb" /machine:I386 /def:".\rmp.def" /out:"rmp.dlf"\
- /implib:"$(OUTDIR)\rmp.lib" /libpath:"..\..\..\base\win32" 
+ odbc32.lib odbccp32.lib /nologo /base:"0x11300000" /subsystem:windows /dll\
+ /incremental:no /pdb:"$(OUTDIR)\rmp.pdb" /machine:I386 /def:".\rmp.def"\
+ /out:"rmp.dlf" /implib:"$(OUTDIR)\rmp.lib" /libpath:"..\..\..\base\win32" 
 DEF_FILE= \
 	".\rmp.def"
 LINK32_OBJS= \
@@ -390,7 +293,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\\" /I "..\..\include" /I\
  "..\include" /I "..\..\..\io\include" /I "..\..\..\base\include" /I\
  "..\..\..\base\win32\include" /I "..\..\..\config" /I "..\..\..\ui\include" /I\
@@ -398,6 +300,43 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\\" /I "..\..\include" /I\
  /Fp"$(INTDIR)\rmp.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\rmp.res" /d "_DEBUG" 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\rmp.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /base:"0x11300000" /subsystem:windows /dll\
+ /incremental:yes /pdb:"$(OUTDIR)\rmp.pdb" /debug /machine:I386 /def:".\rmp.def"\
+ /out:"rmp.dlf" /implib:"$(OUTDIR)\rmp.lib" /pdbtype:sept\
+ /libpath:"..\..\..\base\win32" 
+DEF_FILE= \
+	".\rmp.def"
+LINK32_OBJS= \
+	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\rmp.obj" \
+	"$(INTDIR)\rmp.res" \
+	"..\..\..\base\win32\fabaselib.lib"
+
+".\rmp.dlf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\rmp.dlf"
+   IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir                                 ..\..\..\base\win32\prj\plugins
+	copy rmp.dlf  ..\..\..\base\win32\prj\plugins
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ENDIF 
 
 .c{$(CPP_OBJS)}.obj::
    $(CPP) @<<
@@ -429,49 +368,13 @@ CPP_SBRS=.
    $(CPP_PROJ) $< 
 <<
 
-MTL=midl.exe
-MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)\rmp.res" /d "_DEBUG" 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\rmp.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\rmp.pdb" /debug /machine:I386 /def:".\rmp.def" /out:"rmp.dlf"\
- /implib:"$(OUTDIR)\rmp.lib" /pdbtype:sept /libpath:"..\..\..\base\win32" 
-DEF_FILE= \
-	".\rmp.def"
-LINK32_OBJS= \
-	"$(INTDIR)\Parse.obj" \
-	"$(INTDIR)\rmp.obj" \
-	"$(INTDIR)\rmp.res" \
-	"..\..\..\base\win32\fabaselib.lib"
-
-".\rmp.dlf" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\rmp.dlf"
-   IF NOT EXIST ..\..\..\base\win32\prj\plugins mkdir                                 ..\..\..\base\win32\prj\plugins
-	copy rmp.dlf  ..\..\..\base\win32\prj\plugins
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ENDIF 
-
 
 !IF "$(CFG)" == "rmp - Win32 Release" || "$(CFG)" == "rmp - Win32 Debug" ||\
  "$(CFG)" == "rmp - Win32 NASM Release" || "$(CFG)" == "rmp - Win32 NASM Debug"
 SOURCE=..\..\..\lib\xml\src\Parse.cpp
+
+!IF  "$(CFG)" == "rmp - Win32 Release"
+
 DEP_CPP_PARSE=\
 	"..\..\..\base\include\debug.h"\
 	"..\..\..\base\include\errors.h"\
@@ -482,6 +385,47 @@ DEP_CPP_PARSE=\
 "$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "rmp - Win32 Debug"
+
+DEP_CPP_PARSE=\
+	"..\..\..\base\include\debug.h"\
+	"..\..\..\base\include\errors.h"\
+	"..\..\..\config\config.h"\
+	"..\..\..\lib\xml\include\Parse.h"\
+	
+
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "rmp - Win32 NASM Release"
+
+DEP_CPP_PARSE=\
+	"..\..\..\base\include\debug.h"\
+	"..\..\..\base\include\errors.h"\
+	"..\..\..\config\config.h"\
+	"..\..\..\lib\xml\include\Parse.h"\
+	
+
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "rmp - Win32 NASM Debug"
+
+DEP_CPP_PARSE=\
+	"..\..\..\base\include\debug.h"\
+	"..\..\..\base\include\errors.h"\
+	"..\..\..\config\config.h"\
+	"..\..\..\lib\xml\include\Parse.h"\
+	
+
+"$(INTDIR)\Parse.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\rmp.cpp
 

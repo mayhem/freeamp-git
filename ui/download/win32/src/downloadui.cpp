@@ -74,6 +74,11 @@ FreeTracksWndProc(HWND hwnd,
                   UINT msg, 
                   WPARAM wParam, 
                   LPARAM lParam);
+LRESULT WINAPI 
+ListWndProc(HWND hwnd, 
+            UINT msg, 
+            WPARAM wParam, 
+            LPARAM lParam);
 
 extern "C" DownloadUI *Initialize(FAContext *context)
 {
@@ -113,6 +118,7 @@ DownloadUI::DownloadUI(FAContext *context):UserInterface()
     m_propManager = m_context->props;
     m_dlm = m_context->downloadManager;
     m_overURL = false;
+    m_duringUpdate = false;
 
     m_totalItems = 0;
     m_doneItems = 0;
@@ -316,8 +322,10 @@ Error DownloadUI::AcceptEvent(Event* event)
                         {
                             if(dlipe->Item() == (DownloadItem*)item.lParam)
                             {
+                                m_duringUpdate = true;
                                 ListView_RedrawItems(m_hwndList, i, i);
                                 UpdateWindow(m_hwndList);
+                                m_duringUpdate = false;
                                 break;
                             }
                         }
@@ -437,6 +445,36 @@ BOOL DownloadUI::InitDialog()
 					GWL_WNDPROC, 
                     (DWORD)::FreeTracksWndProc ); 
 
+
+    // Set the proc address as a property 
+	// of the window so it can get it
+	SetProp(m_hwndList, 
+			"oldproc",
+			(HANDLE)GetWindowLong(m_hwndList, GWL_WNDPROC));
+
+    SetProp(m_hwndList, 
+			"ui",
+			(HANDLE)this);
+
+    // Subclass the window so we can draw it
+	SetWindowLong(m_hwndList, 
+					GWL_WNDPROC, 
+                  (DWORD)::ListWndProc ); 
+
+    // Set the proc address as a property 
+	// of the window so it can get it
+	SetProp(m_hwndProgress, 
+			"oldproc",
+			(HANDLE)GetWindowLong(m_hwndProgress, GWL_WNDPROC));
+
+    SetProp(m_hwndProgress, 
+			"ui",
+			(HANDLE)this);
+
+    // Subclass the window so we can draw it
+	SetWindowLong(m_hwndProgress, 
+					GWL_WNDPROC, 
+                  (DWORD)::ProgressWndProc ); 
 
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(m_hwnd, GWL_HINSTANCE);
     HICON appIcon = LoadIcon(hinst, MAKEINTRESOURCE(IDI_EXE_ICON));
@@ -594,13 +632,10 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             DeleteObject(pen);
             break;
         }
-
         case IDC_OVERALL_PROGRESS:
         {
             HFONT font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
             HFONT oldFont;
-
-            oldFont = (HFONT)SelectObject(dis->hDC, font);
            
             if(m_progressBitmap)
             {
@@ -610,17 +645,26 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 float recvd = m_doneBytes;
                 uint32 percent;
                 RECT clientRect;
+                HDC hDc;
+                HBITMAP hBitmap, hSavedBitmap;
 
                 GetClientRect(m_hwndProgress, &clientRect);
 
-                //HBRUSH brush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
-                //FillRect(dis->hDC, &rcClip, brush);
-                //DeleteObject(brush);
-
+                hDc = CreateCompatibleDC(dis->hDC);
+                hBitmap = CreateCompatibleBitmap(dis->hDC, 
+                           clientRect.right - clientRect.left,
+                           clientRect.bottom - clientRect.top);
+                hSavedBitmap = (HBITMAP)SelectObject(hDc, hBitmap);           
+                oldFont = (HFONT)SelectObject(hDc, font);
+            
                 // Set the text background and foreground colors to the
                 // standard window colors
-                SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT));
-                SetBkColor(dis->hDC, GetSysColor(COLOR_3DFACE));
+                SetTextColor(hDc, GetSysColor(COLOR_WINDOWTEXT));
+                SetBkColor(hDc, GetSysColor(COLOR_3DFACE));
+
+                HBRUSH brush = CreateSolidBrush(GetSysColor(COLOR_3DFACE));
+                FillRect(hDc, &clientRect, brush);
+                DeleteObject(brush);
 
                 ost.precision(2);
                 ost.flags(ios_base::fixed);
@@ -652,14 +696,14 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 SIZE stringSize;
                 RECT rcClip = clientRect;
 
-                GetTextExtentPoint32(dis->hDC, displayString.c_str(), 
+                GetTextExtentPoint32(hDc, displayString.c_str(), 
                                     displayString.size(), &stringSize);
 
                 rcClip.left += 3;
                 rcClip.top += ((rcClip.bottom - rcClip.top) - stringSize.cy)/2;
                 rcClip.bottom = rcClip.top + stringSize.cy;
 
-                ExtTextOut( dis->hDC, 
+                ExtTextOut( hDc, 
                             rcClip.left, rcClip.top, 
                             ETO_CLIPPED | ETO_OPAQUE,
                             &rcClip, 
@@ -671,7 +715,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                 displayString = ost.str();
 
-                GetTextExtentPoint32(dis->hDC, displayString.c_str(), 
+                GetTextExtentPoint32(hDc, displayString.c_str(), 
                                     displayString.size(), &stringSize);
 
                 int32 progressWidth = 100;
@@ -679,7 +723,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 int32 count = bmpWidth/(kProgressWidth);
                 int32 remainder = bmpWidth%(kProgressWidth);
 
-                HDC memDC = CreateCompatibleDC(dis->hDC);              
+                HDC memDC = CreateCompatibleDC(hDc);              
                 HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, m_progressBitmap);
                 RECT progressRect = clientRect;
 
@@ -688,20 +732,20 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 progressRect.bottom = progressRect.top + kProgressHeight + 2;
                 progressRect.right = progressRect.left + progressWidth;
 
-                DrawEdge(dis->hDC, &progressRect, EDGE_SUNKEN, BF_RECT);
+                DrawEdge(hDc, &progressRect, EDGE_SUNKEN, BF_RECT);
 
                 uint32 i = 0;
 
                 for(i = 0; i< count; i++)
                 {
-                    BitBlt(dis->hDC, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, kProgressWidth, kProgressHeight, 
+                    BitBlt(hDc, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, kProgressWidth, kProgressHeight, 
                            memDC, 0, 0, SRCCOPY);
 
                 }
 
                 if(remainder)
                 {
-                    BitBlt(dis->hDC, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, remainder, kProgressHeight, 
+                    BitBlt(hDc, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, remainder, kProgressHeight, 
                            memDC, 0, 0, SRCCOPY);
                 }
 
@@ -716,7 +760,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                 rcClip.left += pad;
 
-                ExtTextOut( dis->hDC, 
+                ExtTextOut( hDc, 
                             rcClip.left, rcClip.top, 
                             ETO_CLIPPED | ETO_OPAQUE,
                             &rcClip, 
@@ -724,10 +768,16 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                             displayString.size(),
                             NULL);
 
+                BitBlt(dis->hDC, dis->rcItem.left, dis->rcItem.top,
+                                 dis->rcItem.right - dis->rcItem.left, 
+                                 dis->rcItem.bottom - dis->rcItem.top, 
+                       hDc, 0, 0, SRCCOPY);          
+
+				SelectObject(hDc, hSavedBitmap);
+                DeleteObject(hBitmap);
+				SelectObject(hDc, oldFont);
+                DeleteDC(hDc);
             }
-
-
-            SelectObject(dis->hDC, oldFont);
 
             DeleteObject(font);
 
@@ -740,6 +790,21 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             RECT rcClip;
             HIMAGELIST himl;
             int32 cxImage = 0, cyImage = 0;
+            HDC hDc;
+            HBITMAP hBitmap, hSavedBitmap;
+			HFONT   hSavedFont;
+            
+            hDc = CreateCompatibleDC(dis->hDC);
+            hBitmap = CreateCompatibleBitmap(dis->hDC, 
+                       dis->rcItem.right - dis->rcItem.left,
+                       dis->rcItem.bottom - dis->rcItem.top);
+            hSavedBitmap = (HBITMAP)SelectObject(hDc, hBitmap);           
+            hSavedFont = (HFONT)SelectObject(hDc, (HFONT)GetStockObject(DEFAULT_GUI_FONT));
+            
+            rcClip.left = 0;
+            rcClip.top = 0;
+            rcClip.right = dis->rcItem.right - dis->rcItem.left;            
+            rcClip.bottom = dis->rcItem.bottom - dis->rcItem.top;            
 
             // Get Image List
             himl = ListView_GetImageList(dis->hwndItem, LVSIL_SMALL);
@@ -749,21 +814,24 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             if(dis->itemState & ODS_SELECTED)
             {
                 // Set the text background and foreground colors
-                SetTextColor(dis->hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
-                SetBkColor(dis->hDC, GetSysColor(COLOR_HIGHLIGHT));
+                SetTextColor(hDc, GetSysColor(COLOR_HIGHLIGHTTEXT));
+                SetBkColor(hDc, GetSysColor(COLOR_HIGHLIGHT));
 
-		        // Also add the ILD_BLEND50 so the images come out selected
-		        //uiFlags |= ILD_BLEND50;
+                HBRUSH brush = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
+                FillRect(hDc, &rcClip, brush);
+                DeleteObject(brush);
             }
             else
             {
                 // Set the text background and foreground colors to the
                 // standard window colors
-                SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT));
-                SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
+                SetTextColor(hDc, GetSysColor(COLOR_WINDOWTEXT));
+                SetBkColor(hDc, GetSysColor(COLOR_WINDOW));
+                
+                HBRUSH brush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+                FillRect(hDc, &rcClip, brush);
+                DeleteObject(brush);
             }
-
-            rcClip = dis->rcItem;            
 
             //LV_ITEM* item = (LV_ITEM*)dis->itemData;
             DownloadItem* dli = (DownloadItem*)dis->itemData;
@@ -777,12 +845,12 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             // Check to see if the string fits in the clip rect.
             // If not, truncate the string and add "...".
-            CalcStringEllipsis(dis->hDC, 
+            CalcStringEllipsis(hDc, 
                                displayString, 
                                ListView_GetColumnWidth(m_hwndList, 0) - (cxImage + 1));
 
-            ExtTextOut( dis->hDC, 
-                        rcClip.left + cxImage + 1, rcClip.top + 1, 
+            ExtTextOut( hDc, 
+                        cxImage + 1, 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
                         &rcClip, 
                         displayString.c_str(),
@@ -792,11 +860,10 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             // draw the icon
             if (himl)
             {
-                ImageList_Draw( himl, 0, dis->hDC, 
-                                rcClip.left, rcClip.top,
-                                uiFlags);
+                ImageList_Draw( himl, 0, hDc, 0, 0, uiFlags);
             }
 
+#if 1
             // draw the progress column
 
             rcClip.left += ListView_GetColumnWidth(m_hwndList, 0);
@@ -808,7 +875,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 case kDownloadItemState_Queued:
                 {
                     if(!(dis->itemState & ODS_SELECTED))
-                        SetTextColor(dis->hDC, RGB(0, 127, 0));
+                        SetTextColor(hDc, RGB(0, 127, 0));
 
                     ostringstream ost;
                     float total;
@@ -841,7 +908,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 case kDownloadItemState_Downloading:
                 {
                     if(!(dis->itemState & ODS_SELECTED))
-                        SetTextColor(dis->hDC, RGB(0, 0, 192));
+                        SetTextColor(hDc, RGB(0, 0, 192));
 
                     ostringstream ost;
                     float total;
@@ -877,7 +944,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
                     SIZE stringSize;
                     
-                    GetTextExtentPoint32(dis->hDC, displayString.c_str(), 
+                    GetTextExtentPoint32(hDc, displayString.c_str(), 
                                             displayString.size(), &stringSize);
                     
                     int32 leftoverWidth = ListView_GetColumnWidth(m_hwndList, 1) - (stringSize.cx + kTotalPadding);
@@ -894,7 +961,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                         //debug << "bmpWidth: " << bmpWidth << endl << "progressWidth: " << progressWidth << endl;
                         //OutputDebugString(debug.str().c_str());
 
-                        HDC memDC = CreateCompatibleDC(dis->hDC);
+                        HDC memDC = CreateCompatibleDC(hDc);
                         SelectObject(memDC, m_progressBitmap);
 
                         rcClip.left += kPrePadding;
@@ -909,24 +976,24 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                         {
                             HBRUSH brush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
 
-                            FillRect(dis->hDC, &progressRect, brush);
+                            FillRect(hDc, &progressRect, brush);
                             DeleteObject(brush);
                         }
 
-                        DrawEdge(dis->hDC, &progressRect, EDGE_SUNKEN, BF_RECT);
+                        DrawEdge(hDc, &progressRect, EDGE_SUNKEN, BF_RECT);
 
                         uint32 i = 0;
 
                         for(i = 0; i< count; i++)
                         {
-                            BitBlt(dis->hDC, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, kProgressWidth, kProgressHeight, 
+                            BitBlt(hDc, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, kProgressWidth, kProgressHeight, 
                                    memDC, 0, 0, SRCCOPY);
 
                         }
 
                         if(remainder)
                         {
-                            BitBlt(dis->hDC, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, remainder, kProgressHeight, 
+                            BitBlt(hDc, progressRect.left + 2 + i*kProgressWidth, progressRect.top + 2, remainder, kProgressHeight, 
                                    memDC, 0, 0, SRCCOPY);
                         }
 
@@ -939,7 +1006,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 case kDownloadItemState_Cancelled:
                 {
                     if(!(dis->itemState & ODS_SELECTED))
-                        SetTextColor(dis->hDC, RGB(192, 0, 0));
+                        SetTextColor(hDc, RGB(192, 0, 0));
 
                     ostringstream ost;
 
@@ -952,7 +1019,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 case kDownloadItemState_Paused:
                 {
                     if(!(dis->itemState & ODS_SELECTED))
-                        SetTextColor(dis->hDC, RGB(0, 128, 128));
+                        SetTextColor(hDc, RGB(0, 128, 128));
 
                     ostringstream ost;
                     float total;
@@ -992,7 +1059,7 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 case kDownloadItemState_Error:
                 {
                     if(!(dis->itemState & ODS_SELECTED))
-                        SetTextColor(dis->hDC, RGB(192, 0, 0));
+                        SetTextColor(hDc, RGB(192, 0, 0));
 
                     ostringstream ost;
                     int32 index = (int32)dli->GetDownloadError();
@@ -1010,19 +1077,21 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 default:
                     break;
             }
+#endif
 
+#if 1
             uint32 pad = kPrePadding;
 
             if(progressWidth)
                 pad = (progressWidth + kElementPadding);
 
-            CalcStringEllipsis(dis->hDC, 
+            CalcStringEllipsis(hDc, 
                                displayString, 
                                ListView_GetColumnWidth(m_hwndList, 1) - pad);
 
             rcClip.left += pad;
 
-            ExtTextOut( dis->hDC, 
+            ExtTextOut( hDc, 
                         rcClip.left, rcClip.top + 1, 
                         ETO_CLIPPED | ETO_OPAQUE,
                         &rcClip, 
@@ -1034,20 +1103,32 @@ BOOL DownloadUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             if(dis->itemState & ODS_SELECTED)
             {
                 // Set the text background and foreground colors
-                SetTextColor(dis->hDC, GetSysColor(COLOR_WINDOWTEXT));
-                SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
+                SetTextColor(hDc, GetSysColor(COLOR_WINDOWTEXT));
+                SetBkColor(hDc, GetSysColor(COLOR_WINDOW));
             }
 
             // If the item is focused, now draw a focus rect around the entire row
             if(dis->itemState & ODS_FOCUS)
             {
                 // Draw the focus rect
-                DrawFocusRect(dis->hDC, &dis->rcItem);
+                DrawFocusRect(hDc, &dis->rcItem);
             }
+#endif
+
+            // paint the actual bitmap
+            BitBlt(dis->hDC, dis->rcItem.left, dis->rcItem.top,
+                             dis->rcItem.right - dis->rcItem.left, 
+                             dis->rcItem.bottom - dis->rcItem.top, 
+                   hDc, 0, 0, SRCCOPY);          
+
+			SelectObject(hDc, hSavedBitmap);
+            DeleteObject(hBitmap);
+			SelectObject(hDc, hSavedFont);
+            DeleteDC(hDc);
 
             break;
         }
-
+ 
         case IDC_INFO:
         {
             SetTextColor(dis->hDC, RGB(0, 0, 128));
@@ -1696,7 +1777,6 @@ BOOL CALLBACK DownloadUI::MainProc(	HWND hwnd,
             result = m_ui->Destroy();
             break;
         }
-	
 	}
 
 	return result;
@@ -1795,9 +1875,59 @@ void DownloadUI::UpdateOverallProgress()
     m_doneBytes = doneBytes;
     m_totalItems = totalItems;
     m_doneItems = doneItems;
-    InvalidateRect(m_hwndProgress, NULL, TRUE);
+    InvalidateRect(m_hwndProgress, NULL, FALSE);
 }
 
+LRESULT WINAPI 
+ListWndProc(HWND hwnd, 
+            UINT msg, 
+            WPARAM wParam, 
+            LPARAM lParam)
+{
+    DownloadUI* ui = (DownloadUI*)GetProp( hwnd, "ui" );
+
+    //  Pass all non-custom messages to old window proc
+	return ui->ListWndProc(hwnd, msg, wParam, lParam);
+}
+
+LRESULT DownloadUI::ListWndProc(HWND hwnd, 
+                                UINT msg, 
+                                WPARAM wParam, 
+                                LPARAM lParam)
+{
+    WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
+
+    switch(msg)
+	{
+		case WM_ERASEBKGND:
+		{
+            if (m_duringUpdate)
+               return 1;
+            break;
+		}
+    }
+
+    return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam);
+}
+
+
+LRESULT WINAPI ProgressWndProc(HWND hwnd, 
+                               UINT msg, 
+                               WPARAM wParam, 
+                               LPARAM lParam)
+{
+    WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
+
+    switch(msg)
+	{
+		case WM_ERASEBKGND:
+		{
+            return 1;
+		}
+    }
+
+    return CallWindowProc(lpOldProc, hwnd, msg, wParam, lParam);
+}
 
 LRESULT WINAPI 
 FreeTracksWndProc(HWND hwnd, 

@@ -27,6 +27,7 @@ ____________________________________________________________________________*/
 #include <unistd.h>
 #include <netinet/in.h>
 #include "ThemeManager.h"
+#include "ThemeZip.h"
 #include "utility.h"
 #include "win32impl.h"
 
@@ -96,7 +97,7 @@ Error ThemeManager::GetThemeList(map<string, string> &oThemeFileMap)
         oThemeFileMap[THEME_IN_DEVEL] = m_oDevelTheme;
 
     m_pContext->prefs->GetInstallDirectory(dir, &len);
-    oThemeBasePath = string(dir) + "/../share/freeamp/themes";
+    oThemeBasePath = string(dir) + "/" + BRANDING_SHARE_PATH + "/themes";
     oThemePath = oThemeBasePath + string("/*.fat");    
 
     handle = FindFirstFile((char *)oThemePath.c_str(), &find);
@@ -172,42 +173,56 @@ Error ThemeManager::UseTheme(string &oThemeFile)
     return kError_NoErr;
 }
 
-Error ThemeManager::AddTheme(string &oThemeFile)
+Error ThemeManager::AddTheme(string &oThemeFile, bool bRename)
 {
     string oThemeDest;
-    char fcopy[_MAX_PATH], *filename, *ext;
-    FILE *orig, *dest;
+    bool   bRenameFailed = false;
+    char fcopy[_MAX_PATH], *filename = NULL, *ext = NULL;
 
     oThemeDest = FreeampDir(NULL) + string("/themes");
-    strcpy(fcopy, oThemeFile.c_str());
-    filename = strrchr(fcopy, '/');
-    if (filename)
-        filename = filename + 1;
-    else
-        filename = fcopy;
-    ext = strrchr(filename, '.');
-    if (ext) {
-        *ext = '\0';
-        ext++;
-    }
-    
-    oThemeDest += string("/") + string(filename);
-    if (ext)
-        oThemeDest += string(".") + string(ext);   
+    if (bRename)
+    {
+        ThemeZip oZip;
+        string   oName;
 
-    orig = fopen(oThemeFile.c_str(), "r");
-    if (!orig)
-        return kError_FileNotFound;
-    dest = fopen(oThemeDest.c_str(), "w");
-    if (!dest) {
-        fclose(orig);
-        return kError_FileNotFound;
+        if (IsntError(oZip.GetDescriptiveName(oThemeFile, oName)) &&
+            oName.length() > 0)
+        {
+            int i;
+
+            for(i = oName.length() - 1; i >= 0; i--)
+                if (!isalnum(oName[i]) && oName[i] != ' ')
+                    oName.erase(i, 1);
+
+            oThemeDest += string("/") + oName + string(".fat");
+        }
+        else
+            bRenameFailed = true;
     }
-    unsigned char buf[1];
-    while (fread(buf, 1, 1, orig))
-        fwrite(buf, 1, 1, dest);
-    fclose(orig);
-    fclose(dest);
+
+    if (!bRename || bRenameFailed)
+    {
+        strcpy(fcopy, oThemeFile.c_str());
+        filename = strrchr(fcopy, '/');
+        if (filename)
+            filename = filename + 1;
+        else
+            filename = fcopy;
+        ext = strrchr(filename, '.');
+        if (ext) {
+            *ext = '\0';
+            ext++;
+        }
+        if (!filename) 
+            filename = "unknown";
+
+        oThemeDest += string("/") + string(filename);
+        if (ext)
+            oThemeDest += string(".") + string(ext);   
+    }
+
+    if (!CopyFile(oThemeFile.c_str(), oThemeDest.c_str(), false))
+        return kError_FileNotFound;
 
     // So the caller knows where the theme ended up
     oThemeFile = oThemeDest;

@@ -60,6 +60,10 @@ typedef struct PrefsStruct
     bool useImages;
     bool savePlaylistOnExit;
     bool playImmediately;
+    bool reclaimFiletypes;
+    bool askReclaimFiletypes;
+    string saveMusicDirectory;
+    bool convertUnderscores;
 
     // page 2
     int32 streamInterval;
@@ -78,6 +82,9 @@ typedef struct PrefsStruct
     bool logDecoder;
     bool logPerformance;
 
+    //page 4
+    PortableSet portablePlayers;
+
 	// page 5
     string defaultFont;
     string currentTheme;
@@ -85,11 +92,6 @@ typedef struct PrefsStruct
     // page 6
     bool checkForUpdates;
 
-    bool reclaimFiletypes;
-    bool askReclaimFiletypes;
-    string saveMusicDirectory;
-
-    PortableSet portablePlayers;
 
     
     bool operator == (const struct PrefsStruct& pref)
@@ -133,6 +135,7 @@ typedef struct PrefsStruct
 
             savePlaylistOnExit == pref.savePlaylistOnExit &&
             playImmediately == pref.playImmediately &&
+            convertUnderscores == pref.convertUnderscores &&
 
             true
         );

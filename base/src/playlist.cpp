@@ -1447,7 +1447,7 @@ Error PlaylistManager::MoveItems(vector<PlaylistItem*>* items, uint32 index)
                              items->end());
 
         if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
-            InternalSetCurrentIndex(IndexOf(currentItem));
+            SetCurrentIndex(IndexOf(currentItem));
 
         /*UndoMultiItem* multiItem= new UndoMultiItem();
 
@@ -1687,6 +1687,8 @@ Error PlaylistManager::SetExternalPlaylist(char* url)
                       m_externalList.end());
 
         RetrieveMetaData(items);
+
+        m_externalPlaylist = string(url);
     }
 
     m_mutex.Release();

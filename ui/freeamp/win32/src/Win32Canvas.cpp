@@ -266,8 +266,9 @@ void Win32Canvas::Paint(HDC hDC, Rect &oRect)
       SelectPalette(hDC, m_hPal, false);
       RealizePalette(hDC);
    }
+
    BitBlt(hDC, oRect.x1, oRect.y1, oRect.Width(), oRect.Height(),
-          hMemDC, oRect.x1, oRect.y1, SRCCOPY);
+                 hMemDC, oRect.x1, oRect.y1, SRCCOPY);
 
    DeleteDC(hMemDC);  
 }

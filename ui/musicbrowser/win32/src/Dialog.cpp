@@ -2032,8 +2032,8 @@ FileOpenDialog(HWND hwnd,
     ofn.nFileOffset       = 0;
     ofn.nFileExtension    = 0;
     ofn.lpstrDefExt       = "MP3";
-    ofn.lCustData         = (DWORD)&url_list;
-    ofn.lpfnHook          = OpenFileHookProc;
+    ofn.lCustData         = (DWORD)(allowURL ? &url_list : NULL);
+    ofn.lpfnHook          = (allowURL ? OpenFileHookProc : NULL);
     ofn.lpTemplateName    = (allowURL ? MAKEINTRESOURCE(IDD_OPENURL) : NULL);
 
     if(GetOpenFileName(&ofn) || ofn.lCustData)

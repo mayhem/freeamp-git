@@ -250,8 +250,6 @@ Player::
 SetArgs(int32 argc, char **argv)
 {
     bool autoplay = false;
-    char* path = new char[_MAX_PATH];
-    char* url = new char[_MAX_PATH];
 
     // remember these guys so we can use them later and elsewhere
     m_argc = argc;
@@ -300,7 +298,20 @@ SetArgs(int32 argc, char **argv)
 		                m_context->argFlags |= FAC_ARGFLAGS_SAVE_STREAMS;
                     else if(!strcasecmp(arg + 1, "shuffle"))
                         m_plm->SetShuffleMode(true);
+                    break;
 
+                case 'i':
+                case 'I':
+                    if(!strcasecmp(arg + 1, "import"))
+                    {
+                        uint32 length = _MAX_PATH;
+                        char   url[_MAX_PATH];
+                        
+                        i++;
+                        FilePathToURL(argv[i], url, &length);
+                        m_context->catalog->AddSong(url);
+                        m_plm->AddItem(url);
+                    }
                     break;
 
                 // set UIs
@@ -338,117 +349,63 @@ SetArgs(int32 argc, char **argv)
         }
         else
         {
-            // is this a URL we know how to handle
-            if( !strncasecmp(arg, "http://", 7) || 
-                !strncasecmp(arg, "rtp://", 6))
-            {
-                m_plm->AddItem(arg);
-            }
-            else
-            {
+            HandleSingleArg(arg);
+        }
+    }
+    
+    if(m_autoplay)
+    {
+        AcceptEvent(new Event(CMD_Play));
+    }  
+
+    return true;
+}
+
+void Player::HandleSingleArg(char *arg)
+{
+    char* path = new char[_MAX_PATH];
+    char* url = new char[_MAX_PATH];
+
+    // is this a URL we know how to handle
+    if( !strncasecmp(arg, "http://", 7) || 
+        !strncasecmp(arg, "rtp://", 6))
+    {
+        m_plm->AddItem(arg);
+    }
+    else
+    {
 #ifdef WIN32
-                strcpy(path, arg);
+        strcpy(path, arg);
 
-                HANDLE handle;
-                WIN32_FIND_DATA data;
-        
-                handle = FindFirstFile(arg, &data);
+        HANDLE handle;
+        WIN32_FIND_DATA data;
 
-                // find long filename for item and
-                // expand wildcards...
-                if(handle != INVALID_HANDLE_VALUE)
-                {
-                    do
-                    {
-                        char* cp = NULL;
-                    
-                        cp = strrchr(path, '\\');
+        handle = FindFirstFile(arg, &data);
 
-                        if(cp)
-                            cp++;
-                        else 
-                            cp = path;
+        // find long filename for item and
+        // expand wildcards...
+        if(handle != INVALID_HANDLE_VALUE)
+        {
+            do
+            {
+                char* cp = NULL;
+            
+                cp = strrchr(path, '\\');
 
-                        strcpy(cp, data.cFileName);
+                if(cp)
+                    cp++;
+                else 
+                    cp = path;
 
-
-                        // make sure we have an absolute path
-                        ResolvePath(&path);
-
-                        // format this path as a URL
-                        uint32 length = _MAX_PATH;
-                        FilePathToURL(path, url, &length);
-
-                        // who needs to get this, plm or dlm?
-                        bool giveToDLM = false;
-                        bool giveToTheme = false;
-                        char* extension = NULL;
-
-                        extension = strrchr(url, '.');
-                        if(extension)
-                        {
-                            DownloadFormatInfo dlfi;
-                            uint32 i = 0;
-
-                            extension++;
-
-                            while(IsntError(m_dlm->GetSupportedDownloadFormats(&dlfi, i++)))
-                            {
-                                if(!strcasecmp(extension, dlfi.GetExtension()))
-                                {
-                                    giveToDLM = true;
-                                    break;
-                                }
-                            }
-                            if (strcasecmp(extension, themeExtension) == 0)
-                                giveToTheme = true; 
-                        }
+                strcpy(cp, data.cFileName);
 
 
-                        if(giveToDLM)
-                            m_dlm->ReadDownloadFile(url);
-                        else
-                        if(giveToTheme)
-                        {
-                            char szSavedTheme[_MAX_PATH], szNewTheme[_MAX_PATH];
-                            uint32 iLen = _MAX_PATH;   
-
-                            m_context->prefs->GetPrefString(kThemePathPref, 
-                                 szSavedTheme, &iLen);
-                            iLen = _MAX_PATH;   
-                            URLToFilePath(url, szNewTheme, &iLen); 
-                            m_context->prefs->SetPrefString(kThemePathPref, 
-                               szNewTheme);
-
-                            AcceptEvent(new LoadThemeEvent(url, szSavedTheme));
-                        }
-                        else 
-                            m_plm->AddItem(url); 
-
-                    }while(FindNextFile(handle, &data));
-                   
-                    FindClose(handle);
-                }
-                else // is this a URL we know how to handle ?
-                {
-                    // file not found? don't add it...
-                    continue;
-                }
-#else
-                strcpy(path, arg);
-                
-                //printf("Path: %s\r\n", path);
-               
                 // make sure we have an absolute path
                 ResolvePath(&path);
-               
-                //printf("Resolved: %s\r\n", path);
 
                 // format this path as a URL
                 uint32 length = _MAX_PATH;
                 FilePathToURL(path, url, &length);
-            
-                //printf("URL: %s\r\n", url);
 
                 // who needs to get this, plm or dlm?
                 bool giveToDLM = false;
@@ -456,7 +413,6 @@ SetArgs(int32 argc, char **argv)
                 char* extension = NULL;
 
                 extension = strrchr(url, '.');
-
                 if(extension)
                 {
                     DownloadFormatInfo dlfi;
@@ -478,37 +434,91 @@ SetArgs(int32 argc, char **argv)
 
                 if (giveToDLM) 
                     m_dlm->ReadDownloadFile(url);
-                else if (giveToTheme)
-                {
-                    char szSavedTheme[_MAX_PATH], szNewTheme[_MAX_PATH];
-                    uint32 iLen = _MAX_PATH;   
-
-                    m_context->prefs->GetPrefString(kThemePathPref, 
-                                                    szSavedTheme, &iLen);
-                    iLen = _MAX_PATH;   
-                    URLToFilePath(url, szNewTheme, &iLen); 
-                    m_context->prefs->SetPrefString(kThemePathPref, szNewTheme);
-
-                    AcceptEvent(new LoadThemeEvent(url, szSavedTheme));
-                }
                 else 
                 {
-                    m_plm->AddItem(url); 
-               	}	
-#endif
-            }
+                    if (giveToTheme)
+                        AddTheme(url);
+                    else 
+                        m_plm->AddItem(url); 
+                }	
+
+            }while(FindNextFile(handle, &data));
+           
+            FindClose(handle);
         }
-    }
+
+#else
+        strcpy(path, arg);
+        
+        //printf("Path: %s\r\n", path);
+       
+        // make sure we have an absolute path
+        ResolvePath(&path);
+       
+        //printf("Resolved: %s\r\n", path);
+
+        // format this path as a URL
+        uint32 length = _MAX_PATH;
+        FilePathToURL(path, url, &length);
     
-    if(m_autoplay)
-    {
-        AcceptEvent(new Event(CMD_Play));
-    }  
+        //printf("URL: %s\r\n", url);
+
+        // who needs to get this, plm or dlm?
+        bool giveToDLM = false;
+        bool giveToTheme = false;
+        char* extension = NULL;
+
+        extension = strrchr(url, '.');
+
+        if(extension)
+        {
+            DownloadFormatInfo dlfi;
+            uint32 i = 0;
+
+            extension++;
+
+            while(IsntError(m_dlm->GetSupportedDownloadFormats(&dlfi, i++)))
+            {
+                if(!strcasecmp(extension, dlfi.GetExtension()))
+                {
+                    giveToDLM = true;
+                    break;
+                }
+            }
+            if (strcasecmp(extension, themeExtension) == 0)
+                giveToTheme = true; 
+        }
+
+        if (giveToDLM) 
+            m_dlm->ReadDownloadFile(url);
+        else 
+        {
+            if (giveToTheme)
+                AddTheme(url);
+            else 
+                m_plm->AddItem(url); 
+        }	
+#endif
+    }
     
     delete [] path;
     delete [] url;
+}
 
-    return true;
+void Player::AddTheme(char *url)
+{
+    char     szSavedTheme[_MAX_PATH], szNewTheme[_MAX_PATH];
+    char    *pTempFile;
+    uint32   iLen = _MAX_PATH;   
+
+    m_context->prefs->GetPrefString(kThemePathPref, 
+                                    szSavedTheme, &iLen);
+    iLen = _MAX_PATH;   
+    URLToFilePath(url, szNewTheme, &iLen); 
+    pTempFile = tmpnam(NULL);
+
+    if (CopyFile(szNewTheme, pTempFile, false))
+        AcceptEvent(new LoadThemeEvent(pTempFile, szSavedTheme));
 }
 
 void      

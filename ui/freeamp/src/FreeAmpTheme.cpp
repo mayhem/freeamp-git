@@ -205,29 +205,39 @@ void WorkerThreadStart(void* arg)
 
 void FreeAmpTheme::LoadFreeAmpTheme(void)
 {
-   char         *szTemp;
-   uint32        iLen = 255;
-   string        oThemePath;
-   Error         eRet;
+   char    *szTemp;
+   uint32   iLen = 255;
+   string   oThemePath("");
+   Error    eRet;
+   struct  _stat buf;
 
    szTemp = new char[iLen];
    m_pContext->prefs->GetPrefString(kThemePathPref, szTemp, &iLen);
-   oThemePath = szTemp;
+
+   if (strlen(szTemp) < 1) 
+       strcpy(szTemp, BRANDING_DEFAULT_THEME);
    
-   if (strchr(szTemp, DIR_MARKER) == NULL)
+   if (_stat(szTemp, &buf) < 0)
    {
-       string oBase = oThemePath;
-       map<string, string> oThemeList;
- 
-       m_pThemeMan->GetThemeList(oThemeList);
+      // If the theme doesn't exist, let's try to prepend the install/theme dir
+      char   *dir;
+      uint32  len = _MAX_PATH;
 
-       char *dot;
-       if ((dot = strchr(oBase.c_str(), '.')))
-           dot = '\0';
+      dir = new char[_MAX_PATH];
+   
+      m_pContext->prefs->GetInstallDirectory(dir, &len);
+      oThemePath = string(dir);
+#if defined(unix)
+      oThemePath += string(BRANDING_SHARE_PATH);
+#endif
+      oThemePath += string(DIR_MARKER_STR);    
+      oThemePath += string("themes");
+      oThemePath += string(DIR_MARKER_STR);    
 
-       oThemePath = oThemeList[oBase]; 
+      delete dir;
    }
-  
+   oThemePath += szTemp;
+   
    iLen = 255; 
    m_pContext->prefs->GetPrefString(kThemeDefaultFontPref, szTemp, &iLen);
    SetDefaultFont(string(szTemp));
@@ -437,7 +447,18 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
              UpdateMetaData(pInfo->Item());
          break;
       }
-      
+
+      case INFO_MusicCatalogTrackRemoved:
+      {
+         if ((int32)m_pContext->plm->GetCurrentIndex() < 0)
+         {
+             m_oTitle = szWelcomeMsg;
+             m_pWindow->ControlStringValue("Title", true, m_oTitle);
+             string title = BRANDING;
+             m_pWindow->SetTitle(title);
+         }    
+         break;   
+      }
       case INFO_StreamInfo:
       {
          char *szTitle;
@@ -521,9 +542,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          text = new char[100];
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
-         if (info->GetBitRate() == 1411200) 
-              sprintf(text, "CD Audio");
-         else if (info->GetBitRate() == 0)
+         if (info->GetBitRate() == 0)
               sprintf(text, "VBR %ldkhz %s", 
                    (long int)(info->GetSampleRate() / 1000), 
                    info->GetChannels() ? "Stereo" : "Mono");
@@ -535,7 +554,7 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
 
          m_oStreamInfo = text;
          m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
-         delete [] text;
+         delete text;
       
          break;
       }
@@ -604,34 +623,31 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
           uint32        iLen = _MAX_PATH;
           string        oThemePath;
           MessageDialog oBox(m_pContext);
-	      string        oMessage(szKeepThemeMessage);
+          string        oMessage(szKeepThemeMessage);
 
           szSavedTheme = new char[iLen];
           szNewTheme = new char[iLen];
 
           LoadThemeEvent *pInfo = (LoadThemeEvent *)e;
-          URLToFilePath(pInfo->URL(), szNewTheme, &iLen);
+          strncpy(szNewTheme, pInfo->URL(), _MAX_PATH);
+          szNewTheme[_MAX_PATH - 1] = 0;
+          strncpy(szSavedTheme, pInfo->SavedTheme(), _MAX_PATH);
+          szSavedTheme[_MAX_PATH - 1] = 0;
 
-          iLen = _MAX_PATH;
-          m_pContext->prefs->GetPrefString(kThemePathPref, szSavedTheme, &iLen);
-
-          if (strcmp(szSavedTheme, szNewTheme))
-          {
-              m_pContext->prefs->SetPrefString(kThemePathPref, szNewTheme);
-              ReloadTheme();
-          }
-          else
-              strcpy(szSavedTheme, pInfo->SavedTheme());
+          m_pContext->prefs->SetPrefString(kThemePathPref, szNewTheme);
+          ReloadTheme();
   
           if (oBox.Show(oMessage.c_str(), string(BRANDING), kMessageYesNo) == 
               kMessageReturnYes)
           {
               ThemeManager *pMan;
               string        oThemePath(szNewTheme);
-              
+          
               pMan = new ThemeManager(m_pContext);
-              if (!IsError(pMan->AddTheme(oThemePath)))
+              if (IsntError(pMan->AddTheme(oThemePath, true))) {
                   m_pContext->prefs->SetPrefString(kThemePathPref, oThemePath.c_str());
+                  ReloadTheme();
+              }
               delete pMan;    
           }
           else
@@ -639,9 +655,10 @@ Error FreeAmpTheme::AcceptEvent(Event * e)
               m_pContext->prefs->SetPrefString(kThemePathPref, szSavedTheme);
               ReloadTheme();
           }
-          
-          delete [] szSavedTheme;
-          delete [] szNewTheme;
+         
+          unlink(szNewTheme);
+          delete szSavedTheme;
+          delete szNewTheme;
           
           break;
       }
@@ -1092,15 +1109,35 @@ void FreeAmpTheme::InitWindow(void)
 
 void FreeAmpTheme::ReloadTheme(void)
 {
-    char         *szTemp;
-    uint32        iLen = 255;
-    string        oThemePath, oThemeFile("theme.xml");
-    Error         eRet;
+    char    *szTemp;
+    uint32   iLen = 255;
+    string   oThemePath(""), oThemeFile("theme.xml");
+    Error    eRet;
+    struct  _stat buf;
 
     szTemp = new char[iLen];
 
     m_pContext->prefs->GetPrefString(kThemePathPref, szTemp, &iLen);
-    oThemePath = szTemp;
+    if (_stat(szTemp, &buf) < 0 && strlen(szTemp) > 0)
+    {
+       // If the theme doesn't exist, let's try to prepend the install/theme dir
+       char   *dir;
+       uint32  len = _MAX_PATH;
+
+       dir = new char[_MAX_PATH];
+    
+       m_pContext->prefs->GetInstallDirectory(dir, &len);
+       oThemePath = string(dir);
+#if defined(unix)
+       oThemePath += string(BRANDING_SHARE_PATH);
+#endif
+       oThemePath += string(DIR_MARKER_STR);    
+       oThemePath += string("themes");
+       oThemePath += string(DIR_MARKER_STR);    
+   
+       delete dir;
+    }
+    oThemePath += szTemp;
 
     iLen = 255;
     m_pContext->prefs->GetPrefString(kThemeDefaultFontPref, szTemp, &iLen);
@@ -1117,7 +1154,7 @@ void FreeAmpTheme::ReloadTheme(void)
         oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
     }	
     
-    delete [] szTemp;
+    delete szTemp;
 }
 
 void FreeAmpTheme::SetVolume(int iVolume)
@@ -1296,7 +1333,7 @@ void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
     }
     else    
         sprintf(szText, "0:00");
-            
+
     oText = string(szText);
     if (m_eTimeDisplayState == kTimeRemaining && 
         m_pWindow->DoesControlExist("TimeRemaining") &&
@@ -1420,7 +1457,7 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
             else   
                 if (m_pContext->player->IsSupportedExtension(ext))
                 {
-                    length = sizeof(url);
+                    length = _MAX_PATH + 7;
                     FilePathToURL((*i).c_str(), url, &length);
                 
                     m_pContext->plm->AddItem(url);
@@ -1431,8 +1468,8 @@ void FreeAmpTheme::DropFiles(vector<string> *pFileList)
     if (countbefore == 0)
         m_pContext->target->AcceptEvent(new Event(CMD_Play));
         
-    delete [] ext;
-    delete [] url;    
+    delete ext;
+    delete url;    
 }
 
 void FreeAmpTheme::PostWindowCreate(void)
@@ -1489,7 +1526,7 @@ void FreeAmpTheme::ShowHelp(void)
           oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
     }
 #endif
-    delete [] dir;
+    delete dir;
 }
 
 void FreeAmpTheme::update_thread(void* arg)

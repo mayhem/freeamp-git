@@ -31,6 +31,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "xing - Win32 Release"
 
 OUTDIR=.\Release
@@ -83,7 +87,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -91,40 +94,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
  /Fp"$(INTDIR)\xing.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
@@ -133,9 +103,9 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\xing.pdb" /machine:I386 /def:".\xing.def" /out:"xing.lmc"\
- /implib:"$(OUTDIR)\xing.lib" /libpath:"..\..\..\..\base\win32" 
+ odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll\
+ /incremental:no /pdb:"$(OUTDIR)\xing.pdb" /machine:I386 /def:".\xing.def"\
+ /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\xing.def"
 LINK32_OBJS= \
@@ -235,7 +205,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -243,40 +212,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  /Fp"$(INTDIR)\xing.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
@@ -285,9 +221,9 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\xing.pdb" /debug /machine:I386 /def:".\xing.def"\
- /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /pdbtype:sept\
+ odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll\
+ /incremental:yes /pdb:"$(OUTDIR)\xing.pdb" /debug /machine:I386\
+ /def:".\xing.def" /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /pdbtype:sept\
  /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\xing.def"
@@ -385,7 +321,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -393,40 +328,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
  /Fp"$(INTDIR)\xing.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
@@ -435,9 +337,9 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\xing.pdb" /machine:I386 /def:".\xing.def" /out:"xing.lmc"\
- /implib:"$(OUTDIR)\xing.lib" /libpath:"..\..\..\..\base\win32" 
+ odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll\
+ /incremental:no /pdb:"$(OUTDIR)\xing.pdb" /machine:I386 /def:".\xing.def"\
+ /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\xing.def"
 LINK32_OBJS= \
@@ -542,7 +444,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -550,40 +451,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  /Fp"$(INTDIR)\xing.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
@@ -592,9 +460,9 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\xing.pdb" /debug /machine:I386 /def:".\xing.def"\
- /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /pdbtype:sept\
+ odbc32.lib odbccp32.lib /nologo /base:"0x11800000" /subsystem:windows /dll\
+ /incremental:yes /pdb:"$(OUTDIR)\xing.pdb" /debug /machine:I386\
+ /def:".\xing.def" /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /pdbtype:sept\
  /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\xing.def"
@@ -647,10 +515,72 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\xing.lmc"
 
 !ENDIF 
 
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
 
 !IF "$(CFG)" == "xing - Win32 Release" || "$(CFG)" == "xing - Win32 Debug" ||\
  "$(CFG)" == "xing - Win32 NASM Release" || "$(CFG)" ==\
  "xing - Win32 NASM Debug"
+SOURCE=..\..\..\..\config\config.win32
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ENDIF 
+
 SOURCE=..\..\..\..\io\src\eventbuffer.cpp
 
 !IF  "$(CFG)" == "xing - Win32 Release"
@@ -686,7 +616,8 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -722,7 +653,8 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -759,7 +691,8 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -795,7 +728,8 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -836,7 +770,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -873,7 +808,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -910,7 +846,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -947,7 +884,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -968,7 +906,8 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -985,7 +924,8 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1002,7 +942,8 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1019,7 +960,8 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1066,59 +1008,25 @@ DEP_CPP_CDCT_=\
 	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\cdct.obj" : $(SOURCE) $(DEP_CPP_CDCT_) "$(INTDIR)"
+"$(INTDIR)\cdct.obj" : $(SOURCE) $(DEP_CPP_CDCT_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\csbt.c
+DEP_CPP_CSBT_=\
+	"..\..\src\csbtb.c"\
+	"..\..\src\csbtL3.c"\
+	
+
+"$(INTDIR)\csbt.obj" : $(SOURCE) $(DEP_CPP_CSBT_) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\src\cup.c
 
 !IF  "$(CFG)" == "xing - Win32 Release"
 
-DEP_CPP_CSBT_=\
-	"..\..\src\csbtb.c"\
-	"..\..\src\csbtL3.c"\
-	
-
-"$(INTDIR)\csbt.obj" : $(SOURCE) $(DEP_CPP_CSBT_) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
-
-DEP_CPP_CSBT_=\
-	"..\..\src\csbtb.c"\
-	"..\..\src\csbtL3.c"\
-	
-
-"$(INTDIR)\csbt.obj" : $(SOURCE) $(DEP_CPP_CSBT_) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
-
-DEP_CPP_CSBT_=\
-	"..\..\src\csbtb.c"\
-	"..\..\src\csbtL3.c"\
-	
-
-"$(INTDIR)\csbt.obj" : $(SOURCE) $(DEP_CPP_CSBT_) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
-
-DEP_CPP_CSBT_=\
-	"..\..\src\csbtb.c"\
-	"..\..\src\csbtL3.c"\
-	
-
-"$(INTDIR)\csbt.obj" : $(SOURCE) $(DEP_CPP_CSBT_) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
-
-SOURCE=..\..\src\cup.c
 DEP_CPP_CUP_C=\
 	"..\..\include\mhead.h"\
 	"..\..\src\cupini.c"\
@@ -1128,6 +1036,44 @@ DEP_CPP_CUP_C=\
 "$(INTDIR)\cup.obj" : $(SOURCE) $(DEP_CPP_CUP_C) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_CUP_C=\
+	"..\..\include\mhead.h"\
+	"..\..\src\cupini.c"\
+	"..\..\src\cupL1.c"\
+	
+
+"$(INTDIR)\cup.obj" : $(SOURCE) $(DEP_CPP_CUP_C) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+
+DEP_CPP_CUP_C=\
+	"..\..\include\mhead.h"\
+	"..\..\src\cupini.c"\
+	"..\..\src\cupL1.c"\
+	
+
+"$(INTDIR)\cup.obj" : $(SOURCE) $(DEP_CPP_CUP_C) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+
+DEP_CPP_CUP_C=\
+	"..\..\include\mhead.h"\
+	"..\..\src\cupini.c"\
+	"..\..\src\cupL1.c"\
+	
+
+"$(INTDIR)\cup.obj" : $(SOURCE) $(DEP_CPP_CUP_C) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\src\cupl3.c
 
@@ -1140,7 +1086,8 @@ DEP_CPP_CUPL3=\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1153,7 +1100,8 @@ DEP_CPP_CUPL3=\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1166,7 +1114,8 @@ DEP_CPP_CUPL3=\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1179,7 +1128,8 @@ DEP_CPP_CUPL3=\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1200,7 +1150,8 @@ NODEP_CPP_CWINM=\
 	"..\..\src\cwinq.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1213,7 +1164,8 @@ DEP_CPP_CWINM=\
 	"..\..\src\cwinb.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1230,7 +1182,8 @@ NODEP_CPP_CWINM=\
 	"..\..\src\cwinq.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1243,7 +1196,8 @@ DEP_CPP_CWINM=\
 	"..\..\src\cwinb.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1446,24 +1400,108 @@ DEP_CPP_IWINM=\
 !ENDIF 
 
 SOURCE=..\..\src\l3dq.c
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_L3DQ_=\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"
+"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_L3DQ_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+
+DEP_CPP_L3DQ_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+
+DEP_CPP_L3DQ_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\..\src\l3init.c
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_L3INI=\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"
+"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_L3INI=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+
+DEP_CPP_L3INI=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+
+DEP_CPP_L3INI=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\src\mdct.c
 
@@ -1481,14 +1519,56 @@ DEP_CPP_MHEAD=\
 
 
 SOURCE=..\..\src\msis.c
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_MSIS_=\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"
+"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_MSIS_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+
+DEP_CPP_MSIS_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+
+DEP_CPP_MSIS_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\src\uph.c
 
@@ -1500,7 +1580,8 @@ DEP_CPP_UPH_C=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1512,7 +1593,8 @@ DEP_CPP_UPH_C=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1524,7 +1606,8 @@ DEP_CPP_UPH_C=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1536,21 +1619,64 @@ DEP_CPP_UPH_C=\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
 
 SOURCE=..\..\src\upsf.c
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_UPSF_=\
 	"..\..\..\..\config\config.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"
+"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_UPSF_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+
+DEP_CPP_UPSF_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+
+DEP_CPP_UPSF_=\
+	"..\..\..\..\config\config.h"\
+	"..\..\include\L3.h"\
+	
+
+"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\src\wavep.c
 
@@ -1636,7 +1762,8 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1676,7 +1803,8 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1716,7 +1844,8 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1756,7 +1885,8 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

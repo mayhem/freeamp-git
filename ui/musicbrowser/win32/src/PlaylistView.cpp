@@ -534,6 +534,7 @@ void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
     if(index != kInvalidIndex)
     {
         ListView_RedrawItems(hwnd, index, index);
+        UpdateTotalTime();
 
         //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
@@ -759,6 +760,10 @@ void MusicBrowserUI::UpdateTotalTime()
         {
             uint32 time = item->GetMetaData().Time();
 
+            /*char temp[256];
+            sprintf(temp, "%d/%d\r\n", time, total);
+            OutputDebugString(temp);*/
+
             if(!time)
                 approximate = true;
 
@@ -773,7 +778,7 @@ void MusicBrowserUI::UpdateTotalTime()
     // if any of the times are zero and thus assumed 
     // to be unknown...
     if(approximate)
-        time++;
+        time=buf + 1;
 
     uint32 hours = total / 3600;
     uint32 minutes = total / 60 - hours * 60;

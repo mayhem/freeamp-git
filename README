@@ -37,11 +37,20 @@ Helper Application. Then all that needsjust click on the 'New...' button
 to start adding new associations.  For all the following mime-types, fill
 in the Application field to be: freeamp %s
 
-The mimetypes that FreeAmp can handle are: 
-     audio/x-mpeg     audio/x-mp3     audio/x-mpegurl   audio/x-scpls
-     audio/mpeg       audio/mp3       audio/mpegurl     audio/scpls
-     application/vnd.rn-rn_music_package
-     application/x-freeamp-theme
+The mimetypes and their extension that FreeAmp can handle are: 
+     
+     mimetype                             extension
+     ----------------------------------------------
+     audio/x-mpeg                         mp3
+     audio/x-mp3                          mp3
+     audio/mpeg                           mp3
+     audio/mp3                            mp3
+     audio/mpegurl                        m3u 
+     audio/x-mpegurl                      m3u
+     audio/scpls                          pls
+     audio/x-scpls                        pls
+     application/vnd.rn-rn_music_package  rmp
+     application/x-freeamp-theme          fat
 
 Just set up seperate associations for each of these mimetypes, and 
 FreeAmp will be launched whenever you click on a relavent URL in your

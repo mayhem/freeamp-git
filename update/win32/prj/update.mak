@@ -29,6 +29,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "update - Win32 Release"
 
 OUTDIR=.\Release
@@ -57,7 +61,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\\" /I "..\..\include" /I "..\include"\
  /I "..\..\..\io\include" /I "..\..\..\base\include" /I\
  "..\..\..\base\win32\include" /I "..\..\..\config" /I "..\..\..\ui\include" /I\
@@ -65,40 +68,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\\" /I "..\..\include" /I "..\include"\
  /Fp"$(INTDIR)\update.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\update.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\update.bsc" 
@@ -107,8 +77,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no\
- /pdb:"$(OUTDIR)\update.pdb" /machine:I386 /out:"update.exe"\
+ odbc32.lib odbccp32.lib /nologo /base:"0x11700000" /subsystem:windows\
+ /incremental:no /pdb:"$(OUTDIR)\update.pdb" /machine:I386 /out:"update.exe"\
  /libpath:"..\..\..\base\win32" 
 LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
@@ -160,7 +130,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\\" /I "..\..\include" /I\
  "..\include" /I "..\..\..\io\include" /I "..\..\..\base\include" /I\
  "..\..\..\base\win32\include" /I "..\..\..\config" /I "..\..\..\ui\include" /I\
@@ -168,40 +137,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\\" /I "..\..\include" /I\
  /Fp"$(INTDIR)\update.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\update.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\update.bsc" 
@@ -210,9 +146,9 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:yes\
- /pdb:"$(OUTDIR)\update.pdb" /debug /machine:I386 /out:"update.exe"\
- /pdbtype:sept /libpath:"..\..\..\base\win32" 
+ odbc32.lib odbccp32.lib /nologo /base:"0x11700000" /subsystem:windows\
+ /incremental:yes /pdb:"$(OUTDIR)\update.pdb" /debug /machine:I386\
+ /out:"update.exe" /pdbtype:sept /libpath:"..\..\..\base\win32" 
 LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\update.res" \
@@ -268,7 +204,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\\" /I "..\..\include" /I\
  "..\include" /I "..\..\..\io\include" /I "..\..\..\base\include" /I\
  "..\..\..\base\win32\include" /I "..\..\..\config" /I "..\..\..\ui\include" /I\
@@ -277,40 +212,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\\" /I "..\..\include" /I\
  /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.\Debug/
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\update.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\update.bsc" 
@@ -325,9 +227,9 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:yes\
- /pdb:"$(OUTDIR)\update.pdb" /debug /machine:I386 /out:"update.exe"\
- /pdbtype:sept /libpath:"..\..\..\base\win32" 
+ odbc32.lib odbccp32.lib /nologo /base:"0x11700000" /subsystem:windows\
+ /incremental:yes /pdb:"$(OUTDIR)\update.pdb" /debug /machine:I386\
+ /out:"update.exe" /pdbtype:sept /libpath:"..\..\..\base\win32" 
 LINK32_OBJS= \
 	"$(INTDIR)\main.obj" \
 	"$(INTDIR)\update.res" \
@@ -380,7 +282,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\\" /I "..\..\include" /I "..\include"\
  /I "..\..\..\io\include" /I "..\..\..\base\include" /I\
  "..\..\..\base\win32\include" /I "..\..\..\config" /I "..\..\..\ui\include" /I\
@@ -388,6 +289,38 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "..\\" /I "..\..\include" /I "..\include"\
  /Fp"$(INTDIR)\update.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
+MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\update.res" /d "NDEBUG" 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\update.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /base:"0x11700000" /subsystem:windows\
+ /incremental:no /pdb:"$(OUTDIR)\update.pdb" /machine:I386 /out:"update.exe"\
+ /libpath:"..\..\..\base\win32" 
+LINK32_OBJS= \
+	"$(INTDIR)\main.obj" \
+	"$(INTDIR)\update.res" \
+	"..\..\..\base\win32\fabaselib.lib"
+
+".\update.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\update.exe"
+   copy update.exe  ..\..\..\base\win32\prj
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ENDIF 
 
 .c{$(CPP_OBJS)}.obj::
    $(CPP) @<<
@@ -418,41 +351,6 @@ CPP_SBRS=.
    $(CPP) @<<
    $(CPP_PROJ) $< 
 <<
-
-MTL=midl.exe
-MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)\update.res" /d "NDEBUG" 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\update.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no\
- /pdb:"$(OUTDIR)\update.pdb" /machine:I386 /out:"update.exe"\
- /libpath:"..\..\..\base\win32" 
-LINK32_OBJS= \
-	"$(INTDIR)\main.obj" \
-	"$(INTDIR)\update.res" \
-	"..\..\..\base\win32\fabaselib.lib"
-
-".\update.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\update.exe"
-   copy update.exe  ..\..\..\base\win32\prj
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ENDIF 
 
 
 !IF "$(CFG)" == "update - Win32 Release" || "$(CFG)" == "update - Win32 Debug"\

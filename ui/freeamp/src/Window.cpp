@@ -585,6 +585,9 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     }
 
     pControl = ControlFromPos(oPos);
+    if (pControl && pControl->UseToDragWindow())
+       pControl = NULL;
+
     if (pControl)
     {
        m_bLButtonDown = true;

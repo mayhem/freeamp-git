@@ -45,6 +45,9 @@ void ToLower(char *s);
 
 #ifndef WIN32
 void LaunchBrowser(char* url);
+bool CopyFile(const char *pExistingFileName, 
+              const char *pNewFileName,      // name of new file
+              bool bFailIfExists);     // operation if file exists
 #endif
 
 #ifdef WIN32

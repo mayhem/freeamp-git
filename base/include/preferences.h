@@ -83,6 +83,8 @@ extern const char* kPlayImmediatelyPref;
 extern const char* kNumberOfURLsToRememberPref;
 extern const char* kCDDevicePathPref;
 extern const char* kCDDBServerPref;
+extern const char* kConvertUnderscoresToSpacesPref;
+extern const char* kAllowMultipleInstancesPref;
 
 class LibDirFindHandle;
 
@@ -257,6 +259,12 @@ class Preferences {
 
     Error GetCDDevicePath(char* path, uint32* len);
     Error SetCDDevicePath(const char* path);
+
+    Error GetConvertUnderscoresToSpaces(bool* value);
+    Error SetConvertUnderscoresToSpaces(bool value);
+
+    Error GetAllowMultipleInstances(bool* value);
+    Error SetAllowMultipleInstances(bool  value);  
 };
 
 #endif /* _PREFERENCES_H */

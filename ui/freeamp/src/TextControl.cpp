@@ -84,6 +84,11 @@ bool TextControl::StyleHasBeenSet(void)
     return m_bStyleSet;
 }      
 
+bool TextControl::UseToDragWindow(void)
+{
+    return m_oName != string("Time") && m_oName != string("TimeRemaining");
+}
+
 TextControl::~TextControl(void)
 {
 #ifdef HAVE_GTK

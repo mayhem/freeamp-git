@@ -690,3 +690,53 @@ bool ResolveLink(string& path)
 }
 
 #endif
+
+#ifndef WIN32
+
+const unsigned iCopyBufferSize = 8192;
+
+bool CopyFile(const char *pExistingFileName, 
+              const char *pNewFileName,      // name of new file
+              bool bFailIfExists)      // operation if file exists
+{
+    FILE  *fpDest, *fpSrc;
+    char   szBuffer[iCopyBufferSize];
+    unsigned iRet;
+
+    if (bFailIfExists && !access(pNewFileName, 0))
+        return false;
+
+    fpDest = fopen(pNewFileName, "wb");
+    if (fpDest == NULL)
+        return false;
+
+    fpSrc = fopen(pExistingFileName, "rb");
+    if (fpSrc == NULL)
+        return false;
+
+    for(;;)
+    {
+        iRet = fread(szBuffer, 1, iCopyBufferSize, fpSrc);
+        if (iRet < 0)
+        {
+            fclose(fpDest);
+            fclose(fpSrc);
+            return false;
+        }
+
+        if (fwrite(szBuffer, 1, iRet, fpDest) != iRet)
+        {
+            fclose(fpDest);
+            fclose(fpSrc);
+            return false;
+        }
+        if (iRet != iCopyBufferSize)
+           break; 
+    }
+
+    fclose(fpDest);
+    fclose(fpSrc);
+
+    return true;
+}
+#endif

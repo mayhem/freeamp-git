@@ -21,6 +21,7 @@
         $Id$
 ____________________________________________________________________________*/
 
+
 FreeAmp (www.freeamp.org) is an Open Source development effort 
 (www.opensource.org) with the code base and design provided by:
 
@@ -109,6 +110,10 @@ Other major contributors and their contributions:
 "Daniel Pustka" <pustka@compuserve.com>
 * Fixed bugs in Win32 MusicBrowser
 * Split UpdateButtonMenuStates into UpdateButtonStates and UpdateMenuStates
+
+"Chad Loder" <cloder@ccs.neu.edu>
+* Contributed the README.win32 file which contains instructions on how
+  to build the Win32 source code.
 
 "Harald Klein" <linux@chello.at>
 * keybad support for lcd ui

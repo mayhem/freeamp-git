@@ -423,6 +423,7 @@ void Win32PreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetShowToolbarImages(&values->useImages);
     prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
     prefs->GetPlayImmediately(&values->playImmediately);
+    prefs->GetConvertUnderscoresToSpaces(&values->convertUnderscores);
 
     free(buffer);
 }
@@ -478,6 +479,8 @@ void Win32PreferenceWindow::SavePrefsValues(Preferences* prefs,
 
     prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
     prefs->SetPlayImmediately(values->playImmediately);
+    prefs->SetConvertUnderscoresToSpaces(values->convertUnderscores);
+
 
     // this gets called by each page unfortunately
     // so save some effort by only doing it once
@@ -520,6 +523,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
     static HWND hwndTextAndImages = NULL;
     static HWND hwndSavePlaylistOnExit = NULL;
     static HWND hwndDefaultAction = NULL;
+    static HWND hwndConvertUnderscores = NULL;
     
 
     switch(msg)
@@ -541,6 +545,7 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             hwndTextAndImages = GetDlgItem(hwnd, IDC_TEXTANDIMAGES);
             hwndSavePlaylistOnExit = GetDlgItem(hwnd, IDC_SAVECURRENTLIST);
             hwndDefaultAction = GetDlgItem(hwnd, IDC_DEFAULTACTION);
+            //hwndConvertUnderscores = GetDlgItem(hwnd, IDC_UNDERSCORES);
 
 
             Button_SetCheck(hwndStayOnTop, m_originalValues.stayOnTop);
@@ -552,6 +557,8 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
             Button_SetCheck(hwndSavePlaylistOnExit, m_originalValues.savePlaylistOnExit);
 
             Button_SetCheck(hwndDefaultAction, !m_originalValues.playImmediately);
+
+            //Button_SetCheck(hwndConvertUnderscores, m_originalValues.convertUnderscores);
 
             Button_SetCheck(hwndTextOnly, 
                 m_originalValues.useTextLabels && !m_originalValues.useImages);
@@ -641,6 +648,29 @@ bool Win32PreferenceWindow::PrefGeneralProc(HWND hwnd,
 
                     break;
                 }
+
+                /*case IDC_UNDERSCORES:
+                {
+                    if(Button_GetCheck(hwndConvertUnderscores) == BST_CHECKED)
+                    {
+                        m_proposedValues.convertUnderscores = true;
+                    }
+                    else
+                    {
+                        m_proposedValues.convertUnderscores = false;
+                    }
+
+                    if(m_proposedValues != m_currentValues)
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }*/
 
                 case IDC_DEFAULTACTION:
                 {
@@ -1756,11 +1786,19 @@ bool Win32PreferenceWindow::PrefAboutProc(HWND hwnd,
                         "Jason Woodward.";
                     const char* credit2 =
                         "Other people have also contributed to FreeAmp:";
+                    /*const char* credit3 =
+                        "Brian Almeida, Stephan Auerhahn, William Bull, Jimen Ching, "
+                        "Alan Cutter, Gabor Fleischer, Skip Hansen, Reece Hart, "
+                        "Jean-Michel HERVE, Henrik Johnson, Hiromasa Kato, Harald Klein, "
+                        "Anton Kruger, Chad Loder, Michael Bruun "
+                        "Petersen, Daniel Pustka, Sylvain Rebaud, The Snowblind Alliance, "
+                        "Tom Spindler, Chen Su, Jean Tourrilhes, Valters Vingolds, "
+                        "and Mark Weaver.";*/
                     const char* credit3 =
                         "William Bull, Alan Cutter, Gabor Fleischer, "
                         "Jean-Michel HERVE, Hiromasa Kato, Michael Bruun "
                         "Petersen, Sylvain Rebaud, The Snowblind Alliance, "
-                        "Tom Spindler, and Valters Vingolds.";
+                        "Tom Spindler,Valters Vingolds, and Mark Weaver.";
                     const char* credit4 =
                         "FreeAmp is being released under the terms of the "
                         "GPL. As is provided by the GPL, all of EMusic.com's "
@@ -2325,11 +2363,10 @@ static void check_function(void* arg)
 
     ListView_RedrawItems(ts->hwndList, 0, ListView_GetItemCount(ts->hwndList) - 1);
 
-
     EnableWindow(hwndUpdate, TRUE);
     EnableWindow(hwndCancel, FALSE);
-    ShowWindow(hwndCheck, SW_SHOW);
     ShowWindow(hwndCancel, SW_HIDE);
+    ShowWindow(hwndCheck, SW_SHOW);
 
     EnableWindow(hwndPrefOK, TRUE);
     EnableWindow(hwndPrefCancel, TRUE);
@@ -2424,8 +2461,8 @@ static void update_function(void* arg)
 
     EnableWindow(hwndCheck, TRUE);
     EnableWindow(hwndCancel, FALSE);
-    ShowWindow(hwndUpdate, SW_SHOW);
     ShowWindow(hwndCancel, SW_HIDE);
+    ShowWindow(hwndUpdate, SW_SHOW);
 
     EnableWindow(hwndPrefOK, TRUE);
     EnableWindow(hwndPrefCancel, TRUE);

@@ -482,6 +482,7 @@ Error Win32Window::VulcanMindMeld(Window *pOther)
 
         ShowWindow(m_hWnd, SW_SHOW);
         UpdateWindow(m_hWnd);
+        SetForegroundWindow(m_hWnd);
     }    
 
     SetTimer(m_hWnd, 0, 250, NULL);
@@ -738,9 +739,6 @@ CreateTooltips()
     TOOLINFO ti;
     vector<Control *>::iterator i;
     uint32 uCtr;
-
-    if (m_bMindMeldInProgress)
-       return;
 
     //
     // check if we have been here

@@ -34,6 +34,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "soundcard - Win32 Release"
 
 OUTDIR=.\Release
@@ -69,7 +73,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -78,40 +81,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I\
  /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\soundcard.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\soundcard.bsc" 
@@ -120,8 +90,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib winmm.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
- /incremental:no /pdb:"$(OUTDIR)\soundcard.pdb" /machine:I386\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11500000" /subsystem:windows\
+ /dll /incremental:no /pdb:"$(OUTDIR)\soundcard.pdb" /machine:I386\
  /def:".\soundcard.def" /out:"soundcard.pmo" /implib:"$(OUTDIR)\soundcard.lib"\
  /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
@@ -189,7 +159,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -198,40 +167,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\soundcard.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\soundcard.bsc" 
@@ -240,8 +176,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib winmm.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
- /incremental:yes /pdb:"$(OUTDIR)\soundcard.pdb" /debug /machine:I386\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11500000" /subsystem:windows\
+ /dll /incremental:yes /pdb:"$(OUTDIR)\soundcard.pdb" /debug /machine:I386\
  /def:".\soundcard.def" /out:"soundcard.pmo" /implib:"$(OUTDIR)\soundcard.lib"\
  /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
@@ -309,7 +245,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -318,40 +253,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "..\..\include" /I\
  /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\soundcard.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\soundcard.bsc" 
@@ -360,8 +262,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib winmm.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
- /incremental:yes /pdb:"$(OUTDIR)\soundcard.pdb" /debug /machine:I386\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11500000" /subsystem:windows\
+ /dll /incremental:yes /pdb:"$(OUTDIR)\soundcard.pdb" /debug /machine:I386\
  /def:".\soundcard.def" /out:"soundcard.pmo" /implib:"$(OUTDIR)\soundcard.lib"\
  /pdbtype:sept /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
@@ -426,7 +328,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I\
  "..\..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -435,40 +336,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I\
  /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\soundcard.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\soundcard.bsc" 
@@ -477,8 +345,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=fabaselib.lib winmm.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
- /incremental:no /pdb:"$(OUTDIR)\soundcard.pdb" /machine:I386\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x11500000" /subsystem:windows\
+ /dll /incremental:no /pdb:"$(OUTDIR)\soundcard.pdb" /machine:I386\
  /def:".\soundcard.def" /out:"soundcard.pmo" /implib:"$(OUTDIR)\soundcard.lib"\
  /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
@@ -510,10 +378,72 @@ $(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\soundcard.pmo"
 
 !ENDIF 
 
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
 
 !IF "$(CFG)" == "soundcard - Win32 Release" || "$(CFG)" ==\
  "soundcard - Win32 Debug" || "$(CFG)" == "soundcard - Win32 NASM Debug" ||\
  "$(CFG)" == "soundcard - Win32 NASM Release"
+SOURCE=..\..\..\..\config\config.win32
+
+!IF  "$(CFG)" == "soundcard - Win32 Release"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Debug"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Release"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ENDIF 
+
 SOURCE=..\..\..\src\eventbuffer.cpp
 
 !IF  "$(CFG)" == "soundcard - Win32 Release"
@@ -549,7 +479,8 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -585,7 +516,8 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -621,7 +553,8 @@ DEP_CPP_EVENT=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -658,7 +591,8 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -699,7 +633,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -736,7 +671,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -773,7 +709,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -810,7 +747,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -851,7 +789,8 @@ DEP_CPP_PMO_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"
+"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -888,7 +827,8 @@ DEP_CPP_PMO_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"
+"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -925,7 +865,8 @@ DEP_CPP_PMO_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"
+"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -962,7 +903,8 @@ DEP_CPP_PMO_C=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"
+"$(INTDIR)\pmo.obj" : $(SOURCE) $(DEP_CPP_PMO_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -983,7 +925,8 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1000,7 +943,8 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1017,7 +961,8 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1034,7 +979,8 @@ DEP_CPP_PULLB=\
 	"..\..\..\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1076,7 +1022,8 @@ DEP_CPP_SOUND=\
 	"..\include\SoundCardPMO.h"\
 	
 
-"$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"
+"$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1114,7 +1061,8 @@ DEP_CPP_SOUND=\
 	"..\include\SoundCardPMO.h"\
 	
 
-"$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"
+"$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1152,7 +1100,8 @@ DEP_CPP_SOUND=\
 	"..\include\SoundCardPMO.h"\
 	
 
-"$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"
+"$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1190,7 +1139,8 @@ DEP_CPP_SOUND=\
 	"..\include\SoundCardPMO.h"\
 	
 
-"$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"
+"$(INTDIR)\soundcardpmo.obj" : $(SOURCE) $(DEP_CPP_SOUND) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

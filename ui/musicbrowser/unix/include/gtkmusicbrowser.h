@@ -121,6 +121,9 @@ class GTKMusicBrowser {
 
     bool isVisible;
     void UpdatePlaylistList(void);
+    void AddPlaylistItems(vector<PlaylistItem *> *items);
+    void RemovePlaylistItems(vector<uint32> *indices);
+    void RenumberPlaylistList(int starting);
 
     Properties *m_propManager;
 

@@ -74,7 +74,7 @@ GTKFont::GTKFont(FAContext *context, string &oName, string &oFace,
     HANDLE handle;
  
     m_context->prefs->GetInstallDirectory(dir, &len);
-    ttfbase = string(dir) + "/../share/freeamp/fonts";
+    ttfbase = string(dir) + "/" + BRANDING_SHARE_PATH + "/fonts";
     ttfpath = ttfbase + "/*.ttf";
  
     struct stat st;

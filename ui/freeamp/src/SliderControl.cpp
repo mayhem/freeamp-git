@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999-2000 EMusic
+   Copyright (C) 1999 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,17 +51,14 @@ static TransitionInfo pTransitions[] =
     { CS_LastState,  CT_LastTransition,   CS_LastState  }
 };
 
-SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs) :
+SliderControl::SliderControl(Window *pWindow, string &oName) :
                Control(pWindow, oName, pTransitions)
 {
      m_iRange = -1;
      m_iCurrentPos = 0;
      m_oOrigin.x = -1;
-     m_iNumThumbStates = iThumbs;
      m_bIsDrag = false;
      m_bInUpdate = false;
-     m_bHasTroughBitmap = false;
-     m_iCurrentTroughFrame = -1;
 };
 
 SliderControl::~SliderControl(void)
@@ -69,68 +66,11 @@ SliderControl::~SliderControl(void)
 
 }
 
-void SliderControl::SetTroughBitmap(Bitmap *pBitmap, Rect &oBitmapRect, 
-                                    int iFrames, bool bHoriz, int iDelta)
-{
-    m_oMutex.Acquire();
-    m_pTroughBitmap = pBitmap;
-    m_iTroughFrames = iFrames;
-    m_oTroughBitmapRect = oBitmapRect;
-    m_bHorizontalTroughBitmap = bHoriz;
-    m_iTroughDelta = iDelta;
-    m_bHasTroughBitmap = true;
-    m_oMutex.Release();
-}
-
 void SliderControl::Init(void)
 {
     m_oMutex.Acquire();
     
-    if (!m_bUsesStateBitmapRects) {
-        for (int row = 0; row < m_iNumThumbStates; row++) {
-            for (int i = 0; i < 3; i++) {
-                int iFrameWidth, iFrameHeight; 
-                Rect oFrameRect;
-
-                if (m_bHorizontalBitmap) {
-                    iFrameWidth = (m_oBitmapRect.Width() + 1) / 3;
-                    iFrameHeight = (m_oBitmapRect.Height() + 1) / 
-                                   m_iNumThumbStates;
-                    oFrameRect = m_oBitmapRect;
-                    oFrameRect.x1 += i * iFrameWidth;
-                    oFrameRect.x2 = oFrameRect.x1 + iFrameWidth - 1;
-                    oFrameRect.y1 += row * iFrameHeight;
-                    oFrameRect.y2 = oFrameRect.y1 + iFrameHeight - 1;
-                }
-                else {
-                    iFrameHeight = (m_oBitmapRect.Height() + 1) / 3;
-                    iFrameWidth = (m_oBitmapRect.Width() + 1) /
-                                  m_iNumThumbStates;
-                    oFrameRect = m_oBitmapRect;
-                    oFrameRect.x1 += row * iFrameWidth;
-                    oFrameRect.x2 = oFrameRect.x1 + iFrameWidth - 1;
-                    oFrameRect.y1 += i * iFrameHeight;
-                    oFrameRect.y2 = oFrameRect.y1 + iFrameHeight - 1;
-                }   
-
-                switch (i) {
-                    case 0:
-                        SetStateBitmap(m_pBitmap, oFrameRect, CS_Normal, row);
-                        break;
-                    case 1:
-                        SetStateBitmap(m_pBitmap, oFrameRect, CS_MouseOver, row);
-                        break;
-                    case 2:
-                        SetStateBitmap(m_pBitmap, oFrameRect, CS_Disabled, row);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-
-    m_iThumbWidth = m_oStateBitmapRect[0][CS_Normal].Width();
+    m_iThumbWidth = m_oBitmapRect.Width() / 3;
     m_iRange = m_oRect.Width() - m_iThumbWidth;
 
     m_oMutex.Release();
@@ -152,7 +92,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
            m_pParent->SendControlMessage(this, CM_MouseLeave);
            break;
 
-       case CT_SetValue:
+	   case CT_SetValue:
        {
        	   int iNewPos, iOldPos;	
 
@@ -229,21 +169,15 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
 	   m_bIsDrag = oRect.IsPosInRect(*pPos);
 
     m_oMutex.Release();
-
-    int iThumbNumber = m_iCurrentPos * m_iNumThumbStates / m_iRange;
-    iThumbNumber = min(m_iNumThumbStates - 1, iThumbNumber);
-
-    if (m_eCurrentState != CS_Dragging && m_eCurrentState != CS_DisabledMO)
-        BlitTrough(m_iCurrentPos);
  
     switch(m_eCurrentState)
     {
        case CS_Normal:
-          BlitFrame(CS_Normal, iThumbNumber, &oRect);
+          BlitFrame(0, 3, &oRect);
           break;
 
        case CS_MouseOver:
-          BlitFrame(CS_MouseOver, iThumbNumber, &oRect);
+          BlitFrame(1, 3, &oRect);
           break;
 
        case CS_Dragging:
@@ -270,7 +204,7 @@ void SliderControl::Transition(ControlTransitionEnum  eTrans,
           break;
 
        case CS_Disabled:
-          BlitFrame(CS_Disabled, iThumbNumber, &oRect);
+          BlitFrame(2, 3, &oRect);
           break;
 
        default:
@@ -310,7 +244,7 @@ void SliderControl::HandleJump(ControlTransitionEnum  eTrans,
 void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
                                Pos                   *pPos)
 {
-    int     iDelta, iNewPos;
+    int     iDelta, iNewPos, iOldPos;
 
     m_oMutex.Acquire();
 
@@ -341,108 +275,55 @@ void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
         m_oMutex.Release();
         return;
     }    
-    m_oMutex.Release();
 
-	MoveThumb(m_iCurrentPos, iNewPos);
-
-    m_oMutex.Acquire();
-
+    iOldPos = m_iCurrentPos;
     m_iCurrentPos = iNewPos;
     m_oLastPos = *pPos;
     
 	m_iValue = (m_iCurrentPos * 100) / m_iRange;
     m_oMutex.Release();
 
+	MoveThumb(iOldPos, iNewPos);
     m_pParent->SendControlMessage(this, CM_SliderUpdate);
 }
 
 void SliderControl::MoveThumb(int iCurrentPos, int iNewPos)
 {
     Canvas *pCanvas;
-    Rect    oRect;
+    Rect    oEraseRect, oRect;
 
-    oRect.x1 = m_oRect.x1 + iCurrentPos;
-    oRect.x2 = oRect.x1 + m_iThumbWidth + 1;
-    oRect.y1 = m_oRect.y1;
-    oRect.y2 = m_oRect.y2 + 1;
+    oEraseRect.x1 = m_oRect.x1 + iCurrentPos;
+    oEraseRect.x2 = oEraseRect.x1 + m_iThumbWidth + 1;
+    oEraseRect.y1 = m_oRect.y1;
+    oEraseRect.y2 = m_oRect.y2 + 1;
     
     pCanvas = m_pParent->GetCanvas();
-    pCanvas->Erase(oRect);
-    pCanvas->Invalidate(oRect);
+    pCanvas->Erase(oEraseRect);
 
     oRect.x1 = m_oRect.x1 + iNewPos;
     oRect.x2 = oRect.x1 + m_iThumbWidth;
     oRect.y1 = m_oRect.y1;
     oRect.y2 = m_oRect.y2;
     
-    int iThumbNumber = iNewPos * m_iNumThumbStates / m_iRange;
-    iThumbNumber = min(m_iNumThumbStates - 1, iThumbNumber);
-
-    BlitTrough(iNewPos);
-
     switch(m_eCurrentState)
     {
        case CS_Normal:
-          BlitFrame(CS_Normal, iThumbNumber, &oRect);
+          BlitFrame(0, 3, &oRect, false);
           break;
 
        case CS_Dragging:
        case CS_MouseOver:
-          BlitFrame(CS_MouseOver, iThumbNumber, &oRect);
+          BlitFrame(1, 3, &oRect, false);
           break;
 
        case CS_Disabled:
-          BlitFrame(CS_Disabled, iThumbNumber, &oRect);
+          BlitFrame(2, 3, &oRect, false);
           break;
 
        default:
           break;
     }
-}
-
-void SliderControl::BlitTrough(int iPos)
-{
-    if (!m_bHasTroughBitmap)
-        return;
-
-    Canvas *pCanvas;
-    Rect    oFrameRect, oDestRect;
-
-    oDestRect = m_oRect;
-
-    int iFrameNumber = iPos * m_iTroughFrames / m_iRange;
-    iFrameNumber = min(m_iTroughFrames - 1, iFrameNumber);
-
-    m_iCurrentTroughFrame = iFrameNumber;
-
-    if (m_bHorizontalTroughBitmap) {
-        int iFrameWidth = (m_oTroughBitmapRect.Width() + 1 - 
-                           (m_iTroughDelta * (m_iTroughFrames - 1))) / 
-                           m_iTroughFrames;
-        oFrameRect = m_oTroughBitmapRect;
-        oFrameRect.x1 += iFrameWidth * iFrameNumber; 
-        oFrameRect.x2 = oFrameRect.x1 + iFrameWidth;
-    }
-    else {
-        int iFrameHeight = (m_oTroughBitmapRect.Height() + 1 - 
-                            (m_iTroughDelta * (m_iTroughFrames - 1))) / 
-                            m_iTroughFrames;
-
-        oFrameRect = m_oTroughBitmapRect;
-        oFrameRect.y1 += (iFrameHeight + m_iTroughDelta) * iFrameNumber;
-        oFrameRect.y2 = oFrameRect.y2 + iFrameHeight;
-    }
-
-    oFrameRect.y2++;
-    oFrameRect.x2++;
-
-    oDestRect.y2++;
-    oDestRect.x2++;
-
-    pCanvas = m_pParent->GetCanvas();
-    pCanvas->MaskBlitRect(m_pTroughBitmap, oFrameRect, oDestRect);
-
-    pCanvas->Invalidate(oDestRect);
-    pCanvas->Update();
-}
-
+    
+    oEraseRect.Union(oRect);
+    pCanvas->Invalidate(oEraseRect);
+}                                                         

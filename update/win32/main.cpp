@@ -47,7 +47,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     runOnceMutex = CreateMutex(	NULL,
 							    TRUE,
-							    BRANDING" Should Only Run One Time!");
+							    The_BRANDING" Should Only Run One Time!");
 
     // make sure FreeAmp is not running while this happens...
     while(WAIT_TIMEOUT == WaitForSingleObject(runOnceMutex, 5000))
@@ -123,11 +123,38 @@ void MoveFiles(const char* src, const char* dest)
                 }
                 else 
                 {
-                    // remove old file
-                    DeleteFile(destPath);
+                    int32 failureCount;
+                    BOOL success;
+
+                    failureCount = 0;
+                    success = TRUE;
+
+                    do
+                    {
+                        // remove old file
+                        success = DeleteFile(destPath);
+
+                        if(!success)
+                            Sleep(1000);
+
+                    }while(!success && failureCount++ < 3);
                     
-                    // actually move the file
-                    if(!MoveFile(srcPath, destPath))
+                    if(success)
+                    {
+                        failureCount = 0;
+
+                        do
+                        {
+                           // actually move the file
+                            success = MoveFile(srcPath, destPath);
+
+                            if(!success)
+                                Sleep(1000);
+
+                        }while(!success && failureCount++ < 3);
+                    }  
+                    
+                    if(!success)
                     {
                         LPVOID lpMessageBuffer;
 
@@ -142,7 +169,7 @@ void MoveFiles(const char* src, const char* dest)
 		                  NULL );
 
 		                // now display this string
- 		                MessageBox(NULL, (char*)lpMessageBuffer, 0, MB_OK);
+ 		                MessageBox(NULL, (char*)lpMessageBuffer, destPath, MB_OK);
 
 		                // Free the buffer allocated by the system
 		                LocalFree( lpMessageBuffer );

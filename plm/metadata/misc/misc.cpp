@@ -177,6 +177,61 @@ bool Misc::ReadMetaData(const char* url, MetaData* metadata)
         metadata->SetTitle("RTP Stream");
     }
 
+    // do we need to convert underscores?
+    bool convertUnderscores = false;
+
+    m_context->prefs->GetConvertUnderscoresToSpaces(&convertUnderscores);
+
+    if(convertUnderscores)
+    {
+        string::size_type pos = 0;
+        string temp;
+
+        temp = metadata->Title();
+        
+        while(pos != string::npos)
+        {
+            pos = temp.find('_', pos);
+
+            if(pos != string::npos)
+            {
+                temp[pos++] = ' ';
+            }
+        }
+
+        metadata->SetTitle(temp.c_str());
+
+        pos = 0;
+        temp = metadata->Artist();
+        
+        while(pos != string::npos)
+        {
+            pos = temp.find('_', pos);
+
+            if(pos != string::npos)
+            {
+                temp[pos++] = ' ';
+            }
+        }
+
+        metadata->SetArtist(temp.c_str());
+
+        pos = 0;
+        temp = metadata->Album();
+        
+        while(pos != string::npos)
+        {
+            pos = temp.find('_', pos);
+
+            if(pos != string::npos)
+            {
+                temp[pos++] = ' ';
+            }
+        }
+
+        metadata->SetAlbum(temp.c_str());
+    }
+
     return true;
 }
 

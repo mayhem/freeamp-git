@@ -2,7 +2,7 @@
 
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1999-2000 EMusic
+   Copyright (C) 1999 EMusic
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ ____________________________________________________________________________*/
 #include <assert.h>
 #include <stdlib.h>
 #include <vector>
-#include <map>
 
 using namespace std;
 
@@ -123,11 +122,7 @@ class Control
       virtual void  SetRect(Rect &oRect);
       virtual void  GetRect(Rect &oRect);
       virtual void  SetPos(Pos &oPos);
-      virtual void  SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect, 
-                              bool bHoriz = true);
-      virtual void  SetStateBitmap(Bitmap *pBitmap, Rect &oBitmapRect,
-                                   ControlStateEnum eClickState, 
-                                   int iState = 0);
+      virtual void  SetBitmap(Bitmap *pBitmap, Rect &oBitmapRect, bool bHoriz = true);
       virtual Bitmap *GetBitmap(void);
       virtual void  GetName(string &oName);
       virtual void  SetDesc(const string &oDesc);
@@ -142,6 +137,7 @@ class Control
 
       virtual bool PosInControl(Pos &oPos);
       virtual bool WantsTimingMessages(void);
+      virtual bool UseToDragWindow(void) { return false; };
       virtual void Init(void) = 0;
       virtual void AcceptTransition(ControlTransitionEnum eTrans,
                                     Pos *pMousePos = NULL);
@@ -159,11 +155,11 @@ class Control
       // Call this function to blit the face of the control
       // Args: iFrame: Which frame to blit
       //       iNumFrames: how many frames in the x direction in the bitmap
-      virtual void BlitFrame(ControlStateEnum eFrame, int iState = 0, 
-                             Rect *pRect = NULL);
-      virtual void BlitFrame(int iFrame, int iNumFrames, Rect *pRect = NULL); 
-      virtual void BlitFrameHoriz(int iFrame, int iNumFrames, Rect *pRect = NULL);
-      virtual void BlitFrameVert(int iFrame, int iNumFrames, Rect *pRect = NULL);
+      virtual void BlitFrame(int iFrame, int iNumFrames, Rect *pRect = NULL, bool bUpdate = true); 
+      virtual void BlitFrameHoriz(int iFrame, int iNumFrames, Rect *pRect = NULL, bool bUpdate = true);
+      virtual void BlitFrameVert(int iFrame, int iNumFrames, Rect *pRect = NULL, bool bUpdate = true);
+      virtual void BlitMultiStateFrame(int iFrame, int iNumFramesInBitmap,
+                                       int iRow, int iNumRowsInBitmap);  
 
       string                 m_oName, m_oDesc, m_oToolTip;
       Rect                   m_oRect, m_oBitmapRect;
@@ -175,11 +171,7 @@ class Control
       bool                   m_bHorizontalBitmap;
       int                    m_iValue;
       string                 m_oValue;
-      Mutex                  m_oMutex;
-      bool                   m_bUsesStateBitmapRects;
-
-      // this is cute
-      vector<map<ControlStateEnum, Rect> > m_oStateBitmapRect;
+	  Mutex                  m_oMutex;
 };
 
 #endif

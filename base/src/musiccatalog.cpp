@@ -286,13 +286,13 @@ Error MusicCatalog::RemoveSong(const char *url)
         i = m_artistList->begin();
         for (; i != m_artistList->end() && !found; i++) 
         {
-            if (meta->Artist() == (*i)->name) 
+            if (CaseCompare(meta->Artist(),(*i)->name)) 
             {
                 alList = (*i)->m_albumList;
                 j = alList->begin();
                 for (; j != alList->end() && !found; j++) 
                 {
-                    if (meta->Album() == (*j)->name) 
+                    if (CaseCompare(meta->Album(),(*j)->name)) 
                     {
                         trList = (*j)->m_trackList;
                         k = trList->begin();
@@ -353,6 +353,18 @@ Error MusicCatalog::AddStream(const char *url)
     return kError_NoErr;
 }
 
+bool MusicCatalog::CaseCompare(string s1, string s2)
+{
+    if (s1.length() == s2.length()) {
+        for (uint32 i = 0; i < s1.length(); i++) {
+            if (toupper(s1[i]) != toupper(s2[i]))
+                return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 Error MusicCatalog::AddSong(const char *url)
 {
     assert(url);
@@ -411,13 +423,13 @@ Error MusicCatalog::AddSong(const char *url)
         bool found_artist = false;
         vector<ArtistList *>::iterator i = m_artistList->begin();
         for (; i != m_artistList->end(); i++) {
-            if (meta->Artist() == (*i)->name) {
+            if (CaseCompare(meta->Artist(),(*i)->name)) {
                 bool found_album = false;
                 found_artist = true;
                 vector<AlbumList *> *alList = (*i)->m_albumList;
                 vector<AlbumList *>::iterator j = alList->begin();
                 for (; j != alList->end(); j++) {
-                    if (meta->Album() == (*j)->name) {
+                    if (CaseCompare(meta->Album(),(*j)->name)) {
                         found_album = true;
                        
                         vector<PlaylistItem *> *trList = (*j)->m_trackList;
@@ -505,7 +517,7 @@ Error MusicCatalog::Remove(const char *url)
 
     if (!strncmp("P", data, 1))
         retvalue = RemovePlaylist(url);
-    else if (!strncmp("M", data, 1))
+    else if (!strncmp("M", data, 1)) 
         retvalue = RemoveSong(url);
     else if (!strncmp("S", data, 1))
         retvalue = RemoveStream(url);
@@ -604,15 +616,50 @@ void MusicCatalog::SetDatabase(const char *path)
         m_database = NULL;
     }
 
-    PruneDatabase();
-
     if (m_database) {
         RePopulateFromDatabase();
+        PruneDatabase(true, true);
         Sort();
     }
 }
 
-void MusicCatalog::PruneDatabase(void)
+typedef struct PruneThreadStruct {
+    MusicCatalog *mc;
+    Thread *thread;
+    bool sendmessages;
+} PruneThreadStruct;
+
+void MusicCatalog::PruneDatabase(bool sendmessages, bool spawn)
+{
+    if (spawn) {
+        Thread *thread = Thread::CreateThread();
+
+        if (thread) {
+            PruneThreadStruct *pts = new PruneThreadStruct;
+
+            pts->mc = this;
+            pts->sendmessages = sendmessages;
+            pts->thread = thread;
+
+            thread->Create(prune_thread_function, pts);
+        }
+    }
+    else {
+        PruneThread(sendmessages);
+    }
+}
+
+void MusicCatalog::prune_thread_function(void *arg)
+{
+    PruneThreadStruct *pts = (PruneThreadStruct *)arg;
+
+    pts->mc->PruneThread(pts->sendmessages);
+
+    delete pts->thread;
+    delete pts;
+}
+
+void MusicCatalog::PruneThread(bool sendmessages)
 {
     char *key = m_database->NextKey(NULL);
     struct stat st;
@@ -622,12 +669,18 @@ void MusicCatalog::PruneDatabase(void)
             uint32 length = strlen(key) + 1;
             char *filename = new char[length];
 
-            if (IsntError(URLToFilePath(key, filename, &length)))
+            if (IsntError(URLToFilePath(key, filename, &length))) {
                 if (-1 == stat(filename, &st)) {
-                    m_database->Remove(key);
-                    key = NULL;
+                    if (sendmessages) {
+                        Remove(key);
+                        key = NULL;
+                    }
+                    else {
+                        m_database->Remove(key);
+                        key = NULL;
+                    }
                 }
-
+            }
             delete [] filename;
         }
         key = m_database->NextKey(key);

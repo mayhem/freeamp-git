@@ -238,7 +238,8 @@ Error Theme::LoadTheme(string &oFile, string &oWindowName)
                 
                 delete pZip;
                 return kError_InvalidParam;
-            }    
+            }
+            m_pThemeMan->UseTheme(oFile);
         }
 
         if (IsError(eRet))

@@ -31,6 +31,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 OUTDIR=.\Release
@@ -74,7 +78,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -83,40 +86,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\simple.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
@@ -126,9 +96,9 @@ LINK32=link.exe
 LINK32_FLAGS=gdbm.lib fabaselib.lib version.lib wsock32.lib comctl32.lib\
  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib\
  shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
- /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\simple.pdb"\
- /machine:I386 /def:".\simpleui.def" /out:"simple.ui"\
- /implib:"$(OUTDIR)\simple.lib" /libpath:"..\..\..\..\lib\gdbm"\
+ /base:"0x11400000" /subsystem:windows /dll /incremental:no\
+ /pdb:"$(OUTDIR)\simple.pdb" /machine:I386 /def:".\simpleui.def"\
+ /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" /libpath:"..\..\..\..\lib\gdbm"\
  /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\simpleui.def"
@@ -212,7 +182,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -221,40 +190,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\simple.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
@@ -264,10 +200,10 @@ LINK32=link.exe
 LINK32_FLAGS=gdbm.lib fabaselib.lib version.lib wsock32.lib comctl32.lib\
  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib\
  shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
- /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\simple.pdb" /debug\
- /machine:I386 /def:".\simpleui.def" /out:"simple.ui"\
- /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm"\
- /libpath:"..\..\..\..\base\win32" 
+ /base:"0x11400000" /subsystem:windows /dll /incremental:yes\
+ /pdb:"$(OUTDIR)\simple.pdb" /debug /machine:I386 /def:".\simpleui.def"\
+ /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept\
+ /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\simpleui.def"
 LINK32_OBJS= \
@@ -350,7 +286,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -359,40 +294,7 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\simple.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
@@ -402,10 +304,10 @@ LINK32=link.exe
 LINK32_FLAGS=gdbm.lib fabaselib.lib version.lib wsock32.lib comctl32.lib\
  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib\
  shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
- /subsystem:windows /dll /incremental:yes /pdb:"$(OUTDIR)\simple.pdb" /debug\
- /machine:I386 /def:".\simpleui.def" /out:"simple.ui"\
- /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm"\
- /libpath:"..\..\..\..\base\win32" 
+ /base:"0x11400000" /subsystem:windows /dll /incremental:yes\
+ /pdb:"$(OUTDIR)\simple.pdb" /debug /machine:I386 /def:".\simpleui.def"\
+ /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" /pdbtype:sept\
+ /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\simpleui.def"
 LINK32_OBJS= \
@@ -485,7 +387,6 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  "..\..\include" /I "..\..\..\include" /I "..\..\..\..\io\include" /I\
  "..\..\..\..\base\include" /I "..\..\..\..\base\win32\include" /I\
@@ -494,40 +395,7 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\res" /I "..\include" /I\
  /Fp"$(INTDIR)\simple.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\simple.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\simple.bsc" 
@@ -537,9 +405,9 @@ LINK32=link.exe
 LINK32_FLAGS=gdbm.lib fabaselib.lib version.lib wsock32.lib comctl32.lib\
  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib\
  shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo\
- /subsystem:windows /dll /incremental:no /pdb:"$(OUTDIR)\simple.pdb"\
- /machine:I386 /def:".\simpleui.def" /out:"simple.ui"\
- /implib:"$(OUTDIR)\simple.lib" /libpath:"..\..\..\..\lib\gdbm"\
+ /base:"0x11400000" /subsystem:windows /dll /incremental:no\
+ /pdb:"$(OUTDIR)\simple.pdb" /machine:I386 /def:".\simpleui.def"\
+ /out:"simple.ui" /implib:"$(OUTDIR)\simple.lib" /libpath:"..\..\..\..\lib\gdbm"\
  /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\simpleui.def"
@@ -579,6 +447,36 @@ $(DS_POSTBUILD_DEP) : "xing - Win32 NASM Release"\
 
 !ENDIF 
 
+.c{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_OBJS)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(CPP_SBRS)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
 
 !IF "$(CFG)" == "simple - Win32 Release" || "$(CFG)" == "simple - Win32 Debug"\
  || "$(CFG)" == "simple - Win32 NASM Debug" || "$(CFG)" ==\
@@ -588,9 +486,42 @@ DEP_CPP_ABOUT=\
 	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\about.obj" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"
+"$(INTDIR)\about.obj" : $(SOURCE) $(DEP_CPP_ABOUT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+SOURCE=..\..\..\..\config\config.win32
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "simple - Win32 NASM Debug"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ELSEIF  "$(CFG)" == "simple - Win32 NASM Release"
+
+InputPath=..\..\..\..\config\config.win32
+
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
+
+!ENDIF 
 
 SOURCE=..\..\..\..\base\win32\src\mutex.cpp
 DEP_CPP_MUTEX=\
@@ -630,7 +561,8 @@ NODEP_CPP_PLAYL=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"
+"$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -648,7 +580,8 @@ NODEP_CPP_PREFD=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\prefdialog.obj" : $(SOURCE) $(DEP_CPP_PREFD) "$(INTDIR)"
+"$(INTDIR)\prefdialog.obj" : $(SOURCE) $(DEP_CPP_PREFD) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -659,7 +592,8 @@ DEP_CPP_PREFE=\
 	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -677,7 +611,8 @@ NODEP_CPP_REGIS=\
 	"..\..\..\..\base\include\win32impl.h"\
 	
 
-"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"
+"$(INTDIR)\registrar.obj" : $(SOURCE) $(DEP_CPP_REGIS) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -687,7 +622,8 @@ DEP_CPP_REGIST=\
 	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"
+"$(INTDIR)\registry.obj" : $(SOURCE) $(DEP_CPP_REGIST) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -728,7 +664,8 @@ DEP_CPP_SIMPL=\
 	"..\include\simpleui.h"\
 	
 
-"$(INTDIR)\simpleui.obj" : $(SOURCE) $(DEP_CPP_SIMPL) "$(INTDIR)"
+"$(INTDIR)\simpleui.obj" : $(SOURCE) $(DEP_CPP_SIMPL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -744,7 +681,8 @@ NODEP_CPP_THREA=\
 	"..\..\..\..\base\src\solaristhread.h"\
 	
 
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -756,7 +694,8 @@ DEP_CPP_WIN32=\
 	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -767,7 +706,8 @@ DEP_CPP_WIN32T=\
 	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

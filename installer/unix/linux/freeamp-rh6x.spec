@@ -1,119 +1,94 @@
-#
-# NOTES: This script is intended for building rpms for redhat 6.x
-#        systems. Automatic depedency checking has been turned off for
-#        this script becuase the rpm will check to see if ALSA/ESD
-#        are installed on the system automatically. If we let
-#        rpm determine the dependecies automatically it will complain
-#        to anyone who does not have ALSA/ESD installed.
-#
-#        To update this script, remove the Requires line and set
-#        AutoReqProv to yes. Then build the RPM, and copy the
-#        Requires line that it spits out and paste it where the
-#        Requires line is. Make sure to remove references to
-#        libesd, libasound, and libncurses, as the install
-#        script below will handle them correctly. Finally,
-#        Turn AutoReqProv back on and then build the rpm.
-# 
 Summary: MP3 audio player with theme user interface and streaming support
 Name: freeamp
-Version: 2.0.1
+Version: 2.0.4
 Release: 1
 Copyright: GPL
 Group: Applications/Multimedia
-Source: www.freeamp.org:/pub/freeamp/freeamp-2.0.1-linux-x86-glibc2.1.tar.gz
-
-# Please read note above  
-AutoReqProv: No
+Source: ftp://www.freeamp.org/pub/freeamp/src/freeamp-%{version}.tar.gz
+Prefix: /usr
+BuildRoot: /var/tmp/%{name}-%{version}-root
+ExcludeArch: sparc
+AutoReqProv: No 
 Requires: ld-linux.so.2 libc.so.6 libdl.so.2 libm.so.6 libnsl.so.1 libpthread.so.0 libstdc++-libc6.1-1.so.2 libX11.so.6 libXext.so.6 libgdk-1.2.so.0 libglib-1.2.so.0 libgmodule-1.2.so.0 libgthread-1.2.so.0 libgtk-1.2.so.0 libttf.so.2 libc.so.6(GLIBC_2.0) libm.so.6(GLIBC_2.1) libpthread.so.0(GLIBC_2.1) libpthread.so.0(GLIBC_2.0) libc.so.6(GLIBC_2.1) libdl.so.2(GLIBC_2.1) libdl.so.2(GLIBC_2.0)
 
 %description
-This program plays MP3 (MPEG-1 audio layer 3) files and streams. The
-player will run on Windows, Linux and Solaris.
+FreeAmp is an extensible, cross-platform audio player. It features an
+optimized version of the GPLed Xing MPEG decoder which makes it one of the
+fastest and best sounding players available. FreeAmp provides a number of the
+most common features users have come to expect in a clean, easy to use
+interface.
 
 %prep
-%setup
+%setup -q -n freeamp
+
 %build
+./configure --prefix=%{prefix}
+make
+
 %install
+PATH=$PATH:/sbin:/usr/sbin ; export PATH
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT%{prefix}{/bin,/lib,/share}
+mkdir -p $RPM_BUILD_ROOT%{prefix}/lib/freeamp/plugins
+mkdir -p $RPM_BUILD_ROOT%{prefix}/share/freeamp/{help,themes}
 
-prefix=/usr
-
-bindir="$prefix/bin"
-libdir="$prefix/lib"
-fadir="$libdir/freeamp"
-plugdir="$fadir/plugins"
-sharedir="$prefix/share"
-fasharedir="$sharedir/freeamp"
-themedir="$fasharedir/themes"
-
-# We could use mkdir -p, but not all unix systems' mkdir's support -p
-for dir in "$bindir" "$libdir" "$fadir" "$plugdir" "$sharedir" "$fasharedir" "$themedir"; do
-    if [ \! -d "$dir" ]; then
-	echo "mkdir $dir"
-	mkdir "$dir"
-	echo "chown root $dir"
-	chown root "$dir"
-	echo "chmod 755 $dir"
-	chmod 755 "$dir"
-    fi
-done
-
-install -c -m 755 freeamp "$bindir"
-echo "$bindir/freeamp" > installed.files
-if test -f "MakeTheme"; then 
-    install -c -m 755 MakeTheme "$bindir"
-    echo "$bindir/MakeTheme" >> installed.files
-fi
-for file in themes/*.*; do
-    echo "install -c -o root -m 644 $file $themedir"
-    install -c -o root -m 644 "$file" "$themedir"
-    echo "$fasharedir/$file" >> installed.files
-done
+install -s {MakeTheme,freeamp} $RPM_BUILD_ROOT%{prefix}/bin
+install themes/* $RPM_BUILD_ROOT%{prefix}/share/freeamp/themes
+#install -s plugins/* $RPM_BUILD_ROOT%{prefix}/lib/freeamp/plugins
 for file in plugins/*.*; do
     enable=f
     case "$file" in
-    	*/alsa*.pmo)
-	      if ldconfig -p | grep 'libasound\.so' > /dev/null; then
-	      	enable=t
-	      else
-	      	enable=f
-		      rm -f "$fadir/$file"
-	      fi
-	   ;;
-    	*/esound*.pmo)
-	      if ldconfig -p | grep 'libesd\.so' > /dev/null; then
-	      	enable=t
-	      else
-	      	enable=f
-		      rm -f "$fadir/$file"
-	      fi
-	   ;;
-    	*/ncurses*.ui)
-	      if ldconfig -p | grep 'libncurses\.so' > /dev/null; then
-	      	enable=t
-	      else
-	      	enable=f
-		      rm -f "$fadir/$file"
-	      fi
-	   ;;
-	   *)
-	   enable=t
-	   ;;
+      */alsa*.pmo)
+         if ldconfig -p | grep 'libasound\.so' > /dev/null; then
+            enable=t
+         else
+            enable=f
+         fi
+      ;;
+      */esound*.pmo)
+         if ldconfig -p | grep 'libesd\.so' > /dev/null; then
+            enable=t
+         else
+            enable=f
+         fi
+      ;;
+      */ncurses*.ui)
+         if ldconfig -p | grep 'libncurses\.so' > /dev/null; then
+            enable=t
+         else
+            enable=f
+         fi
+      ;;
+      *)
+      enable=t
+      ;;
     esac
     if [ "$enable" = t ]; then
-        install -c -o root -m 644 "$file" "$plugdir"
-        echo $fadir/$file >> installed.files
+        install -s $file $RPM_BUILD_ROOT%{prefix}/lib/freeamp/plugins
     fi
-done
-gzip -d -c < help/freeamphelp.tar.gz | (cd $fasharedir; rm -rf help; tar -xmf -)
-for file in `ls $fasharedir/help`; do
-    echo $fasharedir/help/$file >> installed.files
-done
+done  
 
-%files -f installed.files
-%dir /usr/lib/freeamp 
-%dir /usr/lib/freeamp/plugins
-%dir /usr/share/freeamp
-%dir /usr/share/freeamp/themes
-%dir /usr/share/freeamp/help
+(cd $RPM_BUILD_ROOT%{prefix}/share/freeamp/ ;
+tar xfz $RPM_BUILD_DIR/%{name}/help/unix/freeamphelp.tar.gz)
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files 
+%defattr(-,root,root)
 %doc AUTHORS CHANGES COPYING INSTALL NEWS README README.linux
+/usr/bin/*
+/usr/lib/freeamp 
+/usr/share/freeamp
+
+%changelog
+* Thu Feb 17 2000 Robert Kaye <rob@freeamp.com>
+- conversion from emusic to normal freeamp rpm
+* Mon Jan 31 2000 Robert Kaye <rob@freeamp.com>
+- conversion from freeamp to emusic
+* Wed Jan 12 2000 Tim Powers <timp@redhat.com>
+- initial build of freeamp for Powertools
+- not origional spec file, violates Red Hat policy as to what can be done in
+	the install section of the spec file (not bad, just violates policy)
+
 

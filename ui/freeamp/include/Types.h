@@ -52,6 +52,13 @@ struct Rect
     {
          return y2 - y1;
     }
+	void Union(Rect &oOther)
+	{
+	     x1 = (oOther.x1 < x1) ? oOther.x1 : x1;
+	     y1 = (oOther.y1 < y1) ? oOther.y1 : y1;
+	     x2 = (oOther.x2 > x2) ? oOther.x2 : x2;
+	     y2 = (oOther.y2 > y2) ? oOther.y2 : y2;
+    }
     bool IsPosInRect(Pos &oPos)
     {
          if (oPos.x >= x1 && oPos.x <= x2 &&

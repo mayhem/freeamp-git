@@ -1159,7 +1159,18 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
         }
         else // might need to add the artist
         {
-            if(TreeView_GetNextSibling(m_hMusicView, m_hUncatItem))
+            HTREEITEM root = TreeView_GetRoot(m_hMusicView);
+
+            TV_ITEM tv_item;
+
+            tv_item.hItem = root;
+            tv_item.mask = TVIF_STATE;
+            tv_item.stateMask = TVIS_EXPANDEDONCE;
+            tv_item.state = 0;
+
+            TreeView_GetItem(m_hMusicView, &tv_item);
+
+            if(tv_item.state & TVIS_EXPANDEDONCE)
             {
                 TV_INSERTSTRUCT insert;
                 TreeData        data;

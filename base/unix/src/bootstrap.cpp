@@ -26,10 +26,13 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/sem.h> 
+#include <sys/shm.h> 
 
-#ifdef DEBUG_MUTEXES
+#include <sys/types.h>
 #include <signal.h>
-#endif
 
 #include "player.h"
 #include "event.h"
@@ -41,6 +44,10 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 #include "unixprefs.h"
+
+const int iSemKey = 0xFA000000;
+const int iMemKey = 0xFA000001;
+const int iSharedMemSize = 4096;
 
 #if MP3_PROF
 extern "C" {
@@ -60,11 +67,81 @@ int main(int argc, char **argv)
 {
     FAContext *context = new FAContext;
     UnixPrefs *unixPrefs = new UnixPrefs;
+    key_t      tSemKey = iSemKey;
+    key_t      tMemKey = iMemKey;
+    int        iCmdSem = -1, iCmdMem = -1;
+    int        iProcess, i;
+    char      *pCmdLine = NULL, *pPtr;
+
+    context->prefs = unixPrefs;
+    context->log = new LogFile("freeamp.log");
 
     int errLine;
     if ((errLine = unixPrefs->GetErrorLineNumber()))
-    	cerr << "ERROR parsing line " << errLine 
+        cerr << "ERROR parsing line " << errLine
              << " of ~/.freeamp/preferences\n";
+
+    bool allow_mult = false;
+    context->prefs->GetAllowMultipleInstances(&allow_mult);
+
+    if (!allow_mult) {
+        iCmdSem = semget(tSemKey, 1, IPC_CREAT | 0666);
+        if (iCmdSem < 0)
+        {
+           printf("Cannot create/open a semaphore. Is SYS V IPC installed?\n");
+           exit(0);
+        }
+
+        // Check to see if the process that created that semaphore still
+        // exists
+        iProcess = semctl(iCmdSem, 0, GETVAL, 0);
+        if (iProcess > 0 && !allow_mult)
+        {
+            if (kill(iProcess, 0) >= 0)
+            {
+                iCmdMem = shmget(tMemKey, iSharedMemSize, 0666);
+                pCmdLine = (char *)shmat(iCmdMem, NULL, 0); 
+                for(i = 1, pPtr = pCmdLine; i < argc; i++)
+                {
+                    char *path = new char[_MAX_PATH];
+                    strcpy(path, argv[i]);
+                    if (strncasecmp(argv[i], "http://", 7) &&
+                        strncasecmp(argv[i], "rtp://", 6))
+                        ResolvePath(&path);
+
+                    strcpy(pPtr, path);
+                    pPtr += strlen(pPtr) + 1;
+
+                    delete [] path;
+                }
+                *pPtr = 0;
+
+                // Now wait for the main freeamp to parse the args and then exit
+                while(*pCmdLine != 0)
+                {
+                    if (kill(iProcess, 0) < 0)
+                        break;
+
+                    sleep(1);
+                }
+
+                shmdt(pCmdLine);
+
+                exit(0);
+            }
+        }
+
+        // Set the current pid into the semaphore
+        semctl(iCmdSem, 0, SETVAL, getpid());
+
+        // Create the shared memory segment
+        iCmdMem = shmget(tMemKey, iSharedMemSize, IPC_CREAT | 0666);
+        if (iCmdMem != -1)
+        {
+            pCmdLine = (char *)shmat(iCmdMem, NULL, 0); 
+            pCmdLine[0] = 0;
+        }
+    }
 
 #ifdef DEBUG_MUTEXES
     struct sigaction sigact;
@@ -77,9 +154,6 @@ int main(int argc, char **argv)
          << "To dump mutex info: kill -SIGUSR1 " << getpid() << endl;
 #endif
     
-    context->prefs = unixPrefs;
-    context->log = new LogFile("freeamp.log");
-
     Registrar *registrar= new Registrar();
     Registry *lmc;
     Registry *pmi;
@@ -125,14 +199,55 @@ int main(int argc, char **argv)
     pP->RegisterPMOs(pmo);
     pP->RegisterUIs(ui);
 
-    if (pP->SetArgs(argc,argv)) {
-	pP->SetTerminationSemaphore(termSemaphore);
-	pP->Run();
-	
-	termSemaphore->Wait();
+    if (pP->SetArgs(argc,argv)) 
+    {
+        pP->SetTerminationSemaphore(termSemaphore);
+        pP->Run();
+
+        for(;;)
+        {
+            if (!termSemaphore->TimedWait(1000))
+            {
+                if (pCmdLine && strlen(pCmdLine) > 0 && !allow_mult)
+                {
+                    int iItems = context->plm->CountItems();
+                    bool bPlay;
+
+                    context->prefs->GetPlayImmediately(&bPlay);
+                    for(i = 0, pPtr = pCmdLine; *pPtr; i++)
+                    {
+                        if (i == 0)
+                        {
+                            if (strcmp("fat", pPtr + strlen(pPtr) - 3) == 0)
+                               bPlay = false;
+
+                            if (bPlay) 
+                                context->plm->RemoveAll();
+                        }
+
+                        pP->HandleSingleArg(pPtr);
+                        pPtr += strlen(pPtr) + 1;
+                    }
+                    pCmdLine[0] = 0;
+
+                    if (iItems == 0 || bPlay)
+                        context->target->AcceptEvent(new Event(CMD_Play));
+                }
+            }
+            else
+                break;
+        }
+    }
+
+    if (!allow_mult) {
+        if (pCmdLine)
+            shmdt(pCmdLine); 
+        semctl (iCmdSem, IPC_RMID, 0);
+        shmctl (iCmdMem, IPC_RMID, 0);
     }
 
     delete pP;
     delete context;
+
     return 0;
 }

@@ -43,6 +43,7 @@ class TextControl : public Control
 
       void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
       virtual void Init(void);
+      virtual bool UseToDragWindow(void);
 
     private:
 

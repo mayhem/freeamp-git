@@ -101,9 +101,7 @@ bool TreeData::IsTrack()
 {
    bool result = false;
 
-    result = m_pAlbum != NULL &&
-             m_pArtist != NULL &&
-             m_pTrack != NULL;
+    result = m_pTrack != NULL;
     
     return result;
 }
