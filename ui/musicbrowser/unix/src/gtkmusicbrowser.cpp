@@ -341,17 +341,8 @@ void GTKMusicBrowser::CreateExpanded(void)
     masterBrowserBox = gtk_vbox_new(FALSE, 0);
     gtk_paned_pack1(GTK_PANED(masterBox), masterBrowserBox, TRUE, TRUE);
 
-<<<<<<< gtkmusicbrowser.cpp
     hbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(masterBrowserBox), hbox, FALSE, FALSE, 5);
-=======
-    if (event->type == GDK_2BUTTON_PRESS) {
-        vector<PlaylistItem *> *newlist = getTreeSelection(ctree);
-        p->AddTracksDoubleClick(newlist);
-    }
-    else {
-        int row, column;
->>>>>>> 1.59.2.1.2.4.2.1.2.1
 
     browserlabel = gtk_label_new("My Music:");
     gtk_box_pack_start(GTK_BOX(hbox), browserlabel, FALSE, FALSE, 5);

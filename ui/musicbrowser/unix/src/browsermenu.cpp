@@ -443,6 +443,11 @@ static void sort_location(GTKMusicBrowser *p, guint action, GtkWidget *w)
     p->SortPlaylistEvent(kPlaylistSortKey_Location, kPlaylistSortType_Ascending);
 }
 
+static void sort_filename(GTKMusicBrowser *p, guint action, GtkWidget *w)
+{
+    p->SortPlaylistEvent(kPlaylistSortKey_FileName, kPlaylistSortType_Ascending);
+}
+
 static void sort_normal(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
     p->iSetShuffleMode = true;
@@ -574,6 +579,7 @@ void GTKMusicBrowser::CreateMenu(GtkWidget *topbox)
      {"/_Sort Playlist/by Genre", NULL,         (void(*)())sort_genre, 0, 0 },
      {"/_Sort Playlist/by Length", NULL,        (void(*)())sort_time,  0, 0 },
      {"/_Sort Playlist/by Location", NULL,      (void(*)())sort_location, 0, 0 },
+     {"/_Sort Playlist/by Filename", NULL,      (void(*)())sort_filename, 0, 0 },
      {"/_Sort Playlist/Randomly", NULL,         (void(*)())sort_random, 0, 0 },
 
      {"/_Help",                 NULL,           0,          0, "<Branch>" },
