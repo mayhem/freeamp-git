@@ -741,6 +741,13 @@ AC_CHECK_LIB(z, uncompress,
 )
 AC_SUBST(ID3_LIBS)
 
+AC_CHECK_HEADERS(kde/artsc/artsc.h, have_arts="true", have_arts="false")
+
+if test "$have_arts" = "false"; then
+  AC_CHECK_HEADERS(artsc/artsc.h, have_arts="true", 
+                    have_arts="false")
+fi
+
 ARTS_LIBS=""
 AC_CHECK_LIB(artsc, arts_init, 
   OSDEPPLUGINS="$OSDEPPLUGINS plugins/arts.pmo";

@@ -28,7 +28,11 @@ ____________________________________________________________________________*/
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#ifdef HAVE_KDE_ARTSC_ARTSC_H
 #include <kde/artsc/artsc.h>
+#else
+#include <artsc/artsc.h>
+#endif
 #include <sys/soundcard.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
