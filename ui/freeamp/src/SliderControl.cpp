@@ -55,11 +55,11 @@ static TransitionInfo pTransitions[] =
 };
 
 SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs,
-                             int iNumFrames) :
+                             int iNumFrames, int iNotchPercent, int iNotchWidth) :
                Control(pWindow, oName, pTransitions)
 {
      m_iRange = -1;
-     m_iCurrentPos = -1;
+     m_iCurrentPos = 0;
      m_iValue = -1;
      m_oOrigin.x = -1;
      m_iNumThumbStates = iThumbs;
@@ -69,7 +69,8 @@ SliderControl::SliderControl(Window *pWindow, string &oName, int iThumbs,
      m_bHasTroughBitmap = false;
      m_bTroughMiddle = false;
      m_iCurrentTroughFrame = -1;
-     m_iLastThumbPos = 0; 
+     m_iNotchPercent = iNotchPercent;
+     m_iNotchWidth = iNotchWidth / 2;
 };
 
 SliderControl::~SliderControl(void)
@@ -313,7 +314,6 @@ void SliderControl::HandleJump(ControlTransitionEnum  eTrans,
     }   
 
     m_iCurrentPos = iNewPos;
-    m_oLastPos = *pPos;
     
     m_iValue = (m_iCurrentPos * 100) / m_iRange;
     m_bIsDrag = true;
@@ -326,14 +326,14 @@ void SliderControl::HandleJump(ControlTransitionEnum  eTrans,
 void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
                                Pos                   *pPos)
 {
-    int     iDelta, iNewPos;
+    int iNewPos;
 
     m_oMutex.Acquire();
 
     // Is this the beginning of a drag?
     if (m_oOrigin.x == -1)
     {
-        m_oLastPos = m_oOrigin = *pPos;
+        m_oOrigin = *pPos;
 
         m_oMutex.Release();
 
@@ -349,17 +349,23 @@ void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
         return;
     }    
 
-    iDelta = pPos->x - m_oLastPos.x; 
-    iNewPos = min(max(m_iCurrentPos + iDelta, 0), m_iRange);
-    
+    iNewPos = min(max(m_iRange - (m_oRect.x2 - pPos->x), 0), m_iRange);
     if (iNewPos == m_iCurrentPos)
     {
         m_oMutex.Release();
         return;
     }    
 
+    if (m_iNotchPercent > 0)
+    {
+        int iNotch;
+        
+        iNotch = ((m_iRange * m_iNotchPercent) / 100);
+        if (iNewPos >= (iNotch - m_iNotchWidth) &&
+            iNewPos <= (iNotch + m_iNotchWidth))
+           iNewPos = iNotch;
+    }
     m_iCurrentPos = iNewPos;
-    m_oLastPos = *pPos;
     
     m_iValue = (m_iCurrentPos * 100) / m_iRange;
     m_oMutex.Release();
@@ -371,7 +377,7 @@ void SliderControl::HandleDrag(ControlTransitionEnum  eTrans,
 void SliderControl::MoveThumb(int iNewPos)
 {
     Canvas *pCanvas;
-    Rect    oEraseRect, oRect;
+    Rect    oRect;
 
     pCanvas = m_pParent->GetCanvas();
     pCanvas->Erase(m_oRect);
@@ -412,8 +418,6 @@ void SliderControl::MoveThumb(int iNewPos)
     }
     
     pCanvas->Invalidate(m_oRect);
-
-    m_iLastThumbPos = iNewPos;
 } 
 
 void SliderControl::BlitTrough(int iPos)

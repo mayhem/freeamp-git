@@ -901,6 +901,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
     {
        m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
        int iThumbStates = 1, iNumFrames = 3;    
+       int iNotch = -1, iNotchWidth = -1;
 
        if (m_pCurrentControl)
        {
@@ -923,10 +924,21 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            iNumFrames = atoi(oAttrMap["Frames"].c_str());
        }
 
+       if (oAttrMap.find("Notch") != oAttrMap.end())
+       {
+           iNotch = atoi(oAttrMap["Notch"].c_str());
+       }
+
+       if (oAttrMap.find("NotchWidth") != oAttrMap.end())
+       {
+           iNotchWidth = atoi(oAttrMap["NotchWidth"].c_str());
+       }
+
        m_eCurrentControl = eSliderControl;
        m_pCurrentControl = new SliderControl(m_pCurrentWindow,
                                              oAttrMap["Name"],
-                                             iThumbStates, iNumFrames);
+                                             iThumbStates, iNumFrames,
+                                             iNotch, iNotchWidth);
        return kError_NoErr;
     }
 
@@ -934,6 +946,7 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
     {
        m_bPosDefined = m_bBitmapDefined = m_bInfoDefined = false;
        int iThumbStates = 1, iNumFrames = 3;    
+       int iNotch = -1, iNotchWidth = -1;
    
        if (m_pCurrentControl)
        {
@@ -956,10 +969,20 @@ Error Theme::BeginElement(string &oElement, AttrMap &oAttrMap)
            iNumFrames = atoi(oAttrMap["Frames"].c_str());
        }
 
+       if (oAttrMap.find("Notch") != oAttrMap.end())
+       {
+           iNotch = atoi(oAttrMap["Notch"].c_str());
+       }
+
+       if (oAttrMap.find("NotchWidth") != oAttrMap.end())
+       {
+           iNotchWidth = atoi(oAttrMap["NotchWidth"].c_str());
+       }
        m_eCurrentControl = eVSliderControl;
        m_pCurrentControl = new VSliderControl(m_pCurrentWindow,
                                               oAttrMap["Name"],
-                                              iThumbStates, iNumFrames);
+                                              iThumbStates, iNumFrames,
+                                              iNotch, iNotchWidth);
        return kError_NoErr;
     }
 

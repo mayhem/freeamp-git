@@ -184,6 +184,10 @@ void ButtonControl::Transition(ControlTransitionEnum  eTrans,
        m_pParent->SendControlMessage(this, CM_Pressed);
     }       
 
+    pCanvas = m_pParent->GetCanvas();
+    pCanvas->Erase(m_oRect);
+    pCanvas->Invalidate(m_oRect);
+
     BlitFrame(m_eCurrentState);
 }
 

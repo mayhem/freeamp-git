@@ -31,7 +31,8 @@ class SliderControl : public Control
     public:
 
                SliderControl(Window *pWindow, string &oName, int iThumbs,
-                             int iNumFrames);
+                             int iNumFrames,  int iNotchPercent = -1, 
+                             int iNotchWidth = -1);
       virtual ~SliderControl(void);
 
               void Transition(ControlTransitionEnum eTrans, Pos *pMousePos);
@@ -49,9 +50,9 @@ class SliderControl : public Control
               void MoveThumb(int iNewPos);
               void BlitTrough(int iPos);
 					  
-      Pos     m_oOrigin, m_oLastPos;
-      int     m_iRange;
-      int     m_iCurrentPos, m_iLastThumbPos;
+      Pos     m_oOrigin;
+      int     m_iRange, m_iNotchPercent, m_iNotchWidth;
+      int     m_iCurrentPos;
       int     m_iThumbWidth;
       bool    m_bIsDrag, m_bInUpdate;
       int     m_iNumThumbStates, m_iNumFrames;

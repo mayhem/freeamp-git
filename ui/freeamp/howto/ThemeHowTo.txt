@@ -4,7 +4,7 @@
                             Robert Kaye
                          (rob@emusic.com)
         $Id$
-                    (Updated for version 2.0.5)
+                    (Updated for version 2.1.0)
 
 INTRODUCTION
 
@@ -72,22 +72,8 @@ reload the theme without exiting FreeAmp.
 
 When you are done with your theme and want to ship it off to the
 FreeAmp theme repository or to your friends, package it up using
-the MakeTheme program bundled with FreeAmp. Simply do:
-
-    MakeTheme mytheme.fat theme.xml title.txt *.bmp
-    
-in your theme directory. You can then add the mytheme.fat in
-the options dialog to load your theme. 
-
-Note: The .fat format is simple (no symlinks, no directories) 
-implementation of a tar'ed, gzipped file. If you prefer you can
-do:
-
-    tar -czf mytheme.fat theme.xml title.txt *.bmp
-    
-It will give you the same result. NOTE: You must use _gzip_ not
-the windows based pkzip or winzip.
-
+any stinking zip program you can find. Rename the resultant .zip
+file to have a .fat extension and you're done.
 
 BITMAPS
 
@@ -488,7 +474,7 @@ field is for whatever miscellaneous credit information you'd like to
 include. Only the Name attribute is required.
 
 
-Headlines: (Added for 2.0.2, updated for 2.0.5)
+Headlines:
 ----------
 
 FreeAmp now has the capabilities to download headlines from popular
@@ -498,8 +484,8 @@ the headlines and what data to display:
 <Headlines URL="http://www.slashdot.org/slashdot.xml"
            XMLPath="/backslash/story/title"
            XMLURLPath="/backslash/story/url"
-		   DownloadInterval="3600"
-		   ChangeInterval="10"/>
+           DownloadInterval="3600"
+           ChangeInterval="10"/>
 
 This Headlines tag shows the headlines from Slashdot in the 'HeadlineInfo'
 TextField. The URL attribute specifies the HTTP location of the XML document 

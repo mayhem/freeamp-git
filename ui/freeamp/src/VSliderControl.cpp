@@ -38,28 +38,28 @@ static TransitionInfo pTransitions[] =
     { CS_Normal,     CT_MouseEnter,       CS_MouseOver  }, 
     { CS_Normal,     CT_Disable,          CS_Disabled   }, 
     { CS_Normal,     CT_Hide,             CS_Hidden     },
-    { CS_Normal,     CT_MouseEnter,       CS_MouseOver  }, 
     { CS_Normal,     CT_Show,             CS_Normal     }, 
     { CS_MouseOver,  CT_MouseLeave,       CS_Normal     }, 
     { CS_MouseOver,  CT_MouseLButtonDown, CS_Dragging   }, 
     { CS_MouseOver,  CT_Disable,          CS_Disabled   }, 
     { CS_Dragging,   CT_MouseMove,        CS_Dragging   }, 
     { CS_Dragging,   CT_MouseLButtonUp,   CS_MouseOver  }, 
+    { CS_Disabled ,  CT_Show,             CS_Disabled   },
     { CS_Disabled ,  CT_Enable,           CS_Normal     },
     { CS_Disabled ,  CT_MouseEnter,       CS_DisabledMO },
-    { CS_Disabled ,  CT_Show,             CS_Disabled   },
     { CS_DisabledMO, CT_MouseLeave,       CS_Disabled   },
+    { CS_DisabledMO, CT_Enable,           CS_MouseOver  },
     { CS_Hidden,     CT_Show,             CS_Normal     },
     { CS_Any,        CT_SetValue,         CS_Same       },
     { CS_LastState,  CT_LastTransition,   CS_LastState  }
 };
 
 VSliderControl::VSliderControl(Window *pWindow, string &oName, int iThumbs,
-                               int iNumFrames) :
+                               int iNumFrames, int iNotchPercent, int iNotchWidth) :
                Control(pWindow, oName, pTransitions)
 {
      m_iRange = -1;
-     m_iCurrentPos = -1;
+     m_iCurrentPos = 0;
      m_iValue = -1;
      m_oOrigin.y = -1;
      m_iNumThumbStates = iThumbs;
@@ -69,6 +69,8 @@ VSliderControl::VSliderControl(Window *pWindow, string &oName, int iThumbs,
      m_bHasTroughBitmap = false;
      m_bTroughMiddle = false;
      m_iCurrentTroughFrame = -1;
+     m_iNotchPercent = iNotchPercent;
+     m_iNotchWidth = iNotchWidth / 2;
 };
 
 VSliderControl::~VSliderControl(void)
@@ -167,7 +169,7 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
 
        case CT_SetValue:
        {
-           int iNewPos, iOldPos;    
+           int iNewPos;    
 
            if (m_iValue < 0 || m_iValue > 100)
                return;
@@ -188,13 +190,12 @@ void VSliderControl::Transition(ControlTransitionEnum  eTrans,
               return;
            }
 
-           iOldPos = m_iCurrentPos;
            m_iCurrentPos = iNewPos;
            m_bInUpdate = false;
            m_oMutex.Release();
 
            if (!m_pPanel->IsHidden())
-               MoveThumb(iOldPos, iNewPos);
+               MoveThumb(iNewPos);
            
            return;
        }   
@@ -311,12 +312,11 @@ void VSliderControl::HandleJump(ControlTransitionEnum  eTrans,
     }   
     m_oMutex.Release();
 
-    MoveThumb(m_iCurrentPos, iNewPos);
+    MoveThumb(iNewPos);
 
     m_oMutex.Acquire();
 
     m_iCurrentPos = iNewPos;
-    m_oLastPos = *pPos;
     
     m_iValue = 100 - ((m_iCurrentPos * 100) / m_iRange);
     m_bIsDrag = true;
@@ -327,15 +327,14 @@ void VSliderControl::HandleJump(ControlTransitionEnum  eTrans,
 void VSliderControl::HandleDrag(ControlTransitionEnum  eTrans,
                                Pos                   *pPos)
 {
-    int     iDelta, iNewPos;
+    int iNewPos;
 
     m_oMutex.Acquire();
 
     // Is this the beginning of a drag?
     if (m_oOrigin.y == -1)
     {
-        m_oLastPos = m_oOrigin = *pPos;
-
+        m_oOrigin = *pPos;
         m_oMutex.Release();
 
         m_pParent->HideMouse(true);
@@ -350,41 +349,39 @@ void VSliderControl::HandleDrag(ControlTransitionEnum  eTrans,
         return;
     }    
 
-    iDelta = pPos->y - m_oLastPos.y; 
-    iNewPos = min(max(m_iCurrentPos + iDelta, 0), m_iRange);
-    
+    iNewPos = min(max(m_iRange - (m_oRect.y2 - pPos->y), 0), m_iRange);
     if (iNewPos == m_iCurrentPos)
     {
         m_oMutex.Release();
         return;
     }    
-    m_oMutex.Release();
 
-    MoveThumb(m_iCurrentPos, iNewPos);
-
-    m_oMutex.Acquire();
-    
+    if (m_iNotchPercent > 0)
+    {
+        int iNotch;
+        
+        iNotch = ((m_iRange * m_iNotchPercent) / 100);
+        if (iNewPos >= (iNotch - m_iNotchWidth) &&
+            iNewPos <= (iNotch + m_iNotchWidth))
+           iNewPos = iNotch;
+    }
     m_iCurrentPos = iNewPos;
-    m_oLastPos = *pPos;
-    
+
     m_iValue = 100 - ((m_iCurrentPos * 100) / m_iRange);
+
     m_oMutex.Release();
     
+    MoveThumb(iNewPos);
     m_pParent->SendControlMessage(this, CM_SliderUpdate);
 }
 
-void VSliderControl::MoveThumb(int iCurrentPos, int iNewPos)
+void VSliderControl::MoveThumb(int iNewPos)
 {
     Canvas *pCanvas;
-    Rect    oEraseRect, oRect;
+    Rect    oRect;
 
-    oEraseRect.y1 = m_oRect.y1 + iCurrentPos;
-    oEraseRect.y2 = oEraseRect.y1 + m_iThumbHeight + 1;
-    oEraseRect.x1 = m_oRect.x1;
-    oEraseRect.x2 = m_oRect.x2 + 1;
-    
     pCanvas = m_pParent->GetCanvas();
-    pCanvas->Erase(oEraseRect);
+    pCanvas->Erase(m_oRect);
 
     oRect.y1 = m_oRect.y1 + iNewPos;
     oRect.y2 = oRect.y1 + m_iThumbHeight;
@@ -408,14 +405,14 @@ void VSliderControl::MoveThumb(int iCurrentPos, int iNewPos)
           break;
 
        case CS_Disabled:
+       case CS_DisabledMO:
           BlitFrame(CS_Disabled, iThumbNumber, &oRect, false);
           break;
 
        default:
           break;
     }
-    oEraseRect.Union(oRect);
-    pCanvas->Invalidate(oEraseRect);
+    pCanvas->Invalidate(m_oRect);
 }
 
 void VSliderControl::BlitTrough(int iPos)
