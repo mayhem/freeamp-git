@@ -51,11 +51,11 @@ MUSICBRAINZOBJ += lib/musicbrainz/osdep/cdi_linux.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/base64.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/sha_func.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/cdindex.o 
-MUSICBRAINZOBJ += lib/musicbrainz/lib/http.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/mb_http.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/xql.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/cdi.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/diskid.o
-MUSICBRAINZOBJ += lib/musicbrainz/lib/parse.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/xparse.o
 
 lib/musicbrainz/lib/libmusicbrainz.a: $(MUSICBRAINZOBJ)
 	+test -d lib/musicbrainz/lib || mkdir lib/musicbrainz/lib
