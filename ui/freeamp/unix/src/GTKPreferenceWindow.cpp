@@ -193,7 +193,7 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
     gdk_threads_enter();
 
     mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_modal(GTK_WINDOW(mainWindow), TRUE);
+    //gtk_window_set_modal(GTK_WINDOW(mainWindow), TRUE);
     gtk_signal_connect(GTK_OBJECT(mainWindow), "destroy",
                        GTK_SIGNAL_FUNC(pref_destroy), this);
     gtk_window_set_title(GTK_WINDOW(mainWindow), BRANDING" - Preferences");
