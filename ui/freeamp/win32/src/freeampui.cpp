@@ -2789,6 +2789,30 @@ AcceptEvent(Event* event)
 				break; 
             }
 
+            case INFO_StreamInfo:
+            { 
+                StreamInfoEvent *info = (StreamInfoEvent*)event;
+
+                char title[256] = "FreeAmp - ";
+
+                m_songTitleView->SetText(info->m_streamTitle);
+
+                SetTrayTooltip(m_songTitleView->Text());
+
+                if(m_prevSongInfoText)
+                        delete m_prevSongInfoText;
+
+                m_prevSongInfoText = new char [strlen(m_songTitleView->Text()) + 1];
+                strcpy(m_prevSongInfoText, m_songTitleView->Text());
+
+                strncat(title, m_songTitleView->Text(), sizeof(title) - strlen(title));
+
+                SetWindowText(m_hwnd, title);
+                
+                break;
+            }
+
+
             case INFO_MediaTimeInfo: 
             {
                 MediaTimeInfoEvent* info = (MediaTimeInfoEvent*)event;

@@ -527,33 +527,34 @@ class     StreamBufferEvent:public Event
 
 class     StreamInfoEvent:public Event
 {
-   private:
-   char     *m_szStreamURL;
-   char     *m_szStreamTitle;
+   
 
-             public:
+public:
+
+   char     *m_streamURL;
+   char     *m_streamTitle;
 
              StreamInfoEvent(char *szTitle, char *szURL)
    {
       m_type = INFO_StreamInfo;
-      m_szStreamURL = strdup(szURL);
-      m_szStreamTitle = strdup(szTitle);
+      m_streamURL = strdup(szURL);
+      m_streamTitle = strdup(szTitle);
    };
 
    virtual ~ StreamInfoEvent()
    {
-      free(m_szStreamURL);
-      free(m_szStreamTitle);
+      free(m_streamURL);
+      free(m_streamTitle);
    };
 
    void      GetURL(char *szUrl, int iSize)
    {
-      strncpy(szUrl, m_szStreamURL, iSize - 1);
+      strncpy(szUrl, m_streamURL, iSize - 1);
       szUrl[iSize - 1] = 0;
    }
    void      GetTitle(char *szTitle, int iSize)
    {
-      strncpy(szTitle, m_szStreamTitle, iSize - 1);
+      strncpy(szTitle, m_streamTitle, iSize - 1);
       szTitle[iSize - 1] = 0;
    }
 };
