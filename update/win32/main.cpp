@@ -123,8 +123,11 @@ void MoveFiles(const char* src, const char* dest)
                 }
                 else 
                 {
+                    // remove old file
+                    DeleteFile(destPath);
+                    
                     // actually move the file
-                    if(!MoveFileEx(srcPath, destPath, MOVEFILE_REPLACE_EXISTING))
+                    if(!MoveFile(srcPath, destPath))
                     {
                         LPVOID lpMessageBuffer;
 
