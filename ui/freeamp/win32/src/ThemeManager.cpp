@@ -65,7 +65,7 @@ ThemeManager::ThemeManager(FAContext *pContext)
         {
            m_bDevelTheme = true;
            m_oDevelTheme = m_oCurrentTheme;
-           m_oCurrentTheme = THEME_IN_DEVEL;
+           m_oCurrentTheme = string(THEME_IN_DEVEL);
         }   
         else
         {
