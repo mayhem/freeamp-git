@@ -2357,7 +2357,7 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
         case WM_HELP:
         case UWM_HELP:
         {
-            ShowHelp(m_pContext, Preferences_About);
+            ShowHelp(m_pContext, Preferences_Directory);
             break;
         }
 
@@ -2369,7 +2369,7 @@ bool Win32PreferenceWindow::PrefDirectoryProc(HWND hwnd,
             {
                 case PSN_HELP:
                 {
-                    ShowHelp(m_pContext, Preferences_About);
+                    ShowHelp(m_pContext, Preferences_Directory);
                     break;
                 }
                 case PSN_SETACTIVE:

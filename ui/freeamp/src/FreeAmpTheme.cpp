@@ -1592,9 +1592,9 @@ void FreeAmpTheme::ShowHelp(void)
     if (!::ShowHelp(m_pContext, FreeAmp_Main_Window))
     {
         MessageDialog oBox(m_pContext);
-        string oMessage("Cannot find the help files. Please make sure that the h
-elp files are properly installed, and you are not running "the_BRANDING" from th
-e build directory.");
+        string oMessage("Cannot find the help files. Please make sure that the "
+			            "help files are properly installed, and you are not "
+						"running "the_BRANDING" from the build directory.");
         oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);  
     }
 }
