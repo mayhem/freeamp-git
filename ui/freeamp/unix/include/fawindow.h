@@ -38,6 +38,7 @@ ____________________________________________________________________________*/
 
 class FAWindow {
  protected:
+    bool m_mapped;
     Display *m_display;
     int32 m_screenNum;
     GC m_gc;
@@ -94,6 +95,47 @@ class FATriStateWindow : public FAWindow {
     void SetClickAction(action_function,void *);
     virtual void DoEvent(XEvent);
 };
+
+class FALcdWindow : public FAWindow {
+ private:
+    enum {
+	LargeFont = 0,
+	SmallFont
+    };
+    char *m_text;
+    int *m_smallFontWidth;
+    Pixmap m_smallFontPixmap;
+    int *m_largeFontWidth;
+    Pixmap m_largeFontPixmap;
+    Pixmap m_doubleBufferPixmap;
+    void Draw();
+    int32 m_displayState;
+    Pixmap m_mainTextMask;
+    Pixmap m_iconMask;
+ public:
+    enum {
+	IntroState,
+	VolumeState,
+	CurrentTimeState,
+	SeekTimeState,
+	RemainingTimeState,
+	TotalTimeState	
+    };
+
+    FALcdWindow(Display *,int32,GC,Window,int32,int32,int32,int32);
+    virtual ~FALcdWindow();
+    virtual void DoEvent(XEvent);
+    void SetSmallFontPixmap(Pixmap);
+    void SetSmallFontWidth(int *);
+    void SetLargeFontPixmap(Pixmap);
+    void SetLargeFontWidth(int *);
+    void SetMainText(const char *);
+
+    void BlitText(Drawable d, int32 x, int32 y, const char *text, int32 font);
+    void SetDisplayState(int32);
+
+};
+
 #endif // _WindowHash_H_
 
 

@@ -269,8 +269,8 @@ void Player::Run(){
 		        m_ui->SetTarget((EventQueue *)this);
 		        m_ui->SetPlayListManager(m_plm);
                 m_ui->SetArgs(m_argc, m_argv);
-		        m_ui->Init();
                 RegisterActiveUI(m_ui);
+		        m_ui->Init();
 		        uisActivated++;
                 break;
             }

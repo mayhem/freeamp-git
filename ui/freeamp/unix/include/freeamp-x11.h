@@ -57,6 +57,8 @@ class FreeAmpUI : public UserInterface {
     EventQueue *m_playerEQ;
  private:
     FAMainWindow *m_mainWindow;
+    FALcdWindow *m_lcdWindow;
+
     FATriStateWindow *m_playButton;
     static void playFunction(void *);
     FATriStateWindow *m_stopButton;

@@ -40,6 +40,10 @@ ____________________________________________________________________________*/
 #include "windowhash.h"
 #include "graphics.h"
 
+#define DEFINE_FONT_WIDTHS
+#include "font_width.h"
+#undef DEFINE_FONT_WIDTHS
+
 extern "C" {
 
 UserInterface *Initialize() {
@@ -68,6 +72,40 @@ void FreeAmpUI::SetPlayListManager(PlayListManager *plm) {
 
 void FreeAmpUI::Init()
 {
+
+    char *arg = NULL;
+    bool shuffle = false;
+    bool autoplay = false;
+    int32 count = 0;
+
+    for(int32 i = 1;i < m_argc; i++) {
+	arg = m_argv[i];
+	
+	if (arg[0] == '-') {
+	    switch (arg[1]) {
+		case 's':
+                    shuffle = true;
+		    break;
+                case 'p':
+                    autoplay = true;
+		    break;
+            }
+        } else {
+            m_plm->Add(arg,0);
+            count++;
+	}
+    }
+
+    m_plm->SetFirst();
+    
+    if(shuffle) 
+        m_plm->SetShuffle(SHUFFLE_SHUFFLED);
+    
+    if(autoplay)
+       m_playerEQ->AcceptEvent(new Event(CMD_Play));
+
+
+
     XSizeHints *size_hints;
     XIconSize *size_list;
     XWMHints *wm_hints;
@@ -149,6 +187,9 @@ void FreeAmpUI::Init()
     m_openButton = new FATriStateWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),OPEN_BUTTON_X,OPEN_BUTTON_Y,OPEN_BUTTON_WIDTH,OPEN_BUTTON_HEIGHT * 3);
     m_openButton->SetPartialHeight(OPEN_BUTTON_HEIGHT);
 
+
+    m_lcdWindow = new FALcdWindow(m_display,m_screenNum,m_gc,m_mainWindow->GetWindow(),LCD_X,LCD_Y,LCD_WIDTH,LCD_HEIGHT);
+
     switch (display_depth) {
 	case 16:
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo,&m_iconPixmap,NULL,NULL);	    
@@ -174,6 +215,9 @@ void FreeAmpUI::Init()
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_buttons,&repeat_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffle_buttons,&shuffle_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),open_buttons,&open_buttons_pixmap,NULL,NULL);
+
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),small_font,&small_font_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),big_font,&big_font_pixmap,NULL,NULL);
 	    break;
 	case 8:
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),logo256,&m_iconPixmap,NULL,NULL);
@@ -199,6 +243,9 @@ void FreeAmpUI::Init()
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),repeat_buttons256,&repeat_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),shuffle_buttons256,&shuffle_buttons_pixmap,NULL,NULL);
 	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),open_buttons256,&open_buttons_pixmap,NULL,NULL);
+
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),small_font256,&small_font_pixmap,NULL,NULL);
+	    XpmCreatePixmapFromData(m_display,m_mainWindow->GetWindow(),big_font256,&big_font_pixmap,NULL,NULL);
 	    break;
 	default:
 	    cerr << "Only know how to deal with bit depths of 8 or 16 (256 or 65535 colors)!!!" << endl;
@@ -230,6 +277,12 @@ void FreeAmpUI::Init()
     m_repeatButton->SetPixmap(repeat_buttons_pixmap);
     m_shuffleButton->SetPixmap(shuffle_buttons_pixmap);
     m_openButton->SetPixmap(open_buttons_pixmap);
+
+    m_lcdWindow->SetPixmap(lcd_pixmap);
+    m_lcdWindow->SetSmallFontPixmap(small_font_pixmap);
+    m_lcdWindow->SetSmallFontWidth(smallFontWidth);
+    m_lcdWindow->SetLargeFontPixmap(big_font_pixmap);
+    m_lcdWindow->SetLargeFontWidth(largeFontWidth);
 
     size_hints->flags = PPosition | PSize | PMinSize;
     size_hints->min_width = TOTAL_WIDTH;
@@ -286,6 +339,8 @@ void FreeAmpUI::Init()
     m_shuffleButton->SelectInput(tmpMask);
     m_openButton->SelectInput(tmpMask);
 
+    m_lcdWindow->SelectInput(tmpMask);
+
     // set up shape
     XSetForeground(m_display,m_gc,BlackPixel(m_display,m_screenNum));
     XFillRectangle(m_display,m_mainWindow->GetWindow(),m_gc,0,0,TOTAL_WIDTH,TOTAL_HEIGHT);
@@ -314,8 +369,6 @@ void FreeAmpUI::x11ServiceFunction(void *p) {
 }
 
 void FreeAmpUI::X11EventService() {
-    int32 button_click_spot_x = 0;
-    int32 button_click_spot_y = 0;
     XEvent report;
 
     m_playButton->SetClickAction(playFunction,this);
@@ -342,6 +395,7 @@ void FreeAmpUI::X11EventService() {
     m_windowHash->Insert(m_repeatButton->GetWindow(),(FAWindow *)m_repeatButton);
     m_windowHash->Insert(m_shuffleButton->GetWindow(),(FAWindow *)m_shuffleButton);
     m_windowHash->Insert(m_openButton->GetWindow(),(FAWindow *)m_openButton);
+    m_windowHash->Insert(m_lcdWindow->GetWindow(),(FAWindow *)m_lcdWindow);
 
     /* Display window */
     m_mainWindow->MapWindow();
@@ -355,6 +409,7 @@ void FreeAmpUI::X11EventService() {
     m_repeatButton->MapWindow();
     m_shuffleButton->MapWindow();
     m_openButton->MapWindow();
+    m_lcdWindow->MapWindow();
 
     fprintf(stderr,"Main window ID: %x\n",m_mainWindow->GetWindow());
     fprintf(stderr,"Play Button ID: %x\n",m_playButton->GetWindow());
@@ -378,6 +433,7 @@ void FreeAmpUI::X11EventService() {
 }
 
 int32 FreeAmpUI::AcceptEvent(Event *e) {
+    cout << "Got Event " << e->Type() << endl;
     switch (e->Type()) {
 	case CMD_Cleanup: {
 	    m_done = true;
@@ -400,6 +456,13 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 	    m_playButton->MapWindow();
 	    m_stopButton->UnMapWindow();
 	    break;
+	case INFO_MediaInfo: {
+	    MediaInfoEvent *info = (MediaInfoEvent *)e;
+	    char *pFoo = strrchr(info->m_filename,'/');
+	    pFoo = (pFoo ? ++pFoo : info->m_filename);
+	    m_lcdWindow->SetMainText(pFoo);
+	    break;
+	}
 	default:
 	    break;
     }
@@ -409,37 +472,6 @@ int32 FreeAmpUI::AcceptEvent(Event *e) {
 void FreeAmpUI::SetArgs(int argc, char **argv) {
     m_argc = argc;
     m_argv = argv;
-
-    char *arg = NULL;
-    bool shuffle = false;
-    bool autoplay = false;
-    int32 count = 0;
-
-    for(int32 i = 1;i < m_argc; i++) {
-	arg = m_argv[i];
-	
-	if (arg[0] == '-') {
-	    switch (arg[1]) {
-		case 's':
-                    shuffle = true;
-		    break;
-                case 'p':
-                    autoplay = true;
-		    break;
-            }
-        } else {
-            m_plm->Add(arg,0);
-            count++;
-	}
-    }
-
-    m_plm->SetFirst();
-    
-    if(shuffle) 
-        m_plm->SetShuffle(SHUFFLE_SHUFFLED);
-    
-    if(autoplay)
-       m_playerEQ->AcceptEvent(new Event(CMD_Play));
 }
 
 
