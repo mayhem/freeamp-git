@@ -184,8 +184,9 @@ void MusicBrowserUI::GenPlaylistEvent(vector<PlaylistItem*>* pSeed)
 
        int nRes = 0;
        APSPlaylist ResultList;
-
-       nRes = pInterface->APSGetPlaylist(NULL, &ResultList);
+       APSPlaylist InputList;
+ 
+       nRes = pInterface->APSGetPlaylist(&InputList, &ResultList);
        if (nRes == APS_NOERROR)
        {
            if (ResultList.Size() > 0)

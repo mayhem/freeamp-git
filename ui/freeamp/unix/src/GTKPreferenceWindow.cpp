@@ -1789,8 +1789,10 @@ void GTKPreferenceWindow::AddProfileEvent(void)
 
     char *name = gtk_entry_get_text(GTK_ENTRY(profileEntry));
     if (name) {
-        if (aps->CreateProfile(name) != APS_NOERROR)
+        if (aps->CreateProfile(name) != APS_NOERROR) {
+cout << "profile creating failed\n";
             return;
+        }
 
         char *iText[1];
         iText[0] = name;

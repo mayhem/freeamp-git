@@ -438,7 +438,7 @@ Error PlaylistManager::GeneratePlaylist()
         response = m_context->aps->APSGetPlaylist(&InputPlaylist, &ResultList);
     }
     else
-        response = m_context->aps->APSGetPlaylist(NULL, &ResultList);
+        response = m_context->aps->APSGetPlaylist(&InputPlaylist, &ResultList);
 
     if (response == (uint32)APS_NOERROR) {
         if (ResultList.Size() > 0) {

@@ -126,8 +126,11 @@ void GTKMusicBrowser::GenPlaylist(vector<PlaylistItem *> *seed)
         nResponse = m_context->aps->APSGetPlaylist(&InputPlaylist, 
                                                    &ResultPlaylist);
     }
-    else 
-        nResponse = m_context->aps->APSGetPlaylist(NULL, &ResultPlaylist);
+    else {
+        APSPlaylist InputPlaylist;
+        nResponse = m_context->aps->APSGetPlaylist(&InputPlaylist, 
+                                                   &ResultPlaylist);
+    }
    
     if (nResponse == APS_NOERROR) {
         if (ResultPlaylist.Size() > 0) {
