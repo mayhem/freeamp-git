@@ -78,11 +78,11 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\misc.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\misc.pdb" /machine:I386 /def:".\misc.def" /out:"misc.mdf"\
- /implib:"$(OUTDIR)\misc.lib" 
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
+ /incremental:no /pdb:"$(OUTDIR)\misc.pdb" /machine:I386 /def:".\misc.def"\
+ /out:"misc.mdf" /implib:"$(OUTDIR)\misc.lib" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\misc.def"
 LINK32_OBJS= \
@@ -102,8 +102,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\misc.mdf"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                              ..\..\..\..\base\win32\prj\plugins
-	copy misc.mdf     ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
+	copy misc.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "misc - Win32 Debug"
@@ -152,11 +152,12 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\misc.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\misc.pdb" /debug /machine:I386 /def:".\misc.def"\
- /out:"misc.mdf" /implib:"$(OUTDIR)\misc.lib" /pdbtype:sept 
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
+ /incremental:yes /pdb:"$(OUTDIR)\misc.pdb" /debug /machine:I386\
+ /def:".\misc.def" /out:"misc.mdf" /implib:"$(OUTDIR)\misc.lib" /pdbtype:sept\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\misc.def"
 LINK32_OBJS= \
@@ -176,8 +177,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\misc.mdf"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                              ..\..\..\..\base\win32\prj\plugins
-	copy misc.mdf     ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
+	copy misc.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "misc - Win32 NASM Release"
@@ -223,11 +224,11 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\misc.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)\misc.pdb" /machine:I386 /def:".\misc.def" /out:"misc.mdf"\
- /implib:"$(OUTDIR)\misc.lib" 
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
+ /incremental:no /pdb:"$(OUTDIR)\misc.pdb" /machine:I386 /def:".\misc.def"\
+ /out:"misc.mdf" /implib:"$(OUTDIR)\misc.lib" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\misc.def"
 LINK32_OBJS= \
@@ -247,8 +248,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\misc.mdf"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                              ..\..\..\..\base\win32\prj\plugins
-	copy misc.mdf     ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
+	copy misc.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "misc - Win32 NASM Debug"
@@ -297,11 +298,12 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\misc.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
- comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
- odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\misc.pdb" /debug /machine:I386 /def:".\misc.def"\
- /out:"misc.mdf" /implib:"$(OUTDIR)\misc.lib" /pdbtype:sept 
+LINK32_FLAGS=fabaselib.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
+ winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
+ uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
+ /incremental:yes /pdb:"$(OUTDIR)\misc.pdb" /debug /machine:I386\
+ /def:".\misc.def" /out:"misc.mdf" /implib:"$(OUTDIR)\misc.lib" /pdbtype:sept\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\misc.def"
 LINK32_OBJS= \
@@ -321,8 +323,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\misc.mdf"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                              ..\..\..\..\base\win32\prj\plugins
-	copy misc.mdf     ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                               ..\..\..\..\base\win32\prj\plugins
+	copy misc.mdf      ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -362,9 +364,6 @@ $(DS_POSTBUILD_DEP) : ".\misc.mdf"
  "$(CFG)" == "misc - Win32 NASM Release" || "$(CFG)" ==\
  "misc - Win32 NASM Debug"
 SOURCE=..\misc.cpp
-
-!IF  "$(CFG)" == "misc - Win32 Release"
-
 DEP_CPP_MISC_=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\facontext.h"\
@@ -380,67 +379,8 @@ DEP_CPP_MISC_=\
 "$(INTDIR)\misc.obj" : $(SOURCE) $(DEP_CPP_MISC_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "misc - Win32 Debug"
-
-DEP_CPP_MISC_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\config\config.h"\
-	"..\misc.h"\
-	
-
-"$(INTDIR)\misc.obj" : $(SOURCE) $(DEP_CPP_MISC_) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "misc - Win32 NASM Release"
-
-DEP_CPP_MISC_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\config\config.h"\
-	"..\misc.h"\
-	
-
-"$(INTDIR)\misc.obj" : $(SOURCE) $(DEP_CPP_MISC_) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "misc - Win32 NASM Debug"
-
-DEP_CPP_MISC_=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\facontext.h"\
-	"..\..\..\..\base\include\log.h"\
-	"..\..\..\..\base\include\metadata.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\config\config.h"\
-	"..\misc.h"\
-	
-
-"$(INTDIR)\misc.obj" : $(SOURCE) $(DEP_CPP_MISC_) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\..\..\base\src\preferences.cpp
-
-!IF  "$(CFG)" == "misc - Win32 Release"
-
 DEP_CPP_PREFE=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\preferences.h"\
@@ -450,49 +390,8 @@ DEP_CPP_PREFE=\
 "$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "misc - Win32 Debug"
-
-DEP_CPP_PREFE=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "misc - Win32 NASM Release"
-
-DEP_CPP_PREFE=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "misc - Win32 NASM Debug"
-
-DEP_CPP_PREFE=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\..\..\base\src\utility.cpp
-
-!IF  "$(CFG)" == "misc - Win32 Release"
-
 DEP_CPP_UTILI=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\preferences.h"\
@@ -505,49 +404,6 @@ DEP_CPP_UTILI=\
 "$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "misc - Win32 Debug"
-
-DEP_CPP_UTILI=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "misc - Win32 NASM Release"
-
-DEP_CPP_UTILI=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\config\config.h"\
-	{$(INCLUDE)}"sys\stat.h"\
-	{$(INCLUDE)}"sys\types.h"\
-	
-
-"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "misc - Win32 NASM Debug"
-
-DEP_CPP_UTILI=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\config\config.h"\
-	
-
-"$(INTDIR)\utility.obj" : $(SOURCE) $(DEP_CPP_UTILI) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\res\misc.rc
 
@@ -556,7 +412,7 @@ SOURCE=..\res\misc.rc
 
 "$(INTDIR)\misc.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\misc.res" /i\
- "\Local\src\freeamp\plm\metadata\misc\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\freeamp\plm\metadata\misc\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "misc - Win32 Debug"
@@ -564,7 +420,7 @@ SOURCE=..\res\misc.rc
 
 "$(INTDIR)\misc.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\misc.res" /i\
- "\Local\src\freeamp\plm\metadata\misc\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\freeamp\plm\metadata\misc\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "misc - Win32 NASM Release"
@@ -572,7 +428,7 @@ SOURCE=..\res\misc.rc
 
 "$(INTDIR)\misc.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\misc.res" /i\
- "\Local\src\freeamp\plm\metadata\misc\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\freeamp\plm\metadata\misc\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "misc - Win32 NASM Debug"
@@ -580,7 +436,7 @@ SOURCE=..\res\misc.rc
 
 "$(INTDIR)\misc.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\misc.res" /i\
- "\Local\src\freeamp\plm\metadata\misc\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\freeamp\plm\metadata\misc\res" /d "_DEBUG" $(SOURCE)
 
 
 !ENDIF 

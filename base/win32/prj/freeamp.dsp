@@ -55,11 +55,11 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib"
+# ADD LINK32 fabaselib.lib zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-        ..\..\..\themes\freeamp.fat themes
+          ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
@@ -87,12 +87,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib"
+# ADD LINK32 fabaselib.lib zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\"
 # SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-        ..\..\..\themes\freeamp.fat themes
+          ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
@@ -122,11 +122,11 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe"
-# ADD LINK32 zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib"
+# ADD LINK32 fabaselib.lib zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-        ..\..\..\themes\freeamp.fat themes
+          ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
@@ -157,12 +157,12 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept
 # SUBTRACT BASE LINK32 /profile
-# ADD LINK32 zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib"
+# ADD LINK32 fabaselib.lib zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib" /libpath:"..\\"
 # SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
-        ..\..\..\themes\freeamp.fat themes
+          ..\..\..\themes\freeamp.fat themes
 # End Special Build Tool
 
 !ENDIF 
@@ -178,95 +178,11 @@ PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\src\database.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\debug.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\downloadmanager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\log.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\src\main.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\musiccatalog.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\lib\xml\src\Parse.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\player.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\playlist.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\propimpl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\thread.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\updatemanager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\utility.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\src\win32updatemanager.cpp
-# End Source File
-# End Group
-# Begin Group "system"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\src\mutex.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\preferences.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\src\semaphore.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\src\win32prefs.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\src\win32thread.cpp
-# End Source File
-# End Group
-# Begin Group "registries"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=..\..\src\registrar.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\src\registry.cpp
 # End Source File
 # End Group
 # Begin Group "text files"

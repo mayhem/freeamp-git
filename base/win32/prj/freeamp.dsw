@@ -35,11 +35,29 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name gdbm
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
 
 Project: "dsoundcard"=..\..\..\io\dsound\win32\prj\dsoundcard.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "fabaselib"=.\fabaselib.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -59,6 +77,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -132,6 +153,9 @@ Package=<4>
     Project_Dep_Name toolbar
     End Project Dependency
     Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
+    Begin Project Dependency
     Project_Dep_Name misc
     End Project Dependency
 }}}
@@ -151,6 +175,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name gdbm
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
     End Project Dependency
 }}}
 
@@ -176,6 +203,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -188,6 +218,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -200,6 +233,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -212,6 +248,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -239,6 +278,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name gdbm
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -251,6 +293,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -265,6 +310,9 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name riolib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
     End Project Dependency
 }}}
 
@@ -290,6 +338,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -323,6 +374,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -335,6 +389,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -347,6 +404,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -359,6 +419,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name fabaselib
+    End Project Dependency
 }}}
 
 ###############################################################################

@@ -57,7 +57,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 gdbm.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"download.ui" /libpath:"..\..\..\..\lib\gdbm"
+# ADD LINK32 fabaselib.lib gdbm.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"download.ui" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
@@ -89,7 +89,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 gdbm.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"download.ui" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm"
+# ADD LINK32 fabaselib.lib gdbm.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"download.ui" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32"
 # SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE=$(InputPath)
@@ -124,7 +124,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"download.ui" /pdbtype:sept
 # SUBTRACT BASE LINK32 /profile
-# ADD LINK32 gdbm.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"download.ui" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm"
+# ADD LINK32 fabaselib.lib gdbm.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"download.ui" /pdbtype:sept /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32"
 # SUBTRACT LINK32 /profile
 # Begin Special Build Tool
 SOURCE=$(InputPath)
@@ -158,7 +158,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"download.ui"
-# ADD LINK32 gdbm.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"download.ui" /libpath:"..\..\..\..\lib\gdbm"
+# ADD LINK32 fabaselib.lib gdbm.lib wsock32.lib comctl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"download.ui" /libpath:"..\..\..\..\lib\gdbm" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
@@ -229,79 +229,11 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\src\database.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\debug.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\downloadmanager.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\src\downloadui.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\downloadui.def
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\log.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\musiccatalog.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\mutex.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\player.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\playlist.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\preferences.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\propimpl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\registrar.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\registry.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\thread.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\utility.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # End Source File
 # End Group
 # Begin Group "resources"

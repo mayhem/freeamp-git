@@ -31,6 +31,10 @@ NULL=
 NULL=nul
 !ENDIF 
 
+CPP=cl.exe
+MTL=midl.exe
+RSC=rc.exe
+
 !IF  "$(CFG)" == "xing - Win32 Release"
 
 OUTDIR=.\Release
@@ -38,15 +42,19 @@ INTDIR=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
+ALL : ".\xing.lmc"
 
 !ELSE 
 
-ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
+ALL : "fabaselib - Win32 Release" ".\xing.lmc"
 
 !ENDIF 
 
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\cdct.obj"
 	-@erase "$(INTDIR)\csbt.obj"
 	-@erase "$(INTDIR)\cup.obj"
@@ -61,33 +69,24 @@ CLEAN :
 	-@erase "$(INTDIR)\iwinm.obj"
 	-@erase "$(INTDIR)\l3dq.obj"
 	-@erase "$(INTDIR)\l3init.obj"
-	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mdct.obj"
 	-@erase "$(INTDIR)\mhead.obj"
 	-@erase "$(INTDIR)\msis.obj"
-	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\semaphore.obj"
-	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\uph.obj"
 	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\wavep.obj"
-	-@erase "$(INTDIR)\win32prefs.obj"
-	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\xing.res"
 	-@erase "$(INTDIR)\xinglmc.obj"
 	-@erase "$(OUTDIR)\xing.exp"
 	-@erase "$(OUTDIR)\xing.lib"
 	-@erase ".\xing.lmc"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -95,51 +94,18 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
  /Fp"$(INTDIR)\xing.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
- odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
+LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
  /pdb:"$(OUTDIR)\xing.pdb" /machine:I386 /def:".\xing.def" /out:"xing.lmc"\
- /implib:"$(OUTDIR)\xing.lib" 
+ /implib:"$(OUTDIR)\xing.lib" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\xing.def"
 LINK32_OBJS= \
@@ -157,23 +123,17 @@ LINK32_OBJS= \
 	"$(INTDIR)\iwinm.obj" \
 	"$(INTDIR)\l3dq.obj" \
 	"$(INTDIR)\l3init.obj" \
-	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mdct.obj" \
 	"$(INTDIR)\mhead.obj" \
 	"$(INTDIR)\msis.obj" \
-	"$(INTDIR)\mutex.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
 	"$(INTDIR)\wavep.obj" \
-	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\xing.res" \
-	"$(INTDIR)\xinglmc.obj"
+	"$(INTDIR)\xinglmc.obj" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\xing.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -185,7 +145,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\xing.lmc"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Release" ".\xing.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
 	copy xing.lmc                        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -197,15 +157,19 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
+ALL : ".\xing.lmc"
 
 !ELSE 
 
-ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
+ALL : "fabaselib - Win32 Debug" ".\xing.lmc"
 
 !ENDIF 
 
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\cdct.obj"
 	-@erase "$(INTDIR)\csbt.obj"
 	-@erase "$(INTDIR)\cup.obj"
@@ -220,23 +184,16 @@ CLEAN :
 	-@erase "$(INTDIR)\iwinm.obj"
 	-@erase "$(INTDIR)\l3dq.obj"
 	-@erase "$(INTDIR)\l3init.obj"
-	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mdct.obj"
 	-@erase "$(INTDIR)\mhead.obj"
 	-@erase "$(INTDIR)\msis.obj"
-	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\semaphore.obj"
-	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\uph.obj"
 	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\wavep.obj"
-	-@erase "$(INTDIR)\win32prefs.obj"
-	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\xing.res"
 	-@erase "$(INTDIR)\xinglmc.obj"
 	-@erase "$(OUTDIR)\xing.exp"
@@ -244,12 +201,10 @@ CLEAN :
 	-@erase "$(OUTDIR)\xing.pdb"
 	-@erase ".\xing.ilk"
 	-@erase ".\xing.lmc"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -257,51 +212,19 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  /Fp"$(INTDIR)\xing.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "_DEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
- odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
+LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
  /pdb:"$(OUTDIR)\xing.pdb" /debug /machine:I386 /def:".\xing.def"\
- /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /pdbtype:sept 
+ /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /pdbtype:sept\
+ /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\xing.def"
 LINK32_OBJS= \
@@ -319,23 +242,17 @@ LINK32_OBJS= \
 	"$(INTDIR)\iwinm.obj" \
 	"$(INTDIR)\l3dq.obj" \
 	"$(INTDIR)\l3init.obj" \
-	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mdct.obj" \
 	"$(INTDIR)\mhead.obj" \
 	"$(INTDIR)\msis.obj" \
-	"$(INTDIR)\mutex.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
 	"$(INTDIR)\wavep.obj" \
-	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\xing.res" \
-	"$(INTDIR)\xinglmc.obj"
+	"$(INTDIR)\xinglmc.obj" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\xing.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -347,7 +264,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\xing.lmc"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 Debug" ".\xing.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
 	copy xing.lmc                        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -359,15 +276,19 @@ INTDIR=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
+ALL : ".\xing.lmc"
 
 !ELSE 
 
-ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
+ALL : "fabaselib - Win32 NASM Release" ".\xing.lmc"
 
 !ENDIF 
 
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM ReleaseCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\cdct.obj"
 	-@erase "$(INTDIR)\csbt.obj"
 	-@erase "$(INTDIR)\cup.obj"
@@ -382,33 +303,24 @@ CLEAN :
 	-@erase "$(INTDIR)\iwinm.obj"
 	-@erase "$(INTDIR)\l3dq.obj"
 	-@erase "$(INTDIR)\l3init.obj"
-	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mdct.obj"
 	-@erase "$(INTDIR)\mhead.obj"
 	-@erase "$(INTDIR)\msis.obj"
-	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\semaphore.obj"
-	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\uph.obj"
 	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\wavep.obj"
-	-@erase "$(INTDIR)\win32prefs.obj"
-	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\xing.res"
 	-@erase "$(INTDIR)\xinglmc.obj"
 	-@erase "$(OUTDIR)\xing.exp"
 	-@erase "$(OUTDIR)\xing.lib"
 	-@erase ".\xing.lmc"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -416,51 +328,18 @@ CPP_PROJ=/nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\\" /I "..\..\..\include" /I\
  /Fp"$(INTDIR)\xing.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Release/
 CPP_SBRS=.
-
-.c{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_OBJS)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.c{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cpp{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-.cxx{$(CPP_SBRS)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $< 
-<<
-
-MTL=midl.exe
 MTL_PROJ=/nologo /D "NDEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
 RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "NDEBUG" 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
- odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
+LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:no\
  /pdb:"$(OUTDIR)\xing.pdb" /machine:I386 /def:".\xing.def" /out:"xing.lmc"\
- /implib:"$(OUTDIR)\xing.lib" 
+ /implib:"$(OUTDIR)\xing.lib" /libpath:"..\..\..\..\base\win32" 
 DEF_FILE= \
 	".\xing.def"
 LINK32_OBJS= \
@@ -481,25 +360,19 @@ LINK32_OBJS= \
 	"$(INTDIR)\iwinm.obj" \
 	"$(INTDIR)\l3dq.obj" \
 	"$(INTDIR)\l3init.obj" \
-	"$(INTDIR)\log.obj" \
 	"$(INTDIR)\mdct.obj" \
 	"$(INTDIR)\mdctasm.obj" \
 	"$(INTDIR)\mhead.obj" \
 	"$(INTDIR)\msis.obj" \
 	"$(INTDIR)\msisasm.obj" \
-	"$(INTDIR)\mutex.obj" \
 	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\preferences.obj" \
 	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\thread.obj" \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
 	"$(INTDIR)\wavep.obj" \
-	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\xing.res" \
-	"$(INTDIR)\xinglmc.obj"
+	"$(INTDIR)\xinglmc.obj" \
+	"..\..\..\..\base\win32\fabaselib.lib"
 
 ".\xing.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -511,7 +384,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\xing.lmc"
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Release" ".\xing.lmc"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
 	copy xing.lmc                        ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -523,15 +396,19 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
+ALL : ".\xing.lmc"
 
 !ELSE 
 
-ALL : "..\..\..\..\config\config.h" ".\xing.lmc"
+ALL : "fabaselib - Win32 NASM Debug" ".\xing.lmc"
 
 !ENDIF 
 
+!IF "$(RECURSE)" == "1" 
+CLEAN :"fabaselib - Win32 NASM DebugCLEAN" 
+!ELSE 
 CLEAN :
+!ENDIF 
 	-@erase "$(INTDIR)\cdct.obj"
 	-@erase "$(INTDIR)\csbt.obj"
 	-@erase "$(INTDIR)\cup.obj"
@@ -546,23 +423,16 @@ CLEAN :
 	-@erase "$(INTDIR)\iwinm.obj"
 	-@erase "$(INTDIR)\l3dq.obj"
 	-@erase "$(INTDIR)\l3init.obj"
-	-@erase "$(INTDIR)\log.obj"
 	-@erase "$(INTDIR)\mdct.obj"
 	-@erase "$(INTDIR)\mhead.obj"
 	-@erase "$(INTDIR)\msis.obj"
-	-@erase "$(INTDIR)\mutex.obj"
 	-@erase "$(INTDIR)\pipeline.obj"
-	-@erase "$(INTDIR)\preferences.obj"
 	-@erase "$(INTDIR)\pullbuffer.obj"
-	-@erase "$(INTDIR)\semaphore.obj"
-	-@erase "$(INTDIR)\thread.obj"
 	-@erase "$(INTDIR)\uph.obj"
 	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\wavep.obj"
-	-@erase "$(INTDIR)\win32prefs.obj"
-	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\xing.res"
 	-@erase "$(INTDIR)\xinglmc.obj"
 	-@erase "$(OUTDIR)\xing.exp"
@@ -570,12 +440,10 @@ CLEAN :
 	-@erase "$(OUTDIR)\xing.pdb"
 	-@erase ".\xing.ilk"
 	-@erase ".\xing.lmc"
-	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP=cl.exe
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  "..\..\include" /I "..\..\..\..\io\include" /I "..\..\..\..\base\include" /I\
  "..\..\..\..\base\win32\include" /I "..\..\..\..\config" /I\
@@ -583,6 +451,69 @@ CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\\" /I "..\..\..\include" /I\
  /Fp"$(INTDIR)\xing.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 CPP_OBJS=.\Debug/
 CPP_SBRS=.
+MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
+RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "_DEBUG" 
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=fabaselib.lib kernel32.lib user32.lib gdi32.lib winspool.lib\
+ comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib\
+ odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
+ /pdb:"$(OUTDIR)\xing.pdb" /debug /machine:I386 /def:".\xing.def"\
+ /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /pdbtype:sept\
+ /libpath:"..\..\..\..\base\win32" 
+DEF_FILE= \
+	".\xing.def"
+LINK32_OBJS= \
+	"$(INTDIR)\cdct.obj" \
+	"$(INTDIR)\cdctasm.obj" \
+	"$(INTDIR)\csbt.obj" \
+	"$(INTDIR)\cup.obj" \
+	"$(INTDIR)\cupl3.obj" \
+	"$(INTDIR)\cwin8asm.obj" \
+	"$(INTDIR)\cwinasm.obj" \
+	"$(INTDIR)\cwinm.obj" \
+	"$(INTDIR)\dec8.obj" \
+	"$(INTDIR)\eventbuffer.obj" \
+	"$(INTDIR)\hwin.obj" \
+	"$(INTDIR)\icdct.obj" \
+	"$(INTDIR)\isbt.obj" \
+	"$(INTDIR)\iup.obj" \
+	"$(INTDIR)\iwinm.obj" \
+	"$(INTDIR)\l3dq.obj" \
+	"$(INTDIR)\l3init.obj" \
+	"$(INTDIR)\mdct.obj" \
+	"$(INTDIR)\mdctasm.obj" \
+	"$(INTDIR)\mhead.obj" \
+	"$(INTDIR)\msis.obj" \
+	"$(INTDIR)\msisasm.obj" \
+	"$(INTDIR)\pipeline.obj" \
+	"$(INTDIR)\pullbuffer.obj" \
+	"$(INTDIR)\uph.obj" \
+	"$(INTDIR)\upsf.obj" \
+	"$(INTDIR)\wavep.obj" \
+	"$(INTDIR)\xing.res" \
+	"$(INTDIR)\xinglmc.obj" \
+	"..\..\..\..\base\win32\fabaselib.lib"
+
+".\xing.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+SOURCE=$(InputPath)
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : "fabaselib - Win32 NASM Debug" ".\xing.lmc"
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
+	copy xing.lmc                        ..\..\..\..\base\win32\prj\plugins
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
+!ENDIF 
 
 .c{$(CPP_OBJS)}.obj::
    $(CPP) @<<
@@ -613,77 +544,6 @@ CPP_SBRS=.
    $(CPP) @<<
    $(CPP_PROJ) $< 
 <<
-
-MTL=midl.exe
-MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /o NUL /win32 
-RSC=rc.exe
-RSC_PROJ=/l 0x409 /fo"$(INTDIR)\xing.res" /d "_DEBUG" 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\xing.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
- odbccp32.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)\xing.pdb" /debug /machine:I386 /def:".\xing.def"\
- /out:"xing.lmc" /implib:"$(OUTDIR)\xing.lib" /pdbtype:sept 
-DEF_FILE= \
-	".\xing.def"
-LINK32_OBJS= \
-	"$(INTDIR)\cdct.obj" \
-	"$(INTDIR)\cdctasm.obj" \
-	"$(INTDIR)\csbt.obj" \
-	"$(INTDIR)\cup.obj" \
-	"$(INTDIR)\cupl3.obj" \
-	"$(INTDIR)\cwin8asm.obj" \
-	"$(INTDIR)\cwinasm.obj" \
-	"$(INTDIR)\cwinm.obj" \
-	"$(INTDIR)\dec8.obj" \
-	"$(INTDIR)\eventbuffer.obj" \
-	"$(INTDIR)\hwin.obj" \
-	"$(INTDIR)\icdct.obj" \
-	"$(INTDIR)\isbt.obj" \
-	"$(INTDIR)\iup.obj" \
-	"$(INTDIR)\iwinm.obj" \
-	"$(INTDIR)\l3dq.obj" \
-	"$(INTDIR)\l3init.obj" \
-	"$(INTDIR)\log.obj" \
-	"$(INTDIR)\mdct.obj" \
-	"$(INTDIR)\mdctasm.obj" \
-	"$(INTDIR)\mhead.obj" \
-	"$(INTDIR)\msis.obj" \
-	"$(INTDIR)\msisasm.obj" \
-	"$(INTDIR)\mutex.obj" \
-	"$(INTDIR)\pipeline.obj" \
-	"$(INTDIR)\preferences.obj" \
-	"$(INTDIR)\pullbuffer.obj" \
-	"$(INTDIR)\semaphore.obj" \
-	"$(INTDIR)\thread.obj" \
-	"$(INTDIR)\uph.obj" \
-	"$(INTDIR)\upsf.obj" \
-	"$(INTDIR)\wavep.obj" \
-	"$(INTDIR)\win32prefs.obj" \
-	"$(INTDIR)\win32thread.obj" \
-	"$(INTDIR)\xing.res" \
-	"$(INTDIR)\xinglmc.obj"
-
-".\xing.lmc" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-SOURCE=$(InputPath)
-DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
-
-ALL : $(DS_POSTBUILD_DEP)
-
-$(DS_POSTBUILD_DEP) : "..\..\..\..\config\config.h" ".\xing.lmc"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                ..\..\..\..\base\win32\prj\plugins
-	copy xing.lmc                        ..\..\..\..\base\win32\prj\plugins
-	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
-
-!ENDIF 
 
 
 !IF "$(CFG)" == "xing - Win32 Release" || "$(CFG)" == "xing - Win32 Debug" ||\
@@ -695,28 +555,28 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -739,8 +599,9 @@ DEP_CPP_EVENT=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\eventbuffer.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pmi.h"\
@@ -751,25 +612,8 @@ DEP_CPP_EVENT=\
 	{$(INCLUDE)}"sys\types.h"\
 	
 
-"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\..\..\base\src\log.cpp
-DEP_CPP_LOG_C=\
-	"..\..\..\..\base\include\log.h"\
-	
-
-"$(INTDIR)\log.obj" : $(SOURCE) $(DEP_CPP_LOG_C) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\..\..\base\win32\src\mutex.cpp
-DEP_CPP_MUTEX=\
-	"..\..\..\..\base\win32\include\Mutex.h"\
-	
-
-"$(INTDIR)\mutex.obj" : $(SOURCE) $(DEP_CPP_MUTEX) "$(INTDIR)"
+"$(INTDIR)\eventbuffer.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -791,8 +635,9 @@ DEP_CPP_PIPEL=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\eventbuffer.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pmi.h"\
@@ -802,17 +647,8 @@ DEP_CPP_PIPEL=\
 	"..\..\..\include\lmc.h"\
 	
 
-"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\..\..\base\src\preferences.cpp
-DEP_CPP_PREFE=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	
-
-"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"
+"$(INTDIR)\pipeline.obj" : $(SOURCE) $(DEP_CPP_PIPEL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -822,57 +658,14 @@ DEP_CPP_PULLB=\
 	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pullbuffer.h"\
 	
 
-"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
-DEP_CPP_SEMAP=\
-	"..\..\..\..\base\win32\include\semaphore.h"\
-	
-
-"$(INTDIR)\semaphore.obj" : $(SOURCE) $(DEP_CPP_SEMAP) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\..\..\base\src\thread.cpp
-DEP_CPP_THREA=\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\win32thread.h"\
-	
-NODEP_CPP_THREA=\
-	"..\..\..\..\base\src\beosthread.h"\
-	"..\..\..\..\base\src\linuxthread.h"\
-	"..\..\..\..\base\src\solaristhread.h"\
-	
-
-"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
-DEP_CPP_WIN32=\
-	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\include\preferences.h"\
-	"..\..\..\..\base\win32\include\win32prefs.h"\
-	
-
-"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
-DEP_CPP_WIN32T=\
-	"..\..\..\..\base\include\thread.h"\
-	"..\..\..\..\base\win32\include\win32thread.h"\
-	
-
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"
+"$(INTDIR)\pullbuffer.obj" : $(SOURCE) $(DEP_CPP_PULLB) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -883,7 +676,7 @@ SOURCE=..\res\xing.rc
 
 "$(INTDIR)\xing.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\xing.res" /i\
- "\FreeAmp\freeamp\lmc\xingmp3\win32\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\freeamp\lmc\xingmp3\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
@@ -891,7 +684,7 @@ SOURCE=..\res\xing.rc
 
 "$(INTDIR)\xing.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\xing.res" /i\
- "\FreeAmp\freeamp\lmc\xingmp3\win32\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\freeamp\lmc\xingmp3\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
@@ -899,7 +692,7 @@ SOURCE=..\res\xing.rc
 
 "$(INTDIR)\xing.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\xing.res" /i\
- "\FreeAmp\freeamp\lmc\xingmp3\win32\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\freeamp\lmc\xingmp3\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
@@ -907,14 +700,18 @@ SOURCE=..\res\xing.rc
 
 "$(INTDIR)\xing.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\xing.res" /i\
- "\FreeAmp\freeamp\lmc\xingmp3\win32\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\freeamp\lmc\xingmp3\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ENDIF 
 
 SOURCE=..\..\src\cdct.c
+DEP_CPP_CDCT_=\
+	"..\..\..\..\config\config.h"\
+	
 
-"$(INTDIR)\cdct.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\cdct.obj" : $(SOURCE) $(DEP_CPP_CDCT_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -941,17 +738,20 @@ DEP_CPP_CUP_C=\
 
 SOURCE=..\..\src\cupl3.c
 DEP_CPP_CUPL3=\
+	"..\..\..\..\config\config.h"\
 	"..\..\include\jdw.h"\
 	"..\..\include\L3.h"\
 	"..\..\include\mhead.h"\
 	
 
-"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\cwinm.c
 DEP_CPP_CWINM=\
+	"..\..\..\..\config\config.h"\
 	"..\..\include\tableawd.h"\
 	"..\..\src\cwin.c"\
 	"..\..\src\cwinb.c"\
@@ -961,7 +761,8 @@ NODEP_CPP_CWINM=\
 	"..\..\src\cwinq.c"\
 	
 
-"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
+"$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1030,19 +831,23 @@ NODEP_CPP_IWINM=\
 
 SOURCE=..\..\src\l3dq.c
 DEP_CPP_L3DQ_=\
+	"..\..\..\..\config\config.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"
+"$(INTDIR)\l3dq.obj" : $(SOURCE) $(DEP_CPP_L3DQ_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\l3init.c
 DEP_CPP_L3INI=\
+	"..\..\..\..\config\config.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"
+"$(INTDIR)\l3init.obj" : $(SOURCE) $(DEP_CPP_L3INI) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1063,29 +868,35 @@ DEP_CPP_MHEAD=\
 
 SOURCE=..\..\src\msis.c
 DEP_CPP_MSIS_=\
+	"..\..\..\..\config\config.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"
+"$(INTDIR)\msis.obj" : $(SOURCE) $(DEP_CPP_MSIS_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\uph.c
 DEP_CPP_UPH_C=\
+	"..\..\..\..\config\config.h"\
 	"..\..\include\htable.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"
+"$(INTDIR)\uph.obj" : $(SOURCE) $(DEP_CPP_UPH_C) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 SOURCE=..\..\src\upsf.c
 DEP_CPP_UPSF_=\
+	"..\..\..\..\config\config.h"\
 	"..\..\include\L3.h"\
 	
 
-"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"
+"$(INTDIR)\upsf.obj" : $(SOURCE) $(DEP_CPP_UPSF_) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1117,8 +928,9 @@ DEP_CPP_XINGL=\
 	"..\..\..\..\base\include\registry.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\include\utility.h"\
-	"..\..\..\..\base\win32\include\Mutex.h"\
+	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
+	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\eventbuffer.h"\
 	"..\..\..\..\io\include\pipeline.h"\
 	"..\..\..\..\io\include\pmi.h"\
@@ -1131,7 +943,8 @@ DEP_CPP_XINGL=\
 	"..\..\include\xinglmc.h"\
 	
 
-"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"
+"$(INTDIR)\xinglmc.obj" : $(SOURCE) $(DEP_CPP_XINGL) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1147,7 +960,7 @@ IntDir=.\Release
 InputPath=..\..\src\cdctasm.asm
 InputName=cdctasm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
@@ -1156,7 +969,7 @@ IntDir=.\Debug
 InputPath=..\..\src\cdctasm.asm
 InputName=cdctasm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ENDIF 
@@ -1173,7 +986,7 @@ IntDir=.\Release
 InputPath=..\..\src\cwin8asm.asm
 InputName=cwin8asm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
@@ -1182,7 +995,7 @@ IntDir=.\Debug
 InputPath=..\..\src\cwin8asm.asm
 InputName=cwin8asm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ENDIF 
@@ -1199,7 +1012,7 @@ IntDir=.\Release
 InputPath=..\..\src\cwinasm.asm
 InputName=cwinasm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
@@ -1208,7 +1021,7 @@ IntDir=.\Debug
 InputPath=..\..\src\cwinasm.asm
 InputName=cwinasm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ENDIF 
@@ -1225,7 +1038,7 @@ IntDir=.\Release
 InputPath=..\..\src\mdctasm.asm
 InputName=mdctasm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
@@ -1234,7 +1047,7 @@ IntDir=.\Debug
 InputPath=..\..\src\mdctasm.asm
 InputName=mdctasm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ENDIF 
@@ -1251,7 +1064,7 @@ IntDir=.\Release
 InputPath=..\..\src\msisasm.asm
 InputName=msisasm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	c:\local\bin\nasm.exe -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
 
 !ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
@@ -1260,8 +1073,63 @@ IntDir=.\Debug
 InputPath=..\..\src\msisasm.asm
 InputName=msisasm
 
-"$(IntDir)\$(InputName).obj"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	nasm.exe -f win32 -o $(IntDir)\$(InputName).obj $(InputPath)
+
+!ENDIF 
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
+"fabaselib - Win32 Release" : 
+   cd "\TEMP\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Release" 
+   cd "..\..\..\lmc\xingmp3\win32\prj"
+
+"fabaselib - Win32 ReleaseCLEAN" : 
+   cd "\TEMP\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
+ CFG="fabaselib - Win32 Release" RECURSE=1 
+   cd "..\..\..\lmc\xingmp3\win32\prj"
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+"fabaselib - Win32 Debug" : 
+   cd "\TEMP\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 Debug" 
+   cd "..\..\..\lmc\xingmp3\win32\prj"
+
+"fabaselib - Win32 DebugCLEAN" : 
+   cd "\TEMP\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak CFG="fabaselib - Win32 Debug"\
+ RECURSE=1 
+   cd "..\..\..\lmc\xingmp3\win32\prj"
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Release"
+
+"fabaselib - Win32 NASM Release" : 
+   cd "\TEMP\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak\
+ CFG="fabaselib - Win32 NASM Release" 
+   cd "..\..\..\lmc\xingmp3\win32\prj"
+
+"fabaselib - Win32 NASM ReleaseCLEAN" : 
+   cd "\TEMP\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
+ CFG="fabaselib - Win32 NASM Release" RECURSE=1 
+   cd "..\..\..\lmc\xingmp3\win32\prj"
+
+!ELSEIF  "$(CFG)" == "xing - Win32 NASM Debug"
+
+"fabaselib - Win32 NASM Debug" : 
+   cd "\TEMP\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) /F .\fabaselib.mak CFG="fabaselib - Win32 NASM Debug" 
+   cd "..\..\..\lmc\xingmp3\win32\prj"
+
+"fabaselib - Win32 NASM DebugCLEAN" : 
+   cd "\TEMP\freeamp\base\win32\prj"
+   $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fabaselib.mak\
+ CFG="fabaselib - Win32 NASM Debug" RECURSE=1 
+   cd "..\..\..\lmc\xingmp3\win32\prj"
 
 !ENDIF 
 

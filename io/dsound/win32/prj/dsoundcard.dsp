@@ -58,12 +58,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"dsoundcard.pmo"
+# ADD LINK32 fabaselib.lib dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"dsoundcard.pmo" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                 ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
-                            ..\..\..\..\base\win32\prj\plugins
+                                  ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
+                             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 Debug"
@@ -90,12 +90,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"dsoundcard.pmo" /pdbtype:sept
+# ADD LINK32 fabaselib.lib dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"dsoundcard.pmo" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                     ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
-            ..\..\..\..\base\win32\prj\plugins
+                      ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
+             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Debug"
@@ -123,12 +123,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"dsoundcard.pmo" /pdbtype:sept
-# ADD LINK32 dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"dsoundcard.pmo" /pdbtype:sept
+# ADD LINK32 fabaselib.lib dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"dsoundcard.pmo" /pdbtype:sept /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                     ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
-            ..\..\..\..\base\win32\prj\plugins
+                      ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
+             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "dsoundcard - Win32 NASM Release"
@@ -156,12 +156,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"dsoundcard.pmo"
-# ADD LINK32 dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"dsoundcard.pmo"
+# ADD LINK32 fabaselib.lib dsound.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"dsoundcard.pmo" /libpath:"..\..\..\..\base\win32"
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                 ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
-                            ..\..\..\..\base\win32\prj\plugins
+                                  ..\..\..\..\base\win32\prj\plugins	copy dsoundcard.pmo\
+                             ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -221,10 +221,6 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\src\debug.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\res\dsound.rc
 # End Source File
 # Begin Source File
@@ -241,14 +237,6 @@ SOURCE=..\..\..\src\eventbuffer.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\src\log.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\mutex.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\pipeline.cpp
 # End Source File
 # Begin Source File
@@ -257,27 +245,7 @@ SOURCE=..\..\..\src\pmo.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\src\preferences.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\pullbuffer.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\src\thread.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # End Source File
 # End Target
 # End Project
