@@ -162,7 +162,6 @@ Error SoundCardPMO::Init(OutputInfo * info)
    Error     result = kError_UnknownErr;
    MMRESULT  mmresult = 0;
    int32     iNewSize = iDefaultBufferSize;
-   PropValue *pProp;
 
    m_channels = info->number_of_channels;
    m_samples_per_second = info->samples_per_second;

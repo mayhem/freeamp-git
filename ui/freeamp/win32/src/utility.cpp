@@ -240,11 +240,22 @@ OpenFileHookProc(   HWND hwnd,
             {
                 case IDC_OPEN_URL:
                 {
+                    char* url = new char[ofn->nMaxFile + 1];
+
                     if(GetDlgItemText(  hwnd,
                                         IDC_URL,
-                                        ofn->lpstrFile,
+                                        url,
                                         ofn->nMaxFile))
                     {
+                        *ofn->lpstrFile = 0x00;
+
+                        if(!strstr(url, "://"))
+                        {
+                            strcpy(ofn->lpstrFile, "http://");
+                        }
+
+                        strcat(ofn->lpstrFile, url);
+
                         PostMessage(GetParent(hwnd), 
                                     WM_COMMAND, 
                                     IDCANCEL,
@@ -252,6 +263,8 @@ OpenFileHookProc(   HWND hwnd,
 
                         ofn->lCustData = 1;
                     }
+
+                    delete url;
                     
                     result = 1;
                     break;
