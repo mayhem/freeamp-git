@@ -77,13 +77,14 @@ class Window
                                  string &oValue);
       Error   ControlGetTip(const string &oName, string &oTip);
       Error   ControlGetDesc(const string &oName, string &oDesc);
+      bool    DoesControlExist(const string &oName);
 
       // These functions should be called from the OS dependent event
       // loop to handle mouse messages
       virtual void  HandleMouseMove(Pos &oPos);
       virtual void  HandleMouseLButtonDown(Pos &oPos);
       virtual void  HandleMouseLButtonUp(Pos &oPos);
-	  virtual void  MouseHasLeftWindow(void);
+	   virtual void  MouseHasLeftWindow(void);
 
       virtual Error StartMouseCapture(Control *);
       virtual Error EndMouseCapture(void);

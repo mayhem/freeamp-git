@@ -227,6 +227,11 @@ Error Window::SendControlMessage(Control *pControl,
     return m_pTheme->HandleControlMessage(oControlName, eMesg);
 }
 
+bool Window::DoesControlExist(const string &oName)
+{
+    return m_oControlMap.find(oName) != m_oControlMap.end();
+}
+
 Control *Window::ControlFromPos(Pos &oPos)
 {
     vector<Control *>::iterator i;

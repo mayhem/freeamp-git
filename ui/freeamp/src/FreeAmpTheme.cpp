@@ -90,6 +90,7 @@ FreeAmpTheme::FreeAmpTheme(FAContext * context)
    m_bPlayShown = true;
    m_oTitle = string("");
    m_eTimeDisplayState = kNormal;
+   m_oStreamInfo = string("");
 
    LoadFreeAmpTheme();
 }
@@ -376,8 +377,17 @@ int32 FreeAmpTheme::AcceptEvent(Event * e)
       case INFO_MPEGInfo:
       {
          MpegInfoEvent *info = (MpegInfoEvent *) e;
+         char           text[100];
 
          m_fSecondsPerFrame = info->GetSecondsPerFrame();
+         sprintf(text, "%dkbps %dkhz %s", 
+               info->GetBitRate() / 1000,
+               info->GetSampleRate() / 1000, 
+               info->GetChannels() ? "Stereo" : "Mono");
+
+         m_oStreamInfo = text;
+         m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
+      
          break;
       }
 
@@ -490,8 +500,19 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (eMesg == CM_MouseEnter)
    {
        string oName("Info"), oDesc("");
-       
-       m_pWindow->ControlGetDesc(oControlName, oDesc);
+
+       if (oControlName == string("Time") ||
+           oControlName == string("TimeRemaining"))
+       {
+           if (m_eTimeDisplayState == kTimeRemaining && 
+               m_pWindow->DoesControlExist("TimeRemaining"))
+               m_pWindow->ControlGetDesc("TimeRemaining", oDesc);
+           else
+               m_pWindow->ControlGetDesc("Time", oDesc);
+       }
+       else
+           m_pWindow->ControlGetDesc(oControlName, oDesc);
+
        m_pWindow->ControlStringValue(oName, true, oDesc);
                                 
        return kError_NoErr;
@@ -701,7 +722,7 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    }    
    if (oControlName == string("Time") && eMesg == CM_Pressed)
    {
-       string oName("Info"), oDesc;
+       string oName("Info"), oDesc("");
        
        if (m_iTotalSeconds < 0)
            return kError_NoErr;       
@@ -709,12 +730,14 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
        if (m_eTimeDisplayState == kNormal)
        {
            m_eTimeDisplayState = kTimeRemaining;
-           oDesc = "Time remaining";
+           if (m_pWindow->DoesControlExist("TimeRemaining"))
+               m_pWindow->ControlStringValue("Time", true, oDesc);
        }    
        else     
        { 
            m_eTimeDisplayState = kNormal;
-           oDesc = "Current time";
+           if (m_pWindow->DoesControlExist("TimeRemaining"))
+               m_pWindow->ControlStringValue("TimeRemaining", true, oDesc);
        }    
        
        m_pWindow->ControlStringValue("Info", true, oDesc);
@@ -746,7 +769,6 @@ Error FreeAmpTheme::HandleControlMessage(string &oControlName,
    if (oControlName == string("Help") && eMesg == CM_Pressed)
    {
        ShowHelp();
-       
    }
    
    return kError_NoErr;
@@ -815,6 +837,8 @@ void FreeAmpTheme::InitControls(void)
 
     iState = m_pContext->plm->GetShuffleMode() ? 1 : 0;
     m_pWindow->ControlIntValue(string("Shuffle"), true, iState);
+
+    m_pWindow->ControlStringValue("StreamInfo", true, m_oStreamInfo);
 }
 
 // This function gets called after the window object is created,
@@ -950,7 +974,7 @@ void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
     char   szText[20];
     int    iSeconds;
     
-    if (m_eTimeDisplayState == kTimeRemaining)
+    if (m_eTimeDisplayState == kTimeRemaining && m_iTotalSeconds >= 0)
     {    
         iSeconds = m_iTotalSeconds - iCurrentSeconds;
         if (iSeconds > 3600)
@@ -981,7 +1005,12 @@ void FreeAmpTheme::UpdateTimeDisplay(int iCurrentSeconds)
         sprintf(szText, "0:00");
             
     oText = string(szText);
-    m_pWindow->ControlStringValue("Time", true, oText);
+    if (m_eTimeDisplayState == kTimeRemaining && 
+        m_pWindow->DoesControlExist("TimeRemaining") &&
+        m_iTotalSeconds >= 0)
+        m_pWindow->ControlStringValue("TimeRemaining", true, oText);
+    else
+        m_pWindow->ControlStringValue("Time", true, oText);
 }
 
 void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)

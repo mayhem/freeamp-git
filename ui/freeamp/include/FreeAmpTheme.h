@@ -83,7 +83,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         Thread          *m_uiThread;
         Pos              m_oWindowPos;
         bool             m_bSeekInProgress, m_bPlayShown;
-        string           m_oCurrentWindow, m_oTitle;
+        string           m_oCurrentWindow, m_oTitle, m_oStreamInfo;
         TimeDisplayState m_eTimeDisplayState;
 };
 
