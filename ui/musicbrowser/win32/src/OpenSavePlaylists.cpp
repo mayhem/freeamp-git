@@ -148,7 +148,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
         {
             char* cp = NULL;
 
-            if(cp = strrchr(szName, ' '))
+            if(cp = strchr(szName, ' '))
             {
                 *cp = 0x00;
             }

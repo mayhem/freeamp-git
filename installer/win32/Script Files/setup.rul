@@ -175,13 +175,15 @@ begin
     nResult = DialogShowSdLicense();
     if (nResult = BACK) goto Dlg_SdWelcome;
 
-    Dlg_SdRegisterUser:
-    nResult = DialogSdRegisterUser();
-    if (nResult = BACK) goto Dlg_SdLicense;
+    //Dlg_SdRegisterUser:
+    //nResult = DialogSdRegisterUser();
+    //if (nResult = BACK) goto Dlg_SdLicense;
 
     Dlg_SdSetupType:
     nResult = DialogShowSdSetupType();
-    if (nResult = BACK) goto Dlg_SdRegisterUser;
+    if (nResult = BACK) goto Dlg_SdLicense;
+    //we are skipping registering the user for now
+    //if (nResult = BACK) goto Dlg_SdRegisterUser;
 
     Dlg_SdComponentDialog2:
     if ((nResult = BACK) && (svSetupType != "Custom") && (svSetupType != "")) then
@@ -352,9 +354,9 @@ end;
 //
 ///////////////////////////////////////////////////////////////////////////////
 function SetupRegistry()
-    NUMBER nResult;
+    NUMBER nResult, nType, nSize;
 	STRING szKey, szNetscapeKey1, szNetscapeKey2, szReclaimFileTypes;
-	STRING szUserName;
+	STRING szUserName, szUserNameKey;
 	BOOL bInLocalMachine, bInCurrentUser;
 begin
 
@@ -379,9 +381,11 @@ begin
 	
 	szKey = "Software\\" + @PRODUCT_NAME + "\\" + @PRODUCT_NAME +
 			" v" + @PRODUCT_VERSION + "\\Main";
+	szUserNameKey = "Software\\Microsoft\\MS Setup (ACME)\\User Info";
 			
 	// Create the ones that are dynamic
-	szUserName = svFirstName + " " + svLastName;
+	//szUserName = svFirstName + " " + svLastName;
+	RegDBGetKeyValueEx(szUserNameKey, "DefName", nType, szUserName, nSize);
 	RegDBSetKeyValueEx(szKey, "UserName", REGDB_STRING, szUserName, -1);	
 	RegDBSetKeyValueEx(szKey, "SaveMusicDirectory", REGDB_STRING, svDefaultMusicDir, -1);
 	
@@ -406,7 +410,7 @@ begin
 			
 	if(bInLocalMachine = TRUE && bInCurrentUser = TRUE) then
 		bNetscapeDetected = TRUE;
-		bRegisterForRMPs = FALSE;		
+		bRegisterForRMPs = TRUE;		
 		
 		// RMP support
 		if(bRegisterForRMPs = TRUE) then
@@ -957,7 +961,7 @@ begin
         szMsg1 = "";
         szMsg2 = "";
         szOption1 = "Read the README file";
-        szOption2 = "Launch FreeAmp";
+        szOption2 = "Launch " + @PRODUCT_NAME;
         nResult = SdFinish( szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2 );
 
 		if (bOpt1) then
@@ -988,6 +992,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 
