@@ -34,7 +34,8 @@ const char *szLogLevelNames[] =
     "Main",
     "Decode",
     "Input",
-    "Output"
+    "Output",
+    "Perf"
 };
 
 LogFile::LogFile(char *m_szLogFileArg)

@@ -89,7 +89,7 @@ noinst_LIBRARIES = $(MYLIBS)
 libfaio_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/base/unix/@host_os@/include  -I@srcdir@/../include -I@top_srcdir@/config -I@top_srcdir@/io/include -I@top_srcdir@/ui/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
+CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT) -D__@host_os@__ 
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = ../../../../../config/config.h
 CONFIG_CLEAN_FILES = 

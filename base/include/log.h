@@ -31,8 +31,9 @@ enum
     LogDecode  = 1,
     LogInput   = 2,
     LogOutput  = 3,
+    LogPerf    = 4,
 
-    LogLast    = 4,
+    LogLast    = 5,
     LogMax     = 32
 };
 

@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 #include <sys/soundcard.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 #include <assert.h>
 
 /* project headers */
@@ -399,6 +400,16 @@ void SoundCardPMO::WorkerThread(void)
    Event      *pEvent;
    OutputInfo *pInfo;
    audio_buf_info info;
+   bool           bPerfWarn = false;
+
+   // The following should be abstracted out into the general thread
+   // classes:
+#ifdef __linux__
+   struct sched_param sParam;
+
+   sParam.sched_priority = sched_get_priority_max(SCHED_OTHER);
+   pthread_setschedparam(pthread_self(), SCHED_OTHER, &sParam);
+#endif
 
    for(; !m_bExit;)
    {
@@ -430,10 +441,19 @@ void SoundCardPMO::WorkerThread(void)
       m_pPauseMutex->Acquire();
 
       eErr = BeginRead(pBuffer, iToCopy);
-      //printf("after begin read\n");
       if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail ||
           iToCopy < m_iDataSize)
       {
+          if (!bPerfWarn)
+          {
+              time_t t;
+
+              time(&t);
+              g_Log->Log(LogPerf, "Output buffer underflow: %s", 
+                         ctime(&t));
+              bPerfWarn = true;
+          }
+
           m_pPauseMutex->Release();
           m_pReadSem->Wait();
           continue;
@@ -480,6 +500,7 @@ void SoundCardPMO::WorkerThread(void)
               eErr);
           break;
       }
+      bPerfWarn = false;
 
       iCopied = 0;
       do
@@ -535,6 +556,5 @@ void SoundCardPMO::WorkerThread(void)
 
       m_pPauseMutex->Release();
    }
-   //printf("output buffer thread exit\n");
 }
 

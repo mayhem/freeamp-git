@@ -270,7 +270,11 @@ void ObsBuffer::WorkerThread(void)
       iCurrNum = pHeader->iFlags & 0xFFFF;
       if (iPacketNum != -1 && iPacketNum != iCurrNum - 1)
       {
-          g_Log->Log(LogInput, "Lost packet (%d, %d)\n", iPacketNum, iCurrNum); 
+          time_t t;
+
+          time(&t);
+          g_Log->Log(LogPerf, "Lost packet (%d, %d): %s", 
+             iPacketNum, iCurrNum, ctime(&t)); 
       }
       iPacketNum = iCurrNum;
 

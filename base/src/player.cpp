@@ -431,6 +431,13 @@ Run()
       if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
          g_Log->AddLogLevel(LogDecode);
    }
+   m_props.GetProperty("LogPerf", &pProp);
+   if (pProp)
+   {
+      if (strcasecmp(((StringPropValue *)pProp)->GetString(), "yes") == 0)
+         g_Log->AddLogLevel(LogPerf);
+   }
+
 
    // which ui should we instantiate first??
    if (m_argUIList->CountItems() == 0)
