@@ -484,6 +484,10 @@ SOURCE=..\..\..\..\base\include\metadata.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\base\include\missingfile.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\include\MultiStateControl.h
 # End Source File
 # Begin Source File
