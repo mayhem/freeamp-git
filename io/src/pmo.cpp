@@ -72,9 +72,11 @@ PhysicalMediaOutput::~PhysicalMediaOutput()
    //Debug_v("Clear PMO");
    Clear();
    //Debug_v("Clear LMC");
-   m_pLmc->Clear();
+   if (m_pLmc)
+      m_pLmc->Clear();
    //Debug_v("Clear PMI");
-   m_pPmi->Clear();
+   if (m_pPmi)
+      m_pPmi->Clear();
 
     delete m_pLmc;
     delete m_pPmi;

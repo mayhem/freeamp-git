@@ -974,6 +974,57 @@ InputName=id3lib
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\musicbrainz\musicbrainz.dll
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+# Begin Custom Build
+InputPath=..\..\..\lib\musicbrainz\musicbrainz.dll
+InputName=musicbrainz
+
+".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\lib\musicbrainz\musicbrainz.dll
+InputName=musicbrainz
+
+".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
+
+# Begin Custom Build
+InputPath=..\..\..\lib\musicbrainz\musicbrainz.dll
+InputName=musicbrainz
+
+".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) .
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
+
+# Begin Custom Build
+InputPath=..\..\..\lib\musicbrainz\musicbrainz.dll
+InputName=musicbrainz
+
+".\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy $(InputPath) .
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # End Target
 # End Project
