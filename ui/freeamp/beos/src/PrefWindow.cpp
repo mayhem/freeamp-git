@@ -23,7 +23,6 @@
 ____________________________________________________________________________*/ 
 
 #include "PrefWindow.h"
-#include "PrefView.h"
 #include "PrefViews.h"
 #include "facontext.h"
 #include "eventdata.h"
@@ -62,7 +61,6 @@ PrefWindow::InitViews( void )
     BRect frame( Frame() );
     frame.OffsetTo( B_ORIGIN );
 
-#if 1
     // Construct the views.
 
     BView* root = new BView( frame, "GreyRoot", B_FOLLOW_ALL, B_WILL_DRAW );
@@ -143,11 +141,6 @@ PrefWindow::InitViews( void )
     m_panes.push_back( pane );
 
     m_currentPane = 0;
-#else
-    PrefView* prefView = new PrefView( context, themeManager,
-                                       frame, "PrefView" );
-    AddChild( prefView );
-#endif
 }
 
 PrefWindow::~PrefWindow()

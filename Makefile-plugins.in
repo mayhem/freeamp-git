@@ -229,7 +229,8 @@ BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/MainWindow.o
 BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/CanvasView.o
 BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/ThemeManager.o
 BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/PrefWindow.o
-BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/PrefView.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/PrefViews.o
+BEOSFREEAMPUIOBJ += ui/freeamp/beos/src/Prefs.o
 BEOSFREEAMPUILIBS = -ltranslation -ltracker -lbe
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)
