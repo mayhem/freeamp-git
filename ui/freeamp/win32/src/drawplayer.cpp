@@ -1610,8 +1610,8 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 				g_ui->m_plm->SetFirst();
 			}
 			if (count) {
-				g_ui->m_target->AcceptEvent(new Event(CMD_Play));
-                SendMessage(hwnd, WM_COMMAND, kPlayControl,0);
+				//g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+                //SendMessage(hwnd, WM_COMMAND, kPlayControl,0);
 			}
 			break;
 		}
@@ -1672,7 +1672,7 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 						strcat(file, "\\");
 
 						cp = filelist + ofn.nFileOffset;
-
+						g_ui->m_plm->RemoveAll();
 						while(*cp)
 						{
 							strcpy(file + ofn.nFileOffset, cp);
@@ -1734,15 +1734,29 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
 			        break;        
 		        }
 
-		        case kNextControl:
+		        case kLastControl:
 		        {
-			        g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
+					if ((g_displayInfo.seconds < 2) &&
+						(g_displayInfo.hours == 0) &&
+						(g_displayInfo.minutes == 0)) {
+						g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
+					} else {
+						g_ui->m_target->AcceptEvent(new Event(CMD_Play));
+					}
+					g_displayInfo.seconds = 0;
+					g_displayInfo.minutes = 0;
+					g_displayInfo.hours = 0;
 			        break;        
 		        }
 
-		        case kLastControl:
+		        case kNextControl:
 		        {
-			        g_ui->m_target->AcceptEvent(new Event(CMD_PrevMediaPiece));
+					if (g_displayInfo.indexOfSong != g_displayInfo.totalSongs) {
+						g_ui->m_target->AcceptEvent(new Event(CMD_NextMediaPiece));
+						g_displayInfo.seconds = 0;
+						g_displayInfo.minutes = 0;
+						g_displayInfo.hours = 0;
+					}
 			        break;        
 		        }
     

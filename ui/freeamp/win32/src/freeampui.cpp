@@ -233,7 +233,23 @@ AcceptEvent(Event* event)
 				{
 					ID3TagEvent *info = (ID3TagEvent *)event;
 					if (info->GetId3Tag().m_containsInfo) {
-						strncpy(g_displayInfo.path,info->GetId3Tag().m_songName,sizeof(g_displayInfo.path)-1);
+						char foo[1024];
+						strncpy(foo,info->GetId3Tag().m_artist,sizeof(foo)-1);
+						//kill trailing spaces
+						char *pFoo = &(foo[strlen(foo)-1]);
+						while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) {
+							*pFoo = '\0';
+							pFoo--;
+						}
+						strncat(foo," - ",sizeof(foo)-strlen(foo));
+						strncat(foo,info->GetId3Tag().m_songName,sizeof(foo)-strlen(foo));
+						// kill trailing spaces
+						pFoo = &(foo[strlen(foo)-1]);
+						while ((pFoo >= foo) && pFoo && (*pFoo == ' ')) {
+							*pFoo = '\0';
+							pFoo--;
+						}
+						strncpy(g_displayInfo.path,foo,sizeof(g_displayInfo.path)-1);
 					}
 					break;
 				}
@@ -250,7 +266,10 @@ AcceptEvent(Event* event)
 				g_displayInfo.totalhours = hours;
 				g_displayInfo.totalminutes = minutes;
 				g_displayInfo.totalseconds = seconds;
-	            break; 
+				g_displayInfo.scrollOffset = 0;
+				g_displayInfo.indexOfSong = info->m_indexOfSong;
+				g_displayInfo.totalSongs = info->m_totalSongs;
+				break; 
             }
 
             case INFO_MediaTimeInfo: 

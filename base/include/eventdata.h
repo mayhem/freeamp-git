@@ -169,7 +169,7 @@ class ID3TagEvent : public Event {
 private:
 	Id3TagInfo m_tagInfo;
 public:
-	ID3TagEvent(Id3TagInfo &t) { m_type = INFO_ID3TagInfo; Id3TagInfo m_tagInfo = t; }
+	ID3TagEvent(Id3TagInfo &t) { m_type = INFO_ID3TagInfo; m_tagInfo = t; }
 	Id3TagInfo GetId3Tag() { return m_tagInfo; }
 	virtual ~ID3TagEvent() {}
 };

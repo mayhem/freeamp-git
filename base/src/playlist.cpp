@@ -168,6 +168,9 @@ void PlayListManager::SetNext() {
 	    m_current = 0;
 	} else {
 	    m_current++;
+		if (m_current >= count) {
+			m_current = count - 1;
+		}
 	}
     }
     SendInfoToPlayer();
@@ -184,6 +187,8 @@ void PlayListManager::SetPrev() {
 	m_current--;
 	if ((m_current < 0) && (m_repeat == REPEAT_ALL)) {
 	    m_current = count - 1;
+	} else if (m_current < 0) {
+		m_current = 0;
 	}
     }
     SendInfoToPlayer();
@@ -192,8 +197,10 @@ void PlayListManager::SetPrev() {
 void PlayListManager::SendInfoToPlayer() {
     PlayListItem *pli = GetCurrent();
     if (pli) {
-	MediaInfoEvent *mie = pli->GetMediaInfo();
-	m_target->AcceptEvent(mie);
+		MediaInfoEvent *mie = pli->GetMediaInfo();
+		if (mie) {
+			m_target->AcceptEvent(mie);
+		}
     }
 }
 
@@ -302,14 +309,16 @@ void PlayListManager::AcceptEvent(Event *e) {
 	switch (e->Type()) {
 	    case CMD_PLMSetMediaInfo: {
 		PLMSetMediaInfoEvent *smi = (PLMSetMediaInfoEvent *)e;
-		PlayListItem *pItem = smi->GetPlayListItem();
-		// make sure pItem still exists
-		pItem->SetPMIRegistryItem(smi->GetPMIRegistryItem());
-		pItem->SetLMCRegistryItem(smi->GetLMCRegistryItem());
-		pItem->SetMediaInfo(smi->GetMediaInfo());
-		// if pItem is the current item, send out the info posthaste
-		if (pItem == GetCurrent()) {
-		    SendInfoToPlayer();
+		if (smi->IsComplete()) {
+			PlayListItem *pItem = smi->GetPlayListItem();
+			// make sure pItem still exists
+			pItem->SetPMIRegistryItem(smi->GetPMIRegistryItem());
+			pItem->SetLMCRegistryItem(smi->GetLMCRegistryItem());
+			pItem->SetMediaInfo(smi->GetMediaInfo());
+			// if pItem is the current item, send out the info posthaste
+			if (pItem == GetCurrent()) {
+				SendInfoToPlayer();
+			}
 		}
 		break;
 	    }

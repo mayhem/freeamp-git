@@ -63,6 +63,8 @@ typedef struct DisplayInfo{
     int32           volume;
     int32           scrollOffset;
     int32           introOffset;
+	int32			totalSongs;
+	int32			indexOfSong;
 
 }DisplayInfo;
 

@@ -134,88 +134,87 @@ Error XingLMC::ExtractMediaInfo(MediaInfoEvent **pMIE) {
     int32 dummy;
     m_input->Seek(dummy,0,SEEK_FROM_START);
     if (bs_fill() > 0) {
-	MPEG_HEAD head;
-	int32 bitrate;
-	uint32 searchAhead;
-	int32 framebytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate, &searchAhead);
-	if (framebytes) {
-	    static int sample_rate_table[8] =  {22050L, 24000L, 16000L, 1L, 44100L, 48000L, 32000L, 1L};
-	    
-	    int32 totalFrames = 0;
-	    int32 bytesPerFrame = framebytes;
-	    int32 backhere;
-	    Error error = m_input->Seek(backhere,0,SEEK_FROM_CURRENT);
-	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
-	    int32 end;
-	    error = m_input->Seek(end,0,SEEK_FROM_END);
-	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
-	    int32 dummy;
-	    error = m_input->Seek(dummy,-128,SEEK_FROM_CURRENT);
-	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
-	    // look for id3 tag
-	    char buf[128];
-	    memset(buf,0,sizeof(buf));
-	    error = m_input->Read(dummy,buf,128);
-	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
-	    Id3TagInfo tag_info(buf);
-	    if (tag_info.m_containsInfo) {
-		end -= 128;
-	    }
-	    error = m_input->Seek(dummy,backhere,SEEK_FROM_START);
- 	    if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
-	    
-	    totalFrames = end / bytesPerFrame;
-	    int32 sampRateIndex = 4*head.id+head.sr_index;
-	    int32 samprate = sample_rate_table[sampRateIndex];
-	    if ((head.sync & 1) == 0)
-		samprate = samprate / 2;	// mpeg25
-	    double milliseconds_per_frame = 0;
-	    static int32 l[4] = {25,3,2,1};
-	    int32 layer = l[head.option];
-	    static double ms_p_f_table[3][3] = {
-		{8.707483f,  8.0f, 12.0f},
-		{26.12245f, 24.0f, 36.0f},
-		{26.12245f, 24.0f, 36.0f}
-	    };
-	    milliseconds_per_frame = ms_p_f_table[layer-1][head.sr_index];
-	    
-	    float totalSeconds = (float)((double)totalFrames * (double)milliseconds_per_frame / 1000);
-	    
-	    *pMIE = new MediaInfoEvent(m_input->Url(), totalSeconds);
-	    
-	    if (*pMIE) {
-		ID3TagEvent *ite = new ID3TagEvent(tag_info);
-		if (ite) {
-		    (*pMIE)->AddChildEvent((Event *)ite);
-		    ite = NULL;
-		} else {
-		    return kError_OutOfMemory;
+		MPEG_HEAD head;
+		int32 bitrate;
+		uint32 searchAhead;
+		int32 framebytes = head_info3(m_bsBuffer, m_bsBufBytes, &head, &bitrate, &searchAhead);
+		if (framebytes) {
+			static int sample_rate_table[8] =  {22050L, 24000L, 16000L, 1L, 44100L, 48000L, 32000L, 1L};
+			
+			int32 totalFrames = 0;
+			int32 bytesPerFrame = framebytes;
+			int32 backhere;
+			Error error = m_input->Seek(backhere,0,SEEK_FROM_CURRENT);
+			if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
+			int32 end;
+			error = m_input->Seek(end,0,SEEK_FROM_END);
+			if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
+			int32 dummy;
+			error = m_input->Seek(dummy,-128,SEEK_FROM_CURRENT);
+			if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
+			// look for id3 tag
+			char buf[128];
+			memset(buf,0,sizeof(buf));
+			error = m_input->Read(dummy,buf,128);
+			if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
+			Id3TagInfo tag_info(buf);
+			if (tag_info.m_containsInfo) {
+			end -= 128;
+			}
+			error = m_input->Seek(dummy,backhere,SEEK_FROM_START);
+ 			if (IsError(error)) { return (Error)lmcError_ID3ReadFailed; }
+			
+			totalFrames = end / bytesPerFrame;
+			int32 sampRateIndex = 4*head.id+head.sr_index;
+			int32 samprate = sample_rate_table[sampRateIndex];
+			if ((head.sync & 1) == 0)
+			samprate = samprate / 2;	// mpeg25
+			double milliseconds_per_frame = 0;
+			static int32 l[4] = {25,3,2,1};
+			int32 layer = l[head.option];
+			static double ms_p_f_table[3][3] = {
+			{8.707483f,  8.0f, 12.0f},
+			{26.12245f, 24.0f, 36.0f},
+			{26.12245f, 24.0f, 36.0f}
+			};
+			milliseconds_per_frame = ms_p_f_table[layer-1][head.sr_index];
+			
+			float totalSeconds = (float)((double)totalFrames * (double)milliseconds_per_frame / 1000);
+			
+			*pMIE = new MediaInfoEvent(m_input->Url(), totalSeconds);
+			
+			if (!(*pMIE)) return kError_OutOfMemory;
+			if (tag_info.m_containsInfo) {
+				ID3TagEvent *ite = new ID3TagEvent(tag_info);
+				if (ite) {
+					(*pMIE)->AddChildEvent((Event *)ite);
+					ite = NULL;
+				} else {
+					return kError_OutOfMemory;
+				}
+			}
+			MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
+								   milliseconds_per_frame / 1000,
+								   m_frameBytes, 
+								   bitrate, 
+								   samprate, 
+								   layer, 
+								   (head.sync == 2)? 3:(head.id)?1:2,
+								   (head.mode == 0x3 ? 1 : 2),
+								   head.original,
+								   head.prot,
+								   head.emphasis,
+								   head.mode,
+								   head.mode_ext);
+			if (mie) {
+				(*pMIE)->AddChildEvent((Event *)mie);
+				mie = NULL;
+			} else {
+				return kError_OutOfMemory;
+			}
+			return kError_NoErr;
 		}
-
-		MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
-						       milliseconds_per_frame / 1000,
-						       m_frameBytes, 
-						       bitrate, 
-						       samprate, 
-						       layer, 
-						       (head.sync == 2)? 3:(head.id)?1:2,
-						       (head.mode == 0x3 ? 1 : 2),
-						       head.original,
-						       head.prot,
-						       head.emphasis,
-						       head.mode,
-						       head.mode_ext
-		    );
-		if (mie) {
-		    (*pMIE)->AddChildEvent((Event *)mie);
-		    mie = NULL;
-		} else {
-		    return kError_OutOfMemory;
-		}
-		return kError_NoErr;
-	    }
 	}
-    }
     return kError_UnknownErr;
 }
 
@@ -292,6 +291,8 @@ XingLMC::
 XingLMC()
 {
     //cout << "XingLMC::XingLMC: Creating XingLMC..." << endl;
+	m_input = NULL;
+	m_output = NULL;
     m_properlyInitialized = false;
     m_target = NULL;
     m_decoderThread = NULL;
