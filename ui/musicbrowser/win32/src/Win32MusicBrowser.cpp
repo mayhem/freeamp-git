@@ -878,6 +878,24 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             break;
         }
 
+        case CMD_EditCurrentPlaylistItemInfo:
+        {
+            Int32PropValue *prop;
+
+            if(IsntError(m_context->props->GetProperty("MainWindow", (PropValue **)&prop)))
+            {
+                HWND hwnd = (HWND)prop->GetInt32();
+    
+                vector<PlaylistItem*> items;
+
+                items.push_back(m_plm->GetCurrentItem());
+
+                EditInfo(items, hwnd);
+            }
+
+            break;
+        }
+
         default:
             break;
     }

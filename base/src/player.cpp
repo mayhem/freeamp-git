@@ -1974,6 +1974,7 @@ ServiceEvent(Event * pC)
         case CMD_AddFiles:
         case CMD_LoadTheme:
         case CMD_ShowPreferences:
+        case CMD_EditCurrentPlaylistItemInfo:
             SendEventToUI(pC);
             delete pC;
             break;

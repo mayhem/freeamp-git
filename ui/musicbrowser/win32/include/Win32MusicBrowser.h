@@ -235,6 +235,7 @@ class MusicBrowserUI : public UserInterface
     void  ChangeRepeatMode(RepeatMode mode);
     void  ExportPlaylistEvent();
     void  EditInfoEvent();
+    void  EditInfo(vector<PlaylistItem*>& items, HWND hwnd = NULL);
     void  RenameEvent();
     void  PlayNowEvent();
     bool  DeleteFromDrive(const char* url);

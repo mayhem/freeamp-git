@@ -44,6 +44,7 @@ class EditTrackInfoDialog
  public:
 
     EditTrackInfoDialog(FAContext* context,
+                        HINSTANCE hinst,
                         HWND hwnd, 
                         const vector<ArtistList*>* artistList, 
                         MetaData* editMetaData,
@@ -66,6 +67,7 @@ class EditTrackInfoDialog
 
  private:
     FAContext* m_context;
+    HINSTANCE m_hinst;
     HWND m_hwnd;
     const vector<ArtistList*>* m_artistList; 
     MetaData* m_editMetaData;

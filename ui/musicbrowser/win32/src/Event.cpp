@@ -383,9 +383,6 @@ const char* kMultipleComments = "<Enter a new comment for all selected tracks.>"
 
 void MusicBrowserUI::EditInfoEvent()
 {
-    MetaData metadata;
-    char location[MAX_PATH];
-
     vector<PlaylistItem*> items;
 
     if(m_hPlaylistView == GetFocus())
@@ -393,8 +390,15 @@ void MusicBrowserUI::EditInfoEvent()
     else if(m_hMusicView == GetFocus())
         GetSelectedMusicTreeItems(&items); 
 
-    if(!items.size())
-        return;
+    if(items.size())
+    {
+        EditInfo(items);
+    }
+}
+
+void MusicBrowserUI::EditInfo(vector<PlaylistItem*>& items, HWND hwnd)
+{
+    MetaData metadata;
 
     metadata = items[0]->GetMetaData();
 
@@ -433,6 +437,8 @@ void MusicBrowserUI::EditInfoEvent()
     if(!sameGenre)
         metadata.SetGenre(kMultipleGenres);
 
+    char location[MAX_PATH];
+
     if(items.size() > 1)
     {
         metadata.SetTitle(kMultipleTracks);
@@ -449,7 +455,8 @@ void MusicBrowserUI::EditInfoEvent()
     }
 
     EditTrackInfoDialog editTrackInfo(m_context,
-                                      m_hWnd,
+                                      (HINSTANCE)GetWindowLong(m_hWnd, GWL_HINSTANCE),  
+                                      (hwnd ? hwnd : m_hWnd),
                                       m_context->catalog->GetMusicList(),
                                       &metadata,
                                       location);
