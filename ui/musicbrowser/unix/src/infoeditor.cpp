@@ -58,7 +58,7 @@ void infoeditorUI::DoApplyInfoEdit(void)
 
     m_playlistItem->SetMetaData(&newmeta);
 
-    m_context->browser->WriteMetaDataToDatabase((char *)m_playlistItem->URL().c_str(),
+    m_context->browser->WriteMetaDataToDatabase(m_playlistItem->URL().c_str(),
                                                 newmeta);
 }
 

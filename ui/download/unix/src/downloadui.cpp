@@ -86,8 +86,10 @@ void DownloadUI::GTKEventService(void)
     }
     m_context->gtkLock.Release();
 
-    if (weAreGTK)
+    if (weAreGTK) {
         gtk_main();
+        gdk_threads_leave();
+    }
 }
 
 int32 DownloadUI::AcceptEvent(Event *event)

@@ -61,60 +61,147 @@ MusicCatalog::~MusicCatalog()
     delete m_playlists;
 }
 
-void MusicCatalog::AddPlaylist(const char *path)
+Error MusicCatalog::RemovePlaylist(const char *url)
 {
     Database *dbase = m_context->browser->GetDatabase();
     assert(dbase);
-    assert(path);
+    assert(url);
 
     if (!dbase->Working())
-        return;
+        return kError_DatabaseNotWorking;
+
+    char *data = dbase->Value(url);
+
+    if (!data)
+        return kError_ItemNotFound;
+
+    delete [] data;
+    dbase->Remove(url);
+
+    vector<string>::iterator i = m_playlists->begin();
+    for (; i != m_playlists->end(); i++)
+         if ((*i) == url) {
+             string tempstr = url;
+             if (tempstr.find("currentlist.m3u") >= tempstr.length())
+                 m_playlists->erase(i);
+             return kError_NoErr;
+         }   
+
+    return kError_ItemNotFound;
+}
+
+
+Error MusicCatalog::AddPlaylist(const char *url)
+{
+    Database *dbase = m_context->browser->GetDatabase();
+    assert(dbase);
+    assert(url);
+
+    if (!dbase->Working())
+        return kError_DatabaseNotWorking;
     
-    char *data = dbase->Value(path);
+    char *data = dbase->Value(url);
     if (!data) 
-        dbase->Insert(path, "P");
+        dbase->Insert(url, "P");
+    else 
+        delete [] data;
 
     bool found = false;
     vector<string>::iterator i = m_playlists->begin();
     for (; i != m_playlists->end(); i++)
-         if ((*i) == path)
+         if ((*i) == url)
              found = true;
     
     if (!found) {
-        string tempstr = path;
+        string tempstr = url;
         if (tempstr.find("currentlist.m3u") < tempstr.length()) 
-            m_playlists->insert(m_playlists->begin(), path);
+            m_playlists->insert(m_playlists->begin(), url);
         else
-            m_playlists->push_back(path);
+            m_playlists->push_back(url);
+        return kError_NoErr;
     }
+
+    return kError_DuplicateItem;
 }
 
-void MusicCatalog::AddSong(const char *path)
+Error MusicCatalog::RemoveSong(const char *url)
+{
+    Database *dbase = m_context->browser->GetDatabase();
+
+    assert(dbase);
+    assert(url);
+
+    if (!dbase->Working())
+        return kError_DatabaseNotWorking;
+
+    MetaData *meta = m_context->browser->ReadMetaDataFromDatabase(url);
+    if (!meta)
+        return kError_ItemNotFound;
+
+    dbase->Remove(url);
+
+    if (meta->Artist() == " ") {
+        vector<PlaylistItem *>::iterator i = m_unsorted->begin();
+        for (; i != m_unsorted->end(); i++)
+            if (url == (*i)->URL())
+                m_unsorted->erase(i);
+    }
+    else {
+        vector<ArtistList *>::iterator i = m_artistList->begin();
+        for (; i != m_artistList->end(); i++) {
+            if (meta->Artist() == (*i)->name) {
+                vector<AlbumList *> *alList = (*i)->m_albumList;
+                vector<AlbumList *>::iterator j = alList->begin();
+                for (; j != alList->end(); j++) {
+                    if (meta->Album() == (*j)->name) {
+                        vector<PlaylistItem *> *trList = (*j)->m_trackList;
+                        vector<PlaylistItem *>::iterator k = trList->begin();
+                        for (; k != trList->end(); k++)
+                            if (url == (*k)->URL())
+                                trList->erase(k);
+
+                        if (trList->size() == 0)
+                            alList->erase(j);
+                     }
+                }
+
+                if (alList->size() == 0)
+                    m_artistList->erase(i);
+            }
+        }
+    }
+
+    delete meta;
+
+    return kError_NoErr;
+}
+
+Error MusicCatalog::AddSong(const char *url)
 {
     Database *dbase = m_context->browser->GetDatabase();
     assert(dbase);
-    assert(path);
+    assert(url);
+
     if (!dbase->Working())
-        return;
+        return kError_DatabaseNotWorking;
 
     PlaylistItem *newtrack;
 
-    uint32 urlLength = strlen(path) + 20;
-    char *pathURL = new char[urlLength];
-    FilePathToURL(path, pathURL, &urlLength);
+    MetaData *meta = m_context->browser->ReadMetaDataFromDatabase(url);
 
-    MetaData *meta = m_context->browser->ReadMetaDataFromDatabase((char *)path);
     if (!meta) {
-        PlaylistItem *newtrack = new PlaylistItem(pathURL);
+        PlaylistItem *newtrack = new PlaylistItem(url);
         m_context->plm->RetrieveMetaData(newtrack);
+
         while (newtrack->GetState() != kPlaylistItemState_Normal)
             usleep(5);
+
         MetaData tempdata = (MetaData)(newtrack->GetMetaData());
-        m_context->browser->WriteMetaDataToDatabase((char *)path, tempdata);
-        meta = m_context->browser->ReadMetaDataFromDatabase((char *)path);
+        m_context->browser->WriteMetaDataToDatabase(url, tempdata);
+        meta = m_context->browser->ReadMetaDataFromDatabase(url);
     }
     else
-        newtrack = new PlaylistItem(pathURL, meta);
+        newtrack = new PlaylistItem(url, meta);
 
     if (meta->Artist() == " ") {
         m_unsorted->push_back(newtrack);
@@ -131,6 +218,15 @@ void MusicCatalog::AddSong(const char *path)
                 for (; j != alList->end(); j++) {
                     if (meta->Album() == (*j)->name) {
                         found_album = true;
+                       
+                        vector<PlaylistItem *> *trList = (*j)->m_trackList;
+                        vector<PlaylistItem *>::iterator k = trList->begin();
+                        for (; k != trList->end(); k++) {
+                            if (url == (*k)->URL()) {
+                                delete newtrack;                                
+                                return kError_DuplicateItem;
+                            }
+                        }
                         (*j)->m_trackList->push_back(newtrack);
                      }
                 }
@@ -152,53 +248,88 @@ void MusicCatalog::AddSong(const char *path)
             m_artistList->push_back(newartist);
         }
     }
+    return kError_NoErr;
 }
 
-void MusicCatalog::AddOneFromDatabase(char *key)
+Error MusicCatalog::Remove(const char *url)
 {
     Database *dbase = m_context->browser->GetDatabase();
     assert(dbase);
-    assert(key);
+    assert(url);
 
     if (!dbase->Working())
-        return;
+        return kError_DatabaseNotWorking;
 
-    char *data = dbase->Value(key);
+    char *data = dbase->Value(url);
     if (!data)
-        return;
+        return kError_ItemNotFound;
 
-    if (!strncmp("P", data, 1)) {
-        string tempstr = key;
-        if (tempstr.find("currentlist.m3u") < tempstr.length())
-            m_playlists->insert(m_playlists->begin(), key);
-        else  
-            m_playlists->push_back(key);
-    }
-    else if (!strncmp("M", data, 1)) 
-        AddSong(key);
+    if (!strncmp("P", data, 1))
+        return RemovePlaylist(url);
+    else if (!strncmp("M", data, 1))
+        return RemoveSong(url);
+
+    delete [] data;
+
+    return kError_YouScrewedUp;
 }
 
-void MusicCatalog::PopulateFromDatabase()
+Error MusicCatalog::Add(const char *url)
 {
     Database *dbase = m_context->browser->GetDatabase();
     assert(dbase);
+    assert(url);
 
     if (!dbase->Working())
-        return;
+        return kError_DatabaseNotWorking;
 
+    char *data = dbase->Value(url);
+    if (!data)
+        return kError_ItemNotFound;
+
+    if (!strncmp("P", data, 1))
+        return AddPlaylist(url);
+    else if (!strncmp("M", data, 1)) 
+        return AddSong(url);
+
+    delete [] data;
+    return kError_YouScrewedUp;
+}
+
+void MusicCatalog::ClearCatalog()
+{
     delete m_artistList;
     delete m_unsorted;
     delete m_playlists;
-
     m_artistList = new vector<ArtistList *>;
     m_unsorted = new vector<PlaylistItem *>;
     m_playlists = new vector<string>;
+}
+
+Error MusicCatalog::RePopulateFromDatabase()
+{
+    Database *dbase = m_context->browser->GetDatabase();
+    assert(dbase);
+
+    if (!dbase->Working())
+        return kError_DatabaseNotWorking;
+
+    ClearCatalog();
  
     char *key = dbase->NextKey(NULL);
+    Error err = kError_NoErr;
+
     while (key) {
-        AddOneFromDatabase(key);
+        err = Add(key);
+
+        if (IsError(err)) {
+             m_context->target->AcceptEvent(new ErrorMessageEvent("There was an internal error during generation of the Music Catalog"));
+             return kError_YouScrewedUp;
+        }
+            
         key = dbase->NextKey(key);
     }
+    return kError_NoErr;
 }
 
 MusicBrowser::MusicBrowser(FAContext *context, char *path)
@@ -211,9 +342,6 @@ MusicBrowser::MusicBrowser(FAContext *context, char *path)
  
     if (path)
         SetDatabase(path);
-
-    if (m_database)
-        m_catalog->PopulateFromDatabase();
 }
 
 MusicBrowser::~MusicBrowser()
@@ -239,7 +367,7 @@ void MusicBrowser::SetDatabase(const char *path)
     PruneDatabase();
 
     if (m_database)
-        m_catalog->PopulateFromDatabase();
+        m_catalog->RePopulateFromDatabase();
 }
 
 void MusicBrowser::PruneDatabase(void)
@@ -248,8 +376,16 @@ void MusicBrowser::PruneDatabase(void)
     struct stat st;
 
     while (key) {
-        if (-1 == stat(key, &st))
-            m_database->Remove(key);
+        if (!strncmp("file://", key, 7)) {
+            uint32 length = strlen(key) + 1;
+            char *filename = new char[length];
+
+            if (IsntError(URLToFilePath(key, filename, &length)))
+                if (-1 == stat(key, &st))
+                    m_database->Remove(key);
+
+            delete [] filename;
+        }
         key = m_database->NextKey(key);
     }
 }
@@ -359,8 +495,14 @@ void MusicBrowser::DoSearchMusic(char *path)
                     string file = path;
                     file.append(DIR_MARKER_STR);
                     file.append(find.cFileName);
-                    m_database->Insert(file.c_str(), "P");
 
+                    uint32 urlLength = strlen(file.c_str()) + 10;
+                    char *url = new char[urlLength];
+
+                    if (IsntError(FilePathToURL(file.c_str(), url, &urlLength)))
+                        m_database->Insert(file.c_str(), "P");
+
+                    delete [] url;
                 }
                 else if (m_context->player->IsSupportedExtension(fileExt))
                 {
@@ -368,18 +510,23 @@ void MusicBrowser::DoSearchMusic(char *path)
                     file.append(DIR_MARKER_STR);
                     file.append(find.cFileName);
 
-                    char *tempurl = new char[file.length() + 15];
-                    uint32 length = file.length() + 15;
-                    FilePathToURL(file.c_str(), tempurl, &length);
+                    char *tempurl = new char[file.length() + 10];
+                    uint32 length = file.length() + 10;
 
+                    if (IsError(FilePathToURL(file.c_str(), tempurl, &length)))
+                    {
+                        continue;
+                    }
+                       
                     PlaylistItem *plist = new PlaylistItem(tempurl);
                     m_plm->RetrieveMetaData(plist);
 
                     while (plist->GetState() != kPlaylistItemState_Normal)
                        usleep(5);
 
-                    WriteMetaDataToDatabase((char *)file.c_str(), (MetaData)(plist->GetMetaData()));
+                    WriteMetaDataToDatabase(tempurl, plist->GetMetaData());
  
+                    delete [] tempurl;
                     delete plist;
                 }
                 delete fileExt;
@@ -390,7 +537,8 @@ void MusicBrowser::DoSearchMusic(char *path)
     }
 }
 
-void MusicBrowser::WriteMetaDataToDatabase(char *path, MetaData information)
+void MusicBrowser::WriteMetaDataToDatabase(const char *url, 
+                                           const MetaData information)
 {
     if (!m_database->Working())
         return;
@@ -437,15 +585,15 @@ void MusicBrowser::WriteMetaDataToDatabase(char *path, MetaData information)
     sprintf(tempstr, "%u", information.Size());
     data += tempstr;
 
-    m_database->Insert(path, (char *)data.c_str());
+    m_database->Insert(url, (char *)data.c_str());
 }
 
-MetaData *MusicBrowser::ReadMetaDataFromDatabase(char *path)
+MetaData *MusicBrowser::ReadMetaDataFromDatabase(const char *url)
 {
     if (!m_database->Working())
         return NULL;
 
-    char *data = m_database->Value(path);
+    char *data = m_database->Value(url);
 
     if (!data)
         return NULL;
@@ -473,7 +621,8 @@ MetaData *MusicBrowser::ReadMetaDataFromDatabase(char *path)
     info = strtok(NULL, DBASEDELIM);
     new_metadata->SetSize(atoi(info));
 
-    delete data;
+    delete [] data;
+
     return new_metadata;
 }
 
@@ -487,7 +636,7 @@ int32 MusicBrowser::AcceptEvent(Event *e)
             PruneDatabase();
             info = "Regenerating the Music Catalog Database...";
             m_context->target->AcceptEvent(new BrowserMessageEvent(info.c_str()));
-            m_catalog->PopulateFromDatabase();
+            m_catalog->RePopulateFromDatabase();
             m_context->target->AcceptEvent(new Event(INFO_SearchMusicDone));
             break;
         } 

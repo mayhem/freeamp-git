@@ -384,6 +384,14 @@ void MusicBrowserUI::UpdateCatalog(void)
     m_musicCatalog = m_context->browser->m_catalog;
     GtkTargetEntry tree_target_table = {"tree-drag", 0, 1};
 
+    const vector<ArtistList *> *artistList = m_musicCatalog->GetMusicList();
+    const vector<PlaylistItem *> *unsorted = m_musicCatalog->GetUnsortedMusic();
+    const vector<string> *playlists = m_musicCatalog->GetPlaylists();
+
+    if ((artistList->size() == 0) && (unsorted->size() == 0) && 
+        (playlists->size() == 0))
+        return;
+
     if (musicBrowserTree) {
         gtk_widget_destroy(musicBrowserTree);
         musicBrowserTree = gtk_tree_new();
@@ -399,7 +407,6 @@ void MusicBrowserUI::UpdateCatalog(void)
     gtk_tree_append(GTK_TREE(musicBrowserTree), artistSubTree);
     gtk_widget_show(artistSubTree);
 
-    vector<ArtistList *>::iterator i = m_musicCatalog->m_artistList->begin();
     item_subtree1 = gtk_tree_new();
     gtk_signal_connect(GTK_OBJECT(item_subtree1), "button_press_event",
                        GTK_SIGNAL_FUNC(tree_clicked), this);
@@ -412,7 +419,8 @@ void MusicBrowserUI::UpdateCatalog(void)
 
     gtk_tree_item_set_subtree(GTK_TREE_ITEM(artistSubTree), item_subtree1);
 
-    for (; i != m_musicCatalog->m_artistList->end(); i++) {
+    vector<ArtistList *>::const_iterator i = artistList->begin();
+    for (; i != artistList->end(); i++) {
         item_new1 = gtk_tree_item_new_with_label((char *)(*i)->name.c_str());
         gtk_object_set_user_data(GTK_OBJECT(item_new1), *i);
         gtk_object_set_data(GTK_OBJECT(item_new1), "type", (gpointer)1);
@@ -460,7 +468,6 @@ void MusicBrowserUI::UpdateCatalog(void)
         gtk_widget_show(item_new1);
     }
 
-    vector<PlaylistItem *>::iterator l = m_musicCatalog->m_unsorted->begin();
     item_new1 = gtk_tree_item_new_with_label("Unsorted Songs");
     gtk_tree_append(GTK_TREE(item_subtree1), item_new1);
     item_subtree2 = gtk_tree_new();
@@ -474,7 +481,8 @@ void MusicBrowserUI::UpdateCatalog(void)
     gtk_signal_connect(GTK_OBJECT(item_subtree2), "drag_begin",
                        GTK_SIGNAL_FUNC(tree_drag_begin), this);
 
-    for (; l != m_musicCatalog->m_unsorted->end(); l++) {
+    vector<PlaylistItem *>::const_iterator l = unsorted->begin();
+    for (; l != unsorted->end(); l++) {
         item_new2 = gtk_tree_item_new_with_label((char *)(*l)->URL().c_str());
         gtk_object_set_user_data(GTK_OBJECT(item_new2), *l);
         gtk_object_set_data(GTK_OBJECT(item_new2), "type", (gpointer)4);
@@ -498,38 +506,27 @@ void MusicBrowserUI::UpdateCatalog(void)
                        GTK_SIGNAL_FUNC(tree_drag_begin), this);
 
     gtk_tree_item_set_subtree(GTK_TREE_ITEM(playlistSubTree), item_subtree1);
-    vector<string>::iterator m = m_musicCatalog->m_playlists->begin();
 
-    for (; m != m_musicCatalog->m_playlists->end(); m++) {
-        if (m == m_musicCatalog->m_playlists->begin()) {
-            item_new1 = gtk_tree_item_new_with_label("Master Playlist");
-            gtk_object_set_user_data(GTK_OBJECT(item_new1), NULL);
-            gtk_object_set_data(GTK_OBJECT(item_new1), "type", (gpointer)9);
-        }
-        else {
-            char *fullname = new char[_MAX_PATH];
-            strcpy(fullname, (*m).c_str());
-            char *listname = fullname;
-            char *temp = strrchr(fullname, '.');
-            if (temp)
-                *temp = '\0';
-            temp = strrchr(fullname, '/');
-            if (temp)
-                listname = temp + 1;
-            item_new1 = gtk_tree_item_new_with_label(listname);
-            delete [] fullname;
-            gtk_object_set_user_data(GTK_OBJECT(item_new1), 
-                                     (char *)(*m).c_str());
-            gtk_object_set_data(GTK_OBJECT(item_new1), "type", (gpointer)5);
-        }
+    vector<string>::const_iterator m = playlists->begin();
+    m++;
+    for (; m != playlists->end(); m++) {
+        char *fullname = new char[(*m).length() + 1];
+        strcpy(fullname, (*m).c_str());
+        char *listname = fullname;
+        char *temp = strrchr(fullname, '.');
+        if (temp)
+            *temp = '\0';
+        temp = strrchr(fullname, '/');
+        if (temp)
+            listname = temp + 1;
+        item_new1 = gtk_tree_item_new_with_label(listname);
+        delete [] fullname;
+        gtk_object_set_user_data(GTK_OBJECT(item_new1), 
+                                 (char *)(*m).c_str());
+        gtk_object_set_data(GTK_OBJECT(item_new1), "type", (gpointer)5);
         gtk_tree_append(GTK_TREE(item_subtree1), item_new1);
         gtk_widget_show(item_new1);
     }
-}
-
-void music_search_internal(GtkWidget *widget, MusicBrowserUI *p)
-{
-    p->StartMusicSearch();
 }
 
 void music_search()
@@ -541,7 +538,6 @@ void MusicBrowserUI::CreateExpanded(void)
 {
     GtkWidget *browserlabel;
     GtkWidget *browservbox;
-    GtkWidget *button;
     GtkWidget *hbox;
 
     if (m_browserCreated)
@@ -560,12 +556,6 @@ void MusicBrowserUI::CreateExpanded(void)
     browserlabel = gtk_label_new("My Music Catalog:");
     gtk_box_pack_start(GTK_BOX(hbox), browserlabel, FALSE, FALSE, 10);
     gtk_widget_show(browserlabel);
-
-    button = gtk_button_new_with_label("Search for Music");
-    gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, FALSE, 10);
-    gtk_signal_connect(GTK_OBJECT(button), "clicked",
-                       GTK_SIGNAL_FUNC(music_search_internal), this);
-    gtk_widget_show(button);
 
     browservbox = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(masterBrowserBox), browservbox);
@@ -867,17 +857,18 @@ void MusicBrowserUI::UpdatePlaylistList(void)
             uint32 filelength = strlen(urlname) + 1;
             char *filename = new char[filelength];
 
-            if (URLToFilePath(urlname, filename, &filelength) != kError_NoErr)
+            if (IsntError(URLToFilePath(urlname, filename, &filelength)))
                 mdata.SetTitle(filename);
             else
                 mdata.SetTitle(urlname);
-
-            delete [] filename;
-            delete [] urlname;
         }
         title = (char *)mdata.Title().c_str();
         artist = (char *)mdata.Artist().c_str();
-        sprintf(length, "%d", mdata.Time());
+
+        if (mdata.Time() == 0)
+            sprintf(length, "Unknown");
+        else
+            sprintf(length, "%d", mdata.Time());
 
         iText[0] = title;
         iText[1] = artist;
@@ -943,7 +934,7 @@ void MusicBrowserUI::CreatePlaylistList(GtkWidget *box)
     gtk_clist_columns_autosize(GTK_CLIST(playlistList));
     gtk_widget_show(playlistList);
 
-    m_currentindex = (uint32)m_plm->GetCurrentIndex();
+    m_currentindex = m_plm->GetCurrentIndex();
 
     UpdatePlaylistList();
 }
@@ -971,14 +962,13 @@ void MusicBrowserUI::LoadPlaylist(string &oPlaylist)
 
     uint32 length = _MAX_PATH;
     char *PlaylistURL = new char[length];
-    FilePathToURL(oPlaylist.c_str(), PlaylistURL, &length);
-
-    m_plm->ReadPlaylist(PlaylistURL);
+    if (IsntError(FilePathToURL(oPlaylist.c_str(), PlaylistURL, &length))) {
+        m_plm->ReadPlaylist(PlaylistURL);
+        m_currentListName = oPlaylist;
+        UpdatePlaylistList();
+    }
 
     delete [] PlaylistURL;
-
-    m_currentListName = oPlaylist;
-    UpdatePlaylistList();
 }
 
 void MusicBrowserUI::CreatePlaylist(void)
@@ -1106,6 +1096,8 @@ void MusicBrowserUI::GTKEventService(void)
     }
     m_context->gtkLock.Release();
 
-    if (weAreGTK)
+    if (weAreGTK) {
         gtk_main();
+        gdk_threads_leave();
+    }
 }

@@ -109,17 +109,19 @@ plugins/esound.pmo: $(ESNDOBJ)
 
 # download manager ui
 DOWNLOADUIOBJ = ui/download/unix/src/downloadui.o \
-                ui/download/unix/src/gtkdownloadui.o
+                ui/download/unix/src/gtkdownloadui.o \
+                base/src/utility.o
 
 plugins/download.ui: $(DOWNLOADUIOBJ)
 	$(LINKMOD) -o $@ $(DOWNLOADUIOBJ) $(GTK_LIBS)
 
 # musicbrowser ui
-MUSICBROWSEROBJ = ui/musicbrowser/unix/gtkmusicbrowser.o \
-                  ui/musicbrowser/src/musicbrowser.o \
-                  ui/musicbrowser/unix/infoeditor.o \
-                  ui/musicbrowser/unix/fileselector.o \
-                  ui/musicbrowser/unix/browsermenu.o
+MUSICBROWSEROBJ = ui/musicbrowser/unix/src/gtkmusicbrowser.o \
+                  ui/musicbrowser/unix/src/musicbrowser.o \
+                  ui/musicbrowser/unix/src/infoeditor.o \
+                  ui/musicbrowser/unix/src/fileselector.o \
+                  ui/musicbrowser/unix/src/browsermenu.o \
+                  base/src/utility.o
 
 plugins/musicbrowser.ui: $(MUSICBROWSEROBJ)
 	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(GTK_LIBS)
@@ -137,12 +139,15 @@ FREEAMPUIOBJ = ui/freeamp/src/Theme.doh ui/freeamp/src/Bitmap.o \
                ui/freeamp/unix/src/GTKWindow.o ui/freeamp/unix/src/GTKBitmap.o \
                ui/freeamp/unix/src/GTKCanvas.o \
 	       ui/freeamp/unix/src/ThemeManager.o \
-               ui/freeamp/unix/src/GTKPreferenceWindow.o 
+               ui/freeamp/unix/src/GTKPreferenceWindow.o \
+               base/src/utility.o
 
 plugins/freeamp.ui: $(FREEAMPUIOBJ)
 	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) lib/zlib/lib/libzlib.a $(GTK_LIBS)
 
-# MakeTheme, only built if we're building the theme.ui
+#        $(LINKMOD) -o $@ $(FREEAMPUIOBJ) lib/zlib/lib/libzlib.a -L/usr/lib -L/usr/X11R6/lib -rdynamic /usr/lib/libgtk_g.a /usr/lib/libgdk_g.a /usr/lib/libgmodule_g.a /usr/lib/libgthread_g.a /usr/lib/libglib_g.a -lpthread -ldl -lXi -lXext -lX11 -lm
+
+# MakeTheme, only built if we're building freeamp.ui
 
 MAKETHEMEOBJ = ui/freeamp/tools/src/MakeTheme.o ui/freeamp/src/ThemeZip.o
 

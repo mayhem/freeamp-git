@@ -1074,10 +1074,17 @@ Error DownloadManager::SubmitToDatabase(DownloadItem* item)
 
         m_context->prefs->GetPrefString(kSaveMusicDirPref, path, &length);
 
-        strcat(path, "\\");
+        strcat(path, DIR_MARKER_STR);
         strcat(path, item->DestinationFile().c_str());
 
-        m_context->browser->WriteMetaDataToDatabase(path, item->GetMetaData());
+        uint32 urlLength = strlen(path) + 10;
+        char *url = new char[urlLength];
+        
+        if (IsntError(FilePathToURL(path, url, &urlLength)))
+            m_context->browser->WriteMetaDataToDatabase(path, 
+                                                        item->GetMetaData());
+
+        delete [] url;
     }
 
     return result;

@@ -50,6 +50,7 @@ void WarpPointer(GdkWindow *win, int x, int y)
 static void runGTK(void *c)
 {
     gtk_main();
+    gdk_threads_leave();
 }
 
 void InitializeGTK(FAContext *context)
@@ -75,13 +76,13 @@ void InitializeGTK(FAContext *context)
 
 void ShutdownGTK(void)
 {
-    if (weAreGTK) {
+    if (weAreGTK && gtkThread) {
         gdk_threads_enter();
         gtk_main_quit();
         gdk_threads_leave();
         weAreGTK = false;
 //        gtkThread->Join();
-// gtk_main() NEVER QUITS... stupid, what am I missing?
+        gtkThread = NULL;
     }
 }
 

@@ -114,6 +114,10 @@ Theme::~Theme(void)
     ClearWindows();
     ClearBitmaps();
     ClearFonts();
+
+#ifdef HAVE_GTK
+    ShutdownGTK();
+#endif
 }
 
 void Theme::ClearWindows(void)

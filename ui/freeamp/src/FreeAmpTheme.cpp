@@ -159,9 +159,7 @@ Error FreeAmpTheme::Close(void)
     Theme::Close();
     
     m_uiThread->Join();
-#ifdef HAVE_GTK 
-    ShutdownGTK();
-#endif
+
     return kError_NoErr;
 }
 
