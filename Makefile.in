@@ -112,9 +112,8 @@ DIRECTORIES += ui/irman/src ui/lcd/src ui/musicbrowser/unix/src ui/ncurses
 DIRECTORIES += update update/unix lmc/cd lmc/cd/src io/cd io/cd/unix 
 DIRECTORIES += io/cd/unix/src lib/unzip lib/unzip/src ftc ftc/kjofol ftc/winamp
 DIRECTORIES += plm/metadata/cddb base/aps lmc/vorbis/src io/signature/src
-DIRECTORIES += lib/musicbrainz lib/musicbrainz/expat
-DIRECTORIES += lib/musicbrainz/expat/xmlparse lib/musicbrainz/expat/xmltok
-DIRECTORIES += lib/musicbrainz/osdep lib/musicbrainz/lib
+DIRECTORIES += lib/musicbrainz plm/metadata/vorbis 
+DIRECTORIES += lib/musicbrainz/lib
 
 dirs:
 	for p in $(DIRECTORIES); do \
