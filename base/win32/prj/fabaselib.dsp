@@ -319,10 +319,6 @@ SOURCE=..\..\aps\wincomsocket.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\aps\writetologfile.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\aps\ypclient.cpp
 # End Source File
 # End Target
