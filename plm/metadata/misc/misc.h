@@ -24,17 +24,23 @@ ____________________________________________________________________________*/
 #ifndef INCLUDED_MISC_H
 #define INCLUDED_MISC_H
 
+#include <assert.h>
+
 #include <string>
+#include <vector>
+#include <map>
 
 using namespace std;
-
-#include <assert.h>
 
 #include "config.h"
 #include "errors.h"
 #include "facontext.h"
+#include "registrar.h"
+#include "registry.h"
 
 #include "metadata.h"
+
+typedef map<string, RegistryItem*> ExtensionMap;
 
 class Misc : public MetaDataFormat 
 {
@@ -48,7 +54,10 @@ class Misc : public MetaDataFormat
 
  private:
 
-     FAContext* m_context;
+    FAContext* m_context;
+    Registry  m_lmcReg;
+    Registry  m_pmiReg;
+    ExtensionMap m_extensions;
 };
 
 

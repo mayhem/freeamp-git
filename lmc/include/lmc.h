@@ -60,6 +60,8 @@ class LogicalMediaConverter : public PipelineUnit
     
     virtual vector<char *> *GetExtensions(void) = 0;
 
+    virtual uint32 CalculateSongLength() = 0;
+
     protected:
 
       virtual Error CanDecode() = 0;

@@ -78,6 +78,8 @@ class     XingLMC:public LogicalMediaConverter
             XingLMC(FAContext *context);
    virtual ~XingLMC();
 
+   virtual uint32 CalculateSongLength();
+
    virtual Error ChangePosition(int32 position);
 
    virtual Error CanDecode();

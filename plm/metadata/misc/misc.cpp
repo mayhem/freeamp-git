@@ -21,8 +21,14 @@
 	$Id$
 ____________________________________________________________________________*/
 
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
+
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <errno.h>
@@ -32,6 +38,8 @@ ____________________________________________________________________________*/
 #include "utility.h"
 
 #include "misc.h"
+#include "lmc.h"
+#include "pmi.h"
 
 
 
@@ -46,6 +54,33 @@ extern "C"
 Misc::Misc(FAContext* context):MetaDataFormat(context)
 {
     m_context = context;
+
+    Registrar registrar;
+
+    registrar.SetSubDir("plugins");
+    registrar.SetSearchString("*.lmc");
+    registrar.InitializeRegistry(&m_lmcReg, m_context->prefs);
+
+    registrar.SetSearchString("*.pmi");
+    registrar.InitializeRegistry(&m_pmiReg, m_context->prefs);
+
+    for (uint32 i = 0; i < m_lmcReg.CountItems(); i++)
+    {
+        LogicalMediaConverter* lmc;
+        RegistryItem* temp = m_lmcReg.GetItem(i);
+
+        lmc = (LogicalMediaConverter *)temp->InitFunction()(m_context);
+        vector<char*>* extList = lmc->GetExtensions();
+
+        for (uint32 j = 0; j < extList->size(); j++)
+        {
+            string ext = (*extList)[j];
+            m_extensions[ext] = temp;
+        }
+
+        delete extList;
+        delete lmc;
+    }
 }
 
 Misc::~Misc()
@@ -56,20 +91,105 @@ Misc::~Misc()
 bool Misc::ReadMetaData(const char* url, MetaData* metadata)
 {
     bool result = false;
-    Error error;
 
     assert(url);
     assert(metadata);
 
-    char path[_MAX_PATH];
-    uint32 length = sizeof(path);
-
-    error = URLToFilePath(url, path, &length);
-
-    if(IsntError(error))
+    // do we need to calculate the song length?
+    if(!strncasecmp(url, "file://", 7) && !metadata->Time())
     {
-        
+        for (uint32 i = 0; i < m_pmiReg.CountItems(); i++)
+        {
+            PhysicalMediaInput* pmi;
+            RegistryItem* pmiItem = m_pmiReg.GetItem(i);
+
+            pmi = (PhysicalMediaInput*)pmiItem->InitFunction()(m_context);
+
+            if(pmi->CanHandle(url, NULL))
+            {
+                pmi->SetTo(url);
+                RegistryItem *lmcItem = NULL;
+                char* cp;
+
+                cp = strrchr(url, '.');
+
+                if(cp)
+                {
+                    cp++;
+                    
+                    char temp[256];
+
+                    strcpy(temp, cp);
+
+                    cp = temp;
+
+                    while(*cp)
+                    {
+                        *cp = toupper(*cp);
+                        cp++;
+                    }
+
+                    string ext = temp;
+
+                    ExtensionMap::const_iterator iter = m_extensions.find(ext);
+                
+                    if(iter != m_extensions.end())
+                    {
+                        LogicalMediaConverter* lmc;
+
+                        lmcItem = iter->second; 
+
+                        lmc = (LogicalMediaConverter*)lmcItem->InitFunction()(m_context);
+                    
+                        lmc->SetPMI(pmi);
+
+                        uint32 length = lmc->CalculateSongLength();
+
+                        metadata->SetTime(length);
+
+                        delete lmc;
+                    }
+                }
+
+                delete pmi;
+                break;
+            }
+
+            delete pmi;
+        }
     }
+
+    // do we need to come up with a name?
+    if(!strncasecmp(url, "file://", 7) && !metadata->Title().size())
+    {
+        char* temp = new char[strlen(url) + 1];
+
+        strcpy(temp, url);
+
+        char* ext = strrchr(temp, '.');
+        char* file = strrchr(temp, '/'); // these are all URLs so we don't need DIR_MARKER
+        
+        if(ext)
+            *ext = 0x00;
+        
+        if(!file)
+            file = temp;
+        else
+            file++;
+    
+        metadata->SetTitle(file);
+
+        delete [] temp;
+    }
+    else if(!strncasecmp(url, "http://", 7) && !metadata->Title().size())
+    {
+        metadata->SetTitle("HTTP Stream");
+    }
+    else if(!strncasecmp(url, "rtp://", 6) && !metadata->Title().size())
+    {
+        metadata->SetTitle("RTP Stream");
+    }
+
     return true;
 }
 

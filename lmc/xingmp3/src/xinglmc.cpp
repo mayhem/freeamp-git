@@ -27,7 +27,6 @@ ____________________________________________________________________________*/
 
 #ifdef WIN32
 #include <windows.h>
-#define sleep(x) Sleep(1000*x)
 #endif
 
 /* system headers */
@@ -66,7 +65,7 @@ extern    "C"
 static AUDIO audio_table[2][2] =
 {
    {                            // [0][]
-   // non iteger mode
+   // non integer mode
       {audio_decode_init, audio_decode_info, audio_decode},
       {audio_decode8_init, audio_decode8_info, audio_decode8},  // 8 bit
                         // methods
@@ -812,4 +811,9 @@ Error XingLMC::ChangePosition(int32 position)
    m_pPmi->Seek(dummy, position * m_frameBytes, SEEK_FROM_START);
 
    return kError_NoErr;
+}
+
+uint32 XingLMC::CalculateSongLength()
+{
+    return 0;
 }
