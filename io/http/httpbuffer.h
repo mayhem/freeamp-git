@@ -60,6 +60,7 @@ enum
    httpError_MaximumError
 };
 
+class FAContext;
 class HttpInput;
 class HttpBuffer : public StreamBuffer
 {
@@ -67,7 +68,7 @@ class HttpBuffer : public StreamBuffer
 
                HttpBuffer(size_t iBufferSize, size_t iOverFlowSize,
                           size_t iWriteTriggerSize, char *szFile,
-                          HttpInput *pHttp);
+                          HttpInput *pHttp, FAContext *context);
       virtual ~HttpBuffer(void);
 
       Error    Open(void);
@@ -77,6 +78,8 @@ class HttpBuffer : public StreamBuffer
 
       const char *GetErrorString(int32 error);
       static   void     StartWorkerThread(void *);
+
+      void            WorkerThread(void);
 
     private:
 
@@ -88,10 +91,6 @@ class HttpBuffer : public StreamBuffer
       bool            m_bLoop;
       ID3Tag         *m_pID3Tag;
       HttpInput      *m_pHttp;
-
-    public:
-
-      void            WorkerThread(void);
 };
 
 #endif

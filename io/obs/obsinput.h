@@ -32,11 +32,13 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 #include "obsbuffer.h"
 
+class FAContext;
+
 class     ObsInput:public PhysicalMediaInput
 {
-   public:
+ public:
 
-   ObsInput();
+   ObsInput(FAContext *context);
    ObsInput(char *path);
    virtual ~ObsInput(void);
 
@@ -74,8 +76,10 @@ class     ObsInput:public PhysicalMediaInput
 		   return kError_UnknownErr; 
 	};
 
-   private:
+ protected:
+   FAContext  *m_context;
 
+ private:
    ObsBuffer  *m_pPullBuffer;
    Properties *m_propManager;
    char       *m_path;

@@ -169,11 +169,15 @@ SOURCE=..\src\mutex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\preferences.cpp
+SOURCE=..\..\src\preferences.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\src\semaphore.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\win32prefs.cpp
 # End Source File
 # Begin Source File
 

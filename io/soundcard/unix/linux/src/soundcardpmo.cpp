@@ -36,9 +36,8 @@ ____________________________________________________________________________*/
 #include <config.h>
 #include "soundcardpmo.h"
 #include "eventdata.h"
+#include "facontext.h"
 #include "log.h"
-
-LogFile  *g_Log;
 
 #define PIECES 50
 #define DB //printf("%s:%d\n", __FILE__, __LINE__);
@@ -50,15 +49,15 @@ const int iWriteTriggerSize = 8 * 1024;
 
 extern    "C"
 {
-   PhysicalMediaOutput *Initialize(LogFile * pLog)
+   PhysicalMediaOutput *Initialize(FAContext *context)
    {
-      g_Log = pLog;
-      return new SoundCardPMO();
+      return new SoundCardPMO(context);
    }
 }
 
-SoundCardPMO::SoundCardPMO() :
-              EventBuffer(iOrigBufferSize, iOverflowSize, iWriteTriggerSize)
+SoundCardPMO::SoundCardPMO(FAContext *context) :
+              EventBuffer(iOrigBufferSize, iOverflowSize,
+			  iWriteTriggerSize, context)
 {
    m_properlyInitialized = false;
 
@@ -230,7 +229,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
       if (IsError(result))
       {
          ReportError("Internal buffer sizing error occurred.");
-         g_Log->Error("Resize output buffer failed.");
+         m_context->log->Error("Resize output buffer failed.");
          return result;
       }
    }
@@ -448,7 +447,7 @@ void SoundCardPMO::WorkerThread(void)
               time_t t;
 
               time(&t);
-              g_Log->Log(LogPerf, "Output buffer underflow: %s", 
+              m_context->log->Log(LogPerf, "Output buffer underflow: %s", 
                          ctime(&t));
               bPerfWarn = true;
           }
@@ -496,7 +495,7 @@ void SoundCardPMO::WorkerThread(void)
           m_pPauseMutex->Release();
 
           ReportError("Internal error occured.");
-          g_Log->Error("Cannot read from buffer in PMO worker tread: %d\n",
+          m_context->log->Error("Cannot read from buffer in PMO worker tread: %d\n",
               eErr);
           break;
       }
@@ -549,7 +548,7 @@ void SoundCardPMO::WorkerThread(void)
          EndRead(0);
          m_pPauseMutex->Release();
          ReportError("Could not write sound data to the soundcard.");
-         g_Log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
+         m_context->log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
 ;
          break;
       }

@@ -39,8 +39,7 @@ ____________________________________________________________________________*/
 #include "obsbuffer.h"
 #include "obsinput.h"
 #include "log.h"
-
-extern LogFile *g_Log;
+#include "facontext.h"
 
 const int iMaxHostNameLen = 64;
 const int iGetHostNameBuffer = 1024;
@@ -60,8 +59,9 @@ static char *g_ErrorArray[5] =
 };
 
 ObsBuffer::ObsBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                     size_t iWriteTriggerSize, char *szFile, ObsInput *pObs) :
-        StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
+                     size_t iWriteTriggerSize, char *szFile, ObsInput *pObs,
+		     FAContext *context) :
+        StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize, context)
 {
     m_hHandle = -1;
     m_pBufferThread = NULL;
@@ -179,8 +179,6 @@ Error ObsBuffer::GetID3v1Tag(unsigned char *pTag)
 
 Error ObsBuffer::Run(void)
 {
-    int iRet;
-
     if (!m_pBufferThread)
     {
        m_pBufferThread = Thread::CreateThread();
@@ -205,12 +203,12 @@ void ObsBuffer::StartWorkerThread(void *pVoidBuffer)
 
 void ObsBuffer::WorkerThread(void)
 {
-   size_t          iToCopy, iActual; 
+   size_t          iToCopy; 
    int             iRead, iPacketNum = -1, iCurrNum, iRet, iHeaderSize;
-   int             iStructSize;
+   int           iStructSize;
    RTPHeader      *pHeader;
    void           *pBuffer;
-   unsigned        char *pTemp, *pCopy;
+   unsigned        char *pTemp;
    Error           eError;
    fd_set          sSet;
    struct timeval  sTv;
@@ -221,7 +219,7 @@ void ObsBuffer::WorkerThread(void)
    {
       if (IsEndOfStream())
       {
-          g_Log->Log(LogInput, "Sleeping on EOS");
+          m_context->log->Log(LogInput, "Sleeping on EOS");
           m_pWriteSem->Wait();
           continue;
       }
@@ -241,7 +239,7 @@ void ObsBuffer::WorkerThread(void)
                        (struct sockaddr *)m_pSin, &iStructSize);
       if (iRead <= 0)
       {
-         g_Log->Log(LogInput, "iRead is less than 0");
+         m_context->log->Log(LogInput, "iRead is less than 0");
          SetEndOfStream(true);
          break;
       }
@@ -257,7 +255,7 @@ void ObsBuffer::WorkerThread(void)
               m_pWriteSem->Wait();
               continue;
           }
-          if (eError == kError_NoErr && iToCopy < iRead)
+          if (eError == kError_NoErr && (int)iToCopy < iRead)
           {
               EndWrite(0);
               //printf("Sleeping on not enough space\n");
@@ -276,7 +274,7 @@ void ObsBuffer::WorkerThread(void)
           time_t t;
 
           time(&t);
-          g_Log->Log(LogPerf, "Lost packet (%d, %d): %s", 
+          m_context->log->Log(LogPerf, "Lost packet (%d, %d): %s", 
              iPacketNum, iCurrNum, ctime(&t)); 
       }
       iPacketNum = iCurrNum;
@@ -289,7 +287,7 @@ void ObsBuffer::WorkerThread(void)
       eError = EndWrite(iRead);
       if (IsError(eError))
       {
-         g_Log->Error("Obs: EndWrite returned: %d\n", eError);
+         m_context->log->Error("Obs: EndWrite returned: %d\n", eError);
          EndWrite(0);
       }
    }
@@ -297,5 +295,5 @@ void ObsBuffer::WorkerThread(void)
    delete pTemp;
    close(m_hHandle);
    m_hHandle = -1;
-   g_Log->Log(LogInput, "Worker thread done");
+   m_context->log->Log(LogInput, "Worker thread done");
 }

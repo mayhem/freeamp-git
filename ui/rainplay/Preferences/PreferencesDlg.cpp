@@ -126,11 +126,10 @@ void CPreferencesDlg::OnApply()
 
 BOOL CPreferencesDlg::SetDefaultUI(CString szDefaultUI)
 {
-    Preferences prefs;
     int32 length = szDefaultUI.GetLength();
     char* ui = szDefaultUI.GetBuffer(length);
 
-    if(IsError(prefs.SetDefaultUI(ui)))
+    if(IsError(m_prefs->SetDefaultUI(ui)))
     {
         return FALSE;
     }

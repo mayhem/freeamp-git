@@ -81,9 +81,9 @@ const char* kSavePlaylistFileTitle = "Save Playlist File";
 
 HINSTANCE g_hinst = NULL;
 
-extern "C" FreeAmpUI *Initialize() 
+extern "C" FreeAmpUI *Initialize(FAContext *context)
 {
-    return new FreeAmpUI();
+    return new FreeAmpUI(context);
 }
 
 INT 
@@ -347,9 +347,10 @@ MainWndProc(HWND hwnd,
 }
 
 FreeAmpUI::
-FreeAmpUI():
+FreeAmpUI(FAContext *context):
 UserInterface()
 {
+    m_context       = context;
     m_hwnd          = NULL;
     m_palette       = NULL;
     m_windowRegion  = NULL;
@@ -467,7 +468,7 @@ UserInterface()
 
     m_uiSemaphore = new Semaphore();
 
-    m_prefs = new Preferences;
+    m_prefs = m_context->prefs;
 
     m_uiThread = Thread::CreateThread();
     m_uiThread->Create(ui_thread_function, this);
@@ -496,9 +497,6 @@ FreeAmpUI::
 
     if(m_uiThread)
         delete m_uiThread;
-
-    if(m_prefs)
-        delete m_prefs;
 
     if(m_trayIcon)
         DeleteObject(m_trayIcon);
@@ -929,7 +927,8 @@ Command(int32 command,
             if(FileOpenDialog(  m_hwnd, 
                                 kOpenAudioFileTitle,
                                 kAudioFileFilter,
-                                &fileList))
+                                &fileList,
+                                m_prefs))
             {
                 AddFileListToPlayList(&fileList);
             }
@@ -953,7 +952,8 @@ Command(int32 command,
                                 kSavePlaylistFileTitle,
                                 kPlaylistFileFilter,
                                 file, 
-                                &size))
+                                &size,
+                                m_prefs))
             {
                 if(strcmp(file, kSaveToRio))
                 {
@@ -975,7 +975,8 @@ Command(int32 command,
             if(FileOpenDialog(  m_hwnd,
                                 kOpenPlaylistFileTitle,
                                 kPlaylistFileFilter,
-                                &fileList))
+                                &fileList,
+                                m_prefs))
             {
                 m_plm->MakeEmpty();
 
@@ -993,7 +994,8 @@ Command(int32 command,
 			if(FileOpenDialog(  m_hwnd, 
                                 kOpenAudioFileTitle,
                                 kAudioFileFilter,
-                                &fileList))
+                                &fileList,
+                                m_prefs))
 			{
                 m_plm->MakeEmpty();
 
@@ -1122,7 +1124,7 @@ Command(int32 command,
 
         case kPrefControl:
         {
-            if(DisplayPreferences(m_hwnd))
+            if(DisplayPreferences(m_hwnd, m_prefs))
                 ReadPreferences();
             break;
         }

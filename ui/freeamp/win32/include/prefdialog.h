@@ -33,6 +33,6 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "player.h"
 
-bool DisplayPreferences(HWND hwndParent);
+bool DisplayPreferences(HWND hwndParent, Preferences* prefs);
 
 #endif /* _PREF_DIALOG_H_ */

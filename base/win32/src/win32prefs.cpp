@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 GoodNoise
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -23,8 +23,7 @@ ____________________________________________________________________________*/
 
 #include <stdio.h>
 #include <assert.h>
-
-#include "preferences.h"
+#include "win32prefs.h"
 
 // location
 const HKEY  kMainKey = HKEY_CURRENT_USER;
@@ -33,45 +32,16 @@ const char* kFreeAmpKey = "SOFTWARE\\FreeAmp";
 const char* kFreeAmpVersionKey = "FreeAmp v1.2";
 const char* kMainComponentKey = "Main";
 
-// preferences
-const char* kInstallDirPref = "InstallDirectory";
-const char* kUIPref = "UI";
-const char* kPMOPref = "PMO";
-const char* kOpenSaveDirPref = "OpenSaveDirectory";
-const char* kStayOnTopPref = "StayOnTop";
-const char* kLiveInTrayPref = "LiveInTray";
-const char* kInputBufferSizePref = "InputBufferSize";
-const char* kOutputBufferSizePref = "OutputBufferSize";
-const char* kStreamBufferIntervalPref = "StreamBufferInterval";
-const char* kDecoderThreadPriorityPref = "DecoderThreadPriority";
-const char* kWindowPositionLeftPref = "WindowPositionLeft";
-const char* kWindowPositionTopPref = "WindowPositionTop";
-const char* kWindowPositionWidthPref = "WindowPositionWidth";
-const char* kWindowPositionHeightPref = "WindowPositionHeight";
-
-//logging
-const char* kUseDebugLogPref = "UseDebugLog";
-const char* kLogMainPref = "LogMain";
-const char* kLogDecodePref = "LogDecode";
-const char* kLogInputPref = "LogInput";
-const char* kLogOutputPref = "LogOutput";
-const char* kLogPerformancePref = "LogPerformance";
-
 // default values
 const char*  kDefaultUI = "freeamp.ui";
 const char*  kDefaultPMO = "soundcard.pmo";
 const bool   kDefaultStayOnTop = false;
 const bool   kDefaultLiveInTray = false;
-const int32  kDefaultInputBufferSize = 64;
-const int32  kDefaultOutputBufferSize = 512;
-const int32  kDefaultStreamBufferInterval = 3;
-const int32  kDefaultDecoderThreadPriority = 4;
-const bool   kDefaultLogging = false;
 const int32  kDefaultWindowPosition = 0;
 
 
-Preferences::
-Preferences()
+Win32Prefs::
+Win32Prefs()
 {
     LONG    result;
     char*   prefsKey = NULL;
@@ -95,14 +65,14 @@ Preferences()
 
     delete [] prefsKey;
 
-    if(result != ERROR_SUCCESS)
-    {
+    if(result == ERROR_SUCCESS)
+		Initialize();
+	else
         m_prefsKey = NULL;
-    }
 }
 
-Preferences::
-Preferences(const char* componentName)
+Win32Prefs::
+Win32Prefs(const char* componentName)
 {
     LONG    result;
     char*   prefsKey = NULL;
@@ -181,11 +151,12 @@ Preferences(const char* componentName)
                 m_prefsKey = NULL;
             }
         }
+		Initialize();
     }
 }
 
-Preferences::
-~Preferences()
+Win32Prefs::
+~Win32Prefs()
 {
     if(m_prefsKey)
     {
@@ -194,7 +165,7 @@ Preferences::
 }
 
 Error
-Preferences::
+Win32Prefs::
 Initialize()
 {
     LONG    result;
@@ -285,59 +256,9 @@ Initialize()
         }
 
         if(result == ERROR_SUCCESS)
-        {
-            // set install directory value
-            SetPrefString(kInstallDirPref, cwd);
-    
-            // set default ui value
-            SetPrefString(kUIPref, kDefaultUI);
-    
-            // set default pmo value
-            SetPrefString(kPMOPref, kDefaultPMO);
-
-            // set default open/save dlg path value
-            SetPrefString(kOpenSaveDirPref, cwd);
-
-            // set default for window staying on top
-            SetPrefBoolean(kStayOnTopPref, kDefaultStayOnTop);
-
-            // set default for minimizing to tray
-            SetPrefBoolean(kLiveInTrayPref, kDefaultLiveInTray);
-
-            // set default for input buffer size
-            SetPrefInt32(kInputBufferSizePref, kDefaultInputBufferSize);
-
-            // set default for output buffer size
-            SetPrefInt32(kOutputBufferSizePref, kDefaultOutputBufferSize);
-
-            // set default for streaming buffer interval
-            SetPrefInt32(   kStreamBufferIntervalPref, 
-                            kDefaultStreamBufferInterval);
-
-            // set default for decoder thread priority
-            SetPrefInt32(   kDecoderThreadPriorityPref, 
-                            kDefaultDecoderThreadPriority);
-
-            // set defaults for logging
-            SetPrefBoolean(kUseDebugLogPref, kDefaultLogging);
-            SetPrefBoolean(kLogMainPref, kDefaultLogging);
-            SetPrefBoolean(kLogDecodePref, kDefaultLogging);
-            SetPrefBoolean(kLogInputPref, kDefaultLogging);
-            SetPrefBoolean(kLogOutputPref, kDefaultLogging);
-            SetPrefBoolean(kLogPerformancePref, kDefaultLogging);
-
-            // set default for window position
-            SetPrefInt32(kWindowPositionLeftPref, kDefaultWindowPosition);
-            SetPrefInt32(kWindowPositionTopPref, kDefaultWindowPosition);
-            SetPrefInt32(kWindowPositionWidthPref, kDefaultWindowPosition);
-            SetPrefInt32(kWindowPositionHeightPref, kDefaultWindowPosition);
-
-            error = kError_NoErr;
-        }
+            error = SetDefaults();
         else
-        {
-             error = kError_NoPrefs;
-        }
+            error = kError_NoPrefs;
 
         RegCloseKey(freeampKey);
         RegCloseKey(versionKey);
@@ -346,281 +267,61 @@ Initialize()
     return error;
 }
 
-
-Error 
-Preferences::
-GetInstallDirectory(char* path, uint32* len)
+Error
+Win32Prefs::
+SetDefaults()
 {
-    return GetPrefString(kInstallDirPref, path, len);
+    char    cwd[MAX_PATH]= {0x00};
+
+    // Where are we starting the program from?
+    GetCurrentDirectory(sizeof(cwd), cwd);
+
+    // set install directory value
+    SetPrefString(kInstallDirPref, cwd);  // XXX: Use real value for Unix
+    
+    // set default ui value
+    SetPrefString(kUIPref, kDefaultUI);
+    
+    // set default pmo value
+    SetPrefString(kPMOPref, kDefaultPMO);
+
+    // set default open/save dlg path value
+    SetPrefString(kOpenSaveDirPref, cwd); // XXX: What for Unix?
+
+    // set default for window staying on top
+    SetPrefBoolean(kStayOnTopPref, kDefaultStayOnTop);
+
+    // set default for minimizing to tray
+    SetPrefBoolean(kLiveInTrayPref, kDefaultLiveInTray);
+
+    // set default for window position
+    SetPrefInt32(kWindowPositionLeftPref, kDefaultWindowPosition);
+    SetPrefInt32(kWindowPositionTopPref, kDefaultWindowPosition);
+    SetPrefInt32(kWindowPositionWidthPref, kDefaultWindowPosition);
+    SetPrefInt32(kWindowPositionHeightPref, kDefaultWindowPosition);
+
+    Preferences::SetDefaults();
+
+    return kError_NoErr;
 }
-
-
-Error 
-Preferences::
-SetInstallDirectory(char* path)
-{
-    return SetPrefString(kInstallDirPref, path);
-}
-
-Error 
-Preferences::
-GetDefaultUI(char* name, uint32* len)
-{
-    return GetPrefString(kUIPref, name, len);
-}
-
-Error 
-Preferences::
-SetDefaultUI(char* name)
-{
-    return SetPrefString(kUIPref, name);
-}
-
-Error 
-Preferences::
-GetDefaultPMO(char* name, uint32* len)
-{
-    return GetPrefString(kPMOPref, name, len);
-}
-
-Error 
-Preferences::
-SetDefaultPMO(char* name)
-{
-    return SetPrefString(kPMOPref, name);
-}
-
-Error 
-Preferences::
-GetOpenSaveDirectory(char* path, uint32* len)
-{
-    return GetPrefString(kOpenSaveDirPref, path, len);
-}
-
-Error 
-Preferences::
-SetOpenSaveDirectory(char* path)
-{
-    return SetPrefString(kOpenSaveDirPref, path);
-}
-
-Error 
-Preferences::
-GetStayOnTop(bool* value)
-{
-    return GetPrefBoolean(kStayOnTopPref, value);
-}
-
-Error 
-Preferences::
-SetStayOnTop(bool value)
-{
-    return SetPrefBoolean(kStayOnTopPref, value);
-}
-
-Error 
-Preferences::
-GetLiveInTray(bool* value)
-{
-    return GetPrefBoolean(kLiveInTrayPref, value);
-}
-
-Error 
-Preferences::
-SetLiveInTray(bool value)
-{
-    return SetPrefBoolean(kLiveInTrayPref, value);
-}
-
-Error 
-Preferences::
-GetInputBufferSize(int32* value)
-{
-    return GetPrefInt32(kInputBufferSizePref, value);
-}
-
-Error 
-Preferences::
-SetInputBufferSize(int32 value)
-{
-    return SetPrefInt32(kInputBufferSizePref, value);
-}
-
-Error 
-Preferences::
-GetOutputBufferSize(int32* value)
-{
-    return GetPrefInt32(kOutputBufferSizePref, value);
-}
-
-Error 
-Preferences::
-SetOutputBufferSize(int32 value)
-{
-    return SetPrefInt32(kOutputBufferSizePref, value);
-}
-
-Error 
-Preferences::
-GetStreamBufferInterval(int32* value)
-{
-    return GetPrefInt32(kStreamBufferIntervalPref, value);
-}
-
-Error 
-Preferences::
-SetStreamBufferInterval(int32 value)
-{
-    return SetPrefInt32(kStreamBufferIntervalPref, value);
-}
-
-Error 
-Preferences::
-GetDecoderThreadPriority(int32* value)
-{
-    return GetPrefInt32(kDecoderThreadPriorityPref, value);
-}
-
-Error 
-Preferences::
-SetDecoderThreadPriority(int32 value)
-{
-    return SetPrefInt32(kDecoderThreadPriorityPref, value);
-}
-
-Error 
-Preferences::
-SetUseDebugLog(bool value)
-{
-    return SetPrefBoolean(kUseDebugLogPref, value);
-}
-
-Error 
-Preferences::
-GetUseDebugLog(bool* value)
-{
-    return GetPrefBoolean(kUseDebugLogPref, value);
-}
-
-Error 
-Preferences::
-SetLogMain(bool value)
-{
-    return SetPrefBoolean(kLogMainPref, value);
-}
-
-Error 
-Preferences::
-GetLogMain(bool* value)
-{
-    return GetPrefBoolean(kLogMainPref, value);
-}
-
-Error 
-Preferences::
-SetLogDecode(bool value)
-{
-    return SetPrefBoolean(kLogDecodePref, value);
-}
-
-Error 
-Preferences::
-GetLogDecode(bool* value)
-{
-    return GetPrefBoolean(kLogDecodePref, value);
-}
-
-Error 
-Preferences::
-SetLogInput(bool value)
-{
-    return SetPrefBoolean(kLogInputPref, value);
-}
-
-Error 
-Preferences::
-GetLogInput(bool* value)
-{
-    return GetPrefBoolean(kLogInputPref, value);
-}
-
-Error 
-Preferences::
-SetLogOutput(bool value)
-{
-    return SetPrefBoolean(kLogOutputPref, value);
-}
-
-Error 
-Preferences::
-GetLogOutput(bool* value)
-{
-    return GetPrefBoolean(kLogOutputPref, value);
-}
-
-Error 
-Preferences::
-SetLogPerformance(bool value)
-{
-    return SetPrefBoolean(kLogPerformancePref, value);
-}
-
-Error 
-Preferences::
-GetLogPerformance(bool* value)
-{
-    return GetPrefBoolean(kLogPerformancePref, value);
-}
-
-Error 
-Preferences::
-GetWindowPosition(  int32* left,
-                    int32* top,
-                    int32* width,
-                    int32* height)
-{
-    Error result;
-
-    result = GetPrefInt32(kWindowPositionLeftPref, left);
-
-    if(IsntError(result))
-        result = GetPrefInt32(kWindowPositionTopPref, top);
-
-    if(IsntError(result))
-        result = GetPrefInt32(kWindowPositionWidthPref, width);
-
-    if(IsntError(result))
-        result = GetPrefInt32(kWindowPositionHeightPref, height);
-
-    return result;
-}
-
-Error 
-Preferences::
-SetWindowPosition(  int32 left,
-                    int32 top,
-                    int32 width,
-                    int32 height)
-{
-    Error result;
-
-    result = SetPrefInt32(kWindowPositionLeftPref, left);
-
-    if(IsntError(result))
-        result = SetPrefInt32(kWindowPositionTopPref, top);
-
-    if(IsntError(result))
-        result = SetPrefInt32(kWindowPositionWidthPref, width);
-
-    if(IsntError(result))
-        result = SetPrefInt32(kWindowPositionHeightPref, height);
-
-    return result;
-}
-
 
 Error
-Preferences::
+Win32Prefs::
+Save()
+{
+	// XXX: Should we do anything more here?
+	return kError_NoErr;
+}
+
+Preferences *
+Win32Prefs::
+ComponentPrefs(const char *componentName)
+{
+	return new Win32Prefs(componentName);
+}
+
+Error
+Win32Prefs::
 GetPrefString(const char* pref, char* buf, uint32* len)
 {
     Error   error = kError_UnknownErr;
@@ -648,8 +349,6 @@ GetPrefString(const char* pref, char* buf, uint32* len)
             error = kError_NoErr;
         else if(result == ERROR_MORE_DATA)
             error = kError_BufferTooSmall;    
-        else if(result == ERROR_FILE_NOT_FOUND)
-            error = kError_NoPrefValue;
 	    
     }
     else
@@ -661,7 +360,7 @@ GetPrefString(const char* pref, char* buf, uint32* len)
 }
 
 Error
-Preferences::
+Win32Prefs::
 SetPrefString(const char* pref, const char* buf)
 {
     Error   error = kError_UnknownErr;
@@ -685,8 +384,6 @@ SetPrefString(const char* pref, const char* buf)
 
         if(result == ERROR_SUCCESS)
             error = kError_NoErr;
-        else if(result == ERROR_FILE_NOT_FOUND)
-            error = kError_NoPrefValue;
     }
     else
     {
@@ -697,7 +394,7 @@ SetPrefString(const char* pref, const char* buf)
 }
 
 Error 
-Preferences::
+Win32Prefs::
 GetPrefBoolean(const char* pref, bool* value)
 {
     Error   error = kError_UnknownErr;
@@ -728,9 +425,7 @@ GetPrefBoolean(const char* pref, bool* value)
             *value = (buf == 0 ? false : true);
         }
         else if(result == ERROR_MORE_DATA)
-            error = kError_BufferTooSmall;  
-        else if(result == ERROR_FILE_NOT_FOUND)
-            error = kError_NoPrefValue;
+            error = kError_BufferTooSmall;    
     }
     else
     {
@@ -741,7 +436,7 @@ GetPrefBoolean(const char* pref, bool* value)
 }
 
 Error
-Preferences:: 
+Win32Prefs:: 
 SetPrefBoolean(const char* pref, bool value)
 {
     Error   error = kError_UnknownErr;
@@ -767,8 +462,6 @@ SetPrefBoolean(const char* pref, bool value)
 
         if(result == ERROR_SUCCESS)
             error = kError_NoErr;
-        else if(result == ERROR_FILE_NOT_FOUND)
-            error = kError_NoPrefValue;
     }
     else
     {
@@ -779,7 +472,7 @@ SetPrefBoolean(const char* pref, bool value)
 }
 
 Error 
-Preferences::
+Win32Prefs::
 GetPrefInt32(const char* pref, int32* value)
 {
     Error   error = kError_UnknownErr;
@@ -810,9 +503,7 @@ GetPrefInt32(const char* pref, int32* value)
             *value = (int32)buf;
         }
         else if(result == ERROR_MORE_DATA)
-            error = kError_BufferTooSmall;  
-        else if(result == ERROR_FILE_NOT_FOUND)
-            error = kError_NoPrefValue;
+            error = kError_BufferTooSmall;    
     }
     else
     {
@@ -823,7 +514,7 @@ GetPrefInt32(const char* pref, int32* value)
 }
 
 Error
-Preferences:: 
+Win32Prefs:: 
 SetPrefInt32(const char* pref, int32 value)
 {
     Error   error = kError_UnknownErr;
@@ -836,9 +527,10 @@ SetPrefInt32(const char* pref, int32 value)
         return error;
     }
 
-	if(m_prefsKey)
+
+    if(m_prefsKey)
 	{
-		// set install directory value
+	    // set install directory value
         result = RegSetValueEx( m_prefsKey,
                                 pref, 
                                 NULL, 
@@ -848,8 +540,6 @@ SetPrefInt32(const char* pref, int32 value)
 
         if(result == ERROR_SUCCESS)
             error = kError_NoErr;
-        else if(result == ERROR_FILE_NOT_FOUND)
-            error = kError_NoPrefValue;
     }
     else
     {

@@ -42,9 +42,8 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "localfileinput.h"
+#include "facontext.h"
 #include "log.h"
-
-LogFile *g_Log;
 
 const int32 iBufferSize = 65536;
 const int32 iOverflowSize = 8192;
@@ -52,17 +51,17 @@ const int32 iTriggerSize = 8192;
 
 extern    "C"
 {
-   PhysicalMediaInput *Initialize(LogFile *pLog)
+   PhysicalMediaInput *Initialize(FAContext *context)
    {
-	  g_Log = pLog;
-      return new LocalFileInput();
+      return new LocalFileInput(context);
    }
 }
-LocalFileInput::LocalFileInput():
+LocalFileInput::LocalFileInput(FAContext *context):
                 PhysicalMediaInput()
 {
-   m_path = NULL;
-   m_pPullBuffer = NULL;
+    m_context = context;
+    m_path = NULL;
+    m_pPullBuffer = NULL;
 }
 
 LocalFileInput::LocalFileInput(char *path):
@@ -140,7 +139,7 @@ Error     LocalFileInput::SetTo(char *url, bool bStartThread)
       if (IsntError(result))
       {
          m_pPullBuffer = new FileBuffer(iBufferSize, iOverflowSize, 
-                                         iTriggerSize, m_path);
+                                         iTriggerSize, m_path, m_context);
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();

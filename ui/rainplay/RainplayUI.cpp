@@ -12,17 +12,20 @@ CRainplayUI *g_ui;
 
 extern BOOL ReadPlaylistFromFile(CString szFile, PlayListManager *plm);
 
-extern "C" CRainplayUI *Initialize()
+extern "C" CRainplayUI *Initialize(FAContext *context)
 {
 	//AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	// normal function body here
-	return new CRainplayUI();
+	return new CRainplayUI(context);
 }
 
 CRainplayUI::
-CRainplayUI():
+CRainplayUI(FAContext *context):
 UserInterface()
 {
+	m_context = context;
+    m_prefs = m_context->prefs;
+
 	m_uiSemaphore = new Semaphore();
 
 	g_ui = this;
@@ -216,6 +219,7 @@ CreateUI()
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	m_Dlg = new CRainplayDlg;
+    m_Dlg->SetPreferences(m_prefs);
 	m_Dlg->DoModal();
 
 	g_ui->m_target->AcceptEvent(new Event(CMD_QuitPlayer));

@@ -31,6 +31,8 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 #include "semaphore.h"
 
+class FAContext;
+
 // Notes:
 //   If the number of requested bytes are not in the buffer at the
 //   beginning of a BeginRead call, the call will block. To get out
@@ -41,7 +43,8 @@ class PullBuffer
 
                PullBuffer(size_t iBufferSize, 
                           size_t iOverflowSize,
-                          size_t iWriteTriggerSize);
+                          size_t iWriteTriggerSize,
+			  FAContext *context);
       virtual ~PullBuffer(void);
 
       virtual  Error    BeginWrite (void *&pBuffer, size_t &iBytesToWrite);
@@ -80,6 +83,7 @@ class PullBuffer
       int32      GetWriteIndex();
       int32      GetReadIndex();
 
+      FAContext *m_context;
       Semaphore *m_pWriteSem, *m_pReadSem;
       Mutex     *m_pMutex;
       bool       m_bExit;

@@ -42,9 +42,6 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "obsinput.h"
-#include "log.h"
-
-LogFile *g_Log;
 
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
@@ -53,17 +50,18 @@ const char *szDefaultStreamTitle = "RTP Stream";
 
 extern    "C"
 {
-   PhysicalMediaInput *Initialize(LogFile *pLog)
+   PhysicalMediaInput *Initialize(FAContext *context)
    {
-      g_Log = pLog;
-      return new ObsInput();
+      return new ObsInput(context);
    }
 }
-ObsInput::ObsInput(): 
+
+ObsInput::ObsInput(FAContext *context): 
           PhysicalMediaInput()
 {
-   m_path = NULL;
-   m_pPullBuffer = NULL;
+    m_context = context;
+    m_path = NULL;
+    m_pPullBuffer = NULL;
 }
 
 ObsInput::ObsInput(char *path):
@@ -139,7 +137,7 @@ Error ObsInput::SetTo(char *url, bool bStartThread)
       if (IsntError(result))
       {
          m_pPullBuffer = new ObsBuffer(iBufferSize, iOverflowSize, 
-                                       iTriggerSize, url, this);
+                                       iTriggerSize, url, this, m_context);
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();

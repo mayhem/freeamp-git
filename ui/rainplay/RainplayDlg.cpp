@@ -549,6 +549,7 @@ void CRainplayDlg::OnRButtonDown(UINT nFlags, CPoint point)
 	switch( bFlag )	{
 	case IDM_MAIN_PREFERENCES:		//Options dialog
 		m_preferencesDlg = new CPreferencesDlg();
+        m_preferencesDlg->SetPreferences(m_prefs);
 		m_preferencesDlg->DoModal();
 		delete m_preferencesDlg;
 		break;

@@ -70,6 +70,7 @@ CLEAN :
 	-@erase "$(INTDIR)\upsf.obj"
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\wavep.obj"
+	-@erase "$(INTDIR)\win32prefs.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\xing.res"
 	-@erase "$(INTDIR)\xinglmc.obj"
@@ -126,6 +127,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
 	"$(INTDIR)\wavep.obj" \
+	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\xing.res" \
 	"$(INTDIR)\xinglmc.obj"
@@ -141,8 +143,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\xing.lmc"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                           ..\..\..\..\base\win32\prj\plugins
-	copy xing.lmc                   ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                            ..\..\..\..\base\win32\prj\plugins
+	copy xing.lmc                    ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
@@ -187,6 +189,7 @@ CLEAN :
 	-@erase "$(INTDIR)\vc50.idb"
 	-@erase "$(INTDIR)\vc50.pdb"
 	-@erase "$(INTDIR)\wavep.obj"
+	-@erase "$(INTDIR)\win32prefs.obj"
 	-@erase "$(INTDIR)\win32thread.obj"
 	-@erase "$(INTDIR)\xing.res"
 	-@erase "$(INTDIR)\xinglmc.obj"
@@ -245,6 +248,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\uph.obj" \
 	"$(INTDIR)\upsf.obj" \
 	"$(INTDIR)\wavep.obj" \
+	"$(INTDIR)\win32prefs.obj" \
 	"$(INTDIR)\win32thread.obj" \
 	"$(INTDIR)\xing.res" \
 	"$(INTDIR)\xinglmc.obj"
@@ -260,8 +264,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\xing.lmc"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                           ..\..\..\..\base\win32\prj\plugins
-	copy xing.lmc                   ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                            ..\..\..\..\base\win32\prj\plugins
+	copy xing.lmc                    ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -304,14 +308,14 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -334,10 +338,13 @@ DEP_CPP_MUTEX=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\..\..\..\base\win32\src\preferences.cpp
+SOURCE=..\..\..\..\base\src\preferences.cpp
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_PREFE=\
 	"..\..\..\..\base\include\errors.h"\
-	"..\..\..\..\base\win32\include\preferences.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\config\config.h"\
 	
 
@@ -345,6 +352,21 @@ DEP_CPP_PREFE=\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_PREFE=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\preferences.obj" : $(SOURCE) $(DEP_CPP_PREFE) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\..\..\base\win32\src\semaphore.cpp
 DEP_CPP_SEMAP=\
@@ -356,6 +378,9 @@ DEP_CPP_SEMAP=\
 
 
 SOURCE=..\..\..\..\base\src\thread.cpp
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
@@ -367,14 +392,65 @@ DEP_CPP_THREA=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_THREA=\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\win32thread.h"\
+	"..\..\..\..\config\config.h"\
+	
+NODEP_CPP_THREA=\
+	"..\..\..\..\base\src\linuxthread.h"\
+	"..\..\..\..\base\src\solaristhread.h"\
+	
+
+"$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_WIN32=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\win32\include\win32prefs.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_WIN32=\
+	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\preferences.h"\
+	"..\..\..\..\base\win32\include\win32prefs.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\win32prefs.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
+DEP_CPP_WIN32T=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	
 
-"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32T) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
@@ -386,7 +462,7 @@ SOURCE=..\res\xing.rc
 
 "$(INTDIR)\xing.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\xing.res" /i\
- "\Local\src\freeamp\lmc\xingmp3\win32\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\merge\freeamp\lmc\xingmp3\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
@@ -394,7 +470,7 @@ SOURCE=..\res\xing.rc
 
 "$(INTDIR)\xing.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\xing.res" /i\
- "\Local\src\freeamp\lmc\xingmp3\win32\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\merge\freeamp\lmc\xingmp3\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -406,9 +482,6 @@ SOURCE=..\..\src\cdct.c
 
 
 SOURCE=..\..\src\csbt.c
-
-!IF  "$(CFG)" == "xing - Win32 Release"
-
 DEP_CPP_CSBT_=\
 	"..\..\src\csbtb.c"\
 	"..\..\src\csbtl3.c"\
@@ -417,19 +490,6 @@ DEP_CPP_CSBT_=\
 "$(INTDIR)\csbt.obj" : $(SOURCE) $(DEP_CPP_CSBT_) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
-
-DEP_CPP_CSBT_=\
-	"..\..\src\csbtb.c"\
-	"..\..\src\csbtl3.c"\
-	
-
-"$(INTDIR)\csbt.obj" : $(SOURCE) $(DEP_CPP_CSBT_) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 SOURCE=..\..\src\cup.c
 
@@ -460,6 +520,9 @@ DEP_CPP_CUP_C=\
 !ENDIF 
 
 SOURCE=..\..\src\cupl3.c
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_CUPL3=\
 	"..\..\include\jdw.h"\
 	"..\..\include\l3.h"\
@@ -469,6 +532,20 @@ DEP_CPP_CUPL3=\
 "$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_CUPL3=\
+	"..\..\include\jdw.h"\
+	"..\..\include\l3.h"\
+	"..\..\include\mhead.h"\
+	
+
+"$(INTDIR)\cupl3.obj" : $(SOURCE) $(DEP_CPP_CUPL3) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\src\cwinm.c
 
@@ -490,6 +567,10 @@ DEP_CPP_CWINM=\
 	"..\..\include\tableawd.h"\
 	"..\..\src\cwin.c"\
 	"..\..\src\cwinb.c"\
+	
+NODEP_CPP_CWINM=\
+	"..\..\src\cwinbq.c"\
+	"..\..\src\cwinq.c"\
 	
 
 "$(INTDIR)\cwinm.obj" : $(SOURCE) $(DEP_CPP_CWINM) "$(INTDIR)"
@@ -583,6 +664,9 @@ DEP_CPP_IUP_C=\
 !ENDIF 
 
 SOURCE=..\..\src\iwinm.c
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_IWINM=\
 	"..\..\include\itype.h"\
 	"..\..\src\iwinbq.c"\
@@ -592,6 +676,24 @@ DEP_CPP_IWINM=\
 "$(INTDIR)\iwinm.obj" : $(SOURCE) $(DEP_CPP_IWINM) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_IWINM=\
+	"..\..\include\itype.h"\
+	"..\..\src\iwinbq.c"\
+	"..\..\src\iwinq.c"\
+	
+NODEP_CPP_IWINM=\
+	"..\..\src\iwin.c"\
+	"..\..\src\iwinb.c"\
+	
+
+"$(INTDIR)\iwinm.obj" : $(SOURCE) $(DEP_CPP_IWINM) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\src\l3dq.c
 DEP_CPP_L3DQ_=\
@@ -671,6 +773,9 @@ DEP_CPP_UPSF_=\
 
 
 SOURCE=..\..\src\wavep.c
+
+!IF  "$(CFG)" == "xing - Win32 Release"
+
 DEP_CPP_WAVEP=\
 	"..\..\include\port.h"\
 	
@@ -678,6 +783,19 @@ DEP_CPP_WAVEP=\
 "$(INTDIR)\wavep.obj" : $(SOURCE) $(DEP_CPP_WAVEP) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "xing - Win32 Debug"
+
+DEP_CPP_WAVEP=\
+	"..\..\include\port.h"\
+	"..\..\src\wcvt.c"\
+	
+
+"$(INTDIR)\wavep.obj" : $(SOURCE) $(DEP_CPP_WAVEP) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 SOURCE=..\..\src\xinglmc.cpp
 
@@ -687,14 +805,15 @@ DEP_CPP_XINGL=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\preferences.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
@@ -717,14 +836,15 @@ DEP_CPP_XINGL=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\queue.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
-	"..\..\..\..\base\win32\include\preferences.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\

@@ -31,9 +31,11 @@ ____________________________________________________________________________*/
 #include "thread.h"
 #include "playlist.h"
 
+class FAContext;
+
 class cmdlineUI : public UserInterface {
  public:
-    cmdlineUI();
+    cmdlineUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
@@ -42,6 +44,10 @@ class cmdlineUI : public UserInterface {
     static void keyboardServiceFunction(void *);
     virtual ~cmdlineUI();
    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+
+ protected:
+   FAContext *m_context;
+
  private:
    Properties *m_propManager;
    void ProcessArgs();

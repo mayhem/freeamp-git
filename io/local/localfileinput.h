@@ -32,11 +32,13 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 #include "filebuffer.h"
 
+class FAContext;
+
 class     LocalFileInput:public PhysicalMediaInput
 {
    public:
 
-   LocalFileInput();
+   LocalFileInput(FAContext *context);
    LocalFileInput(char *path);
    virtual ~ LocalFileInput(void);
 
@@ -68,6 +70,9 @@ class     LocalFileInput:public PhysicalMediaInput
 		else 
 		   return kError_UnknownErr; 
 	};
+
+ protected:
+   FAContext  *m_context;
 
  private:
    Properties *m_propManager;

@@ -51,12 +51,13 @@ typedef enum
 }
 PlayerState;
 
+class FAContext;
+
 class Player : public EventQueue, Properties, PropertyWatcher
 {
 
  public:
-   // Player();
-   static Player *GetPlayer();
+   static Player *GetPlayer(FAContext *context);
             ~Player();
 
    int32     RegisterActiveUI(UserInterface * ui);
@@ -72,8 +73,6 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
    void      Run();
    bool      SetArgs(int32 argc, char **argv);
-   void      SetPreferences(Preferences *);
-   Preferences* GetPreferences() const;
    void      SetTerminationSemaphore(Semaphore *);
    void      testQueue();
    static void EventServiceThreadFunc(void *);
@@ -88,7 +87,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
    virtual Error PropertyChange(const char *, PropValue *);
  protected:
-             Player();
+             Player(FAContext *context);
    void      GetUIManipLock();
    void      ReleaseUIManipLock();
    int32     CompareNames(const char *, const char *);
@@ -100,6 +99,8 @@ class Player : public EventQueue, Properties, PropertyWatcher
 
    int32     ServiceEvent(Event *);
    void      CreateLMC(PlayListItem * pc, Event * pC);
+
+   FAContext *m_context;
 
  private:
 
@@ -138,7 +139,6 @@ class Player : public EventQueue, Properties, PropertyWatcher
    PropertiesImpl m_props;
    bool      m_didUsage;
    bool      m_autoplay;
-   Preferences *m_prefs;
    Semaphore *m_pTermSem;
    static Player *m_thePlayer;
    Semaphore *m_eventSem;

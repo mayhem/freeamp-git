@@ -37,9 +37,11 @@ ____________________________________________________________________________*/
 #include "queue.h"
 
 
+class FAContext;
+
 class SimpleUI : public UserInterface {
  public:
-    SimpleUI();
+    SimpleUI(FAContext *context);
     ~SimpleUI();
 
     virtual Error Init(int32 startup_type) { return kError_NoErr;}
@@ -64,8 +66,9 @@ class SimpleUI : public UserInterface {
 
 
  protected:
-      static void UIThreadFunc(void *);
+    static void UIThreadFunc(void *);
 
+    FAContext*		m_context;
 
  private:
     PlayListManager*    m_plm;

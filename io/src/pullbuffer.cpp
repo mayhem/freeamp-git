@@ -25,12 +25,12 @@ ____________________________________________________________________________*/
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#ifndef WIN32
 #include <unistd.h>
-
+#endif
 #include "pullbuffer.h"
 #include "log.h"
-
-extern LogFile *g_Log;
+#include "facontext.h"
 
 #ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
@@ -39,8 +39,11 @@ extern LogFile *g_Log;
 
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,
-                       size_t iWriteTriggerSize)
+                       size_t iWriteTriggerSize,
+		       FAContext *context)
 {
+   m_context = context;
+
    m_bEOS = false;
    m_bExit = false;
    m_bReadOpPending = false;
@@ -182,14 +185,14 @@ Error PullBuffer::Resize(size_t iNewSize,
 
    if (iNewSize < m_iBytesInBuffer)
    {
-       g_Log->Error("Pullbuffer: Not resized. Too many bytes in buffer.\n");
+       m_context->log->Error("Pullbuffer: Not resized. Too many bytes in buffer.\n");
        return kError_BufferTooSmall;
    }
 
    // Nothing should've been read from the buffer yet!
    if (m_iReadIndex != 0)
    {
-       g_Log->Error("Pullbuffer: Not resized. The buffer has been read.\n");
+       m_context->log->Error("Pullbuffer: Not resized. The buffer has been read.\n");
        return kError_InvalidError;
    }
 
@@ -346,7 +349,7 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
 
    m_bWriteOpPending = false;
 
-   g_Log->Log(LogInput, "EndWrite: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
+   m_context->log->Log(LogInput, "EndWrite: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
 
    return kError_NoErr;
@@ -400,7 +403,7 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded, bool bBlock)
       iOverflow = (m_iReadIndex + iBytesNeeded) - m_iBufferSize; 
       if (iOverflow > m_iOverflowSize)
       {
-          g_Log->Error("Overflow buffer is too small!! \n"
+          m_context->log->Error("Overflow buffer is too small!! \n"
                        "Needed %d but had only %d for overflow.\n",
                        iOverflow, m_iOverflowSize);
 
@@ -438,7 +441,7 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
 
    m_bReadOpPending = false;
 
-   g_Log->Log(LogInput, "EndRead: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
+   m_context->log->Log(LogInput, "EndRead: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
 
    if (m_iBufferSize - m_iBytesInBuffer >= m_iWriteTriggerSize && !m_bEOS)
        m_pWriteSem->Signal();
@@ -470,10 +473,11 @@ Error PullBuffer::DiscardBytes()
       m_iReadIndex = (m_iReadIndex + m_iWriteTriggerSize) % m_iBufferSize;
     	m_iBytesInBuffer -= m_iWriteTriggerSize;
       assert(m_iBytesInBuffer <= m_iBufferSize);
-      g_Log->Log(LogInput, "Discarding %d bytes.\n", m_iWriteTriggerSize);
+      m_context->log->Log(LogInput, "Discarding %d bytes.\n", m_iWriteTriggerSize);
    }
 
    m_pMutex->Release();
 
    return kError_NoErr;
 }
+

@@ -44,6 +44,7 @@ mods 1/7/97 warnings
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4244)
+#pragma warning(disable: 4056)
 #endif
 
 
@@ -450,3 +451,8 @@ void i_sbt8_dual_right(SAMPLEINT * sample, short *pcm, int n)
 /*--- 8 bit output ----------------*/
 #include "isbtb.c"
 /*----------------------------------*/
+
+#ifdef _MSC_VER
+#pragma warning(default: 4244)
+#pragma warning(default: 4056)
+#endif

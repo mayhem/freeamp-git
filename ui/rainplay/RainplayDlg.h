@@ -14,6 +14,7 @@
 #include "EQDlg.h"
 #include "AboutDlg.h"
 #include "VisualView.h"
+#include "preferences.h"
 
 //Scroll songname timer
 #define	TIMER_SONGNAME_SCROLL	0x01
@@ -106,6 +107,8 @@ public:
 	BOOL NotifyNumSongs(int indexOfSong, int totalSongs);
 	BOOL NotifyVisDataReady(unsigned int length, unsigned char *buf);
 
+    void SetPreferences(Preferences* prefs) { m_prefs = prefs;}
+
 // Dialog Data
 	//{{AFX_DATA(CRainplayDlg)
 	enum { IDD = IDD_RAINPLAY };
@@ -177,6 +180,7 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 private:
+    Preferences*    m_prefs;
 	CEQDlg * m_EQDlg;						//Equalizer dialog
 	CPlayListDlg * m_playlistDlg;			//Play list manager dialog
 	CPreferencesDlg * m_preferencesDlg;		//Options dialog

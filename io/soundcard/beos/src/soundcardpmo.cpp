@@ -43,9 +43,9 @@ const int32 OVERFLOW_SIZE	= 9216;
 const int32 TRIGGER_SIZE	= 9216;
 
 extern "C" {
-PhysicalMediaOutput* Initialize()
+PhysicalMediaOutput* Initialize(FAContext *context)
 {
-	return new SoundCardPMO();
+	return new SoundCardPMO(context);
 }
 } /* extern "C" */
 
@@ -70,11 +70,12 @@ SoundCardPMO::GetErrorString( int32 error )
 	return g_ErrorArray[error - pmoError_MinimumError];
 }
 
-SoundCardPMO::SoundCardPMO()
+SoundCardPMO::SoundCardPMO(FAContext *context)
 :	m_buffer( NULL ),
 	m_player( NULL ),
 	m_pcmBuffer( NULL )
 {
+    m_context = context;
 	m_buffer    = new RingBuffer( BUFFER_SIZE );
 //	m_player    = new BSoundPlayer( "Freeamp", _PlayerHook, NULL, this );
 	m_pcmBuffer = new int16[ PCMBUFFERSIZE ];

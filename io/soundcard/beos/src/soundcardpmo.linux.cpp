@@ -40,8 +40,8 @@ ____________________________________________________________________________*/
 #define PIECES 50
 
 extern "C" {
-PhysicalMediaOutput *Initialize() {
-    return new SoundCardPMO();
+PhysicalMediaOutput *Initialize(FAContext *context) {
+    return new SoundCardPMO(context);
 }
 	   }
 
@@ -63,7 +63,8 @@ const char *SoundCardPMO::GetErrorString(int32 error) {
     return g_ErrorArray[error - pmoError_MinimumError];
 }
 
-SoundCardPMO::SoundCardPMO() {
+SoundCardPMO::SoundCardPMO(FAContext *context) {
+    m_context = context;
     //cout << "Creating scpmo" << endl;
     m_properlyInitialized = false;
     myInfo = new OutputInfo();

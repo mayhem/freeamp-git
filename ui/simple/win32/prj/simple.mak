@@ -116,8 +116,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Release" "soundcard - Win32 Release"\
  "fileinput - Win32 Release" ".\simple.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                       ..\..\..\..\base\win32\prj\plugins
-	copy simple.ui         ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                        ..\..\..\..\base\win32\prj\plugins
+	copy simple.ui          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
@@ -210,8 +210,8 @@ ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "xing - Win32 Debug" "soundcard - Win32 Debug"\
  "fileinput - Win32 Debug" ".\simple.ui"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                       ..\..\..\..\base\win32\prj\plugins
-	copy simple.ui         ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                        ..\..\..\..\base\win32\prj\plugins
+	copy simple.ui          ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -264,14 +264,14 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -306,8 +306,6 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\io\include\pmi.h"\
 	"..\..\..\..\io\include\rio.h"\
 	"..\..\..\..\io\include\std.h"\
-	{$(INCLUDE)}"sys\stat.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -334,6 +332,8 @@ DEP_CPP_PLAYL=\
 	"..\..\..\..\io\include\pmi.h"\
 	"..\..\..\..\io\include\rio.h"\
 	"..\..\..\..\io\include\std.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\playlist.obj" : $(SOURCE) $(DEP_CPP_PLAYL) "$(INTDIR)"\
@@ -350,10 +350,7 @@ SOURCE=..\..\..\..\io\rio\rio.cpp
 DEP_CPP_RIO_C=\
 	"..\..\..\..\io\include\binary.h"\
 	"..\..\..\..\io\include\rio.h"\
-	"..\..\..\..\io\include\rioioctl.h"\
 	"..\..\..\..\io\include\std.h"\
-	{$(INCLUDE)}"sys\stat.h"\
-	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
@@ -365,7 +362,10 @@ DEP_CPP_RIO_C=\
 DEP_CPP_RIO_C=\
 	"..\..\..\..\io\include\binary.h"\
 	"..\..\..\..\io\include\rio.h"\
+	"..\..\..\..\io\include\rioioctl.h"\
 	"..\..\..\..\io\include\std.h"\
+	{$(INCLUDE)}"sys\stat.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\rio.obj" : $(SOURCE) $(DEP_CPP_RIO_C) "$(INTDIR)"
@@ -431,6 +431,7 @@ DEP_CPP_SIMPL=\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\..\io\include\pmi.h"\
+	"..\..\..\..\io\include\std.h"\
 	"..\..\..\include\ui.h"\
 	"..\include\about.h"\
 	"..\include\simpleui.h"\
@@ -452,9 +453,6 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	
-NODEP_CPP_THREA=\
-	"..\..\..\..\base\src\linuxthread.h"\
-	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
@@ -468,6 +466,10 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
 	
+NODEP_CPP_THREA=\
+	"..\..\..\..\base\src\linuxthread.h"\
+	"..\..\..\..\base\src\solaristhread.h"\
+	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\
  "..\..\..\..\config\config.h"
@@ -477,6 +479,9 @@ DEP_CPP_THREA=\
 !ENDIF 
 
 SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
 DEP_CPP_WIN32=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
@@ -488,6 +493,21 @@ DEP_CPP_WIN32=\
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
+DEP_CPP_WIN32=\
+	"..\..\..\..\base\include\thread.h"\
+	"..\..\..\..\base\win32\include\win32thread.h"\
+	"..\..\..\..\config\config.h"\
+	
+
+"$(INTDIR)\win32thread.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
+ "..\..\..\..\config\config.h"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 SOURCE=..\res\simple.rc
 DEP_RSC_SIMPLE=\
 	"..\res\about8.bmp"\
@@ -498,7 +518,7 @@ DEP_RSC_SIMPLE=\
 
 "$(INTDIR)\simple.res" : $(SOURCE) $(DEP_RSC_SIMPLE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\simple.res" /i\
- "\Local\src\freeamp\ui\simple\win32\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\merge\freeamp\ui\simple\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
@@ -506,7 +526,7 @@ DEP_RSC_SIMPLE=\
 
 "$(INTDIR)\simple.res" : $(SOURCE) $(DEP_RSC_SIMPLE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\simple.res" /i\
- "\Local\src\freeamp\ui\simple\win32\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\merge\freeamp\ui\simple\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -514,12 +534,12 @@ DEP_RSC_SIMPLE=\
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 "fileinput - Win32 Release" : 
-   cd "\Local\src\freeamp\io\local\win32\prj"
+   cd "\TEMP\merge\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "fileinput - Win32 ReleaseCLEAN" : 
-   cd "\Local\src\freeamp\io\local\win32\prj"
+   cd "\TEMP\merge\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fileinput.mak\
  CFG="fileinput - Win32 Release" RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -527,12 +547,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 "fileinput - Win32 Debug" : 
-   cd "\Local\src\freeamp\io\local\win32\prj"
+   cd "\TEMP\merge\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\fileinput.mak CFG="fileinput - Win32 Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "fileinput - Win32 DebugCLEAN" : 
-   cd "\Local\src\freeamp\io\local\win32\prj"
+   cd "\TEMP\merge\freeamp\io\local\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\fileinput.mak CFG="fileinput - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -542,12 +562,12 @@ DEP_RSC_SIMPLE=\
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 "soundcard - Win32 Release" : 
-   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   cd "\TEMP\merge\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "soundcard - Win32 ReleaseCLEAN" : 
-   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   cd "\TEMP\merge\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\soundcard.mak\
  CFG="soundcard - Win32 Release" RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -555,12 +575,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 "soundcard - Win32 Debug" : 
-   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   cd "\TEMP\merge\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\soundcard.mak CFG="soundcard - Win32 Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "soundcard - Win32 DebugCLEAN" : 
-   cd "\Local\src\freeamp\io\soundcard\win32\prj"
+   cd "\TEMP\merge\freeamp\io\soundcard\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\soundcard.mak CFG="soundcard - Win32 Debug"\
  RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -570,12 +590,12 @@ DEP_RSC_SIMPLE=\
 !IF  "$(CFG)" == "simple - Win32 Release"
 
 "xing - Win32 Release" : 
-   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   cd "\TEMP\merge\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 Release" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "xing - Win32 ReleaseCLEAN" : 
-   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   cd "\TEMP\merge\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\xing.mak CFG="xing - Win32 Release"\
  RECURSE=1 
    cd "..\..\..\..\ui\simple\win32\prj"
@@ -583,12 +603,12 @@ DEP_RSC_SIMPLE=\
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
 
 "xing - Win32 Debug" : 
-   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   cd "\TEMP\merge\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) /F .\xing.mak CFG="xing - Win32 Debug" 
    cd "..\..\..\..\ui\simple\win32\prj"
 
 "xing - Win32 DebugCLEAN" : 
-   cd "\Local\src\freeamp\lmc\xingmp3\win32\prj"
+   cd "\TEMP\merge\freeamp\lmc\xingmp3\win32\prj"
    $(MAKE) /$(MAKEFLAGS) CLEAN /F .\xing.mak CFG="xing - Win32 Debug" RECURSE=1\
  
    cd "..\..\..\..\ui\simple\win32\prj"

@@ -42,9 +42,11 @@ ____________________________________________________________________________*/
 #include "fawindow.h"
 #include "windowhash.h"
 
+class FAContext;
+
 class FreeAmpUI : public UserInterface {
  public:
-    FreeAmpUI();
+    FreeAmpUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
@@ -56,8 +58,12 @@ class FreeAmpUI : public UserInterface {
 
     EventQueue *m_playerEQ;
    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+
+ protected:
+    FAContext *m_context;
+
  private:
-   Properties *m_propManager;
+    Properties *m_propManager;
     int32 m_startupType;
     void Usage();
     bool m_noStartUp;

@@ -32,9 +32,11 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "playlist.h"
 
+class FAContext;
+
 class Mpg123UI : public UserInterface {
  public:
-    Mpg123UI();
+    Mpg123UI(FAContext *context);
 
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
@@ -46,8 +48,12 @@ class Mpg123UI : public UserInterface {
 
     static EventQueue *m_playerEQ;
    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+
+ protected:
+    FAContext *m_context;
+
  private:
-   Properties *m_propManager;
+    Properties *m_propManager;
     int32 m_argc;
     char **m_argv;
     int32 m_startupType;

@@ -30,8 +30,8 @@ ____________________________________________________________________________*/
 #include "streambuffer.h"
 
 StreamBuffer::StreamBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                           size_t iWriteTriggerSize) : 
-				  PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
+                           size_t iWriteTriggerSize, FAContext *context) : 
+     PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize, context)
 {
    m_bBufferingUp = true;
    m_bPause = true;

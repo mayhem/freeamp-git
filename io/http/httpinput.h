@@ -32,11 +32,13 @@ ____________________________________________________________________________*/
 #include "pmi.h"
 #include "httpbuffer.h"
 
+class FAContext;
+
 class HttpInput:public PhysicalMediaInput
 {
    public:
 
-   HttpInput();
+   HttpInput(FAContext *context);
    HttpInput(char *path);
    virtual ~ HttpInput(void);
 
@@ -75,6 +77,10 @@ class HttpInput:public PhysicalMediaInput
 	   else 
 		    return kError_UnknownErr; 
 	};
+
+ protected:
+   FAContext  *m_context;
+
  private:
    Properties *m_propManager;
 

@@ -21,6 +21,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
+#include "config.h"
+
 #include <iostream.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -30,9 +32,11 @@ ____________________________________________________________________________*/
 #include <sys/time.h>
 #include <termios.h>
 #include <signal.h>
-#include <errno.h>
 
-#include "config.h"
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
 #include "irmanui.h"
 
 #include "event.h"
@@ -45,8 +49,8 @@ extern "C" {
 
 extern "C" {
 
-UserInterface *Initialize() {
-    return new IRManUI();
+UserInterface *Initialize(FAContext *context) {
+    return new IRManUI(context);
 }
     
 	   }
@@ -62,7 +66,8 @@ void IRManUI::SetPlayListManager(PlayListManager *plm) {
 #define IR_VolumeDown 9999
 
 
-IRManUI::IRManUI() {
+IRManUI::IRManUI(FAContext *context) {
+    m_context = context;
     m_plm = NULL;
     m_playerEQ = NULL;
     m_propManager = NULL;
@@ -243,8 +248,4 @@ void IRManUI::ProcessArgs() {
 void IRManUI::processSwitch(char *pc) {
     return;
 }
-
-
-
-
 

@@ -779,13 +779,12 @@ PrefPage2Proc(  HWND hwnd,
     return result;
 }
 
-bool DisplayPreferences(HWND hwndParent)
+bool DisplayPreferences(HWND hwndParent, Preferences* prefs)
 {
     bool result = false;
     PROPSHEETPAGE psp[2];
     PROPSHEETHEADER psh;
     HINSTANCE hinst = (HINSTANCE)GetWindowLong(hwndParent, GWL_HINSTANCE);
-    Preferences prefs;
 
     psp[0].dwSize = sizeof(PROPSHEETPAGE);
     psp[0].dwFlags = 0;
@@ -794,7 +793,7 @@ bool DisplayPreferences(HWND hwndParent)
     psp[0].pszIcon = NULL;
     psp[0].pfnDlgProc = PrefPage1Proc;
     psp[0].pszTitle = NULL;
-    psp[0].lParam = (LPARAM)&prefs;
+    psp[0].lParam = (LPARAM)prefs;
 
     psp[1].dwSize = sizeof(PROPSHEETPAGE);
     psp[1].dwFlags = 0;
@@ -803,7 +802,7 @@ bool DisplayPreferences(HWND hwndParent)
     psp[1].pszIcon = NULL;
     psp[1].pfnDlgProc = PrefPage2Proc;
     psp[1].pszTitle = NULL;
-    psp[1].lParam = (LPARAM)&prefs;
+    psp[1].lParam = (LPARAM)prefs;
 
     psh.dwSize = sizeof(PROPSHEETHEADER);
     psh.dwFlags = PSH_PROPSHEETPAGE;
@@ -818,3 +817,4 @@ bool DisplayPreferences(HWND hwndParent)
 
     return result;
 }
+

@@ -30,27 +30,24 @@ PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 GAS2INTEL = @top_srcdir@/util/gas2intel
 
-if AM_HAVE_WIN32
-C_FILES =
-ASM_FILES =
-ASM_DEFS =
-MYLIBS =
-TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
-else
-if AM_HAVE_X86
 C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
           cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
           mhead.c upsf.c iwinm.c xinglmc.cpp
+
+if AM_HAVE_X86
+
+if AM_HAVE_NASM
+ASM_FILES = cdctasm.s cwinasm.s cwin8asm.s mdctasm.s msisasm.s
+ASM_DEFS = -DASM_X86
+else # !AM_HAVE_NASM
 ASM_FILES = x86gas.s
 ASM_DEFS = -DASM_FDCT32 -DASM_WINDOW_DUAL
-else
-# A bug in automake forces us to redundantly declare C_FILES
-C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
-          cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
-          mhead.c upsf.c iwinm.c xinglmc.cpp
+endif # !AM_HAVE_NASM
+
+else # !AM_HAVE_X86
 ASM_FILES =
 ASM_DEFS =
-endif
+endif # !AM_HAVE_X86
 MYLIBS = libfalmc.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
@@ -61,13 +58,17 @@ $(PLUGIN_FULL_NAME) : $(libfalmc_a_OBJECTS)
 	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfalmc_a_OBJECTS)
 	@chmod 644 $(PLUGIN_FULL_NAME)
 
+%asm.s: %asm.asm
+	$(PERL) -pe 's/\b_//g' $< > $@
+
+%asm.o: %asm.s
+	$(NASM) -f elf -o $@ $<
+
 x86intel.asm: x86gas.s $(GAS2INTEL)
-	$(GAS2INTEL) $< > $@
+	$(PERL) $(GAS2INTEL) $< > $@
 
 x86intel.c: x86gas.s $(GAS2INTEL)
-	$(GAS2INTEL) -i $< > $@
-
-endif
+	$(PERL) $(GAS2INTEL) -i $< > $@
 
 if AM_HAVE_LINUXTHREADS
 REENT = -D_REENTRANT

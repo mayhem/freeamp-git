@@ -32,6 +32,7 @@ ____________________________________________________________________________*/
 /* project headers */  
 #include "list.h"
 #include "dib.h"
+#include "preferences.h"
 
 extern const char* kSaveToRio;
 
@@ -48,13 +49,15 @@ DetermineControlRegions(DIB* bitmap,
 bool FileOpenDialog(HWND hwnd, 
                     const char* title,
                     const char* filter,
-                    List<char*>* fileList);
+                    List<char*>* fileList,
+                    Preferences* prefs);
 
 bool FileSaveDialog(HWND hwnd, 
                     const char* title,
                     const char* filter,
                     char* path,
-                    uint32* pathLength);
+                    uint32* pathLength,
+                    Preferences* prefs);
 
 bool LoadDriver(const char* driverName, 
                 const char* driverPath);

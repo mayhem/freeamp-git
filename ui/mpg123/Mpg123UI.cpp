@@ -39,14 +39,15 @@ void mysigint(int);
 
 
 extern "C" {
-    UserInterface *Initialize() {
-	return new Mpg123UI();
+    UserInterface *Initialize(FAContext *context) {
+	return new Mpg123UI(context);
     }
 	   }
 
 EventQueue *Mpg123UI::m_playerEQ = NULL;
 
-Mpg123UI::Mpg123UI() {
+Mpg123UI::Mpg123UI(FAContext *context) {
+    m_context = context;
     m_mediaInfo_set = false;
     m_mpegInfo_set = false;
 

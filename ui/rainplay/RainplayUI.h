@@ -12,11 +12,13 @@
 #include "playlist.h"
 #include "RainplayDlg.h"
 #include "player.h"
+#include "preferences.h"
+#include "facontext.h"
 
 class CRainplayUI: public UserInterface
 {
 public:
-    CRainplayUI();
+    CRainplayUI(FAContext *context);
     ~CRainplayUI();
 
 	virtual Error Init(int32 startup_type) { return kError_NoErr; }
@@ -35,8 +37,10 @@ protected:
       static void UIThreadFunc(void *);
 
 private:
-	Properties *   m_propManager;
-	CRainplayDlg*	m_Dlg;
+    FAContext*      m_context;
+	Properties *    m_propManager;
+    Preferences*     m_prefs;
+	CRainplayDlg*   m_Dlg;
 	Thread*         m_uiThread;
 };
 

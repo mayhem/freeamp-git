@@ -30,10 +30,7 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "SoundCardPMO.h"
 #include "eventdata.h"
-#include "preferences.h"
 #include "log.h"
-
-LogFile  *g_Log;
 
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
@@ -46,10 +43,9 @@ Mutex *g_pHeaderMutex;
 
 extern    "C"
 {
-   PhysicalMediaOutput *Initialize(LogFile * pLog)
+   PhysicalMediaOutput *Initialize(FAContext *context)
    {
-      g_Log = pLog;
-      return new SoundCardPMO();
+      return new SoundCardPMO(context);
    }
 }
 
@@ -72,9 +68,9 @@ MCICallBack(HWAVEOUT hwo, UINT msg, DWORD dwInstance,
    }
 }
 
-SoundCardPMO::SoundCardPMO() :
+SoundCardPMO::SoundCardPMO(FAContext *context) :
               EventBuffer(iOrigBufferSize, iOverflowSize, 
-                          iWriteTriggerSize)
+                          iWriteTriggerSize, context)
 {
    m_wfex = NULL;
    m_wavehdr_array = NULL;
@@ -99,6 +95,9 @@ SoundCardPMO::SoundCardPMO() :
    m_iOffset = 0;
    m_iLastFrame = -1;
    m_bPaused = false;
+
+   m_context = context;
+   m_prefs = m_context->prefs;
 
    if (!m_pBufferThread)
    {
@@ -175,7 +174,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
    if (IsError(result))
    {
        ReportError("Internal buffer sizing error occurred.");
-       g_Log->Error("Resize output buffer failed.");
+       m_context->log->Error("Resize output buffer failed.");
 
        return result;
    }
@@ -511,11 +510,8 @@ void SoundCardPMO::WorkerThread(void)
    Error       eErr;
    Event      *pEvent;
    int         iValue;
-   Preferences *pPref;
 
-   pPref = new Preferences();
-   pPref->GetDecoderThreadPriority(&iValue);
-   delete pPref;
+   m_prefs->GetDecoderThreadPriority(&iValue);
 
    m_pBufferThread->SetPriority(iValue);
 
@@ -590,13 +586,13 @@ void SoundCardPMO::WorkerThread(void)
       if (IsError(eErr))
       {
           ReportError("Internal error occured.");
-          g_Log->Error("Cannot read from buffer in PMO worker tread: %d\n",
+          m_context->log->Error("Cannot read from buffer in PMO worker tread: %d\n",
               eErr);
           break;
       }
 
       Write(pBuffer);
    }
-   g_Log->Log(LogDecode, "PMO: Soundcard thread exiting\n");
+   m_context->log->Log(LogDecode, "PMO: Soundcard thread exiting\n");
 }    
 

@@ -35,7 +35,7 @@ ____________________________________________________________________________*/
 /*  You can use -a <soundcard #>:<device #>... */
 /*  For example: mpg123 -a 1:0 aaa.mpg         */
 /*               mpg123 -a guspnp:1 aaa.mpg    */
-#define ALSA_DEVICE "1:0"
+//#define ALSA_DEVICE "1:0"	// No longer used; now a preference
 
 /* system headers */
 #include <stdlib.h>
@@ -100,7 +100,7 @@ enum {
 class AlsaPMO : public PhysicalMediaOutput, public EventBuffer
 {
 public:
-	    AlsaPMO();
+    AlsaPMO(FAContext *context);
     virtual ~AlsaPMO();
     
     virtual Error Init(OutputInfo* info);

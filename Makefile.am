@@ -66,7 +66,7 @@ freeamp_DEPENDENCIES = $(MYDEPS)
 ## decspeed_DEPENDENCIES = $(MYDEPS)
 
 INCLUDES = -I@top_srcdir@/base/include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/io/include -I@top_srcdir@/ui/include -I@top_srcdir@/lmc/include
-CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@host_os@__ -Wl,-export-dynamic
+CXXFLAGS = $(EXTRA_CXXFLAGS) -D__@host_os@__ -Wl,--export-dynamic
 
 install-exec-local: install_plugins
 

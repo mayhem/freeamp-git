@@ -42,7 +42,7 @@ extern int band_limit_nsb;
 typedef float ARRAY36[36];
 
 /*-- windows by block type --*/
-static float win[4][36];
+float win[4][36];
 
 
 /*====================================================================*/
@@ -58,6 +58,9 @@ ARRAY36 *hwin_init_addr()
 int hybrid(float xin[], float xprev[], float y[18][32],
 	   int btype, int nlong, int ntot, int nprev)
 {
+#ifdef ASM_X86
+   hybrid_asm(xin, xprev, y, btype, nlong, ntot, nprev);
+#else
    int i, j;
    float *x, *x0;
    float xa, xb;
@@ -153,6 +156,7 @@ int hybrid(float xin[], float xprev[], float y[18][32],
    }
 
    return nout;
+#endif
 }
 /*--------------------------------------------------------------------*/
 /*--------------------------------------------------------------------*/
@@ -246,6 +250,9 @@ void sum_f_bands(float a[], float b[], int n)
 /*--------------------------------------------------------------------*/
 void FreqInvert(float y[18][32], int n)
 {
+#ifdef ASM_X86
+   FreqInvert_asm(y, n);
+#else
    int i, j;
 
    n = (n + 17) / 18;
@@ -256,8 +263,6 @@ void FreqInvert(float y[18][32], int n)
 	 y[1 + j][1 + i] = -y[1 + j][1 + i];
       }
    }
-
-
-
+#endif
 }
 /*--------------------------------------------------------------------*/

@@ -41,14 +41,15 @@ class List {
     T LastItem();
 
     T ItemAt(int32 index);
+    void SetItemAt(const T &item, int32 index);
     int32 IndexOf(T &item);
     bool HasItem(T &item);
     bool IsEmpty();
 
     int32 CountItems();
     
-    bool AddItem(T &item);
-    bool AddItem(T &item, int32 index);
+    bool AddItem(const T &item);
+    bool AddItem(const T &item, int32 index);
 
     bool AddList(List<T> &list);
     bool AddList(List<T> &list,int32 index);
@@ -79,14 +80,13 @@ class List {
 
     // cmp returns true if first arg is 'greater' than the second ; 
     // sorts list smallest to largest according to cmp
-    void SortItems(int32 (*cmp)(const T &, const T &)); 
+    void SortItems(int (*cmp)(const T &, const T &)); 
 
  private:
     T*      m_list;  // array of objects
     int32   m_threshhold;
     int32   m_insertionPoint;
     int32   m_currentLength;
- 
 };
 
 template<class T> 
@@ -154,6 +154,17 @@ ItemAt(int32 index)
     return m_list[index];
 }
 
+template<class T>
+void
+List<T>::
+SetItemAt(const T &item, int32 index)
+{
+    if (index < m_insertionPoint && index >= 0)
+    {
+	m_list[index] = item;
+    }
+}
+
 template<class T> 
 int32 
 List<T>::
@@ -207,7 +218,7 @@ CountItems()
 template<class T> 
 bool 
 List<T>::
-AddItem(T &item) 
+AddItem(const T &item) 
 {
     bool result = false;
 
@@ -239,7 +250,7 @@ AddItem(T &item)
 template<class T> 
 bool 
 List<T>::
-AddItem(T &item, int32 index) 
+AddItem(const T &item, int32 index) 
 {
     bool result = false;
 
@@ -525,7 +536,7 @@ T
 List<T>::
 RandomItem() 
 {
-    srand((unsigned int) time (NULL));
+    srand((unsigned int) time (NULL)); // XXX: Yuck!  Fix this.
     int32 foo = (int32) (((double)m_insertionPoint * rand()) / (RAND_MAX+1.0));
     return m_list[foo];
 }
@@ -577,18 +588,13 @@ void
 List<T>::
 SortItems(int (*cmp)(const T &, const T &)) 
 {
-    for(int end = m_insertionPoint-2;i>= 0;end--) 
-    {
-	    for(int i=0;i<end;i++) 
-        {
-	        if (*cmp(m_list[i],m_list[i+1])) 
-            {
-		        Swap(i,i+1);
-	        }
-	    }
-    }
+    for(int end = m_insertionPoint-2; end > 0; end--) 
+	for(int i=0; i < end; i++) 
+	    if (cmp(m_list[i],m_list[i+1])) 
+		Swap(i,i+1);
 }
 
 
-
 #endif // _LIST_H_
+
+

@@ -40,7 +40,7 @@ enum {
 
 class LcdUI : public UserInterface {
  public:
-    LcdUI();
+    LcdUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
@@ -49,8 +49,12 @@ class LcdUI : public UserInterface {
     static void keyboardServiceFunction(void *);
     virtual ~LcdUI();
    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+
+ protected:
+    FAContext *m_context;
+
  private:
-   Properties *m_propManager;
+    Properties *m_propManager;
 
     int32 m_sock;
 

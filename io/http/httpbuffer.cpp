@@ -40,13 +40,12 @@ ____________________________________________________________________________*/
 
 #include "httpbuffer.h"
 #include "httpinput.h"
+#include "facontext.h"
 #include "log.h"
 
 #ifndef WIN32
 #define closesocket(s) close(s)
 #endif
-
-extern LogFile *g_Log;
 
 const int iHttpPort = 80;
 const int iMaxHostNameLen = 64;
@@ -65,8 +64,8 @@ const int iTransmitTimeout = 60;
 
 HttpBuffer::HttpBuffer(size_t iBufferSize, size_t iOverFlowSize, 
                        size_t iWriteTriggerSize, char *szFile, 
-                       HttpInput *pHttp) :
-          StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
+                       HttpInput *pHttp, FAContext *context) :
+          StreamBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize, context)
 {
     m_hHandle = -1;
     m_bLoop = false;
@@ -118,7 +117,7 @@ void HttpBuffer::LogError(char *szErrorMsg)
     sprintf(m_szError, "%s: %s", szErrorMsg, strerror(errno));
 #endif
     m_pHttp->ReportError(m_szError);
-    g_Log->Error("%s\n", m_szError);
+    m_context->log->Error("%s\n", m_szError);
 }
 
 // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
@@ -176,7 +175,7 @@ Error HttpBuffer::Open(void)
     char                szHostName[iMaxHostNameLen+1], *szFile, *szQuery;
     char               *pInitialBuffer;
     unsigned            iPort;
-    int                 iRet, iRead, iLoop, iConnect;
+    int                 iRet, iRead, iConnect;
     struct sockaddr_in  sAddr;
     struct hostent      sHost;
     Error               eRet;
@@ -189,7 +188,7 @@ Error HttpBuffer::Open(void)
     {
         m_pHttp->ReportError("Bad URL format. URL format: http:<host name>"
                              ":[port][/path]");
-        g_Log->Error("Badly formatted URL: %s\n", m_szUrl);
+        m_context->log->Error("Badly formatted URL: %s\n", m_szUrl);
         return (Error)httpError_BadUrl;
     }
 
@@ -204,7 +203,7 @@ Error HttpBuffer::Open(void)
     {
        sprintf(m_szError, "Cannot find host %s\n", szHostName);
        m_pHttp->ReportError(m_szError);
-       g_Log->Error("Cannot find host %s\n", szHostName);
+       m_context->log->Error("Cannot find host %s\n", szHostName);
        return (Error)httpError_CustomError;
     }
 
@@ -257,7 +256,8 @@ Error HttpBuffer::Open(void)
                 szHostName);
 
     iRet = send(m_hHandle, szQuery, strlen(szQuery), 0);
-    if (iRet != strlen(szQuery))
+
+    if (iRet != (int)strlen(szQuery))
     {
 		delete szQuery;
         LogError("Cannot write to socket");
@@ -293,7 +293,7 @@ Error HttpBuffer::Open(void)
     if (sscanf(pInitialBuffer, " ICY %d %255[^\n\r]", &iRet, m_szError) ||
         sscanf(pInitialBuffer, " HTTP/1.0 %d %255[^\n\r]", &iRet, m_szError))
     {
-        char *pStreamBegin, *pHeaderData, *pPtr;
+        char *pHeaderData, *pPtr;
         int   iHeaderBytes = 0, iCurHeaderSize = iHeaderSize;
 
 		  if (iRet != iICY_OK)
@@ -301,7 +301,7 @@ Error HttpBuffer::Open(void)
             char szErr[255];
 
             sprintf(szErr, "This stream is not available: %s\n", m_szError);
-            g_Log->Error(szErr);
+            m_context->log->Error(szErr);
             m_pHttp->ReportError(szErr);
 
 		      delete pInitialBuffer;
@@ -489,7 +489,7 @@ void HttpBuffer::WorkerThread(void)
           eError = EndWrite(iRead);
           if (IsError(eError))
           {
-              g_Log->Error("http: EndWrite returned: %d\n", eError);
+              m_context->log->Error("http: EndWrite returned: %d\n", eError);
               break;
           }
       }

@@ -68,14 +68,16 @@ GTK_CFLAGS = @GTK_CFLAGS@
 GTK_CONFIG = @GTK_CONFIG@
 GTK_LIBS = @GTK_LIBS@
 MAKEINFO = @MAKEINFO@
+NASM = @NASM@
 PACKAGE = @PACKAGE@
+PERL = @PERL@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 host_os = @host_os@
 
 @AM_HAVE_WIN32_TRUE@FILES = 
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
-@AM_HAVE_WIN32_FALSE@FILES = preferences.cpp bootstrap.cpp win32impl.cpp
+@AM_HAVE_WIN32_FALSE@FILES = unixprefs.cpp bootstrap.cpp win32impl.cpp
 @AM_HAVE_WIN32_FALSE@MYLIBS = libfaunix.a
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
@@ -101,8 +103,8 @@ X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 libfaunix_a_LIBADD = 
 @AM_HAVE_WIN32_TRUE@cond0libfaunix_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfaunix_a_OBJECTS =  preferences.o \
-@AM_HAVE_WIN32_FALSE@bootstrap.o win32impl.o
+@AM_HAVE_WIN32_FALSE@cond1libfaunix_a_OBJECTS =  unixprefs.o bootstrap.o \
+@AM_HAVE_WIN32_FALSE@win32impl.o
 libfaunix_a_OBJECTS =  $(cond0libfaunix_a_OBJECTS) \
 $(cond1libfaunix_a_OBJECTS)
 AR = ar
@@ -115,7 +117,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/bootstrap.P .deps/preferences.P .deps/win32impl.P
+DEP_FILES =  .deps/bootstrap.P .deps/unixprefs.P .deps/win32impl.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfaunix_a_SOURCES)
 OBJECTS = $(libfaunix_a_OBJECTS)

@@ -32,6 +32,7 @@ ____________________________________________________________________________*/
 
 #define HAVE_UNISTD_H 0
 #define HAVE_IO_H 0
+#define HAVE_ERRNO_H 0
 
 #define HAVE_BASELINUXTHREADS 0
 #define HAVE_ENHLINUXTHREADS 0
@@ -40,6 +41,9 @@ ____________________________________________________________________________*/
 
 #define HAVE_LINUX 0
 #define HAVE_SOLARIS 0
+
+#define AC_HOST_OS "unknown"
+#define AC_HOST_CPU "unknown"
 
 #define MP3_PROF 0
 

@@ -42,8 +42,8 @@ ____________________________________________________________________________*/
 
 extern "C" {
 
-UserInterface *Initialize() {
-    return new cmdlineUI();
+UserInterface *Initialize(FAContext *context) {
+    return new cmdlineUI(context);
 }
 
 	   }
@@ -64,8 +64,8 @@ void cmdlineUI::SetPlayListManager(PlayListManager *plm) {
     m_plm = plm;
 }
 
-cmdlineUI::cmdlineUI() {
-
+cmdlineUI::cmdlineUI(FAContext *context) {
+    m_context = context;
     m_plm = NULL;
     m_playerEQ = NULL;
 

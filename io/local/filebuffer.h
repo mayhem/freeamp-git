@@ -36,12 +36,15 @@ ____________________________________________________________________________*/
 const int32 iMaxFileNameLen = 255;
 const int32 iID3TagSize = 128;
 
+class FAContext;
+
 class FileBuffer : public PullBuffer
 {
     public:
 
                FileBuffer(size_t iBufferSize, size_t iOverFlowSize,
-                          size_t iWriteTriggerSize, char *szFile);
+                          size_t iWriteTriggerSize, char *szFile,
+			  FAContext *context);
       virtual ~FileBuffer(void);
 
       Error    Open(void);

@@ -35,6 +35,9 @@ portable C
 /*-------------------------------------------------------------------------*/
 void windowB(float *vbuf, int vb_ptr, unsigned char *pcm)
 {
+#ifdef ASM_X86
+   windowB_asm(vbuf, vb_ptr, pcm);
+#else
    int i, j;
    int si, bx;
    float *coef;
@@ -99,10 +102,14 @@ void windowB(float *vbuf, int vb_ptr, unsigned char *pcm)
 	 tmp = -32768;
       *pcm++ = ((unsigned char) (tmp >> 8)) ^ 0x80;
    }
+#endif
 }
 /*------------------------------------------------------------*/
 void windowB_dual(float *vbuf, int vb_ptr, unsigned char *pcm)
 {
+#ifdef ASM_X86
+   windowB_dual_asm(vbuf, vb_ptr, pcm);
+#else
    int i, j;			/* dual window interleaves output */
    int si, bx;
    float *coef;
@@ -170,11 +177,15 @@ void windowB_dual(float *vbuf, int vb_ptr, unsigned char *pcm)
       *pcm = ((unsigned char) (tmp >> 8)) ^ 0x80;
       pcm += 2;
    }
+#endif
 }
 /*------------------------------------------------------------*/
 /*------------------- 16 pt window ------------------------------*/
 void windowB16(float *vbuf, int vb_ptr, unsigned char *pcm)
 {
+#ifdef ASM_X86
+   windowB16_asm(vbuf, vb_ptr, pcm);
+#else
    int i, j;
    unsigned char si, bx;
    float *coef;
@@ -241,10 +252,14 @@ void windowB16(float *vbuf, int vb_ptr, unsigned char *pcm)
 	 tmp = -32768;
       *pcm++ = ((unsigned char) (tmp >> 8)) ^ 0x80;
    }
+#endif
 }
 /*--------------- 16 pt dual window (interleaved output) -----------------*/
 void windowB16_dual(float *vbuf, int vb_ptr, unsigned char *pcm)
 {
+#ifdef ASM_X86
+   windowB16_dual_asm(vbuf, vb_ptr, pcm);
+#else
    int i, j;
    unsigned char si, bx;
    float *coef;
@@ -314,10 +329,14 @@ void windowB16_dual(float *vbuf, int vb_ptr, unsigned char *pcm)
       *pcm = ((unsigned char) (tmp >> 8)) ^ 0x80;
       pcm += 2;
    }
+#endif
 }
 /*------------------- 8 pt window ------------------------------*/
 void windowB8(float *vbuf, int vb_ptr, unsigned char *pcm)
 {
+#ifdef ASM_X86
+   windowB8_asm(vbuf, vb_ptr, pcm);
+#else
    int i, j;
    int si, bx;
    float *coef;
@@ -384,10 +403,14 @@ void windowB8(float *vbuf, int vb_ptr, unsigned char *pcm)
 	 tmp = -32768;
       *pcm++ = ((unsigned char) (tmp >> 8)) ^ 0x80;
    }
+#endif
 }
 /*--------------- 8 pt dual window (interleaved output) -----------------*/
 void windowB8_dual(float *vbuf, int vb_ptr, unsigned char *pcm)
 {
+#ifdef ASM_X86
+   windowB8_dual_asm(vbuf, vb_ptr, pcm);
+#else
    int i, j;
    int si, bx;
    float *coef;
@@ -457,5 +480,6 @@ void windowB8_dual(float *vbuf, int vb_ptr, unsigned char *pcm)
       *pcm = ((unsigned char) (tmp >> 8)) ^ 0x80;
       pcm += 2;
    }
+#endif
 }
 /*------------------------------------------------------------*/

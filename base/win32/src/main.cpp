@@ -33,7 +33,9 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "event.h"
 #include "registrar.h"
-#include "preferences.h"
+#include "log.h"
+#include "facontext.h"
+#include "win32prefs.h"
 
 static
 BOOL
@@ -64,7 +66,6 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 		 				LPSTR lpszCmdLine, 
 						int cmdShow)
 {
-    Preferences* prefs;
     HANDLE runOnceMutex;
 
     runOnceMutex = CreateMutex(	NULL,
@@ -116,8 +117,9 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     WSADATA sGawdIHateMicrosoft;
     WSAStartup(0x0002,  &sGawdIHateMicrosoft);
 
-    prefs = new Preferences;
-    prefs->Initialize();
+    FAContext *context = new FAContext;
+    context->prefs = new Win32Prefs();
+    context->log = new LogFile("freeamp.log");
 
     // find all the plug-ins we use
     Registrar* registrar;
@@ -131,24 +133,24 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
     lmc = new LMCRegistry;
-    registrar->InitializeRegistry(lmc, prefs);
+    registrar->InitializeRegistry(lmc, context->prefs);
 
     registrar->SetSearchString("*.pmi");
     pmi = new PMIRegistry;
-    registrar->InitializeRegistry(pmi, prefs);
+    registrar->InitializeRegistry(pmi, context->prefs);
 
     registrar->SetSearchString("*.pmo");
     pmo = new PMORegistry;
-    registrar->InitializeRegistry(pmo, prefs);
+    registrar->InitializeRegistry(pmo, context->prefs);
 
     registrar->SetSearchString("*.ui");
     ui = new UIRegistry;
-    registrar->InitializeRegistry(ui, prefs);
+    registrar->InitializeRegistry(ui, context->prefs);
 
     delete registrar;
 
     // create the player
-	Player *player = Player::GetPlayer();
+	Player *player = Player::GetPlayer(context);
 
     // need a way to signal main thread to quit...
     Semaphore *termination = new Semaphore();
@@ -165,9 +167,6 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     // in MS's STDLIB.H file. 
     player->SetArgs(__argc, __argv);
 
-    // player needs prefs for InstallDir information
-    player->SetPreferences(prefs);
-
     // kick things off... player is now in charge!
     player->Run();
 
@@ -176,6 +175,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     // clean up our act
     delete player;
+	delete context;
 
     CloseHandle(runOnceMutex);
 

@@ -32,8 +32,8 @@ ____________________________________________________________________________*/
 #define DB printf("%x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
 EventBuffer::EventBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                         size_t iWriteTriggerSize) : 
-				 PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
+                         size_t iWriteTriggerSize, FAContext *context) : 
+				 PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize, context)
 {
     m_pQueue = new Queue < BufferEvent * >();
 }

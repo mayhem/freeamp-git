@@ -49,6 +49,8 @@ ____________________________________________________________________________*/
 #include "dib.h"
 #include "linkedlist.h"
 #include "preferences.h"
+#include "facontext.h"
+
 
 #include "bitmapview.h"
 #include "buttonview.h"
@@ -65,10 +67,11 @@ enum {	UIState_Stopped = 0,
 		UIState_Playing, 
 		UIState_Paused };
 
+class FAContext;
 
 class FreeAmpUI : public UserInterface {
  public:
-    FreeAmpUI();
+    FreeAmpUI(FAContext *context);
     ~FreeAmpUI();
 
     virtual Error Init(int32 startup_type) { return kError_NoErr;}
@@ -170,7 +173,7 @@ class FreeAmpUI : public UserInterface {
 
     bool                m_mouseCaptured;
 
-
+    FAContext*          m_context;
     PlayListManager*    m_plm;
     Properties*         m_propManager;
     Preferences*        m_prefs;

@@ -28,7 +28,7 @@ if AM_HAVE_WIN32
 FILES = 
 MYLIBS = 
 else
-FILES = preferences.cpp bootstrap.cpp win32impl.cpp
+FILES = unixprefs.cpp bootstrap.cpp win32impl.cpp
 MYLIBS = libfaunix.a
 endif
 

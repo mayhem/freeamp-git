@@ -7,6 +7,7 @@
 // PreferencesDlg.h : header file
 //
 #include "optionsetupdlg.h"
+#include "preferences.h"
 
 #define	TOTAL_PAGES				4
 #define	ID_PAGE_SETUP			0
@@ -22,11 +23,13 @@ class CPreferencesDlg : public CDialog
 // Construction
 public:
 	CPreferencesDlg(CWnd* pParent = NULL);   // standard constructor
+    void SetPreferences(Preferences* prefs) { m_prefs = prefs;}
 protected:
 	COptionSetupDlg tabpage_setup;
 	CDialog		tabpage_options;
 	CDialog		tabpage_visualization;
 	CDialog		tabpage_plugins;
+    Preferences* m_prefs;
 // Dialog Data
 	//{{AFX_DATA(CPreferencesDlg)
 	enum { IDD = IDD_PREFERENCES };

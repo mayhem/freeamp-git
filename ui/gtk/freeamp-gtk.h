@@ -31,9 +31,11 @@ ____________________________________________________________________________*/
 #include "thread.h"
 #include "playlist.h"
 
+class FAContext;
+
 class GtkUI : public UserInterface {
  public:
-    GtkUI();
+    GtkUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
@@ -43,6 +45,10 @@ class GtkUI : public UserInterface {
     virtual ~GtkUI();
 
     EventQueue *m_playerEQ;
+
+ protected:
+    FAContext *m_context;
+
  private:
     void processSwitch(char *);
     Thread *gtkListenThread;

@@ -43,7 +43,8 @@ class EventBuffer : public PullBuffer
 
                EventBuffer(size_t iBufferSize, 
                            size_t iOverflowSize,
-                           size_t iWriteTriggerSize);
+                           size_t iWriteTriggerSize,
+			   FAContext *context);
       virtual ~EventBuffer(void);
 
       virtual  Error      AcceptEvent(Event *);

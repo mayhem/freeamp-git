@@ -42,13 +42,14 @@ GtkUI *g_pGtkUI;
 
 extern "C" {
 
-UserInterface *Initialize() {
-    return new GtkUI();
+UserInterface *Initialize(FAContext *context) {
+    return new GtkUI(context);
 }
 
 	   }
 
-GtkUI::GtkUI() {
+GtkUI::GtkUI(FAContext *context) {
+    m_context = context;
 
     m_plm = NULL;
     m_playerEQ = NULL;

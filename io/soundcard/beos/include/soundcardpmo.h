@@ -52,11 +52,12 @@ enum {
 class BSoundPlayer;
 class RingBuffer;
 class Thread;
+class FAContext;
 
 class SoundCardPMO : public PhysicalMediaOutput
 {
 public:
-							SoundCardPMO();
+							SoundCardPMO(FAContext *context);
 	virtual					~SoundCardPMO();
     
 	virtual Error			Init(OutputInfo* info);
@@ -75,6 +76,7 @@ public:
 							}
 
 protected:
+	FAContext *				m_context;
 
 private:
 	static void				_DummyPlayerHook( void* arg );

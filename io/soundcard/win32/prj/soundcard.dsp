@@ -142,7 +142,7 @@ SOURCE=..\..\..\..\base\win32\src\mutex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\win32\src\preferences.cpp
+SOURCE=..\..\..\..\base\src\preferences.cpp
 # End Source File
 # Begin Source File
 
@@ -167,6 +167,10 @@ SOURCE=..\src\soundcardpmo.cpp
 # Begin Source File
 
 SOURCE=..\..\..\..\base\src\thread.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
 # End Source File
 # Begin Source File
 

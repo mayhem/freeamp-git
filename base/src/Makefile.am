@@ -34,7 +34,7 @@ INCLS =
 else
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 FILES = player.cpp playlist.cpp hashtable.cpp thread.cpp registrar.cpp \
-        registry.cpp propimpl.cpp log.cpp
+        registry.cpp propimpl.cpp log.cpp preferences.cpp prefixprefs.cpp
 INCLS = -I@top_srcdir@/base/unix/include
 endif
 

@@ -32,9 +32,11 @@ ____________________________________________________________________________*/
 
 #define DEFAULT_DEVICE "/dev/irman"
 
+class FAContext;
+
 class IRManUI : public UserInterface {
  public:
-    IRManUI();
+    IRManUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
     virtual void SetArgs(int argc, char **argv);
     virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
@@ -43,6 +45,10 @@ class IRManUI : public UserInterface {
     static void irServiceFunction(void *);
     virtual ~IRManUI();
     virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+
+ protected:
+    FAContext *m_context;
+
  private:
     HashTable<int32 *> m_commands;
     bool m_quitIRListen;

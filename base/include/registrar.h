@@ -32,7 +32,7 @@ ____________________________________________________________________________*/
 #include "win32impl.h"
 #endif
 
-class Registrar{
+class Registrar {
  public:
     Registrar(){m_subdir = NULL; m_search = NULL;}
     ~Registrar(){}

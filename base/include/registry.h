@@ -28,7 +28,9 @@ ____________________________________________________________________________*/
 #include "list.h"
 #include "log.h"
 
-typedef void *(*InitializeFunction)(LogFile *);
+class FAContext;
+
+typedef void *(*InitializeFunction)(FAContext *);
 
 class RegistryItem {
  public:
@@ -49,9 +51,6 @@ class RegistryItem {
 
     virtual void SetModule(void* module);
     virtual const void* Module() const { return m_module;}
-
- private:
-     
 
  private:
     char*               m_path;

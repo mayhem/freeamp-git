@@ -42,9 +42,6 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "httpinput.h"
-#include "log.h"
-
-LogFile *g_Log;
 
 const int iBufferSize = 8192;
 const int iOverflowSize = 1536;
@@ -53,17 +50,17 @@ const char *szDefaultStreamTitle = "SHOUTcast Stream";
 
 extern    "C"
 {
-   PhysicalMediaInput *Initialize(LogFile *pLog)
+   PhysicalMediaInput *Initialize(FAContext *context)
    {
-	  g_Log = pLog;
-      return new HttpInput();
+      return new HttpInput(context);
    }
 }
-HttpInput::HttpInput():
+HttpInput::HttpInput(FAContext *context):
            PhysicalMediaInput()
 {
-   m_path = NULL;
-   m_pPullBuffer = NULL;
+    m_context = context;
+    m_path = NULL;
+    m_pPullBuffer = NULL;
 }
 
 HttpInput::HttpInput(char *path):
@@ -139,7 +136,7 @@ Error HttpInput::SetTo(char *url, bool bStartThread)
       if (IsntError(result))
       {
          m_pPullBuffer = new HttpBuffer(iBufferSize, iOverflowSize, 
-                                         iTriggerSize, url, this);
+                                         iTriggerSize, url, this, m_context);
          assert(m_pPullBuffer);
 
          result = m_pPullBuffer->Open();

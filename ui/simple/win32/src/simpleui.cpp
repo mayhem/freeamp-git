@@ -48,9 +48,9 @@ BOOL CALLBACK MainProc(	HWND hwnd,
 						WPARAM wParam, 
 						LPARAM lParam ); 
 
-extern "C" SimpleUI *Initialize() 
+extern "C" SimpleUI *Initialize(FAContext *context)
 {
-    return new SimpleUI();
+    return new SimpleUI(context);
 }
 
 
@@ -84,9 +84,10 @@ SetPlayListManager(PlayListManager *plm) {
 }
 
 SimpleUI::
-SimpleUI():
-UserInterface()
+SimpleUI(FAContext *context):
+     UserInterface()
 {
+    m_context = context;
     m_scrolling = false;
 
     m_uiSemaphore = new Semaphore();

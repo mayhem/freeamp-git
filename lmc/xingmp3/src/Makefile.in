@@ -68,7 +68,9 @@ GTK_CFLAGS = @GTK_CFLAGS@
 GTK_CONFIG = @GTK_CONFIG@
 GTK_LIBS = @GTK_LIBS@
 MAKEINFO = @MAKEINFO@
+NASM = @NASM@
 PACKAGE = @PACKAGE@
+PERL = @PERL@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 host_os = @host_os@
@@ -79,24 +81,19 @@ PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 
 GAS2INTEL = @top_srcdir@/util/gas2intel
 
-@AM_HAVE_WIN32_TRUE@C_FILES =
-@AM_HAVE_WIN32_TRUE@ASM_FILES =
-@AM_HAVE_WIN32_TRUE@ASM_DEFS =
-@AM_HAVE_WIN32_TRUE@MYLIBS =
-@AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@          cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@          mhead.c upsf.c iwinm.c xinglmc.cpp
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@ASM_FILES = x86gas.s
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@ASM_DEFS = -DASM_FDCT32 -DASM_WINDOW_DUAL
-# A bug in automake forces us to redundantly declare C_FILES
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@          cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@          mhead.c upsf.c iwinm.c xinglmc.cpp
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@ASM_FILES =
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@ASM_DEFS =
-@AM_HAVE_WIN32_FALSE@MYLIBS = libfalmc.a
-@AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
+C_FILES = cdct.c cupl3.c hwin.c iup.c l3init.c msis.c wavep.c csbt.c \
+          cwinm.c icdct.c mdct.c uph.c cup.c dec8.c isbt.c l3dq.c \
+          mhead.c upsf.c iwinm.c xinglmc.cpp
+
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@ASM_FILES = cdctasm.s cwinasm.s cwin8asm.s mdctasm.s msisasm.s
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@ASM_DEFS = -DASM_X86
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@ASM_FILES = x86gas.s
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@ASM_DEFS = -DASM_FDCT32 -DASM_WINDOW_DUAL
+
+@AM_HAVE_X86_FALSE@ASM_FILES =
+@AM_HAVE_X86_FALSE@ASM_DEFS =
+MYLIBS = libfalmc.a
+TRGT_SYS_HEADS = @top_srcdir@/base/unix/@host_os@/include
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
@@ -126,21 +123,24 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 libfalmc_a_LIBADD = 
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@cond0libfalmc_a_OBJECTS =  cdct.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@cupl3.o hwin.o iup.o l3init.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@msis.o wavep.o csbt.o cwinm.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@icdct.o mdct.o uph.o cup.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@dec8.o isbt.o l3dq.o mhead.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@upsf.o iwinm.o xinglmc.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_TRUE@x86gas.o
-@AM_HAVE_WIN32_TRUE@cond1libfalmc_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@cond2libfalmc_a_OBJECTS =  \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@cdct.o cupl3.o hwin.o iup.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@l3init.o msis.o wavep.o csbt.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@cwinm.o icdct.o mdct.o uph.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@cup.o dec8.o isbt.o l3dq.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@mhead.o upsf.o iwinm.o \
-@AM_HAVE_WIN32_FALSE@@AM_HAVE_X86_FALSE@xinglmc.o
+@AM_HAVE_X86_FALSE@cond0libfalmc_a_OBJECTS =  cdct.o cupl3.o hwin.o \
+@AM_HAVE_X86_FALSE@iup.o l3init.o msis.o wavep.o csbt.o cwinm.o icdct.o \
+@AM_HAVE_X86_FALSE@mdct.o uph.o cup.o dec8.o isbt.o l3dq.o mhead.o \
+@AM_HAVE_X86_FALSE@upsf.o iwinm.o xinglmc.o
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@cond1libfalmc_a_OBJECTS =  cdct.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@cupl3.o hwin.o iup.o l3init.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@msis.o wavep.o csbt.o cwinm.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@icdct.o mdct.o uph.o cup.o dec8.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@isbt.o l3dq.o mhead.o upsf.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@iwinm.o xinglmc.o cdctasm.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@cwinasm.o cwin8asm.o mdctasm.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_TRUE@msisasm.o
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@cond2libfalmc_a_OBJECTS =  cdct.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@cupl3.o hwin.o iup.o l3init.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@msis.o wavep.o csbt.o cwinm.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@icdct.o mdct.o uph.o cup.o dec8.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@isbt.o l3dq.o mhead.o upsf.o \
+@AM_HAVE_X86_TRUE@@AM_HAVE_NASM_FALSE@iwinm.o xinglmc.o x86gas.o
 libfalmc_a_OBJECTS =  $(cond0libfalmc_a_OBJECTS) \
 $(cond1libfalmc_a_OBJECTS) $(cond2libfalmc_a_OBJECTS)
 AR = ar
@@ -155,11 +155,12 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-DEP_FILES =  .deps/cdct.P .deps/csbt.P .deps/cup.P .deps/cupl3.P \
-.deps/cwinm.P .deps/dec8.P .deps/hwin.P .deps/icdct.P .deps/isbt.P \
-.deps/iup.P .deps/iwinm.P .deps/l3dq.P .deps/l3init.P .deps/mdct.P \
-.deps/mhead.P .deps/msis.P .deps/uph.P .deps/upsf.P .deps/wavep.P \
-.deps/x86gas.P .deps/xinglmc.P
+DEP_FILES =  .deps/cdct.P .deps/cdctasm.P .deps/csbt.P .deps/cup.P \
+.deps/cupl3.P .deps/cwin8asm.P .deps/cwinasm.P .deps/cwinm.P \
+.deps/dec8.P .deps/hwin.P .deps/icdct.P .deps/isbt.P .deps/iup.P \
+.deps/iwinm.P .deps/l3dq.P .deps/l3init.P .deps/mdct.P .deps/mdctasm.P \
+.deps/mhead.P .deps/msis.P .deps/msisasm.P .deps/uph.P .deps/upsf.P \
+.deps/wavep.P .deps/x86gas.P .deps/xinglmc.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 SOURCES = $(libfalmc_a_SOURCES)
 OBJECTS = $(libfalmc_a_OBJECTS)
@@ -349,18 +350,24 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 include @top_srcdir@/config/Makefile.header
 
-@AM_HAVE_WIN32_FALSE@all-local : $(PLUGIN_FULL_NAME)
+all-local : $(PLUGIN_FULL_NAME)
 
-@AM_HAVE_WIN32_FALSE@$(PLUGIN_FULL_NAME) : $(libfalmc_a_OBJECTS)
-@AM_HAVE_WIN32_FALSE@	@mkdir -p @top_srcdir@/plugins
-@AM_HAVE_WIN32_FALSE@	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfalmc_a_OBJECTS)
-@AM_HAVE_WIN32_FALSE@	@chmod 644 $(PLUGIN_FULL_NAME)
+$(PLUGIN_FULL_NAME) : $(libfalmc_a_OBJECTS)
+	@mkdir -p @top_srcdir@/plugins
+	gcc -shared -Wl,-soname,$(PLUGIN_NAME) -o $(PLUGIN_FULL_NAME) $(libfalmc_a_OBJECTS)
+	@chmod 644 $(PLUGIN_FULL_NAME)
 
-@AM_HAVE_WIN32_FALSE@x86intel.asm: x86gas.s $(GAS2INTEL)
-@AM_HAVE_WIN32_FALSE@	$(GAS2INTEL) $< > $@
+%asm.s: %asm.asm
+	$(PERL) -pe 's/\b_//g' $< > $@
 
-@AM_HAVE_WIN32_FALSE@x86intel.c: x86gas.s $(GAS2INTEL)
-@AM_HAVE_WIN32_FALSE@	$(GAS2INTEL) -i $< > $@
+%asm.o: %asm.s
+	$(NASM) -f elf -o $@ $<
+
+x86intel.asm: x86gas.s $(GAS2INTEL)
+	$(PERL) $(GAS2INTEL) $< > $@
+
+x86intel.c: x86gas.s $(GAS2INTEL)
+	$(PERL) $(GAS2INTEL) -i $< > $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

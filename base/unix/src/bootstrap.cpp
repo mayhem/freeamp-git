@@ -32,6 +32,9 @@ ____________________________________________________________________________*/
 #include "hashtable.h"
 #include "semaphore.h"
 #include "registrar.h"
+#include "facontext.h"
+#include "log.h"
+#include "unixprefs.h"
 
 #if MP3_PROF
 extern "C" {
@@ -62,7 +65,17 @@ int main(int argc, char **argv) {
     //testBuffer();
     //testHashTable();
     //exit(1);
-    Preferences *prefs = new Preferences();
+
+    FAContext *context = new FAContext;
+    UnixPrefs *unixPrefs = new UnixPrefs();
+
+    int errLine = unixPrefs->GetErrorLineNumber();
+    if (errLine)
+    	cerr << "ERROR parsing line " << errLine << " of ~/.freeamp_prefs\n";
+
+    context->prefs = unixPrefs;
+    context->log = new LogFile("freeamp.log");
+
     Registrar *registrar= new Registrar();
     LMCRegistry *lmc;
     PMIRegistry *pmi;
@@ -83,7 +96,7 @@ int main(int argc, char **argv) {
 //    registrar->SetSubDir("lmc");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
-    registrar->InitializeRegistry(lmc,prefs);
+    registrar->InitializeRegistry(lmc,context->prefs);
 #endif
 
 
@@ -91,25 +104,25 @@ int main(int argc, char **argv) {
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.pmi");
     pmi = new PMIRegistry;
-    registrar->InitializeRegistry(pmi,prefs);
+    registrar->InitializeRegistry(pmi,context->prefs);
 
     registrar->SetSearchString("*.pmo");
     pmo = new PMORegistry;
-    registrar->InitializeRegistry(pmo,prefs);
+    registrar->InitializeRegistry(pmo,context->prefs);
 
 
 //    registrar->SetSubDir("ui");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.ui");
     ui = new UIRegistry;
-    registrar->InitializeRegistry(ui,prefs);
+    registrar->InitializeRegistry(ui,context->prefs);
 
     delete registrar;
 
 
     Semaphore *termSemaphore;
     termSemaphore = new Semaphore();
-    Player *pP = Player::GetPlayer();
+    Player *pP = Player::GetPlayer(context);
 
     pP->RegisterLMCs(lmc);
     pP->RegisterPMIs(pmi);
@@ -120,13 +133,13 @@ int main(int argc, char **argv) {
 
 
     if (pP->SetArgs(argc,argv)) {
-	pP->SetPreferences(prefs);
 	pP->SetTerminationSemaphore(termSemaphore);
 	pP->Run();
 	
 	termSemaphore->Wait();
     }
     delete pP;
+    delete context;
     return 0;
 }
 

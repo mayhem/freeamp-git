@@ -110,8 +110,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                  ..\..\..\..\base\win32\prj\plugins
-	copy httpinput.pmi             ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                   ..\..\..\..\base\win32\prj\plugins
+	copy httpinput.pmi              ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
@@ -195,8 +195,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : ".\httpinput.pmi"
-   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                  ..\..\..\..\base\win32\prj\plugins
-	copy httpinput.pmi             ..\..\..\..\base\win32\prj\plugins
+   IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                   ..\..\..\..\base\win32\prj\plugins
+	copy httpinput.pmi              ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ENDIF 
@@ -240,14 +240,14 @@ SOURCE=..\..\..\..\config\config.win32
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
 
 InputPath=..\..\..\..\config\config.win32
 
-"..\..\..\..\config\config.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"..\..\..\..\config\config.h"	 : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy ..\..\..\..\config\config.win32 ..\..\..\..\config\config.h
 
 !ENDIF 
@@ -259,7 +259,7 @@ SOURCE=..\res\http.rc
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i\
- "\Local\src\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
+ "\TEMP\merge\freeamp\io\http\win32\res" /d "NDEBUG" $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "httpinput - Win32 Debug"
@@ -267,7 +267,7 @@ SOURCE=..\res\http.rc
 
 "$(INTDIR)\http.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\http.res" /i\
- "\Local\src\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
+ "\TEMP\merge\freeamp\io\http\win32\res" /d "_DEBUG" $(SOURCE)
 
 
 !ENDIF 
@@ -280,9 +280,11 @@ DEP_CPP_HTTPB=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
@@ -306,9 +308,11 @@ DEP_CPP_HTTPB=\
 	"..\..\..\..\base\include\errors.h"\
 	"..\..\..\..\base\include\event.h"\
 	"..\..\..\..\base\include\eventdata.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
 	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
@@ -319,6 +323,7 @@ DEP_CPP_HTTPB=\
 	"..\..\..\include\streambuffer.h"\
 	"..\..\httpbuffer.h"\
 	"..\..\httpinput.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\httpbuffer.obj" : $(SOURCE) $(DEP_CPP_HTTPB) "$(INTDIR)"\
@@ -338,7 +343,6 @@ DEP_CPP_HTTPI=\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
-	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
@@ -364,7 +368,6 @@ DEP_CPP_HTTPI=\
 	"..\..\..\..\base\include\eventdata.h"\
 	"..\..\..\..\base\include\id3v1.h"\
 	"..\..\..\..\base\include\list.h"\
-	"..\..\..\..\base\include\log.h"\
 	"..\..\..\..\base\include\properties.h"\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
@@ -408,7 +411,9 @@ SOURCE=..\..\..\src\pullbuffer.cpp
 
 DEP_CPP_PULLB=\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -424,7 +429,9 @@ DEP_CPP_PULLB=\
 
 DEP_CPP_PULLB=\
 	"..\..\..\..\base\include\errors.h"\
+	"..\..\..\..\base\include\facontext.h"\
 	"..\..\..\..\base\include\log.h"\
+	"..\..\..\..\base\include\preferences.h"\
 	"..\..\..\..\base\win32\include\mutex.h"\
 	"..\..\..\..\base\win32\include\semaphore.h"\
 	"..\..\..\..\config\config.h"\
@@ -474,6 +481,7 @@ DEP_CPP_STREA=\
 	"..\..\..\..\config\config.h"\
 	"..\..\..\include\pullbuffer.h"\
 	"..\..\..\include\streambuffer.h"\
+	{$(INCLUDE)}"sys\types.h"\
 	
 
 "$(INTDIR)\streambuffer.obj" : $(SOURCE) $(DEP_CPP_STREA) "$(INTDIR)"\
@@ -504,6 +512,10 @@ DEP_CPP_THREA=\
 	"..\..\..\..\base\include\thread.h"\
 	"..\..\..\..\base\win32\include\win32thread.h"\
 	"..\..\..\..\config\config.h"\
+	
+NODEP_CPP_THREA=\
+	"..\..\..\..\base\src\linuxthread.h"\
+	"..\..\..\..\base\src\solaristhread.h"\
 	
 
 "$(INTDIR)\thread.obj" : $(SOURCE) $(DEP_CPP_THREA) "$(INTDIR)"\

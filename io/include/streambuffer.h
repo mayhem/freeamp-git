@@ -37,7 +37,8 @@ class StreamBuffer : public PullBuffer
 
                StreamBuffer(size_t iBufferSize, 
                             size_t iOverflowSize,
-                            size_t iWriteTriggerSize);
+                            size_t iWriteTriggerSize,
+			    FAContext *context);
       virtual ~StreamBuffer(void);
 
 //      virtual  Error    BeginRead  (void *&pBuffer, size_t &iBytesNeeded);

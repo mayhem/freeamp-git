@@ -19,23 +19,28 @@
    $Id$
 ____________________________________________________________________________*/
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+#if HAVE_ERRNO_H
 #include <errno.h>
+#endif
 
 #include "filebuffer.h"
 #include "log.h"
+#include "facontext.h"
 //#include "debug.hpp"
-
-extern LogFile *g_Log;
 
 #define DB //printf("%s:%d\n", __FILE__, __LINE__);
 
 FileBuffer::FileBuffer(size_t iBufferSize, size_t iOverFlowSize, 
-                       size_t iWriteTriggerSize, char *szFile) :
-            PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize)
+                       size_t iWriteTriggerSize, char *szFile,
+		       FAContext *context) :
+            PullBuffer(iBufferSize, iOverFlowSize, iWriteTriggerSize, context)
 {
     m_fpFile = NULL;
     m_bLoop = false;
@@ -99,22 +104,22 @@ Error FileBuffer::Open(void)
         switch (errno)
         {
             case EACCES:
-               g_Log->Error("Access to the file was denied.\n");
+               m_context->log->Error("Access to the file was denied.\n");
                return kError_FileNoAccess;
                break;
 
             case EINVAL:
-               g_Log->Error("Internal error: The file could not be opened.\n");
+               m_context->log->Error("Internal error: The file could not be opened.\n");
                return kError_FileInvalidArg;
                break;
 
             case EMFILE:
-               g_Log->Error("Internal error: The file could not be opened.\n");
+               m_context->log->Error("Internal error: The file could not be opened.\n");
                return kError_FileNoHandles;
                break;
 
             case ENOENT:
-               g_Log->Error("File not found.\n");
+               m_context->log->Error("File not found.\n");
                return kError_FileNotFound;
                break;
 
@@ -172,7 +177,7 @@ Error FileBuffer::Run(void)
        m_pBufferThread = Thread::CreateThread();
        if (!m_pBufferThread)
        {
-           g_Log->Error("Could not create filebuffer thread.");
+           m_context->log->Error("Could not create filebuffer thread.");
            return (Error)kError_CreateThreadFailed;
        }
        m_pBufferThread->Create(FileBuffer::StartWorkerThread, this);
@@ -207,7 +212,7 @@ void FileBuffer::WorkerThread(void)
           eError = EndWrite(iRead);
           if (IsError(eError))
           {
-              g_Log->Error("local: EndWrite returned: %d\n", eError);
+              m_context->log->Error("local: EndWrite returned: %d\n", eError);
               break;
           }
 
@@ -219,5 +224,6 @@ void FileBuffer::WorkerThread(void)
           m_pWriteSem->Wait();
       }
    }
-   g_Log->Log(LogInput, "PMI: filebuffer thread exit\n");
+   m_context->log->Log(LogInput, "PMI: filebuffer thread exit\n");
 }
+

@@ -366,13 +366,13 @@ void FALcdWindow::DoEvent(XEvent e) {
 		SetState(nextStateArray[m_displayState]);
 		switch (m_displayState) {
 		    case CurrentTimeState:
-			Player::GetPlayer()->AcceptEvent(new UserMessageEvent("time_curr_mode"));
+			Player::GetPlayer(0)->AcceptEvent(new UserMessageEvent("time_curr_mode"));
 			break;
 		    case RemainingTimeState:
-			Player::GetPlayer()->AcceptEvent(new UserMessageEvent("time_remain_mode"));
+			Player::GetPlayer(0)->AcceptEvent(new UserMessageEvent("time_remain_mode"));
 			break;
 		    case TotalTimeState:
-			Player::GetPlayer()->AcceptEvent(new UserMessageEvent("time_total_mode"));
+			Player::GetPlayer(0)->AcceptEvent(new UserMessageEvent("time_total_mode"));
 			break;
 		}
 	    }

@@ -139,7 +139,7 @@ SOURCE=..\..\..\..\base\win32\src\mutex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\base\win32\src\preferences.cpp
+SOURCE=..\..\..\..\base\src\preferences.cpp
 # End Source File
 # Begin Source File
 
@@ -156,6 +156,10 @@ SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # Begin Source File
 
 SOURCE=.\xing.def
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
 # End Source File
 # Begin Source File
 

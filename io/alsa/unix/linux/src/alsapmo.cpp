@@ -43,9 +43,8 @@ ____________________________________________________________________________*/
 /* project headers */
 #include <config.h>
 #include "alsapmo.h"
+#include "facontext.h"
 #include "log.h"
-
-LogFile  *g_Log;
 
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
 
@@ -56,9 +55,8 @@ const int iWriteTriggerSize = 8 * 1024;
 
 extern "C"
 {
-   PhysicalMediaOutput *Initialize(LogFile * pLog) {
-      g_Log = pLog;
-      return new AlsaPMO();
+   PhysicalMediaOutput *Initialize(FAContext *context) {
+      return new AlsaPMO(context);
    }
 }
 
@@ -88,8 +86,9 @@ const char *AlsaPMO::GetErrorString(int32 error) {
 }
 */
 
-AlsaPMO::AlsaPMO() :
-        EventBuffer(iOrigBufferSize, iOverflowSize, iWriteTriggerSize)
+AlsaPMO::AlsaPMO(FAContext *context) :
+        EventBuffer(iOrigBufferSize, iOverflowSize,
+		    iWriteTriggerSize, context)
 {
    m_properlyInitialized = false;
    myInfo = new OutputInfo();
@@ -281,18 +280,13 @@ Error AlsaPMO::Init(OutputInfo* info) {
         PropValue *pv = NULL, *pProp;
         int        iNewSize = iDefaultBufferSize;
         Error      result;
+	uint32	   deviceNameSize = 128;
 
-        m_propManager->GetProperty("ALSA-device",&pv);
-        if (pv) {
-            const char *pChar = ((StringPropValue *)pv)->GetString();
-            if (pChar) {
-                ai->device = strdup(pChar);
-            } else {
-                ai->device=strdup(ALSA_DEVICE);
-            }
-        } else {
-            ai->device=strdup(ALSA_DEVICE);  // use default
-        }
+	ai->device = (char *) malloc(deviceNameSize);
+	m_context->prefs->GetPrefString(kALSADevicePref, ai->device,
+					&deviceNameSize);
+	// cerr << "Using ALSA device: " << ai->device << endl;
+
         m_iDataSize = info->max_buffer_size;
         m_propManager->GetProperty("OutputBuffer", &pProp);
         if (pProp)
@@ -305,7 +299,7 @@ Error AlsaPMO::Init(OutputInfo* info) {
         if (IsError(result))
         {
            ReportError("Internal buffer sizing error occurred.");
-           g_Log->Error("Resize output buffer failed.");
+           m_context->log->Error("Resize output buffer failed.");
            return result;
         }
 
@@ -551,7 +545,7 @@ void AlsaPMO::WorkerThread(void)
           m_pPauseMutex->Release();
 
           ReportError("Internal error occured.");
-          g_Log->Error("Cannot read from buffer in PMO worker tread: %d\n",
+          m_context->log->Error("Cannot read from buffer in PMO worker tread: %d\n",
               eErr);
           break;
       }
@@ -598,7 +592,7 @@ void AlsaPMO::WorkerThread(void)
          EndRead(0);
          m_pPauseMutex->Release();
          ReportError("Could not write sound data to the soundcard.");
-         g_Log->Error("Failed to write to the soundcard\n");
+         m_context->log->Error("Failed to write to the soundcard\n");
          break;
       }
 

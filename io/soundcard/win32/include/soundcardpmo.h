@@ -37,18 +37,19 @@ ____________________________________________________________________________*/
 #include "mutex.h"
 #include "properties.h"
 #include "eventbuffer.h"
+#include "preferences.h"
+#include "facontext.h"
 
 #define BIT_SELECT  0x1f
 #define SLEEPTIME   256
 
 static const uint32 OBUFFERSIZE = 2 * 1152;
 
-
 class SoundCardPMO : public PhysicalMediaOutput, public EventBuffer
 {
 
 public:
-    SoundCardPMO();
+    SoundCardPMO(FAContext *context);
     virtual ~SoundCardPMO();
     
     virtual Error Init(OutputInfo* info);
@@ -68,7 +69,7 @@ public:
     virtual Error AcceptEvent(Event *);
     virtual int   GetBufferPercentage();
 
-    
+ 
  private:
 
 	void          WorkerThread(void); 
@@ -80,7 +81,10 @@ public:
     Error         Write(void *pBuffer);
 
  private:
-	Properties *    m_propManager;
+    FAContext*      m_context;
+
+    Properties *    m_propManager;
+    Preferences*    m_prefs;
 	WAVEFORMATEX*	m_wfex;
 	LPWAVEHDR*		m_wavehdr_array;
 	HWAVEOUT		m_hwo;

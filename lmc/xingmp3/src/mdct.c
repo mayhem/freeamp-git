@@ -45,13 +45,13 @@ inplace ok.
 
 
 /*------ 18 point xform -------*/
-static float w[18];
-static float w2[9];
-static float coef[9][4];
+float mdct18w[18];
+float mdct18w2[9];
+float coef[9][4];
 
-static float v[6];
-static float v2[3];
-static float coef87;
+float mdct6_3v[6];
+float mdct6_3v2[3];
+float coef87;
 
 typedef struct
 {
@@ -62,9 +62,9 @@ typedef struct
 IMDCT_INIT_BLOCK;
 
 static IMDCT_INIT_BLOCK imdct_info_18 =
-{w, w2, coef};
+{mdct18w, mdct18w2, coef};
 static IMDCT_INIT_BLOCK imdct_info_6 =
-{v, v2, &coef87};
+{mdct6_3v, mdct6_3v2, &coef87};
 
 /*====================================================================*/
 IMDCT_INIT_BLOCK *imdct_init_addr_18()
@@ -78,6 +78,9 @@ IMDCT_INIT_BLOCK *imdct_init_addr_6()
 /*--------------------------------------------------------------------*/
 void imdct18(float f[18])	/* 18 point */
 {
+#ifdef ASM_X86
+   imdct18_asm(f);
+#else
    int p;
    float a[9], b[9];
    float ap, bp, a8p, b8p;
@@ -86,27 +89,27 @@ void imdct18(float f[18])	/* 18 point */
 
    for (p = 0; p < 4; p++)
    {
-      g1 = w[p] * f[p];
-      g2 = w[17 - p] * f[17 - p];
+      g1 = mdct18w[p] * f[p];
+      g2 = mdct18w[17 - p] * f[17 - p];
       ap = g1 + g2;		// a[p]
 
-      bp = w2[p] * (g1 - g2);	// b[p]
+      bp = mdct18w2[p] * (g1 - g2);	// b[p]
 
-      g1 = w[8 - p] * f[8 - p];
-      g2 = w[9 + p] * f[9 + p];
+      g1 = mdct18w[8 - p] * f[8 - p];
+      g2 = mdct18w[9 + p] * f[9 + p];
       a8p = g1 + g2;		// a[8-p]
 
-      b8p = w2[8 - p] * (g1 - g2);	// b[8-p]
+      b8p = mdct18w2[8 - p] * (g1 - g2);	// b[8-p]
 
       a[p] = ap + a8p;
       a[5 + p] = ap - a8p;
       b[p] = bp + b8p;
       b[5 + p] = bp - b8p;
    }
-   g1 = w[p] * f[p];
-   g2 = w[17 - p] * f[17 - p];
+   g1 = mdct18w[p] * f[p];
+   g2 = mdct18w[17 - p] * f[17 - p];
    a[p] = g1 + g2;
-   b[p] = w2[p] * (g1 - g2);
+   b[p] = mdct18w2[p] * (g1 - g2);
 
 
    f[0] = 0.5f * (a[0] + a[1] + a[2] + a[3] + a[4]);
@@ -167,11 +170,15 @@ void imdct18(float f[18])	/* 18 point */
 
 
    return;
+#endif
 }
 /*--------------------------------------------------------------------*/
 /* does 3, 6 pt dct.  changes order from f[i][window] c[window][i] */
 void imdct6_3(float f[])	/* 6 point */
 {
+#ifdef ASM_X86
+   imdct6_3_asm(f);
+#else
    int w;
    float buf[18];
    float *a, *c;		// b[i] = a[3+i]
@@ -183,20 +190,20 @@ void imdct6_3(float f[])	/* 6 point */
    a = buf;
    for (w = 0; w < 3; w++)
    {
-      g1 = v[0] * f[3 * 0];
-      g2 = v[5] * f[3 * 5];
+      g1 = mdct6_3v[0] * f[3 * 0];
+      g2 = mdct6_3v[5] * f[3 * 5];
       a[0] = g1 + g2;
-      a[3 + 0] = v2[0] * (g1 - g2);
+      a[3 + 0] = mdct6_3v2[0] * (g1 - g2);
 
-      g1 = v[1] * f[3 * 1];
-      g2 = v[4] * f[3 * 4];
+      g1 = mdct6_3v[1] * f[3 * 1];
+      g2 = mdct6_3v[4] * f[3 * 4];
       a[1] = g1 + g2;
-      a[3 + 1] = v2[1] * (g1 - g2);
+      a[3 + 1] = mdct6_3v2[1] * (g1 - g2);
 
-      g1 = v[2] * f[3 * 2];
-      g2 = v[3] * f[3 * 3];
+      g1 = mdct6_3v[2] * f[3 * 2];
+      g2 = mdct6_3v[3] * f[3 * 3];
       a[2] = g1 + g2;
-      a[3 + 2] = v2[2] * (g1 - g2);
+      a[3 + 2] = mdct6_3v2[2] * (g1 - g2);
 
       a += 6;
       f++;
@@ -223,5 +230,6 @@ void imdct6_3(float f[])	/* 6 point */
    }
 
    return;
+#endif
 }
 /*--------------------------------------------------------------------*/

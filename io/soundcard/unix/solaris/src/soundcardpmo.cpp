@@ -35,9 +35,8 @@ ____________________________________________________________________________*/
 #include <config.h>
 #include "soundcardpmo.h"
 #include "eventdata.h"
+#include "facontext.h"
 #include "log.h"
-
-LogFile  *g_Log;
 
 #define PIECES 50
 #define DB printf("%s:%d\n", __FILE__, __LINE__);
@@ -50,15 +49,15 @@ const int iWriteToCard = 8 * 1024;
 
 extern    "C"
 {
-   PhysicalMediaOutput *Initialize(LogFile * pLog)
+   PhysicalMediaOutput *Initialize(FAContext *context)
    {
-      g_Log = pLog;
-      return new SoundCardPMO();
+      return new SoundCardPMO(context);
    }
 }
 
-SoundCardPMO::SoundCardPMO() :
-              EventBuffer(iInitialBufferSize, iOverflowSize, iWriteTriggerSize)
+SoundCardPMO::SoundCardPMO(context) :
+              EventBuffer(iInitialBufferSize, iOverflowSize,
+			  iWriteTriggerSize, context)
 {
    //printf("PMO ctor\n");
    m_properlyInitialized = false;
@@ -449,7 +448,7 @@ void SoundCardPMO::WorkerThread(void)
           m_pPauseMutex->Release();
 
           ReportError("Internal error occured.");
-          g_Log->Error("Cannot read from buffer in PMO worker thread: %d\n",
+          m_context->log->Error("Cannot read from buffer in PMO worker thread: %d\n",
               eErr);
           break;
       }
@@ -500,7 +499,7 @@ void SoundCardPMO::WorkerThread(void)
          EndRead(0);
          m_pPauseMutex->Release();
          ReportError("Could not write sound data to the soundcard.");
-         g_Log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
+         m_context->log->Error("Failed to write to the soundcard: %s\n", strerror(errno))
 ;
          break;
       }

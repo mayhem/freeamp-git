@@ -71,12 +71,14 @@ enum
    lmcError_MaximumError
 };
 
+class FAContext;
+
 class     XingLMC:public LogicalMediaConverter
 {
 
    public:
 //      XingLMC(PhysicalMediaInput* input, PhysicalMediaOutput* output,EventCallback callback, void* cookie);
-   XingLMC();
+   XingLMC(FAContext *context);
 
    virtual ~ XingLMC();
 
@@ -104,6 +106,10 @@ class     XingLMC:public LogicalMediaConverter
    virtual int32 GetVolume(void);
 
    virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
+
+ protected:
+   FAContext  *m_context;
+
  private:
    Properties *m_propManager;
 

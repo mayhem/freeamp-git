@@ -53,17 +53,18 @@ ____________________________________________________________________________*/
 
 extern "C" {
 
-UserInterface *Initialize() {
-    return new FreeAmpUI();
+UserInterface *Initialize(FAContext *context) {
+    return new FreeAmpUI(context);
 }
 
 	   }
 
-FreeAmpUI::FreeAmpUI() {
+FreeAmpUI::FreeAmpUI(FAContext *context) {
     int32 foo = 0;
     if (!(foo = XInitThreads())) {
 	fprintf(stderr, "FreeAmpUI: XInitThreads returned %d: Unexplained X errors may arise!\n",foo);
     }
+    m_context = context;
     m_windowHash = new WindowHash();
     m_done = false;
     m_initialized = false;

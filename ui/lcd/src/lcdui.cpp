@@ -57,8 +57,8 @@ extern "C" {
 
 extern "C" {
 
-UserInterface *Initialize() {
-    return new LcdUI();
+UserInterface *Initialize(FAContext *context) {
+    return new LcdUI(context);
 }
 
 	   }
@@ -81,7 +81,8 @@ void LcdUI::SetPlayListManager(PlayListManager *plm) {
     m_plm = plm;
 }
 
-LcdUI::LcdUI() {
+LcdUI::LcdUI(FAContext *context) {
+    m_context = context;
     m_timeType = TIME_CURR;
     m_plm = NULL;
     m_playerEQ = NULL;

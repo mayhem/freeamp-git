@@ -47,13 +47,8 @@ ____________________________________________________________________________*/
 #include "semaphore.h"
 #include "preferences.h"
 #include "lmc.h"
+#include "facontext.h"
 #include "log.h"
-
-#if MP3_PROF
-extern LogFile *g_Log;
-#else
-LogFile *g_Log = NULL;
-#endif
 
 #define DB printf("%08x: %s:%d\n", pthread_self(), __FILE__, __LINE__);
 
@@ -64,13 +59,9 @@ extern    "C"
 
 extern    "C"
 {
-   LogicalMediaConverter *Initialize(LogFile *pLogFile)
+   LogicalMediaConverter *Initialize(FAContext *context)
    {
-#if !MP3_PROF
-      g_Log = pLogFile;
-#endif
-
-      return new XingLMC();
+      return new XingLMC(context);
    }
 }
 
@@ -123,8 +114,10 @@ const char *szFailWrite = "Cannot write audio data to output buffer.";
 
 #define ENSURE_INITIALIZED if (!m_properlyInitialized) return kError_PluginNotInitialized;
 
-XingLMC::XingLMC()
+XingLMC::XingLMC(FAContext *context)
 {
+   m_context = context;
+
    m_input = NULL;
    m_output = NULL;
    m_properlyInitialized = false;
@@ -202,7 +195,7 @@ Stop()
 	  //Debug_v("decode join");
       m_decoderThread->Join();  // wait for thread to exit
 	  //Debug_v("decode joined");
-      g_Log->Log(LogDecode, "LMC: Decoder thread exited.\n");
+      m_context->log->Log(LogDecode, "LMC: Decoder thread exited.\n");
 
 	  //Debug_v("delete input");
       delete m_input;
@@ -337,7 +330,7 @@ Error XingLMC::AdvanceBufferToNextFrame()
            pBuffer++, iCount++)
                ; // <=== Empty body!
  
-       g_Log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
+       m_context->log->Log(LogDecode, "Skipped %d bytes in advance frame.\n", iCount + 1);
        if (m_input)
            m_input->EndRead(iCount + 1);
 
@@ -412,16 +405,14 @@ bool XingLMC::CanDecode()
    Error      Err;
    int32      dummy;
    bool       bRet = false;
-   Preferences *pPref;
 
    if (!m_input)
    {
-      g_Log->Error("CanDecode() called, with no PMI set.\n");
+      m_context->log->Error("CanDecode() called, with no PMI set.\n");
       return false;
    }
 
-   pPref = new Preferences();
-   if (IsError(pPref->GetInputBufferSize(&m_iBufferSize)))
+   if (IsError(m_context->prefs->GetInputBufferSize(&m_iBufferSize)))
        m_iBufferSize = iStreamingBufferSize;
 
    m_iBufferSize *= 1024;
@@ -433,14 +424,14 @@ bool XingLMC::CanDecode()
    Err = GetHeadInfo();
    if (Err != kError_NoErr)
    {
-       g_Log->Log(LogDecode, "GetHeadInfo() in CanDecode() could not find the sync marker.\n");
+       m_context->log->Log(LogDecode, "GetHeadInfo() in CanDecode() could not find the sync marker.\n");
        return false;
    }
 
-   if (IsError(pPref->GetStreamBufferInterval(&m_iBufferUpInterval)))
+   if (IsError(m_context->prefs->
+	       GetStreamBufferInterval(&m_iBufferUpInterval)))
       m_iBufferUpInterval = iDefaultBufferUpInterval;
 
-   delete pPref;
 
    return true;
 }
@@ -611,7 +602,7 @@ Error XingLMC::InitDecoder()
    }
    else
    {
-      g_Log->Log(LogDecode, "Audio decode init failed.\n");
+      m_context->log->Log(LogDecode, "Audio decode init failed.\n");
       return (Error) lmcError_AudioDecodeInitFailed;
    }
 
@@ -673,7 +664,6 @@ void XingLMC::DecodeWork()
    Error          Err;
    int            iLoop = 0, iValue;
    IN_OUT         x = {0, 0};
-   Preferences *pPref;
 
    in_bytes = out_bytes = 0;
 
@@ -686,7 +676,7 @@ void XingLMC::DecodeWork()
 
    if (IsError(Err))
    {
-       g_Log->Error("PMI initialization failed: %s\n", m_szError);
+       m_context->log->Error("PMI initialization failed: %s\n", m_szError);
        ReportError("Cannot initialize the input plugin.\n");
 
        return;
@@ -695,7 +685,7 @@ void XingLMC::DecodeWork()
    bRet = CanDecode();
    if (!bRet)
    {
-       g_Log->Error("CanDecode returned false.\n");
+       m_context->log->Error("CanDecode returned false.\n");
        ReportError("This LMC cannot decode this media\n");
        return;
    }
@@ -706,7 +696,7 @@ void XingLMC::DecodeWork()
 
    if (IsError(Err))
    {
-       g_Log->Error("ExtractMediaInfo failed: %d\n", Err);
+       m_context->log->Error("ExtractMediaInfo failed: %d\n", Err);
        ReportError("This LMC cannot decode this media\n");
 
        return;
@@ -718,16 +708,14 @@ void XingLMC::DecodeWork()
 
    if (IsError(Err))
    {
-       g_Log->Error("Initializing the decoder failed: %d\n", Err);
+       m_context->log->Error("Initializing the decoder failed: %d\n", Err);
        ReportError("Initializing the decoder failed.");
 
        return;
    }
 
 
-   pPref = new Preferences();
-   pPref->GetDecoderThreadPriority(&iValue);
-   delete pPref;
+   m_context->prefs->GetDecoderThreadPriority(&iValue);
 
    m_decoderThread->SetPriority(iValue);
 
@@ -756,7 +744,7 @@ void XingLMC::DecodeWork()
           {
               m_seekMutex->Release();
               ReportError(szFailWrite);
-              g_Log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
+              m_context->log->Error("LMC: Cannot write to eventbuffer: %s (%d)\n", 
                         m_szError, Err); 
               return;
           }
@@ -770,7 +758,7 @@ void XingLMC::DecodeWork()
           {
               m_seekMutex->Release();
               ReportError(szFailRead);
-              g_Log->Error("LMC: Cannot read from pullbuffer: %s\n", m_szError); 
+              m_context->log->Error("LMC: Cannot read from pullbuffer: %s\n", m_szError); 
               return;
           }
 
@@ -789,13 +777,13 @@ void XingLMC::DecodeWork()
                  if (IsError(Err))
                  {
                      m_seekMutex->Release();
-                     g_Log->Error("lmc: EndWrite returned %d\n", Err);
+                     m_context->log->Error("lmc: EndWrite returned %d\n", Err);
                      ReportError(szFailWrite);
                      
                      return;
                  }
              }
-             g_Log->Log(LogDecode, "Audio decode failed. Resetting the decoder.\n");
+             m_context->log->Log(LogDecode, "Audio decode failed. Resetting the decoder.\n");
              m_audioMethods.decode_init(&m_sMpegHead, m_frameBytes,
 				                           0, 0, 0, 24000);
 
@@ -806,7 +794,7 @@ void XingLMC::DecodeWork()
              if (Err != kError_NoErr)
              {
                  m_seekMutex->Release();
-                 g_Log->Error("LMC: Cannot advance to next frame: %d\n", Err);
+                 m_context->log->Error("LMC: Cannot advance to next frame: %d\n", Err);
                  ReportError("Cannot advance to next frame. Possible media corruption?");
 
                  return;
@@ -842,7 +830,7 @@ void XingLMC::DecodeWork()
          if (IsError(Err))
          {
              m_seekMutex->Release();
-             g_Log->Error("lmc: EndWrite returned %d\n", Err);
+             m_context->log->Error("lmc: EndWrite returned %d\n", Err);
              ReportError(szFailWrite);
                      
              return;
@@ -852,7 +840,7 @@ void XingLMC::DecodeWork()
       if (iLoop == iMaxDecodeRetries)
       {
          m_seekMutex->Release();
-         g_Log->Error("LMC: Maximum number of retries reached"
+         m_context->log->Error("LMC: Maximum number of retries reached"
                       " while trying to decode.\n");
          ReportError("Cannot decode this MP3. Is the MP3 corrupted?");
 

@@ -52,11 +52,13 @@ enum
    pmoError_MaximumError
 };
 
+class FAContext;
+
 class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
 {
-   public:
+ public:
 
-            SoundCardPMO();
+            SoundCardPMO(FAContext *context);
    virtual ~SoundCardPMO();
 
    virtual Error Init(OutputInfo * info);
@@ -75,8 +77,7 @@ class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
    virtual Error AcceptEvent(Event *);
    virtual int   GetBufferPercentage();
 
-   private:
-
+ private:
    void          WorkerThread(void); 
    virtual Error Reset(bool user_stop);
    void          HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent);

@@ -1,7 +1,7 @@
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
-	Portions copyright (C) 1998 GoodNoise
+	Portions copyright (C) 1998-1999 GoodNoise
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -59,21 +59,12 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 
     uint32 len = sizeof(dir);
     uint32 totalFilesFound = 0;
-    HANDLE libDirHandle = (HANDLE)NULL;
-    if(IsntError(error))
-    {
-#ifdef WIN32
-        prefs->GetInstallDirectory(dir, &len);
-#else
-	libDirHandle = prefs->GetFirstLibDir(dir, &len);
-#endif
-    }
+    LibDirFindHandle *libDirHandle = 0;
 
-#ifdef WIN32
     if(IsntError(error))
-#else
+	libDirHandle = prefs->GetFirstLibDir(dir, &len);
+
     while(libDirHandle && (error != kError_NoMoreLibDirs))
-#endif
     {
 #ifndef WIN32
         if (dir[0] == '~') {
@@ -197,15 +188,11 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 
             FindClose(handle);
         }
-#ifndef WIN32
-	    error = prefs->GetNextLibDir(libDirHandle,dir,&len);
-#endif
+	error = prefs->GetNextLibDir(libDirHandle,dir,&len);
     }
 
-#ifndef WIN32
     if (libDirHandle) 
         prefs->GetLibDirClose(libDirHandle);
-#endif
     if (pHT) {
 	delete pHT;
 	pHT = NULL;
