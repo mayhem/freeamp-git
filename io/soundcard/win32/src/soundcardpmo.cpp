@@ -196,11 +196,19 @@ Reset(bool user_stop)
 {
 	bool result = false;
 
+    MessageBox(NULL, "Reset", 0, MB_OK);
+
+    char buf[1024];
+
+    memset(buf, 0x00, sizeof(buf));
+
+    Write(buf, sizeof(buf));
+
 	if(user_stop)
 	{
 		m_user_stop = user_stop;
 
-		//waveOutReset(m_hwo);
+		waveOutReset(m_hwo);
 	}
 
 	return result;

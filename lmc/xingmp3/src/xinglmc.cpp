@@ -229,6 +229,7 @@ void XingLMC::Stop() {
 	m_decoderThread->Join(); // wait for thread to exit
 	delete m_decoderThread;
 	m_decoderThread = NULL;
+    m_output->Reset(m_output, true);
 	//cout << "XingLMC deleted decoder thread.." << endl;
     }
 }

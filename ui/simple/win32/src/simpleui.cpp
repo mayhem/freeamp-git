@@ -168,6 +168,10 @@ AcceptEvent(Event* event)
 						    (WPARAM)TRUE,
 						    (LPARAM)0);
 
+                char timeString[256] = "00:00:00";
+
+                SetWindowText(m_hwndCurrent, timeString);
+
 	            break; 
             }
 
@@ -548,9 +552,9 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 					{
 						char file[MAX_PATH + 1];
 						char* cp = NULL;
-						//PlayList* templist;
+						PlayList* playlist;
 
-						//templist = new PlayList;
+						playlist = new PlayList;
 
 						strcpy(file, filelist);
 						strcat(file, "\\");
@@ -561,17 +565,12 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 						{
 							strcpy(file + ofn.nFileOffset, cp);
 
-							//templist->Add(file);
+							playlist->Add(file,0);
 
 							cp += strlen(cp) + 1;
 						}
 
-						/*PlayList* playlist = player->Load(templist);
-
-						if(playlist)
-						{
-							delete playlist;
-						}*/
+						m_ui->m_target->AcceptEvent(m_ui->m_target, new Event(CMD_SetPlaylist,playlist));
 					}
 
 					delete [] filelist;
@@ -634,14 +633,14 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 			HDROP hDrop = (HDROP) wParam;
 			int32 count;
 			char szFile[MAX_PATH + 1];
-			//PlayList* templist;
+			PlayList* playlist;
 
 			count = DragQueryFile(	hDrop,
 									-1L,
 									szFile,
 									sizeof(szFile));
 
-			//templist = new PlayList;
+			playlist = new PlayList;
 
 			for(int32 i = 0; i < count; i++)
 			{
@@ -650,15 +649,10 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 								szFile,
 								sizeof(szFile));
 
-				//templist->Add(szFile);
+				playlist->Add(szFile,0);
 			}
 
-			/*PlayList* playlist = player->Load(templist);
-
-			if(playlist)
-			{
-				delete playlist;
-			}*/
+			m_ui->m_target->AcceptEvent(m_ui->m_target, new Event(CMD_SetPlaylist,playlist));
 
 			break;
 		}

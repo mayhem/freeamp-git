@@ -56,7 +56,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\lmc mkdir\
-       ..\..\..\..\base\win32\prj\lmc	copy xing.lmc ..\..\..\..\base\win32\prj\lmc
+        ..\..\..\..\base\win32\prj\lmc	copy xing.lmc ..\..\..\..\base\win32\prj\lmc
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "xing - Win32 Debug"
@@ -88,7 +88,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\lmc mkdir\
-       ..\..\..\..\base\win32\prj\lmc	copy xing.lmc ..\..\..\..\base\win32\prj\lmc
+        ..\..\..\..\base\win32\prj\lmc	copy xing.lmc ..\..\..\..\base\win32\prj\lmc
 # End Special Build Tool
 
 !ENDIF 
