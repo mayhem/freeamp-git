@@ -66,7 +66,7 @@ plugins plugins-cc: $(PLUGINS) $(OSDEPPLUGINS)
 
 #
 # localfileinput is a nice simple example of a plugin dependency.
-LFIOBJ = io/src/pmi.o io/local/localfileinput.o io/src/pipeline.o
+LFIOBJ = io/src/pmi.o io/local/localfileinput.o io/src/pipeline.lo
 
 plugins/localfileinput.pmi: $(LFIOBJ)
 	$(LINKMOD) -o $@ $(LFIOBJ) $(STATICLD)
@@ -76,7 +76,7 @@ plugins/localfileinput.pmi: $(LFIOBJ)
 
 #
 # here's httpinput
-HTTPOBJ  = io/src/pmi.o io/http/httpinput.o io/src/pipeline.o io/src/tstream.lo
+HTTPOBJ  = io/src/pmi.o io/http/httpinput.o io/src/pipeline.lo io/src/tstream.lo
 
 plugins/httpinput.pmi: $(HTTPOBJ)
 	$(LINKMOD) -o $@ $(HTTPOBJ) $(STATICLD)
@@ -85,7 +85,7 @@ plugins/httpinput.pmi: $(HTTPOBJ)
 #	$(CXXCOMPILE) $(FPIC) -o $(*).o -c ${*:%.o=%}.c
 
 # obsinput
-OBSPMI  = io/src/pmi.o io/obs/obsinput.o io/src/pipeline.o io/src/tstream.lo
+OBSPMI  = io/src/pmi.o io/obs/obsinput.o io/src/pipeline.lo io/src/tstream.lo
 
 plugins/obsinput.pmi: $(OBSPMI)
 	$(LINKMOD) -o $@ $(OBSPMI) $(STATICLD)
@@ -97,27 +97,27 @@ SCPMObeosOBJ=io/soundcard/beos/src/soundutils.o
 SCPMObeosLIB=-lmedia -lbe -lroot
 
 SCPMOOBJ  = io/soundcard/$(OSDEP)/src/soundcardpmo.o io/src/pmo.o
-SCPMOOBJ += io/src/pipeline.o $(SCPMO$(HOST_OS)OBJ)
+SCPMOOBJ += io/src/pipeline.lo $(SCPMO$(HOST_OS)OBJ)
 
 plugins/soundcard.pmo: $(SCPMOOBJ)
 	$(LINKMOD) -o $@ $(SCPMOOBJ) $(SCPMO$(HOST_OS)LIB) $(STATICLD)
 
 # alsa
-ALSAOBJ  = io/alsa/$(OSDEP)/src/alsapmo.o io/src/pipeline.o io/src/pmo.o
+ALSAOBJ  = io/alsa/$(OSDEP)/src/alsapmo.o io/src/pipeline.lo io/src/pmo.o
 
 plugins/alsa.pmo: $(ALSAOBJ)
 	$(LINKMOD) -o $@ $(ALSAOBJ) -lasound 
 #	$(LINKMOD) -o $@ $(ALSAOBJ) $(STATICLD) /usr/lib/libasound.a
 
 # esound
-ESNDOBJ  = io/esound/src/esoundpmo.o io/src/pipeline.o io/src/pmo.o
+ESNDOBJ  = io/esound/src/esoundpmo.o io/src/pipeline.lo io/src/pmo.o
 
 plugins/esound.pmo: $(ESNDOBJ)
 	$(LINKMOD) -o $@ $(ESNDOBJ) $(ESD_LIBS)
 #	$(LINKMOD) -o $@ $(ESNDOBJ) $(STATICLD) /usr/lib/libesd.a /usr/lib/libaudiofile.a
 
 # cd
-CDPMOOBJ  = io/cd/unix/src/cdpmo.o io/cd/unix/src/cdaudio.o io/src/pipeline.o 
+CDPMOOBJ  = io/cd/unix/src/cdpmo.o io/cd/unix/src/cdaudio.o io/src/pipeline.lo 
 CDPMOOBJ += io/src/pmo.o
 
 plugins/cd.pmo: $(CDPMOOBJ)
@@ -257,7 +257,7 @@ XINGLMCOBJC = lmc/xingmp3/src/cdct.o lmc/xingmp3/src/cupl3.o \
   lmc/xingmp3/src/cwinm.o lmc/xingmp3/src/icdct.o lmc/xingmp3/src/mdct.o \
   lmc/xingmp3/src/uph.o lmc/xingmp3/src/cup.o lmc/xingmp3/src/dec8.o \
   lmc/xingmp3/src/isbt.o lmc/xingmp3/src/l3dq.o lmc/xingmp3/src/mhead.o \
-  lmc/xingmp3/src/upsf.o lmc/xingmp3/src/iwinm.o io/src/pipeline.o
+  lmc/xingmp3/src/upsf.o lmc/xingmp3/src/iwinm.o io/src/pipeline.lo
 
 XINGLMCOBJC += @XINGASM@ 
 #assembly lang code, if we need it

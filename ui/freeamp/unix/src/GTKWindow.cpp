@@ -43,8 +43,8 @@ void mouse_move(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     oPos.x = (int)e->motion.x_root;
     oPos.y = (int)e->motion.y_root;
     gdk_threads_leave();
-    ui->SetMouseIn();
     ui->m_pMindMeldMutex->Acquire();
+    ui->SetMouseIn();
     ui->HandleMouseMove(oPos);
     ui->m_pMindMeldMutex->Release();
     gdk_threads_enter();
@@ -57,8 +57,8 @@ void button_down(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     oPos.x = (int)e->button.x_root;
     oPos.y = (int)e->button.y_root;
     gdk_threads_leave();
-    ui->SetMouseIn();
     ui->m_pMindMeldMutex->Acquire();
+    ui->SetMouseIn();
     if (e->button.button == 1) 
         ui->HandleMouseLButtonDown(oPos);
     else if (e->button.button == 3)
@@ -73,8 +73,8 @@ void button_up(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
     oPos.x = (int)e->button.x_root;
     oPos.y = (int)e->button.y_root;
     gdk_threads_leave();
-    ui->SetMouseOut();
     ui->m_pMindMeldMutex->Acquire();
+    ui->SetMouseOut();
     if (e->button.button == 1)
         ui->HandleMouseLButtonUp(oPos);
     ui->m_pMindMeldMutex->Release();
@@ -85,8 +85,8 @@ void key_press(GtkWidget *w, GdkEvent *e, GTKWindow *ui)
 {
     char *str = e->key.string;
     gdk_threads_leave();
-    ui->SetMouseIn();
     ui->m_pMindMeldMutex->Acquire();
+    ui->SetMouseIn();
     ui->Keystroke(str[0]);
     ui->m_pMindMeldMutex->Release();
     gdk_threads_enter();

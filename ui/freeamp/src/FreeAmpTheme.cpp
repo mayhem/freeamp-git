@@ -1129,22 +1129,6 @@ void FreeAmpTheme::SetVolume(int iVolume)
     m_pWindow->ControlStringValue(string("Info"), true, oVol);
 }    
 
-const char *aThemes[] =
-{
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\Aquatica.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\FreeAmpClassic.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\FreeAmp.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\EMusic.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\Minimalist.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\Visions.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\Stereo.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\office.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\giger.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\emusich.fat",
-     "D:\\FREEAMP\\FREEAMP\\BASE\\WIN32\\PRJ\\THEMES\\freeamph.fat",
-     "\0"
-};
-
 void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
 {
     switch(cKey)
@@ -1215,7 +1199,7 @@ void FreeAmpTheme::HandleKeystroke(unsigned char cKey)
      {
         m_bShowBuffers = !m_bShowBuffers;
         break;
-     }    
+     }   
    }
 }
 

@@ -110,7 +110,7 @@ freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 clean: freeamp-clean plugins-clean
 
 clean-freeamp freeamp-clean:
-	-rm -f $(FREEAMPOBJ) freeamp $(GDBMOBJ) $(PARSEOBJ) 
+	-rm -f $(FREEAMPOBJ) freeamp $(ZLIBOBJ) $(GDBMOBJ) $(PARSEOBJ) 
 
 plugins: plugins-cc
 
