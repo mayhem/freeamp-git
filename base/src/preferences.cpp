@@ -61,6 +61,7 @@ const char* kPlaylistRepeatPref = "PlaylistRepeat";
 const char* kPlaylistShufflePref = "PlaylistShuffle";
 const char* kTimeDisplayPref = "TimeDisplay";
 const char* kVolumePref = "Volume";
+const char* kUserNamePref = "UserName";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -94,11 +95,11 @@ const char *kDefaultThemeDefaultFont = "Helvetica";
 const char *kDefaultDownloadManagerUI = "download.ui";
 const char *kDefaultMusicBrowserUI = "musicbrowser.ui";
 const bool kDefaultCheckForUpdates = false;
-
 const int32 kDefaultPlaylistRepeat = 0;
 const bool kDefaultPlaylistShuffle = false;
 const int32 kDefaultTimeDisplay = 0;
 const int32 kDefaultVolume = 85;
+const char* kDefaultUserName = "";
 
 Error
 Preferences::
@@ -210,6 +211,11 @@ SetDefaults()
 
     if (GetPrefInt32(kVolumePref, &dummyInt) == kError_NoPrefValue)
         SetPrefInt32(kVolumePref, kDefaultVolume);
+
+    dummyInt = 255;
+    if (GetPrefString(kUserNamePref, dummyString, 
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kUserNamePref, kDefaultUserName);
 
     return kError_NoErr;
 }
@@ -733,6 +739,20 @@ Preferences::
 SetVolume(int32 value)
 {
     return SetPrefInt32(kVolumePref, value);
+}
+
+Error
+Preferences::
+GetUserName(char* name, uint32* len)
+{
+    return GetPrefString(kUserNamePref, name, len);
+}
+
+Error
+Preferences::
+SetUserName(char* name)
+{
+    return SetPrefString(kUserNamePref, name);
 }
 
 
