@@ -1,6 +1,27 @@
+[RegisterFileTypes:HKCR:PLSPlaylistFile]
+(Default)=S,PLS Playlist File
+---Comment---=
+
+[RegisterFileTypes:HKCR:.pls]
+(Default)=S,PLSPlaylistFile
+---Comment---=
+Content Type=S,audio/x-scpls
+
 [RegisterFileTypes:HKCR:MP2AudioFile]
 ---Comment---=
 (Default)=S,MP2 Audio File
+
+[RegisterFileTypes:HKCR:M3UPlaylistFile]
+(Default)=S,M3U Playlist File
+---Comment---=
+
+[RegisterFileTypes:HKCR:MP1AudioFile\shell\open\command]
+---Comment---=
+(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
+
+[RegisterFileTypes:HKCR:PLSPlaylistFile\DefaultIcon]
+(Default)=S,<TARGETDIR>\freeamp.exe,0
+---Comment---=
 
 [FreeAmpSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
 (Default)=S,
@@ -11,17 +32,14 @@ UI=S,freeamp.ui
 (Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
 ---Comment---=
 
-[RegisterFileTypes:HKCR:PlayListFile\DefaultIcon]
+[RegisterFileTypes:HKCR:M3UPlaylistFile\DefaultIcon]
 (Default)=S,<TARGETDIR>\freeamp.exe,0
 ---Comment---=
 
-[RegisterFileTypes:HKCR:PlayListFile\shell\open\command]
-(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
----Comment---=
-
 [RegisterFileTypes:HKCR:.m3u]
-(Default)=S,PlayListFile
+(Default)=S,M3UPlaylistFile
 ---Comment---=
+Content Type=S,audio/x-mpegurl
 
 [RegisterFileTypes:HKCR:MP3AudioFile]
 (Default)=S,MP3 Audio File
@@ -32,14 +50,14 @@ UI=S,freeamp.ui
 ---FileGroup---=
 HKCU0=Software\FreeAmp\FreeAmp v2.0\Main
 
+[RegisterFileTypes:HKCR:MP1AudioFile\DefaultIcon]
+---Comment---=
+(Default)=S,<TARGETDIR>\freeamp.exe,0
+
 [DSoundSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
 (Default)=S,
 ---Comment---=
 PMO=S,dsoundcard.pmo
-
-[RegisterFileTypes:HKCR:PlayListFile]
-(Default)=S,PlayList File
----Comment---=
 
 [RegisterFileTypes:HKCR:MP3AudioFile\DefaultIcon]
 (Default)=S,<TARGETDIR>\freeamp.exe,0
@@ -56,10 +74,23 @@ Set4=SoundCardSet
 ---Comment---=
 (Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
 
+[RegisterFileTypes:HKCR:PLSPlaylistFile\shell\open\command]
+(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
+---Comment---=
+
 [SoundCardSet]
 ---Comment---=
 ---FileGroup---=Soundcard Output
 HKCU0=Software\FreeAmp\FreeAmp v2.0\Main
+
+[RegisterFileTypes:HKCR:.mp1]
+---Comment---=
+(Default)=S,MP1AudioFile
+Content Type=S,audio/x-mpeg
+
+[RegisterFileTypes:HKCR:MP1AudioFile]
+---Comment---=
+(Default)=S,MP1 Audio File
 
 [DSoundSet]
 ---Comment---=
@@ -73,6 +104,7 @@ Version=1.00.000
 [RegisterFileTypes:HKCR:.mp2]
 ---Comment---=
 (Default)=S,MP2AudioFile
+Content Type=S,audio/x-mpeg
 
 [MainSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
 TimeDisplay=N,0
@@ -127,6 +159,7 @@ HKCU0=Software\FreeAmp\FreeAmp v2.0\Main
 [RegisterFileTypes:HKCR:.mp3]
 (Default)=S,MP3AudioFile
 ---Comment---=
+Content Type=S,audio/x-mpeg
 
 [SoundCardSet:HKCU:Software\FreeAmp\FreeAmp v2.0\Main]
 ---Comment---=
@@ -134,15 +167,23 @@ HKCU0=Software\FreeAmp\FreeAmp v2.0\Main
 PMO=S,soundcard.pmo
 
 [RegisterFileTypes]
-HKCR4=PlayListFile
+HKCR4=M3UPlaylistFile
 HKCR10=MP2AudioFile\DefaultIcon
-HKCR5=PlayListFile\shell\open\command
+HKCR5=M3UPlaylistFile\shell\open\command
 ---Comment---=
 HKCR11=MP2AudioFile\shell\open\command
-HKCR6=PlayListFile\DefaultIcon
+HKCR6=M3UPlaylistFile\DefaultIcon
+HKCR12=.mp1
 HKCR7=MP3AudioFile\DefaultIcon
+HKCR13=MP1AudioFile
 HKCR8=.mp2
+HKCR14=MP1AudioFile\DefaultIcon
 HKCR9=MP2AudioFile
+HKCR15=MP1AudioFile\shell\open\command
+HKCR16=.pls
+HKCR17=PLSPlaylistFile
+HKCR18=PLSPlaylistFile\DefaultIcon
+HKCR19=PLSPlaylistFile\shell\open\command
 ---FileGroup---=Program Executable Files
 HKCR0=.mp3
 HKCR1=MP3AudioFile
@@ -152,4 +193,8 @@ HKCR3=.m3u
 [RegisterFileTypes:HKCR:MP2AudioFile\DefaultIcon]
 ---Comment---=
 (Default)=S,<TARGETDIR>\freeamp.exe,0
+
+[RegisterFileTypes:HKCR:M3UPlaylistFile\shell\open\command]
+(Default)=S,"<TARGETDIR>\freeamp.exe" "%1"
+---Comment---=
 
