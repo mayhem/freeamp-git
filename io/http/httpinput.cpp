@@ -431,7 +431,7 @@ static void EncodeURI(string& URI)
 		string hex = "%";
 		char num[8];
 
-		sprintf(num, "%x", URI[convert]);
+		sprintf(num, "%.2x", URI[convert]);
 		hex += num;
 		
 		URI.replace(convert, 1, hex);
