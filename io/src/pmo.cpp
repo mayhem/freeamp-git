@@ -208,7 +208,9 @@ void PhysicalMediaOutput::CheckForBufferUp(void)
 {
    int iInPercent, iOutPercent;
 
-   if (!m_pPmi->IsStreaming())
+   if (!m_pPmi->IsStreaming() || 
+       m_pPmiBuffer == NULL ||
+       m_pInputBuffer == NULL)
       return;
 
    iInPercent = m_pPmiBuffer->GetBufferPercentage(); 
