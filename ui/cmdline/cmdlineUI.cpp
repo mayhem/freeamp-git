@@ -68,6 +68,7 @@ cmdlineUI::cmdlineUI(FAContext *context) {
     m_context = context;
     m_plm = NULL;
     m_playerEQ = NULL;
+    m_lastIndexPlayed = -1;
 
     keyboardListenThread = NULL;
 }
@@ -176,7 +177,8 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 		break; }
 	    case INFO_MediaInfo: {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
-		if (pmvi) {
+		if (pmvi && m_lastIndexPlayed != pmvi->m_indexOfSong) {
+		    m_lastIndexPlayed = pmvi->m_indexOfSong;
 		    cout << "Playing: " << pmvi->m_filename << endl;
 		}
 		break; }

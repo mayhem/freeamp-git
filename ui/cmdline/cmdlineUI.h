@@ -58,6 +58,7 @@ class cmdlineUI : public UserInterface {
    void processSwitch(char *);
    Thread *keyboardListenThread;
    PlayListManager *m_plm;
+   int32 m_lastIndexPlayed;
 };
 
 
