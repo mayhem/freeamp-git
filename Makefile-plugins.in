@@ -116,7 +116,7 @@ plugins/mpg123-$(HOST_OS).ui: $(MPG123UIOBJ)
 NCURSESUIOBJ = ui/ncurses/ncursesUI.o
 
 plugins/ncurses-$(HOST_OS).ui: $(NCURSESUIOBJ)
-	$(LINKMOD) -o $@ $(NCURSESUIOBJ) -lncurses
+	$(LINKMOD) -o $@ $(NCURSESUIOBJ) -l@CURSES@
 
 # lcd ui
 LCDUIOBJ = ui/lcd/src/lcdui.o ui/lcd/src/sockets.o

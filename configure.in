@@ -429,7 +429,18 @@ else
   EXTRALIBS="$EXTRALIBS -lXpm"
 fi
 
+AC_CHECK_LIB(ncurses,initscr,curses="ncurses", [
+	AC_CHECK_LIB(curses,initscr,curses="curses", [
+	  echo "curses/ncurses not found. disabling curses UI."
+	])
+])
 
+if test "$curses" != ""; then
+	OSDEPPLUGINS="$OSDEPPLUGINS plugins/ncurses-${host_os}.ui";
+	CURSES="$curses";
+	AC_SUBST(CURSES)
+fi
+	
 dnl ****
 dnl Check for alsa
 dnl ****
