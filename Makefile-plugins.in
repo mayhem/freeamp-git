@@ -4,6 +4,7 @@
 RELOC = @FPIC@
 
 include config/Makefile.header
+INSTALL_PROGRAM = @INSTALL@
 
 plugins-install install_plugins: install-plugins
 

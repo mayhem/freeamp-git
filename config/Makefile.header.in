@@ -29,7 +29,7 @@ top_builddir = .
 AUTOCONF = @AUTOCONF@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+# INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
@@ -85,9 +85,8 @@ FREEAMPOBJ += io/src/pullbuffer.o io/src/streambuffer.o
 FREEAMPOBJ += lmc/src/lmcregistry.o ui/src/uiregistry.o
 FREEAMPOBJ += $(OSDEPOBJ)
 
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS) $(RELOC)
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS)
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS)
-CXXCOMPILE += $(RELOC)
 
 CXXLINK = $(CXXLD) $(CXXFLAGS) $(LDFLAGS) $(RELOC) -o $@
 
