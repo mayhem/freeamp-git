@@ -1,4 +1,3 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
@@ -22,56 +21,42 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef THREAD_H
-#define THREAD_H
+#ifndef _LINUX_THREAD_H
+#define _LINUX_THREAD_H
 
 #include <pthread.h>
+#include "thread.h"
 
 #include "mutex.h"
 
-#define THREAD_RETURN void *
-#define THREAD_LINKAGE
 
-typedef THREAD_RETURN  ( THREAD_LINKAGE *thread_function)( void * arg);
-
-typedef enum Priority{
-	Idle			= -15,
-	Low				= -2,
-	BelowNormal		= -1,
-	Normal			= 0,
-	AboveNormal		= 1,
-	High			= 2,
-	Critical		= 15,
-
-}Priority;
-
-class Thread {
+class linuxThread : public Thread{
 
 public:
-	Thread();
-	~Thread();
+	linuxThread();
+	~linuxThread();
 
 
-	bool Create(thread_function function, void* arg);
-	void Destroy();
-	void Suspend();
-	void Resume();
-	void Join();
-	static void SetDieImmediately(); // for pthreads, must set PTHREAD_CANCEL_ASYNCHRONOUS for proper operation
-	static void ClearDieImmediately();
-	Priority GetPriority() const;
-	Priority SetPriority(Priority priority);
+	virtual bool Create(thread_function function, void* arg);
+	virtual void Destroy();
+	virtual void Suspend();
+	virtual void Resume();
+	virtual void Join();
+	virtual static void SetDieImmediately(); // for pthreads, must set PTHREAD_CANCEL_ASYNCHRONOUS for proper operation
+	virtual static void ClearDieImmediately();
+	virtual Priority GetPriority() const;
+	virtual Priority SetPriority(Priority priority);
 
 
 private:
 	Priority	m_priority;
-	pthread_t       m_threadHandle;
+	pthread_t   m_threadHandle;
 	unsigned	m_threadId;
-	bool            m_suspended;
-	Mutex *         m_suspendMutex;
+	bool        m_suspended;
+	Mutex *     m_suspendMutex;
 };
 
-#endif /* THREAD_H */
+#endif /* _LINUX_THREAD_H */
 
 
 
