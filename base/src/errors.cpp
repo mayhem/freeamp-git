@@ -24,19 +24,19 @@ ____________________________________________________________________________*/
 
 const char* ErrorString[] = {
 
-    "No Error", //  kError_NoErr      = 0,
-    "kError_UnknownErr", //           = 1,
-    "kError_InvalidParam", //         = 2,
-    "kError_LoadLibFailed", //        = 3,
-    "kError_FindFuncFailed", //       = 4,
+    "The operation was successful", //              kError_NoErr            = 0,
+    "An unknown error occurred", //                 kError_UnknownErr       = 1,
+    "An invalid parameter was used", //             kError_InvalidParam     = 2,
+    "There was an error loading the library", //    kError_LoadLibFailed    = 3,
+    "Could not find the function", //               kError_FindFuncFailed   = 4,
     "kError_NoFiles", //              = 5,
     "kError_NoPrefs", //              = 6,
-    "kError_BufferTooSmall", //       = 7,
-    "kError_OutOfMemory", //          = 8,
-    "kError_FileNoAccess", //         = 9,
-    "kError_FileExists", //           = 10,
+    "The buffer was too small to hold the data", // kError_BufferTooSmall = 7,
+    "Memory allocation failed", //                  kError_OutOfMemory = 8,
+    "Access to the file is denied", //              kError_FileNoAccess = 9,
+    "The file already exists", //                   kError_FileExists = 10,
     "kError_FileInvalidArg", //       = 11,
-    "kError_FileNotFound", //         = 12,
+    "The file was not found", //                    kError_FileNotFound = 12,
     "kError_FileNoHandles", //        = 13,
     "kError_NoMoreLibDirs", //        = 14,
     "kError_NullValueInvalid", //     = 15,
@@ -91,7 +91,7 @@ const char* ErrorString[] = {
     "kError_DatabaseNotWorking", //   = 64,
     "kError_DuplicateItem", //        = 65,
     "kError_ItemNotFound", //         = 66,
-    "kError_HTTPFileNotFound", //     = 67,
+    "HTTP Error: File Not Found", //                kError_HTTPFileNotFound  = 67,
 
     "kError_LastError", //            = 9999
 };

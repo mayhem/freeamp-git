@@ -24,6 +24,7 @@
 #define IDI_WARN                        207
 #define IDD_OPENURL                     219
 #define IDD_DELETETRACKS                220
+#define IDD_REMOVETRACKS                220
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
 #define IDB_ARTIST                      544

@@ -46,7 +46,7 @@ void MusicBrowserUI::DeleteListEvent(void)
     UpdateButtonMenuStates();
 }
 
-void MusicBrowserUI::DeleteEvent(void)
+void MusicBrowserUI::RemoveEvent(void)
 {
     // first figure out which control has focus
     HWND hwndFocus = GetFocus();
@@ -70,13 +70,37 @@ void MusicBrowserUI::DeleteEvent(void)
             }
 
             index--;
-        }
-
-        UpdateButtonMenuStates();
+        }        
     }
     else if(hwndFocus == m_hMusicCatalog)
     {
-        MessageBox(NULL, "Deleting from Catalog not yet implemented.", "doh!", MB_OK);
+        bool deleteFromDrive = false;
+
+        if(0 < DialogBoxParam(g_hinst, 
+                              MAKEINTRESOURCE(IDD_REMOVETRACKS),
+                              m_hWnd, 
+                              (int (__stdcall *)(void))::RemoveTracksDlgProc, 
+                              (LPARAM)&deleteFromDrive))
+        {       
+            vector<string> urls;
+            GetSelectedMusicTreeItems(&urls, false); 
+
+            vector<string>::iterator i;
+
+            for(i = urls.begin(); i != urls.end(); i++)
+            {
+                m_context->browser->m_catalog->RemoveSong((*i).c_str());
+            }
+
+            urls.clear();
+            
+            GetSelectedPlaylistItems(&urls);
+
+            for(i = urls.begin(); i != urls.end(); i++)
+            {
+                m_context->browser->m_catalog->RemovePlaylist((*i).c_str());
+            }
+        }
     }
 }
 
@@ -231,6 +255,52 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                       (NM_TREEVIEW*)pHdr);
             return 0;
         }    
+
+
+        if (pTreeView->hdr.code == TVN_BEGINLABELEDIT)
+        {
+            TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
+            HTREEITEM item = info->item.hItem;
+
+            if(item == m_hCatalogItem ||
+               item == m_hPlaylistItem ||
+               item == m_hAllItem ||
+               item == m_hUncatItem ||
+               item == m_hNewPlaylistItem)
+            {
+                return TRUE;
+            }
+            else
+            {
+                return FALSE;
+            }
+        }   
+        
+        if (pTreeView->hdr.code == TVN_ENDLABELEDIT)
+        {
+            TV_DISPINFO* info = (TV_DISPINFO*)pHdr;
+            TV_ITEM item = info->item;
+           
+            if(m_oTreeIndex.IsTrack(item.lParam))
+            {
+                // just change the title for this song
+            } 
+            else if(m_oTreeIndex.IsPlaylist(item.lParam))
+            {
+                // just change the title for this playlist
+            }
+            else if(m_oTreeIndex.IsAlbum(item.lParam))
+            {
+                // need to change the album for all tracks in album
+            }
+            else if(m_oTreeIndex.IsArtist(item.lParam))
+            {
+                // need to change the artist for all albums
+                // and tracks by this artist
+            }
+
+            return FALSE;
+        }    
  
 	    if (pTreeView->hdr.code == TVN_ITEMEXPANDING && 
             pTreeView->itemNew.hItem == m_hPlaylistItem)
@@ -303,6 +373,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             UpdateButtonMenuStates();
             return 0;
         }
+
 	    if (pTreeView->hdr.code == NM_DBLCLK)
         {
             //int32 lParam;
@@ -337,9 +408,6 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                     NewPlaylist();
                 }
             }
-
-
-            
         }
         
         // What is the define for -17? what is -17??
@@ -374,12 +442,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             else               
                SendMessage(m_hStatus, SB_SETTEXT, 0, (LPARAM)"");
         }
-
-        //if (pTreeView->hdr.code == NM_CLICK)
-        //{
-        //    SendMessage();
-        //}
-
+       
         if (pTreeView->hdr.code == NM_RCLICK)
         {
             POINT sPoint;
@@ -445,7 +508,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
             if(pnkd->wVKey == VK_DELETE)
             {
-                DeleteEvent();  
+                RemoveEvent();  
             }
             else if(pnkd->wVKey == 'A' && (GetKeyState(VK_CONTROL) < 0))
             {
@@ -687,27 +750,6 @@ void MusicBrowserUI::EditPlaylistEvent(void)
                (tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, 
                                                         tv_item.hItem)));
     }
-}
-
-
-void MusicBrowserUI::RemoveEvent(void)
-{
-    int32     lParam;
-    HTREEITEM hItem;
-
-    lParam = GetMusicTreeSelection(hItem);
-    if (m_oTreeIndex.IsTrack(lParam))
-    {
-        m_context->browser->m_catalog->RemoveSong(
-             m_oTreeIndex.Data(lParam).m_pTrack->URL().c_str());
-        TreeView_DeleteItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), hItem);
-    }        
-    if (m_oTreeIndex.IsPlaylist(lParam))
-    {
-        m_context->browser->m_catalog->RemovePlaylist( 
-             m_oTreeIndex.Data(lParam).m_oPlaylistPath.c_str());
-        TreeView_DeleteItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), hItem);
-    }             
 }
 
 void MusicBrowserUI::RemoveFromDiskEvent(void)

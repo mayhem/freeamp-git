@@ -191,7 +191,6 @@ class MusicBrowserUI : public UserInterface
     void  AddTrackEvent(void);
     void  AddFileEvent(void);
     void  EditPlaylistEvent(void);
-    void  DeleteEvent(void);
     void  DeleteListEvent(void);
     void  SortEvent(int id);
     void  EmptyDBCheck(void);
@@ -231,20 +230,27 @@ class MusicBrowserUI : public UserInterface
     void    FillUncatTracks(void);
     int32   GetCurrentItemFromMousePos(void);
     int32   GetMusicTreeSelection(HTREEITEM hItem);
-    void    GetSelectedMusicTreeItems(vector<string>* urls);
-    BOOL    FindSelectedItems(HWND hwnd, HTREEITEM root, vector<string>* urls);
+    void    GetSelectedMusicTreeItems(vector<string>* urls,
+                                      bool includePlaylists = true);
+    BOOL    FindSelectedItems(HTREEITEM root, vector<string>* urls);
     void    AddTrackURLs(TV_ITEM* tv_item, vector<string>* urls);
     void    AddAllTrackURLs(vector<string>* urls);
     void    AddUncatagorizedTrackURLs(vector<string>* urls);
-    void    AddSelectedPlaylistItems(vector<string>* urls);
+    void    GetSelectedPlaylistItems(vector<string>* urls);
     void    TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv);
     void    MusicCatalogTrackAdded(const ArtistList* artist,
                                    const AlbumList* album,
                                    const PlaylistItem* item);
     void    MusicCatalogPlaylistAdded(string item);
+    void    MusicCatalogTrackRemoved(const ArtistList* artist,
+                                     const AlbumList* album,
+                                     const PlaylistItem* item);
+    void    MusicCatalogPlaylistRemoved(string item);
 
     HTREEITEM FindArtist(const ArtistList* artist);
     HTREEITEM FindAlbum(HTREEITEM artistItem, const AlbumList* album);
+    HTREEITEM FindTrack(HTREEITEM albumItem, const PlaylistItem* track);
+    HTREEITEM FindPlaylist(const string playlist);
 
 
     // Data members

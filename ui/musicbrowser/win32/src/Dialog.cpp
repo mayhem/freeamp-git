@@ -1228,7 +1228,7 @@ void MusicBrowserUI::UpdateButtonMenuStates()
 
 
     // Can we move items up and down?
-    uint32 index = ListView_GetItemCount(m_hPlaylistView) - 1;
+    uint32 index = ListView_GetItemCount(m_hPlaylistView);
     uint32 count = ListView_GetSelectedCount(m_hPlaylistView);
 
     if(count && m_hPlaylistView == GetFocus())
@@ -1236,7 +1236,7 @@ void MusicBrowserUI::UpdateButtonMenuStates()
         uint32 state;
 
         state = ListView_GetItemState(m_hPlaylistView, 
-                                      index, 
+                                      index - 1, 
                                       LVIS_SELECTED);
 
         EnableMenuItem(hMenu, ID_EDIT_MOVEDOWN, 

@@ -222,6 +222,14 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         {
             MusicCatalogTrackRemovedEvent* pie = (MusicCatalogTrackRemovedEvent*)event;
 
+            vector<MusicBrowserUI *>::iterator i;
+
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicCatalogTrackRemoved(pie->Artist(), pie->Album(), pie->Item());
+            }
+
+            MusicCatalogTrackRemoved(pie->Artist(), pie->Album(), pie->Item());
             
             break; 
         }
@@ -245,7 +253,15 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         case INFO_MusicCatalogPlaylistRemoved:
         {
             MusicCatalogPlaylistRemovedEvent* pie = (MusicCatalogPlaylistRemovedEvent*)event;
+            
+            vector<MusicBrowserUI *>::iterator i;
 
+            for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+            {
+                (*i)->MusicCatalogPlaylistRemoved(pie->Item());
+            }
+
+            MusicCatalogPlaylistRemoved(pie->Item());
             
             break; 
         }

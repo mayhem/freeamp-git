@@ -40,7 +40,7 @@ char* kUncatagorized = "<Uncategorized>";
 char* kPlaylists = "My Playlists";
 char* kStreams = "My Favorite Streams";
 char* kPortables = "My Portables";
-
+char* kNewPlaylist = "Create a New Playlist...";
 
 void MusicBrowserUI::InitTree(void)
 {                          
@@ -343,7 +343,7 @@ int32 MusicBrowserUI::GetMusicTreeSelection(HTREEITEM hItem)
        hItem = NULL;
        return -1;
     }   
-}    
+}   
 
 void MusicBrowserUI::FillPlaylists(void)
 {
@@ -353,7 +353,6 @@ void MusicBrowserUI::FillPlaylists(void)
     int                       iIndex;
     char                      szBase[MAX_PATH];
     TreeData                  oData;
-    char*                     kNewPlaylist = "Create a New Playlist...";
 
     sInsert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
                         TVIF_SELECTEDIMAGE | TVIF_PARAM; 
@@ -362,16 +361,6 @@ void MusicBrowserUI::FillPlaylists(void)
                              m_catalog->GetPlaylists(); 
 
     oData.m_iLevel = 1;
-
-    sInsert.item.pszText = kNewPlaylist;
-    sInsert.item.cchTextMax = strlen(kNewPlaylist);
-    sInsert.item.iImage = 0;
-    sInsert.item.iSelectedImage = 0;
-    sInsert.item.cChildren= 0;
-    sInsert.item.lParam = -1;
-    sInsert.hInsertAfter = TVI_SORT;
-    sInsert.hParent = m_hPlaylistItem;
-    m_hNewPlaylistItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
 
     for(i = pList->begin(), iIndex = 0; i != pList->end(); i++,iIndex++)
     {
@@ -388,7 +377,17 @@ void MusicBrowserUI::FillPlaylists(void)
         sInsert.hInsertAfter = TVI_SORT;
         sInsert.hParent = m_hPlaylistItem;
         TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
-    }    
+    }
+    
+    sInsert.item.pszText = kNewPlaylist;
+    sInsert.item.cchTextMax = strlen(kNewPlaylist);
+    sInsert.item.iImage = 0;
+    sInsert.item.iSelectedImage = 0;
+    sInsert.item.cChildren= 0;
+    sInsert.item.lParam = -1;
+    sInsert.hInsertAfter = TVI_FIRST;
+    sInsert.hParent = m_hPlaylistItem;
+    m_hNewPlaylistItem = TreeView_InsertItem(GetDlgItem(m_hWnd, IDC_MUSICTREE), &sInsert);
 }
 
 
@@ -476,6 +475,87 @@ HTREEITEM MusicBrowserUI::FindAlbum(HTREEITEM artistItem, const AlbumList* album
     return result;
 }
 
+HTREEITEM MusicBrowserUI::FindTrack(HTREEITEM albumItem, const PlaylistItem* track)
+{
+    HTREEITEM result = NULL;
+    HWND hwnd = m_hMusicCatalog;
+
+    TV_ITEM tv_item;
+
+    tv_item.hItem = NULL;
+    tv_item.mask = TVIF_PARAM;
+
+    // this should retrieve the first artist
+    tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, albumItem);
+
+    BOOL success;
+
+    do
+    {
+        success = TreeView_GetItem(hwnd, &tv_item);
+
+        if(success)
+        {
+            if(track == m_oTreeIndex.Data(tv_item.lParam).m_pTrack)
+            {
+                result = tv_item.hItem;
+                break;
+            }
+        }
+
+    }while(success && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
+    
+    return result;
+}
+
+HTREEITEM MusicBrowserUI::FindPlaylist(const string playlist)
+{
+    HTREEITEM result = NULL;
+    HWND hwnd = m_hMusicCatalog;
+
+    TV_ITEM tv_item;
+
+    tv_item.hItem = NULL;
+    tv_item.mask = TVIF_PARAM;
+
+    // this should retrieve the first playlist
+    tv_item.hItem = TreeView_GetChild(m_hMusicCatalog, m_hPlaylistItem);
+
+    // but we want the second one... not the magic "Create New Playlist..."
+    tv_item.hItem = TreeView_GetNextSibling(m_hMusicCatalog, tv_item.hItem);
+
+    BOOL success;
+
+    do
+    {
+        success = TreeView_GetItem(hwnd, &tv_item);
+
+        if(success)
+        {
+            if(playlist == m_oTreeIndex.Data(tv_item.lParam).m_oPlaylistPath)
+            {
+                result = tv_item.hItem;
+                break;
+            }
+        }
+
+    }while(success && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
+    
+    return result;
+}
+
+void MusicBrowserUI::MusicCatalogPlaylistRemoved(string item)
+{
+    HTREEITEM playlistItem = NULL;
+
+    playlistItem = FindPlaylist(item);
+
+    if(playlistItem)
+    {
+        TreeView_DeleteItem(m_hMusicCatalog, playlistItem);
+    }
+}
+
 void MusicBrowserUI::MusicCatalogPlaylistAdded(string item)
 {
     // put it under playlists
@@ -505,6 +585,69 @@ void MusicBrowserUI::MusicCatalogPlaylistAdded(string item)
         sInsert.hInsertAfter = TVI_SORT;
         sInsert.hParent = m_hPlaylistItem;
         TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+
+        TreeView_DeleteItem(m_hMusicCatalog, m_hNewPlaylistItem);
+        sInsert.item.pszText = kNewPlaylist;
+        sInsert.item.cchTextMax = strlen(kNewPlaylist);
+        sInsert.item.iImage = 0;
+        sInsert.item.iSelectedImage = 0;
+        sInsert.item.cChildren= 0;
+        sInsert.item.lParam = -1;
+        sInsert.hInsertAfter = TVI_FIRST;
+        sInsert.hParent = m_hPlaylistItem;
+        m_hNewPlaylistItem = TreeView_InsertItem(m_hMusicCatalog, &sInsert);
+    }
+}
+
+void MusicBrowserUI::MusicCatalogTrackRemoved(const ArtistList* artist,
+                                              const AlbumList* album,
+                                              const PlaylistItem* item)
+{
+    HTREEITEM artistItem = NULL;
+    HTREEITEM albumItem = NULL;
+    HTREEITEM trackItem = NULL;
+    
+
+    // is this in the uncatagorized section?
+    if(!artist) 
+    {
+        trackItem = FindTrack(m_hUncatItem, item);
+    }
+    else
+    {
+        artistItem = FindArtist(artist);
+
+        if(artistItem)
+        {
+            albumItem = FindAlbum(artistItem, album);
+
+            if(albumItem)
+            {
+                trackItem = FindTrack(albumItem, item);
+            }
+        }
+    }
+
+    if(trackItem)
+    {
+        TreeView_DeleteItem(m_hMusicCatalog, trackItem);
+
+        if(albumItem && !TreeView_GetChild(m_hMusicCatalog, albumItem))
+        {
+            TreeView_DeleteItem(m_hMusicCatalog, albumItem);
+
+            if(artistItem && !TreeView_GetChild(m_hMusicCatalog, artistItem))
+            {
+                TreeView_DeleteItem(m_hMusicCatalog, artistItem);
+            }
+        }
+
+        trackItem = FindTrack(m_hAllItem, item);
+
+        if(trackItem)
+        {
+            TreeView_DeleteItem(m_hMusicCatalog, trackItem);
+        }
     }
 }
 
@@ -680,6 +823,36 @@ void MusicBrowserUI::MusicCatalogTrackAdded(const ArtistList* artist,
     }
 }
 
+void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
+{
+    if(m_hNewPlaylistItem != nmtv->itemNew.hItem)
+    {
+        vector<string>* urls = new vector<string>;
+
+        GetSelectedMusicTreeItems(urls); 
+
+        HIMAGELIST himl;
+        RECT rcItem;
+        POINT hotspot;
+
+        himl = TreeView_CreateDragImage(hwnd, nmtv->itemNew.hItem);
+
+        TreeView_GetItemRect(hwnd, nmtv->itemNew.hItem, &rcItem, TRUE); 
+
+        hotspot.x = 0;
+        hotspot.y = (rcItem.bottom - rcItem.top)/2;
+
+        DataObject* data = new DataObject(CFSTR_FREEAMP_CATALOGITEM, urls);
+        DropSource* src = new DropSource(hwnd, himl, hotspot, nmtv->ptDrag);
+        DWORD dwEffect = 0;
+
+        DoDragDrop(data, src, DROPEFFECT_COPY|DROPEFFECT_SCROLL, &dwEffect); 
+
+        data->Release();
+        src->Release();
+    }
+}
+
 void MusicBrowserUI::AddAllTrackURLs(vector<string>* urls)
 {
     vector<ArtistList*>*            artistList;
@@ -774,39 +947,10 @@ void MusicBrowserUI::AddTrackURLs(TV_ITEM* tv_item,
     }
 }
 
-void MusicBrowserUI::TVBeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
-{
-    if(m_hNewPlaylistItem != nmtv->itemNew.hItem)
-    {
-        vector<string>* urls = new vector<string>;
-
-        GetSelectedMusicTreeItems(urls); 
-
-        HIMAGELIST himl;
-        RECT rcItem;
-        POINT hotspot;
-
-        himl = TreeView_CreateDragImage(hwnd, nmtv->itemNew.hItem);
-
-        TreeView_GetItemRect(hwnd, nmtv->itemNew.hItem, &rcItem, TRUE); 
-
-        hotspot.x = 0;
-        hotspot.y = (rcItem.bottom - rcItem.top)/2;
-
-        DataObject* data = new DataObject(CFSTR_FREEAMP_CATALOGITEM, urls);
-        DropSource* src = new DropSource(hwnd, himl, hotspot, nmtv->ptDrag);
-        DWORD dwEffect = 0;
-
-        DoDragDrop(data, src, DROPEFFECT_COPY|DROPEFFECT_SCROLL, &dwEffect); 
-
-        data->Release();
-        src->Release();
-    }
-}
-
-BOOL MusicBrowserUI::FindSelectedItems(HWND hwnd, HTREEITEM root, vector<string>* urls)
+BOOL MusicBrowserUI::FindSelectedItems(HTREEITEM root, vector<string>* urls)
 {
     BOOL result = FALSE;
+    HWND hwnd = m_hMusicCatalog;
     TV_ITEM tv_item;
 
     tv_item.hItem = root;
@@ -826,7 +970,7 @@ BOOL MusicBrowserUI::FindSelectedItems(HWND hwnd, HTREEITEM root, vector<string>
         }
         else if(result && childItem)
         {
-            FindSelectedItems(hwnd, childItem, urls);        
+            FindSelectedItems(childItem, urls);        
         }
 
     }while(result && (tv_item.hItem = TreeView_GetNextSibling(hwnd, tv_item.hItem)));
@@ -834,7 +978,7 @@ BOOL MusicBrowserUI::FindSelectedItems(HWND hwnd, HTREEITEM root, vector<string>
     return result;
 }
 
-void MusicBrowserUI::AddSelectedPlaylistItems(vector<string>* urls)
+void MusicBrowserUI::GetSelectedPlaylistItems(vector<string>* urls)
 {
     TV_ITEM tv_root;
 
@@ -936,7 +1080,8 @@ void MusicBrowserUI::AddSelectedPlaylistItems(vector<string>* urls)
 // 3. Otherwise we iterate the children and if selected
 //    add the track items beneath that item. 
 
-void MusicBrowserUI::GetSelectedMusicTreeItems(vector<string>* urls)
+void MusicBrowserUI::GetSelectedMusicTreeItems(vector<string>* urls, 
+                                               bool includePlaylists)
 {
     // need to iterate all the items and add selected
     // items and their children
@@ -978,6 +1123,11 @@ void MusicBrowserUI::GetSelectedMusicTreeItems(vector<string>* urls)
             }
             else // if not we iterate the catalog for selected items
             {
+                HTREEITEM firstSearchItem = TreeView_GetChild(m_hMusicCatalog, tv_all.hItem);
+
+                if(firstSearchItem)
+                    FindSelectedItems(firstSearchItem, urls);
+
                 TV_ITEM tv_uncat;
                 
                 // is the "Uncatagorized" item selected
@@ -988,7 +1138,7 @@ void MusicBrowserUI::GetSelectedMusicTreeItems(vector<string>* urls)
 
                 TreeView_GetItem(m_hMusicCatalog, &tv_uncat);
 
-                HTREEITEM firstSearchItem = tv_uncat.hItem;
+                firstSearchItem = tv_uncat.hItem;
 
                 // if so then we add all the items under "Uncatagorized"
                 if(tv_uncat.state & TVIS_SELECTED)
@@ -1000,12 +1150,13 @@ void MusicBrowserUI::GetSelectedMusicTreeItems(vector<string>* urls)
                 }
 
                 if(firstSearchItem)
-                    FindSelectedItems(m_hMusicCatalog, firstSearchItem, urls);
+                    FindSelectedItems(firstSearchItem, urls);
             }
         }
 
         // iterate playlists
-        AddSelectedPlaylistItems(urls);
+        if(includePlaylists)
+            GetSelectedPlaylistItems(urls);
     }
 }
 
@@ -1054,6 +1205,55 @@ static BOOL TreeView_SetBranch(HWND hwnd, TV_ITEM* root)
     return result;
 }
 
+static
+LRESULT WINAPI 
+EditLabelWndProc(HWND hwnd, 
+                 UINT msg, 
+                 WPARAM wParam, 
+                 LPARAM lParam)
+{
+    WNDPROC lpOldProc = (WNDPROC)GetProp(hwnd, "oldproc" );
+
+    switch(msg)
+	{
+		case WM_DESTROY:   
+		{
+			//  Put back old window proc and
+			SetWindowLong( hwnd, GWL_WNDPROC, (DWORD)lpOldProc );
+
+			// remove window property
+			RemoveProp( hwnd, "oldproc" ); 
+
+			break;
+        }
+
+        case WM_GETDLGCODE:
+        {
+            return DLGC_WANTALLKEYS;
+        }
+
+        case WM_CHAR:
+        {
+            if(wParam == VK_ESCAPE)
+            {
+                SendMessage(GetParent(hwnd), TVM_ENDEDITLABELNOW, TRUE, 0); 
+                return 1;
+            }
+            else if(wParam == VK_RETURN)
+            {
+                SendMessage(GetParent(hwnd), TVM_ENDEDITLABELNOW, FALSE, 0); 
+                return 1;
+            }
+
+            break;
+        }
+
+
+    }
+
+    return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
+}
+
 LRESULT WINAPI 
 TreeViewWndProc(HWND hwnd, 
                 UINT msg, 
@@ -1074,6 +1274,9 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
     static bool dragging = false;
     static RECT dragRect;
     static HTREEITEM dragItem = NULL;
+    static bool selectedOnMouseDown = false;
+
+    //return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
 
 	switch(msg)
 	{
@@ -1135,10 +1338,103 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
             break;
         }
 
+        case WM_RBUTTONDOWN:
+        {
+            SetFocus(hwnd);
+
+            HTREEITEM item;
+            TV_HITTESTINFO hti;
+
+            hti.pt.x = LOWORD(lParam);
+            hti.pt.y = HIWORD(lParam);
+
+            item = TreeView_HitTest(hwnd, &hti);  
+
+            if(item && (hti.flags & TVHT_ONITEM))
+            {
+                HTREEITEM focusItem = TreeView_GetSelection(hwnd);
+                TV_ITEM tv_item;
+
+                tv_item.hItem = focusItem;
+                tv_item.mask = TVIF_STATE;
+                tv_item.stateMask = TVIS_SELECTED;
+
+                TreeView_GetItem(hwnd, &tv_item);
+
+                bool wasFocusSelected = (tv_item.state & TVIS_SELECTED) != 0;
+
+                tv_item.hItem = item;
+                tv_item.mask = TVIF_STATE;
+                tv_item.stateMask = TVIS_SELECTED;
+
+                TreeView_GetItem(hwnd, &tv_item);
+
+                bool wasFocus = item == focusItem;
+                bool wasSelected = (tv_item.state & TVIS_SELECTED) != 0;
+
+                if(!wasSelected)
+                {
+                    // need to iterate all the items and 
+                    // make sure they aren't selected
+                    HTREEITEM rootItem = TreeView_GetRoot(hwnd);
+
+                    if(rootItem)
+                    {
+                        do
+                        {
+                            tv_item.hItem = rootItem;
+                            tv_item.mask = TVIF_STATE;
+                            tv_item.stateMask = TVIS_SELECTED;
+                            tv_item.state = 0;
+
+                            TreeView_SetBranch(hwnd, &tv_item);
+                        
+                        }while(rootItem = TreeView_GetNextSibling(hwnd, rootItem));
+                    }
+
+                    // need to set this back cause windows won't
+                    // set it if it is already the focus item and
+                    // we just deselected it
+                    if(wasSelected && wasFocus)
+                    {
+                        tv_item.hItem = focusItem;
+                        tv_item.mask = TVIF_STATE;
+                        tv_item.stateMask = TVIS_SELECTED;
+                        tv_item.state = TVIS_SELECTED;
+
+                        TreeView_SetItem(hwnd, &tv_item);
+                    }
+                }
+
+                TreeView_Select(hwnd, item, TVGN_CARET);
+
+                if(!wasFocus && wasFocusSelected && wasSelected)
+                {
+                    tv_item.hItem = focusItem;
+                    tv_item.mask = TVIF_STATE;
+                    tv_item.stateMask = TVIS_SELECTED;
+                    tv_item.state = TVIS_SELECTED;
+
+                    TreeView_SetItem(hwnd, &tv_item);
+                }
+            }
+
+            //return TRUE;
+
+            break;
+        }
+
+        case WM_RBUTTONUP:
+        {
+            break;
+        }
+
         case WM_LBUTTONDOWN:
         {
             bool shiftKeyPressed = IsShiftDown();
             bool ctrlKeyPressed = IsCtrlDown();
+
+            selectedOnMouseDown = false;
 
             SetFocus(hwnd);
 
@@ -1181,6 +1477,8 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
 
                 bool wasFocus = item == focusItem;
                 bool wasSelected = (tv_item.state & TVIS_SELECTED) != 0;
+
+                selectedOnMouseDown = wasSelected;
                 
                 if(ctrlKeyPressed)
                 {
@@ -1432,6 +1730,37 @@ LRESULT MusicBrowserUI::TreeViewWndProc(HWND hwnd,
                         tv_item.state = TVIS_SELECTED;
 
                         TreeView_SetItem(hwnd, &tv_item);
+                    }
+                    
+                    if(selectedOnMouseDown)
+                    {
+                        // i should do this in the notify but it is ignoring me
+                        if(item != m_hCatalogItem &&
+                           item != m_hPlaylistItem &&
+                           item != m_hAllItem &&
+                           item != m_hUncatItem &&
+                           item != m_hNewPlaylistItem)
+                        {
+                            Sleep(500);
+                            SetFocus(hwnd);
+                            HWND hwndEdit = TreeView_EditLabel(hwnd, item);
+
+                            if(hwndEdit)
+                            {
+                                SetProp(hwndEdit, 
+                                        "oldproc",
+                                        (HANDLE)GetWindowLong(hwndEdit, GWL_WNDPROC));
+
+                                /*SetProp(m_hMusicCatalog, 
+                                        "this",
+                                        (HANDLE)this);*/
+	
+	                            // Subclass the window so we can handle multi-select
+	                            SetWindowLong(hwndEdit, 
+			                                  GWL_WNDPROC, 
+                                              (DWORD)::EditLabelWndProc);  
+                            }
+                        }
                     }
                 }
             }
