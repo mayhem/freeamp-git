@@ -91,7 +91,7 @@ APSInterface::APSInterface(char *profilePath, const char* pIP,
     m_pYpClient->SetAddress(m_strIP.c_str(), nAPSYPPort);
     m_nMetaFailures = 0;
 
-    m_pSigClient = new SigClient;
+    m_pSigClient = new SigClient; 
     m_pSigClient->SetAddress(m_sigIP.c_str(), nAPSSigPort);
 
     m_pSLClient = new SoundsLikeClient;

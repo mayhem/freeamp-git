@@ -786,8 +786,7 @@ void MusicCatalog::SetDatabase(const char *path)
         RePopulateFromDatabase();
         if (m_timeout == 0)
             PruneDatabase(true, true);
-        else
-            Sort();
+        Sort();
     }
 }
 

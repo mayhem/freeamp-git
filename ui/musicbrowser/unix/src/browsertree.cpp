@@ -146,6 +146,7 @@ vector<PlaylistItem *> *GTKMusicBrowser::GetTreeSelection(void)
             for (; j != list->m_trackList->end(); j++) {
                 PlaylistItem *item = new PlaylistItem(*(PlaylistItem *)*j);
                 newlist->push_back(item);
+cout << "adding " << item->URL() << endl;
             }
             break; }
         case kTreeCD:
