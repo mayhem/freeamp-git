@@ -18,6 +18,10 @@
 
  ********************************************************************/
 
+#ifndef vorbis_size32_t
+#define vorbis_size32_t int
+#endif
+
 #if defined (_WIN32) 
 #if !defined(__GNUC__)
 
