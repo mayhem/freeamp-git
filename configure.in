@@ -108,6 +108,11 @@ case "$host_os" in
     CFLAGS="$CFLAGS -D_THREAD_SAFE -pthread"
     LDFLAGS="$LDFLAGS -Wl,-export-dynamic"
     ;;
+  netbsd*)
+    host_os="freebsd"
+    CFLAGS="$CFLAGS -I/usr/pkg/include -D_THREAD_SAFE -pthread"
+    LDFLAGS="$LDFLAGS -L/usr/pkg/lib -Wl,-export-dynamic"
+    ;;
   irix*)
     AC_DEFINE(IRIX_CDAUDIO)
     ;;
