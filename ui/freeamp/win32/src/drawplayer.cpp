@@ -846,15 +846,15 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                 smallFont = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_SMALL_FONT_256), &palette);
                 largeFont = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_BIG_FONT_256), &palette);
 
-                playButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAY), &palette);
-                stopButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_STOP), &palette);
-                pauseButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_PAUSE), &palette);
-                nextButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_NEXT), &palette);
-                lastButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_LAST), &palette);
+                playButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_PLAY_256), &palette);
+                stopButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_STOP_256), &palette);
+                pauseButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_PAUSE_256), &palette);
+                nextButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_NEXT_256), &palette);
+                lastButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_LAST_256), &palette);
 
-                modeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MODE), &palette);
-                minimizeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MINIMIZE), &palette);
-                closeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_CLOSE), &palette);
+                modeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MODE_256), &palette);
+                minimizeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_MINIMIZE_256), &palette);
+                closeButtonBitmap = LoadResourceBitmap(g_hInst, MAKEINTRESOURCE(IDB_CLOSE_256), &palette);
 
 			}
             else
