@@ -414,7 +414,7 @@ begin
 
     // Append product version to appropriate strings
     svProductName = @PRODUCT_NAME + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
-    svFolderName = @FOLDER_NAME + " " + @PRODUCT_VERSION;
+    svFolderName = @FOLDER_NAME;// + " " + @PRODUCT_VERSION;
     svMainTitle = @TITLE_MAIN + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
     svUninstallDisplayName = @UNINST_DISPLAY_NAME + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
     svUninstallKey = @UNINST_KEY + " " + @PRODUCT_VERSION + @VERSION_STRING_SPECIAL;
@@ -757,6 +757,7 @@ end;
 // --- include script file section ---
 
 #include "sddialog.rul"
+
 
 
 
