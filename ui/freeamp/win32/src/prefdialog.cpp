@@ -34,7 +34,6 @@ ____________________________________________________________________________*/
 #include "config.h"
 #include "prefdialog.h"
 #include "preferences.h"
-#include "properties.h"
 #include "log.h"
 #include "registrar.h"
 #include "resource.h"
@@ -47,12 +46,16 @@ typedef struct PrefValues {
     int32 outputBufferSize;
     int32 streamInterval;
     int32 decoderThreadPriority;
+    bool stayOnTop;
+    bool minimizeToTray;
 
     // page2
     bool enableLogging;
+    bool logMain;
     bool logInput;
     bool logOutput;
     bool logDecoder;
+    bool logPerformance;
 
     PrefValues()
     {
@@ -77,11 +80,15 @@ SavePrefValues( Preferences* prefs,
     prefs->SetInputBufferSize(values->inputBufferSize);
     prefs->SetOutputBufferSize(values->outputBufferSize);
     prefs->SetStreamBufferInterval(values->streamInterval);
+    prefs->SetStayOnTop(values->stayOnTop);
+    prefs->SetMinimizeToTray(values->minimizeToTray);
+    prefs->SetUseDebugLog(values->enableLogging);
+    prefs->SetLogMain(values->logMain);
+    prefs->SetLogDecode(values->logDecoder);
+    prefs->SetLogInput(values->logInput);
+    prefs->SetLogOutput(values->logOutput);
+    prefs->SetLogPerformance(values->logPerformance);
 
-    /*if()
-    {
-
-    }*/
 }
 
 static
@@ -101,15 +108,14 @@ PrefPage1Proc(  HWND hwnd,
     static HWND hwndInput = NULL;
     static HWND hwndOutput = NULL;
     static HWND hwndStreamInterval = NULL;
+    static HWND hwndStayOnTop = NULL;
+    static HWND hwndMinimizeToTray = NULL;
     
 
     switch(msg)
     {
         case WM_INITDIALOG:
         {
-            //memset(&originalValues, 0x00, sizeof(PrefValues));
-            //memset(&currentValues, 0x00, sizeof(PrefValues));
-
             // remember these for later...
             psp = (PROPSHEETPAGE*)lParam;
             prefs = (Preferences*)psp->lParam;
@@ -121,6 +127,8 @@ PrefPage1Proc(  HWND hwnd,
             hwndInput = GetDlgItem(hwnd, IDC_INPUT);
             hwndOutput = GetDlgItem(hwnd, IDC_OUTPUT);
             hwndStreamInterval = GetDlgItem(hwnd, IDC_STREAM_INTERVAL);
+            hwndStayOnTop = GetDlgItem(hwnd, IDC_STAYONTOP);
+            hwndMinimizeToTray = GetDlgItem(hwnd, IDC_TRAY);
 
             // get registries
             Registrar registrar;
@@ -201,6 +209,12 @@ PrefPage1Proc(  HWND hwnd,
             Edit_LimitText(hwndStreamInterval, 2);
             Edit_SetText(hwndStreamInterval, temp);
             originalValues.streamInterval = value;
+
+            prefs->GetStayOnTop(&originalValues.stayOnTop);
+            Button_SetCheck(hwndStayOnTop, originalValues.stayOnTop);
+
+            prefs->GetMinimizeToTray(&originalValues.minimizeToTray);
+            Button_SetCheck(hwndMinimizeToTray, originalValues.minimizeToTray);
 
             currentValues = originalValues;
             
@@ -333,6 +347,56 @@ PrefPage1Proc(  HWND hwnd,
 
                     break;
                 }
+
+                case IDC_STAYONTOP:
+                {
+                    if(Button_GetCheck(hwndStayOnTop) == BST_CHECKED)
+                    {
+                        currentValues.stayOnTop = true;
+                    }
+                    else
+                    {
+                        currentValues.stayOnTop = false;
+                    }
+
+                    if(memcmp(  &originalValues, 
+                                &currentValues, 
+                                sizeof(PrefValues)))
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_TRAY:
+                {
+                    if(Button_GetCheck(hwndMinimizeToTray) == BST_CHECKED)
+                    {
+                        currentValues.minimizeToTray = true;
+                    }
+                    else
+                    {
+                        currentValues.minimizeToTray = false;
+                    }
+
+                    if(memcmp(  &originalValues, 
+                                &currentValues, 
+                                sizeof(PrefValues)))
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
             }
 
             break;
@@ -431,6 +495,8 @@ PrefPage2Proc(  HWND hwnd,
     static HWND hwndLogDecoder = NULL;
     static HWND hwndLogInput = NULL;
     static HWND hwndLogOutput = NULL;
+    static HWND hwndLogMain = NULL;
+    static HWND hwndLogPerformance = NULL;
     
     switch(msg)
     {
@@ -445,20 +511,40 @@ PrefPage2Proc(  HWND hwnd,
             hwndLogDecoder = GetDlgItem(hwnd, IDC_LOGDECODER);
             hwndLogInput = GetDlgItem(hwnd, IDC_LOGINPUT);
             hwndLogOutput = GetDlgItem(hwnd, IDC_LOGOUTPUT);
+            hwndLogMain = GetDlgItem(hwnd, IDC_LOGMAIN);
+            hwndLogPerformance = GetDlgItem(hwnd, IDC_LOGPERFORMANCE);
 
             // initialize our controls
+            bool value;
 
-            PropValue* value;
+            prefs->GetUseDebugLog(&value);
+            originalValues.enableLogging = value;
+            Button_SetCheck(hwndLog, value); 
+            Button_Enable(hwndLogDecoder, value); 
+            Button_Enable(hwndLogInput, value);
+            Button_Enable(hwndLogOutput, value);
+            Button_Enable(hwndLogMain, value);
+            Button_Enable(hwndLogPerformance, value);
 
+            prefs->GetLogMain(&value);
+            originalValues.logMain = value;
+            Button_SetCheck(hwndLogMain, value); 
 
-            Button_Enable(hwndLogDecoder, FALSE); 
-            Button_Enable(hwndLogInput, FALSE);
-            Button_Enable(hwndLogOutput, FALSE);
+            prefs->GetLogDecode(&value);
+            originalValues.logDecoder = value;
+            Button_SetCheck(hwndLogDecoder, value); 
 
-            originalValues.enableLogging = false;
-            originalValues.logDecoder = false;
-            originalValues.logInput = false;
-            originalValues.logOutput = false;
+            prefs->GetLogInput(&value);
+            originalValues.logInput = value;
+            Button_SetCheck(hwndLogInput, value); 
+
+            prefs->GetLogOutput(&value);
+            originalValues.logOutput = value;
+            Button_SetCheck(hwndLogOutput, value); 
+
+            prefs->GetLogPerformance(&value);
+            originalValues.logPerformance = value;
+            Button_SetCheck(hwndLogPerformance, value); 
            
             currentValues = originalValues;
             
@@ -488,6 +574,8 @@ PrefPage2Proc(  HWND hwnd,
                     Button_Enable(hwndLogDecoder, enabled); 
                     Button_Enable(hwndLogInput, enabled);
                     Button_Enable(hwndLogOutput, enabled);
+                    Button_Enable(hwndLogMain, enabled);
+                    Button_Enable(hwndLogPerformance, enabled);
 
                     if(memcmp(  &originalValues, 
                                 &currentValues, 
@@ -562,6 +650,56 @@ PrefPage2Proc(  HWND hwnd,
                     else
                     {
                         currentValues.logOutput = false;
+                    }
+
+                    if(memcmp(  &originalValues, 
+                                &currentValues, 
+                                sizeof(PrefValues)))
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_LOGPERFORMANCE:
+                {
+                    if(Button_GetCheck(hwndLogPerformance) == BST_CHECKED)
+                    {
+                        currentValues.logPerformance = true;
+                    }
+                    else
+                    {
+                        currentValues.logPerformance = false;
+                    }
+
+                    if(memcmp(  &originalValues, 
+                                &currentValues, 
+                                sizeof(PrefValues)))
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_LOGMAIN:
+                {
+                    if(Button_GetCheck(hwndLogMain) == BST_CHECKED)
+                    {
+                        currentValues.logMain = true;
+                    }
+                    else
+                    {
+                        currentValues.logMain = false;
                     }
 
                     if(memcmp(  &originalValues, 
