@@ -71,8 +71,8 @@ IDI_WARN                ICON    DISCARDABLE     "warn.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,0,4
- PRODUCTVERSION 2,0,0,4
+ FILEVERSION 2,0,1,0
+ PRODUCTVERSION 2,0,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -90,13 +90,13 @@ BEGIN
             VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
             VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
             VALUE "FileDescription", "This is the primary FreeAmp application.\0"
-            VALUE "FileVersion", "2.0 beta 4\0"
+            VALUE "FileVersion", "2.0 beta 5\0"
             VALUE "InternalName", "FreeAmp\0"
             VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
             VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
             VALUE "OriginalFilename", "freeamp.exe\0"
             VALUE "ProductName", "FreeAmp Application\0"
-            VALUE "ProductVersion", "2.0 beta 4\0"
+            VALUE "ProductVersion", "2.0 beta 5\0"
         END
     END
     BLOCK "VarFileInfo"
