@@ -1063,9 +1063,13 @@ void MusicCatalog::DoSearchMusic(char *path, bool bSendMessages)
                     m_plm->RetrieveMetaDataNow(plist);
 
                     MetaData *tempdata = ReadMetaDataFromDatabase(tempurl);
-                    if (!tempdata || !m_addImmediately) 
-                        WriteMetaDataToDatabase(tempurl,
-                                                (MetaData)plist->GetMetaData());
+                    if (!tempdata || !m_addImmediately) {
+                        MetaData newmdata = (MetaData)plist->GetMetaData();
+                        if (tempdata)
+                            newmdata.SetGUID(tempdata->GUID().c_str());
+
+                        WriteMetaDataToDatabase(tempurl, newmdata);
+                    }
                     if (m_addImmediately)
                         AddSong(tempurl);
 
