@@ -359,8 +359,6 @@ void Player::Run(){
     uint32 len = 256;
     Error error = kError_NoErr;
     int32 uisActivated = 0;
-    m_eventServiceThread = Thread::CreateThread();
-    m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
 
     // which ui should we instantiate first??
     if(m_argUIvector->NumElements() == 0)
@@ -442,8 +440,12 @@ void Player::Run(){
          AcceptEvent(e);
          e = new Event(INFO_ReadyToDieUI);
          AcceptEvent(e);
-      }
-   }
+	}
+    }
+    m_eventServiceThread = Thread::CreateThread();
+    m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
+    
+
 
    delete[]name;
 }

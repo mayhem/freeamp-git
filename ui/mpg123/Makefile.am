@@ -34,7 +34,7 @@ MYLIBS =
 TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 else
 FILES = Mpg123UI.cpp
-MYLIBS = libfauicmdline.a
+MYLIBS = libfaui.a
 TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 all-local : $(PLUGIN_FULL_NAME)
@@ -53,7 +53,7 @@ endif
 
 
 noinst_LIBRARIES = $(MYLIBS)
-libfauicmdline_a_SOURCES = $(FILES)
+libfaui_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)

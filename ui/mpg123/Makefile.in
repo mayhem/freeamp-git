@@ -85,13 +85,13 @@ PLUGIN_FULL_NAME = $(PLUGIN_DIR)$(PLUGIN_NAME)
 @AM_HAVE_WIN32_TRUE@MYLIBS = 
 @AM_HAVE_WIN32_TRUE@TRGT_SYS_HEADS = @top_srcdir@/base/win32/include
 @AM_HAVE_WIN32_FALSE@FILES = Mpg123UI.cpp
-@AM_HAVE_WIN32_FALSE@MYLIBS = libfauicmdline.a
+@AM_HAVE_WIN32_FALSE@MYLIBS = libfaui.a
 @AM_HAVE_WIN32_FALSE@TRGT_SYS_HEADS = @top_srcdir@/base/unix/@target_os@/include
 
 @AM_HAVE_LINUXTHREADS_TRUE@REENT = -D_REENTRANT
 
 noinst_LIBRARIES = $(MYLIBS)
-libfauicmdline_a_SOURCES = $(FILES)
+libfaui_a_SOURCES = $(FILES)
 
 INCLUDES = -I@top_srcdir@/base/include -I@srcdir@/../include -I@top_srcdir@/config -I$(TRGT_SYS_HEADS) -I@top_srcdir@/lmc/include -I@top_srcdir@/io/include
 CXXFLAGS = $(EXTRA_CXXFLAGS) $(REENT)
@@ -109,11 +109,10 @@ X_CFLAGS = @X_CFLAGS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
-libfauicmdline_a_LIBADD = 
-@AM_HAVE_WIN32_TRUE@cond0libfauicmdline_a_OBJECTS = 
-@AM_HAVE_WIN32_FALSE@cond1libfauicmdline_a_OBJECTS =  Mpg123UI.o
-libfauicmdline_a_OBJECTS =  $(cond0libfauicmdline_a_OBJECTS) \
-$(cond1libfauicmdline_a_OBJECTS)
+libfaui_a_LIBADD = 
+@AM_HAVE_WIN32_TRUE@cond0libfaui_a_OBJECTS = 
+@AM_HAVE_WIN32_FALSE@cond1libfaui_a_OBJECTS =  Mpg123UI.o
+libfaui_a_OBJECTS =  $(cond0libfaui_a_OBJECTS) $(cond1libfaui_a_OBJECTS)
 AR = ar
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
@@ -126,8 +125,8 @@ TAR = tar
 GZIP = --best
 DEP_FILES =  .deps/Mpg123UI.P
 CXXMKDEP = $(CXX) -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
-SOURCES = $(libfauicmdline_a_SOURCES)
-OBJECTS = $(libfauicmdline_a_OBJECTS)
+SOURCES = $(libfaui_a_SOURCES)
+OBJECTS = $(libfaui_a_OBJECTS)
 
 all: Makefile $(LIBRARIES) all-local
 
@@ -166,10 +165,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfauicmdline.a: $(libfauicmdline_a_OBJECTS) $(libfauicmdline_a_DEPENDENCIES)
-	-rm -f libfauicmdline.a
-	$(AR) cru libfauicmdline.a $(libfauicmdline_a_OBJECTS) $(libfauicmdline_a_LIBADD)
-	$(RANLIB) libfauicmdline.a
+libfaui.a: $(libfaui_a_OBJECTS) $(libfaui_a_DEPENDENCIES)
+	-rm -f libfaui.a
+	$(AR) cru libfaui.a $(libfaui_a_OBJECTS) $(libfaui_a_LIBADD)
+	$(RANLIB) libfaui.a
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 

@@ -55,6 +55,7 @@ int main(int argc, char **argv) {
     //testVector();
     //testBuffer();
     //testHashTable();
+    //exit(1);
 
     Preferences *prefs = new Preferences();
     Registrar *registrar= new Registrar();
@@ -118,38 +119,29 @@ void testVector() {
     Vector<char *> *pVect = new Vector<char *>(2);
     char *p1 = "Hey man!";
     char *p2 = "Yo dude!";
-    char *p3 = "And, the third.";
+    char *p3 = "And, the fourth.";
+    char *p4 = "third :)";
     pVect->Insert(p1);
     pVect->Insert(p2);
     pVect->Insert(p3);
+    pVect->InsertAt(2,p4);
     
     cout << pVect->ElementAt(0) << endl;
     cout << pVect->ElementAt(1) << endl;
     cout << pVect->ElementAt(2) << endl;
+    cout << pVect->ElementAt(3) << endl;
 
     pVect->RemoveElementAt(1);
 
     cout << pVect->ElementAt(0) << endl;
     cout << pVect->ElementAt(1) << endl;
+    cout << pVect->ElementAt(2) << endl;
 
     pVect->RemoveAll();
 
     if (pVect->ElementAt(0) != NULL) {
 	cout << "Final Test failed!!" << endl;
     }
-
-    Vector<DummyUI *> *pVect2 = new Vector<DummyUI *>(2);
-    DummyUI *pd = new DummyUI(NULL);
-    pVect2->Insert(pd);
-    pd = new DummyUI(NULL);
-    pVect2->Insert(pd);
-    pd = new DummyUI(NULL);
-    pVect2->Insert(pd);
-
-    pVect2->DeleteAll();
-    if (pVect2->ElementAt(0) != NULL) {
-	cout << "Final Test failed!! (2nd one)" << endl;
-   }
     cout << "Ending testVector..." << endl;
 }
 #endif

@@ -187,6 +187,10 @@ bool FreeLibrary(HMODULE hLibModule) {
 
 
 FARPROC GetProcAddress(HMODULE hModule, char *lpProcName) {
-    return dlsym(hModule,lpProcName);
+    FARPROC *rtn = dlsym(hModule,lpProcName);
+    if (!rtn) {
+	cout << "GetProcAddress: dlsym error: " << dlerror() << endl;
+    }
+    return rtn;
 }
 

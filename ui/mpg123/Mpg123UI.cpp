@@ -69,6 +69,7 @@ Error Mpg123UI::Init(int32 startup_level) {
 	signal(SIGINT,mysigint);
  
     }
+    return kError_NoErr;
 }
 
 void mysigterm(int f) {
@@ -93,7 +94,7 @@ Mpg123UI::~Mpg123UI() {
 
 int32 Mpg123UI::AcceptEvent(Event *e) {
     if (e) {
-	//cerr << "Mpg123COO: processing event " << e->GetEvent() << endl;
+	//cerr << "Mpg123COO: processing event " << e->Type() << endl;
 	switch (e->Type()) {
 	    case INFO_PlayListDonePlay: {
 		Event *e = new Event(CMD_QuitPlayer);
@@ -351,6 +352,7 @@ void Mpg123UI::ProcessArgs() {
 	Event *e = new Event(CMD_Play);
 	m_playerEQ->AcceptEvent(e);
     } else {
+	//cout << "Gonna try and quit..." << endl;
 	m_playerEQ->AcceptEvent(new Event(CMD_QuitPlayer));
     }
 }

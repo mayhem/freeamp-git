@@ -46,6 +46,7 @@ class Vector {
     void Swap(int32,int32);
     int32 DeleteElementAt(int32);
     int32 Insert(T &);
+    int32 InsertAt(int32,T &);
     int32 NumElements();
  
  private:
@@ -137,10 +138,36 @@ template<class T> int32 Vector<T>::DeleteElementAt(int32 e) {
     }
 }
 
+template<class T> int32 Vector<T>::InsertAt(int32 point, T &pE) {
+    int32 rtn = -1;
+    if (pE) {
+	if ((point<=m_insertionPoint) && (point >= 0)) {
+	    if (m_insertionPoint == (m_currentLength-1)) {
+		T *pNewObjs = new T[m_currentLength+m_threshhold];
+		memcpy(pNewObjs,m_pObjs,(sizeof (T))*point);
+		pNewObjs[point] = pE;
+		if (point < m_insertionPoint) {
+		    memcpy(&(pNewObjs[point+1]), &(m_pObjs[point]),(sizeof (T))*(m_insertionPoint-point));
+		}
+		delete m_pObjs;
+		m_pObjs = pNewObjs;
+		memset(&(m_pObjs[m_insertionPoint+1]),0,m_insertionPoint + m_threshhold - 2);
+		m_currentLength += m_threshhold;
+	    } else {
+		memmove(&(m_pObjs[point+1]),&(m_pObjs[point]),m_insertionPoint - point);
+		m_pObjs[point] = pE;
+	    }
+	    m_insertionPoint++;
+	    rtn = 0;
+	}
+    }
+    return rtn;
+}
+
 template<class T> int32 Vector<T>::Insert(T &pE) {
 //    cout << "v:inserting" << endl;
     if (pE) {
-	if (m_insertionPoint == m_currentLength) {
+	if (m_insertionPoint == (m_currentLength-1)) {
 	    //cout << "v:adding more" << endl;
 	    // add more and copy over
 	    T *pNewObjs = new T[m_currentLength+m_threshhold];
@@ -149,7 +176,8 @@ template<class T> int32 Vector<T>::Insert(T &pE) {
 	    //cout << "v:did copy" << endl;
 	    delete m_pObjs;
 	    m_pObjs = pNewObjs;
-	    for (int32 i=m_currentLength;i<m_currentLength + m_threshhold;i++) m_pObjs[i] = NULL;
+	    memset(&(m_pObjs[m_currentLength]),0,m_threshhold);
+	    //for (int32 i=m_currentLength;i<m_currentLength + m_threshhold;i++) m_pObjs[i] = NULL;
 	    m_currentLength = m_currentLength + m_threshhold;
 	}
 	m_pObjs[m_insertionPoint] = pE;
