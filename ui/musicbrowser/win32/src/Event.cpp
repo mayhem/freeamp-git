@@ -33,6 +33,7 @@ ____________________________________________________________________________*/
 #include "resource.h"
 #include "Win32MusicBrowser.h"
 #include "eventdata.h"
+#include "debug.h"
 
 const char* kAudioFileFilter =
             "MPEG Audio Streams (.mpg, .mp1, .mp2, .mp3, .mpp)\0"
@@ -1075,14 +1076,14 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent)
 {
     PlaylistFormatInfo format;
     int32 i, iOffset = 0;
-    
+
     char szFilter[1024] = "MPEG Audio Streams (.mp1;.mp2;.mp3;.mpp)\0"
                           "*.mp1;*.mp2;*.mp3;*.mpp\0";
 
     // we need a way to iterate LMCs...
     iOffset += strlen(szFilter) + 1; 
     iOffset += strlen(szFilter + iOffset) + 1;  
-        
+
     for(i = 0; ; i++)
     {
        if (m_oPlm->GetSupportedPlaylistFormats(&format, i) != kError_NoErr)

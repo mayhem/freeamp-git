@@ -797,7 +797,6 @@ DEP_CPP_MAIN_=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -814,6 +813,9 @@ DEP_CPP_MAIN_=\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
 	"..\include\win32prefs.h"\
+	
+NODEP_CPP_MAIN_=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"\
@@ -888,7 +890,6 @@ DEP_CPP_MAIN_=\
 	"..\..\include\hashtable.h"\
 	"..\..\include\log.h"\
 	"..\..\include\metadata.h"\
-	"..\..\include\musicbrowser.h"\
 	"..\..\include\player.h"\
 	"..\..\include\playlist.h"\
 	"..\..\include\playlistformat.h"\
@@ -905,6 +906,9 @@ DEP_CPP_MAIN_=\
 	"..\include\mutex.h"\
 	"..\include\semaphore.h"\
 	"..\include\win32prefs.h"\
+	
+NODEP_CPP_MAIN_=\
+	"..\..\include\musicbrowser.h"\
 	
 
 "$(INTDIR)\main.obj" : $(SOURCE) $(DEP_CPP_MAIN_) "$(INTDIR)"\

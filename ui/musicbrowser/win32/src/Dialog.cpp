@@ -1742,8 +1742,7 @@ FileOpenDialog(HWND hwnd,
     // Setup open file dialog box structure
     ofn.lStructSize       = sizeof(OPENFILENAME);
     ofn.hwndOwner         = hwnd;
-    ofn.hInstance         = (HINSTANCE)GetWindowLong(hwnd, 
-                                                     GWL_HINSTANCE);
+    ofn.hInstance         = g_hinst;
     ofn.lpstrFilter       = filter;
     ofn.lpstrCustomFilter = NULL;
     ofn.nMaxCustFilter    = 0;
@@ -1758,7 +1757,7 @@ FileOpenDialog(HWND hwnd,
 					        OFN_PATHMUSTEXIST |
   	     			        OFN_HIDEREADONLY | 
 					        OFN_ALLOWMULTISELECT |
-					        OFN_EXPLORER |
+					        OFN_EXPLORER | 
                             OFN_ENABLEHOOK |
                             OFN_ENABLETEMPLATE;
     ofn.nFileOffset       = 0;
@@ -1810,7 +1809,6 @@ FileOpenDialog(HWND hwnd,
 
         result = true;
     }
-
 
     /*if(CommDlgExtendedError() == CDERR_NOHINSTANCE)
     {   

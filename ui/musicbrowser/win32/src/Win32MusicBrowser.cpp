@@ -669,20 +669,12 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
         case CMD_AddFiles:
         {
             Int32PropValue *prop;
-            
+
             if(IsntError(m_context->props->GetProperty("MainWindow", (PropValue **)&prop)))
             {
                 HWND hwnd = (HWND)prop->GetInt32();
-
-                //if(!isVisible)
-                //    ShowBrowser(true);
-
-                AddFileEvent(m_hWnd);
-                
-
-                //MessageBox(NULL, "\'Open Files\' in not implemented under win32 right now." 
-                //                 "To add files use the \'My Music\' window.", "Sorry!", MB_OK);
-                //m_oPlm->AddItem("file://c|/local/mpegs/Air - Moon Safari - 01 - La Femme D'argent.mp3");
+    
+                AddFileEvent(hwnd);
             }
             
             break;
