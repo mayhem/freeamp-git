@@ -21,8 +21,8 @@
         $Id$
 ____________________________________________________________________________*/
 
-#ifndef INCLUDED_MISSINGFILE_H_
-#define INCLUDED_MISSINGFILE_H_
+#ifndef INCLUDED_MISSINGFILEUI_H_
+#define INCLUDED_MISSINGFILEUI_H_
 
 #include "config.h"
 

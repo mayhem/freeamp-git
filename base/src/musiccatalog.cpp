@@ -73,10 +73,11 @@ MusicCatalog::MusicCatalog(FAContext *context, char *databasepath)
 
 void MusicCatalog::StartTimer(void)
 {
-    WatchTimer();
-    if (m_timeout > 0)
+    if (m_timeout > 0) {
+        WatchTimer();
         m_context->timerManager->StartTimer(&m_watchTimer, watch_timer,
                                             m_timeout, this);
+    }
 }
 
 MusicCatalog::~MusicCatalog()
