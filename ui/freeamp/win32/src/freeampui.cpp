@@ -1212,25 +1212,12 @@ Notify(int32 command, LPNMHDR notifyMsgHdr)
                 {
                     case DIAL_BUTTON_DOWN:
                     {
+                        m_target->AcceptEvent(new Event(CMD_GetVolume));
+                        SetTimer(m_hwnd, TIMER_VOLUME_POSITION, 200, NULL);
+
                         m_timeView->Hide();
                         m_volumeInfoView->Show();
-
-                        uint32 volume;
-                        MMRESULT result;
-
-                        result = waveOutGetVolume((HWAVEOUT)WAVE_MAPPER, (DWORD*)&volume);
-
-                        if(result == MMSYSERR_NOERROR) 
-                        {
-                            volume = (uint32)(100 * ((float)LOWORD(volume)/(float)0xffff));
-                            m_volumeInfoView->SetVolume(volume);
-                            SetTimer(m_hwnd, TIMER_VOLUME_POSITION, 200, NULL);
-                        }
-                        else
-                        {
-                            m_volumeInfoView->SetVolume(666);
-                        }
-                        
+                       
                         break;
                     }
 
@@ -1426,12 +1413,14 @@ Timer(int32 timerID)
 
             m_volumeInfoView->SetVolume(volume);
 
-            MMRESULT result;
+            m_target->AcceptEvent(new VolumeEvent(CMD_SetVolume, volume));
+
+            /*MMRESULT result;
             //float percent = (float)volume/(float)100;
 
 			result = waveOutSetVolume( (HWAVEOUT)WAVE_MAPPER, 
                                         MAKELPARAM( 0xFFFF*volume/100, 
-                                                    0xFFFF*volume/100));
+                                                    0xFFFF*volume/100));*/
 
             break;
         }
@@ -2802,6 +2791,13 @@ AcceptEvent(Event* event)
                 KillTimer(m_hwnd, TIMER_SHOW_STATUS_INFO);
                 SetTimer(m_hwnd, TIMER_SHOW_STATUS_INFO, 5000, NULL);
                 m_songTitleView->SetText(statusEvent->GetStatusMessage());
+                break;
+            }
+
+            case INFO_VolumeInfo:
+            {
+                VolumeEvent* volumeEvent = (VolumeEvent*)event;
+                m_volumeInfoView->SetVolume(volumeEvent->GetVolume());
                 break;
             }
 

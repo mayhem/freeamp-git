@@ -33,9 +33,11 @@ Win32VolumeManager::Win32VolumeManager()
 
 }
 
-void Win32VolumeManager::SetVolume(int32 v) 
+void Win32VolumeManager::SetVolume(int32 volume) 
 {
-    waveOutSetVolume((HWAVEOUT)WAVE_MAPPER , MAKELPARAM(0xFFFF*v, 0xFFFF*v)); 
+    waveOutSetVolume(   (HWAVEOUT)WAVE_MAPPER, 
+                        MAKELPARAM( 0xFFFF*volume/100, 
+                                    0xFFFF*volume/100));
 }
 
 int32 Win32VolumeManager::GetVolume() 
