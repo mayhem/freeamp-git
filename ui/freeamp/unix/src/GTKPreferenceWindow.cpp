@@ -305,6 +305,7 @@ void GTKPreferenceWindow::GetPrefsValues(Preferences* prefs,
     prefs->GetShowToolbarTextLabels(&values->useTextLabels);
     prefs->GetShowToolbarImages(&values->useImages);
     prefs->GetSaveCurrentPlaylistOnExit(&values->savePlaylistOnExit);
+    prefs->GetPlayImmediately(&values->playImmediately);
 
     if(kError_BufferTooSmall == prefs->GetSaveMusicDirectory(buffer, &size))
     {
@@ -355,6 +356,7 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
     prefs->SetShowToolbarTextLabels(values->useTextLabels);
     prefs->SetShowToolbarImages(values->useImages);
     prefs->SetSaveCurrentPlaylistOnExit(values->savePlaylistOnExit);
+    prefs->SetPlayImmediately(values->playImmediately);
 
     prefs->SetDefaultPMO(values->defaultPMO.c_str());
     prefs->SetInputBufferSize(values->inputBufferSize);
@@ -490,6 +492,19 @@ void save_onexit_toggle(GtkWidget *w, GTKPreferenceWindow *p)
     p->SaveOnExitToggle(i);
 }
 
+void GTKPreferenceWindow::PlayImmediatelyToggle(int active)
+{
+    proposedValues.playImmediately = !active;
+    if (!firsttime)
+        gtk_widget_set_sensitive(applyButton, TRUE);
+}
+
+void play_now_toggle(GtkWidget *w, GTKPreferenceWindow *p)
+{
+    int i = GTK_TOGGLE_BUTTON(w)->active;
+    p->PlayImmediatelyToggle(i);
+}
+
 GtkWidget *GTKPreferenceWindow::CreatePage1(void)
 {
     firsttime = true;
@@ -581,19 +596,27 @@ GtkWidget *GTKPreferenceWindow::CreatePage1(void)
     gtk_box_pack_start(GTK_BOX(pane), frame, FALSE, FALSE, 5);
     gtk_widget_show(frame);
 
-    temphbox = gtk_hbox_new(FALSE, 5);
-    gtk_container_set_border_width(GTK_CONTAINER(temphbox), 5);
-    gtk_container_add(GTK_CONTAINER(frame), temphbox);
-    gtk_widget_show(temphbox);
+    vbox = gtk_vbox_new(FALSE, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+    gtk_widget_show(vbox);
 
     GtkWidget *check = gtk_check_button_new_with_label("Save current playlist when exiting the application");
-    gtk_box_pack_start(GTK_BOX(temphbox), check, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), check, FALSE, FALSE, 0);
     gtk_signal_connect(GTK_OBJECT(check), "toggled",
                        GTK_SIGNAL_FUNC(save_onexit_toggle), this);
     if (originalValues.savePlaylistOnExit)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     gtk_widget_show(check);
-    
+   
+    check = gtk_check_button_new_with_label("By default queue tracks rather than play them immediately");
+    gtk_box_pack_start(GTK_BOX(vbox), check, FALSE, FALSE, 0);
+    gtk_signal_connect(GTK_OBJECT(check), "toggled",
+                       GTK_SIGNAL_FUNC(play_now_toggle), this);
+    if (!originalValues.playImmediately) 
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
+    gtk_widget_show(check);
+
     return pane;
 }
 

@@ -75,6 +75,7 @@ typedef struct PrefsStruct
     bool useTextLabels;
     bool useImages; 
     bool savePlaylistOnExit;
+    bool playImmediately;
 
     string saveMusicDirectory;
     PortableSet portablePlayers;
@@ -84,6 +85,7 @@ typedef struct PrefsStruct
     bool operator == (const struct PrefsStruct& pref)
     {
         return (
+            playImmediately == pref.playImmediately &&
             useTextLabels == pref.useTextLabels &&
             useImages == pref.useImages &&
             savePlaylistOnExit == pref.savePlaylistOnExit &&
@@ -228,6 +230,7 @@ class GTKPreferenceWindow : public PreferenceWindow
       void SaveMusicSet(char *newpath, bool set);
       void SetToolbar(bool text, bool pics);
       void SaveOnExitToggle(int active);
+      void PlayImmediatelyToggle(int active);
 
       FAContext *GetContext(void) { return m_pContext; }
 };

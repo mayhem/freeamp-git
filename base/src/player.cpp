@@ -819,7 +819,9 @@ Run()
    delete[] name;
    delete[] musicBrowserName;
    delete[] downloadName;
+#ifdef WIN32
    delete[] toolbarName;
+#endif
 }
 
 void 

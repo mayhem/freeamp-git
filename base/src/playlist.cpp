@@ -485,8 +485,10 @@ Error PlaylistManager::GotoNextItem(bool userAction)
 
                 if(m_shuffle)
                 {
+                    pointer_to_unary_function<int, int> lRand = 
+                                   pointer_to_unary_function<int, int>(my_rand);
                     random_shuffle(m_shuffleList.begin(), m_shuffleList.end(),
-                                   pointer_to_unary_function<int, int>(my_rand));
+                                   lRand);
                 }
             }
             else if(index >= count)
@@ -525,8 +527,11 @@ Error PlaylistManager::GotoPreviousItem(bool userAction)
 
                 if(m_shuffle)
                 {
+                    pointer_to_unary_function<int, int> lRand =
+                                   pointer_to_unary_function<int, int>(my_rand);
+
                     random_shuffle(m_shuffleList.begin(), m_shuffleList.end(),
-                                   pointer_to_unary_function<int, int>(my_rand));
+                                   lRand);
                 }
             }
             else if(index != 0)
@@ -576,8 +581,9 @@ Error PlaylistManager::SetShuffleMode(bool shuffle)
 
     if(shuffle)
     {
-        random_shuffle(m_shuffleList.begin(), m_shuffleList.end(),
-                       pointer_to_unary_function<int, int>(my_rand));
+        pointer_to_unary_function<int, int> lRand =
+                       pointer_to_unary_function<int, int>(my_rand);
+        random_shuffle(m_shuffleList.begin(), m_shuffleList.end(), lRand);
 
         if(currentItem)
             m_current = InternalIndexOf(&m_shuffleList, currentItem);
@@ -837,7 +843,7 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, bool queryForMetaDa
 
     if(list)
     {
-        uint32 index = m_activeList->size();
+        //uint32 index = m_activeList->size();
 
         m_activeList->insert(m_activeList->end(),
                              list->begin(), 
@@ -1524,8 +1530,9 @@ Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
     }
     else if(currentItem && key == kPlaylistSortKey_Random)
     {
-        random_shuffle(m_activeList->begin(), m_activeList->end(),
-                       pointer_to_unary_function<int, int>(my_rand));
+        pointer_to_unary_function<int, int> lRand = 
+                       pointer_to_unary_function<int, int>(my_rand);
+        random_shuffle(m_activeList->begin(), m_activeList->end(), lRand);
         
         m_sortKey = key;
         m_sortType = type;
@@ -2273,8 +2280,10 @@ void PlaylistManager::AddItemToShuffleList(PlaylistItem* item)
 
 void PlaylistManager::AddItemsToShuffleList(vector<PlaylistItem*>* list)
 {
-    random_shuffle(list->begin(), list->end(),
-                   pointer_to_unary_function<int, int>(my_rand));
+    pointer_to_unary_function<int, int> lRand = 
+                   pointer_to_unary_function<int, int>(my_rand);
+
+    random_shuffle(list->begin(), list->end(), lRand);
 
     m_shuffleList.insert(m_shuffleList.end(),
                          list->begin(), 
