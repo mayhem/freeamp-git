@@ -1765,6 +1765,10 @@ LRESULT WINAPI MainWndProc( HWND hwnd,
                         {
                             KillTimer(hwnd, 0x02);
 
+                            g_displayInfo.hours = g_displayInfo.seekhours;
+                            g_displayInfo.minutes = g_displayInfo.seekminutes;
+                            g_displayInfo.seconds = g_displayInfo.seekseconds;
+
                             if(g_ui->m_state == STATE_Playing)
                             {
                                 g_ui->m_target->AcceptEvent(new ChangePositionEvent(g_displayInfo.seekframe));
