@@ -264,13 +264,15 @@ void MusicBrowserUI::InitList(void)
     GetWindowRect(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sRect);
 
     lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
-    lvc.fmt = LVCFMT_LEFT; // left align column
+    lvc.fmt = LVCFMT_RIGHT; // right align column
 
     lvc.pszText = "#";
     lvc.cchTextMax = strlen(lvc.pszText);
     lvc.iSubItem = 0;
     lvc.cx = (sRect.right-sRect.left)/8; // width of column in pixels
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 0, &lvc);
+
+    lvc.fmt = LVCFMT_LEFT; // left align column
 
     lvc.pszText = "Title";
     lvc.cchTextMax = strlen(lvc.pszText);

@@ -166,7 +166,7 @@ class MusicBrowserUI : public UserInterface
     TreeDataIndex        m_oTreeIndex;
     int                  m_iCollapseMoveAmount;
     HCURSOR              m_hSavedCursor, m_hDragCursor, m_hNoDropCursor;
-    HCURSOR              m_hSplitterCursor;
+    HCURSOR              m_hSplitterCursor, m_hPointerCursor, m_hCurrentCursor;
     MusicBrowserUI      *m_pParent;
     vector<MusicBrowserUI *> m_oWindowList;
     bool                 m_overSplitter;

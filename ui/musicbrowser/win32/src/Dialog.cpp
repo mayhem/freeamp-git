@@ -563,11 +563,8 @@ void MusicBrowserUI::SetMinMaxInfo(void)
 void MusicBrowserUI::InitDialog(HWND hWnd)
 {
     HIMAGELIST      hList;
-    HMODULE         hShell;
-    DWORD           dwIcon;
     const int32     kNumPanes = 1;
     int32           panes[kNumPanes]= {-1};
-    RECT            rect;
 
     m_hWnd = hWnd;
     m_hMusicCatalog = GetDlgItem(m_hWnd, IDC_MUSICTREE);
@@ -575,25 +572,26 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     m_hPlaylistTitle = GetDlgItem(m_hWnd, IDC_PLAYLISTTITLE);
     m_hMusicCatalogTitle = GetDlgItem(m_hWnd, IDC_MUSICCATALOGTEXT);
 
-    m_hSplitterCursor = LoadCursor(g_hinst, MAKEINTRESOURCE(IDC_SPLITTER));
-
-    hShell = GetModuleHandle("SHELL32.DLL");
+    HBITMAP bmp;
     
-    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 4, 0);
-    dwIcon = 4;     // 'Closed folder' Icon
-    ImageList_AddIcon(hList, LoadIcon(hShell, MAKEINTRESOURCE(dwIcon)));
-    dwIcon = 5; 	   // 'Open folder' icon
-    ImageList_AddIcon(hList, LoadIcon(hShell, MAKEINTRESOURCE(dwIcon)));
-    dwIcon = 152; 	   // 'File folder' icon (hopefully)
-    ImageList_AddIcon(hList, LoadIcon(hShell, MAKEINTRESOURCE(dwIcon)));
-    ImageList_AddIcon(hList, LoadIcon(g_hinst, MAKEINTRESOURCE(IDI_ACTIVELIST)));
+    hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 5, 0);
+
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_CATALOG));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PLAYLIST));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ARTIST));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_ALBUM));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_TRACK));
+    ImageList_AddMasked(hList, bmp, RGB(255,0,0));
  
     TreeView_SetImageList(m_hMusicCatalog, hList, TVSIL_NORMAL); 
-	FreeLibrary(hShell);
     
     hList = ImageList_Create(16, 16, ILC_COLOR24|ILC_MASK, 1, 0);
 
-    HBITMAP bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PLAYING));
+    bmp = LoadBitmap(g_hinst, MAKEINTRESOURCE(IDB_PLAYING));
     ImageList_AddMasked(hList, bmp, RGB(255,0,0));
     DeleteObject(bmp);
  
@@ -627,12 +625,8 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
     m_currentindex = -1;
     UpdateButtonStates();
 
-    // now that we have added all our decorations
-    // (toolbar and statusbar) let's calculate our size.
-    GetWindowRect(hWnd, &rect);
-
-    m_sMinSize.x = rect.right - rect.left;
-    m_sMinSize.y = rect.bottom - rect.top;
+    m_sMinSize.x = 500;
+    m_sMinSize.y = 300;
     
     if (m_pParent)
         ShowWindow(m_hWnd, SW_SHOW);
@@ -785,7 +779,7 @@ BOOL MusicBrowserUI::SetCursor(int hitTest, int mouseMsg)
 {
     BOOL result = FALSE;
 
-    if(m_overSplitter || m_trackSplitter)
+    if(m_overSplitter || m_trackSplitter && hitTest == HTCLIENT)
     {
         ::SetCursor(m_hSplitterCursor);
         result = TRUE;

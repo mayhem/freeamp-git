@@ -123,6 +123,10 @@ MusicBrowserUI::MusicBrowserUI(FAContext      *context,
 
     m_splitterBrush = CreatePatternBrush(bmp);
     DeleteObject(bmp);
+
+    m_hSplitterCursor = LoadCursor(g_hinst, MAKEINTRESOURCE(IDC_SPLITTER));
+    m_hPointerCursor = LoadCursor(NULL, IDC_ARROW);
+    m_hCurrentCursor = m_hPointerCursor;
 }
 
 MusicBrowserUI::~MusicBrowserUI()
