@@ -484,19 +484,8 @@ static void sort_random(GTKMusicBrowser *p, guint action, GtkWidget *w)
 
 static void show_help(GTKMusicBrowser *p, guint action, GtkWidget *w)
 {
-    string oHelpFile;
-    char   dir[_MAX_PATH];
-    uint32 len = _MAX_PATH;
-
-    p->GetContext()->prefs->GetInstallDirectory(dir, &len);
-    oHelpFile = string(dir) + string(DIR_MARKER_STR) + string("../share/");
-    oHelpFile += string(HELP_FILE);
-
-    struct stat st;
-
-    if (stat(oHelpFile.c_str(), &st) == 0 && st.st_mode & S_IFREG)
-        LaunchBrowser((char *)oHelpFile.c_str());
-    else {
+    if (!::ShowHelp(p->GetContext(), Music_Browser))
+    {
         GTKMessageDialog oBox;
         string oMessage("Cannot find the help files. Please make sure that the help files are properly installed, and you are not running "the_BRANDING" from the build directory.");
         oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);

@@ -93,19 +93,8 @@ static void pref_cancel_click(GtkWidget *w, GTKPreferenceWindow *p)
 
 void GTKPreferenceWindow::ShowHelp(void)
 {
-    string oHelpFile;
-    char   dir[_MAX_PATH];
-    uint32 len = _MAX_PATH;
-
-    m_pContext->prefs->GetInstallDirectory(dir, &len);
-    oHelpFile = string(dir) + string(DIR_MARKER_STR) + string("../share/");
-    oHelpFile += string(HELP_FILE);
-
-    struct stat st;
-
-    if (stat(oHelpFile.c_str(), &st) == 0 && st.st_mode & S_IFREG)
-        LaunchBrowser((char *)oHelpFile.c_str());
-    else {
+    if (!::ShowHelp(m_pContext, Preferences_General))
+    {
         MessageDialog oBox(m_pContext);
         string oMessage("Cannot find the help files. Please make sure that the help files are properly installed, and you are not running "the_BRANDING" from the build directory.");
         oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);

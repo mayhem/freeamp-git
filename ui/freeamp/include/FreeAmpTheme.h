@@ -87,6 +87,7 @@ class FreeAmpTheme : public UserInterface, public Theme
 
     protected:
 
+        void             ShowHelp(void);
         void             ReloadTheme(void);
         void             SetVolume(int iVolume, int iBalance);
         void             UpdateTimeDisplay(int iCurrentTime);

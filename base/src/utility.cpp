@@ -1,24 +1,24 @@
 /*____________________________________________________________________________
-	
-	FreeAmp - The Free MP3 Player
+    
+    FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1999 EMusic.com
+    Portions Copyright (C) 1999 EMusic.com
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-	
-	$Id$
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    
+    $Id$
 ____________________________________________________________________________*/
 
 // The debugger can't handle symbols more than 255 characters long.
@@ -528,22 +528,22 @@ void LaunchBrowser(const char* url)
             execlp("netscape", "netscape", url, NULL);
         }
         perror("Could not launch netscape");
-	_exit(0);
+    _exit(0);
     }
     else
     {
         if (fork() > 0) {
             delete [] browser;
-	    return;
+        return;
         }
-	    
+        
         char *command = new char[strlen(browser) + strlen(url) + 10];
         sprintf(command, "%s \"%s\"", browser, url);
 
         system(command);
 
         delete [] command;
-	_exit(0);
+    _exit(0);
     }
 }
 #endif
@@ -810,7 +810,7 @@ string FindFile(string oPath)
     return retvalue;
 }
 
-void ShowHelp(FAContext *m_context, const char *helpurl)
+bool ShowHelp(FAContext *m_context, const char *helpurl)
 {
     string  oHelpFile;
     char   *dir;
@@ -831,18 +831,14 @@ void ShowHelp(FAContext *m_context, const char *helpurl)
 #endif
     oHelpFile += string(helpurl);
 
-#if 0
     struct _stat   st;
     if (_stat(oHelpFile.c_str(), &st) != 0 || st.st_mode & S_IFREG == 0)
     {
-          MessageDialog oBox(m_context);
-          string        oMessage(szCantFindHelpError);
-
-          oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk, true);
+         delete [] dir;
+         return false;
     }
-#endif
 
-#ifdef UNIX	
+#ifdef UNIX 
     LaunchBrowser((char *)oHelpFile.c_str());
 #endif
 #ifdef WIN32
@@ -857,7 +853,9 @@ void ShowHelp(FAContext *m_context, const char *helpurl)
 
     len = _MAX_PATH;
     FilePathToURL(oHelpFile.c_str(), dir, &len);
-	ShellExecute(hWnd, "open", dir, NULL, NULL, SW_SHOWNORMAL);
+    ShellExecute(hWnd, "open", dir, NULL, NULL, SW_SHOWNORMAL);
 #endif
     delete [] dir;
+
+    return true;
 } 
