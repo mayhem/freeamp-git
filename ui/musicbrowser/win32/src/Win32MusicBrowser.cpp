@@ -477,6 +477,28 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
             break; 
         }
 
+        case INFO_PlaylistItemsAdded:
+        {
+            PlaylistItemsAddedEvent* pie = (PlaylistItemsAddedEvent*)event;
+
+            if(pie->Manager() == m_oPlm)
+                PlaylistListItemsAdded(pie->Items());
+            else
+            {
+                vector<MusicBrowserUI *>::iterator i;
+
+                for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                {
+                    if((*i)->PLManager() == pie->Manager())
+                    {
+                        (*i)->PlaylistListItemsAdded(pie->Items());
+                        break;
+                    }
+                }
+            }
+            
+            break; 
+        }
 
         case INFO_PlaylistItemAdded:
         {

@@ -1835,6 +1835,7 @@ ServiceEvent(Event * pC)
         case INFO_PlaylistRepeat:
         case INFO_PlaylistUpdated:
         case INFO_PlaylistItemAdded:
+        case INFO_PlaylistItemsAdded:
         case INFO_PlaylistItemRemoved:
         case INFO_PlaylistItemMoved:
         case INFO_PlaylistSorted:

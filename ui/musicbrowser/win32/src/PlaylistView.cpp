@@ -385,19 +385,19 @@ void MusicBrowserUI::InitList(void)
     {
         for(uint32 i = 0; i < m_itemsAddedBeforeWeWereCreated; i++)
         {
-            LV_ITEM sItem;
+            LV_ITEM lv_item;
 
-            sItem.mask = 0;
-            sItem.iSubItem = 0;
-            sItem.iItem = 0;
+            lv_item.mask = 0;
+            lv_item.iSubItem = 0;
+            lv_item.iItem = 0;
 
-            ListView_InsertItem(m_hPlaylistView, &sItem);
+            ListView_InsertItem(m_hPlaylistView, &lv_item);
         }
 
         m_itemsAddedBeforeWeWereCreated = 0;
     }
 
-    HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+    //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
     //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
     //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
@@ -420,19 +420,19 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
 
         //OutputDebugString(buf);
 
-        //LV_ITEM sItem;
+        //LV_ITEM lv_item;
 
         uint32 state = ListView_GetItemState(m_hPlaylistView, 
                                              oldIndex, 
                                              LVIS_SELECTED|LVIS_FOCUSED);
 
-        /*sItem.mask = LVIF_IMAGE | LVIF_PARAM | LVIF_STATE;
-        sItem.iSubItem = 0;
-        sItem.iItem = index;
-        sItem.lParam = (LPARAM)item;
-        sItem.iImage = 0;
-        sItem.stateMask = LVIS_FOCUSED|LVIS_SELECTED;
-        sItem.state = state;*/
+        /*lv_item.mask = LVIF_IMAGE | LVIF_PARAM | LVIF_STATE;
+        lv_item.iSubItem = 0;
+        lv_item.iItem = index;
+        lv_item.lParam = (LPARAM)item;
+        lv_item.iImage = 0;
+        lv_item.stateMask = LVIS_FOCUSED|LVIS_SELECTED;
+        lv_item.state = state;*/
 
         ListView_SetItemState(m_hPlaylistView, 
                               oldIndex, 
@@ -446,7 +446,7 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
 
         ListView_RedrawItems(m_hPlaylistView, 0, ListView_GetItemCount(m_hPlaylistView) - 1);
 
-        HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+        //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
         //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
         //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
@@ -461,27 +461,27 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
 
     if(oldIndex != kInvalidIndex)
     {
-        LV_ITEM sItem;
+        LV_ITEM lv_item;
         
-        sItem.mask = LVIF_PARAM|LVIF_STATE;
-        sItem.iItem = oldIndex;
-        sItem.iSubItem = 0;
-        sItem.lParam = 0;
-        sItem.stateMask = LVIS_SELECTED|LVIS_FOCUSED;
+        lv_item.mask = LVIF_PARAM|LVIF_STATE;
+        lv_item.iItem = oldIndex;
+        lv_item.iSubItem = 0;
+        lv_item.lParam = 0;
+        lv_item.stateMask = LVIS_SELECTED|LVIS_FOCUSED;
 
-        ListView_GetItem(m_hPlaylistView, &sItem);
+        ListView_GetItem(m_hPlaylistView, &lv_item);
         
         ListView_DeleteItem(m_hPlaylistView, oldIndex);
 
         if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
             oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
 
-        if(sItem.state & LVIS_SELECTED)
+        if(lv_item.state & LVIS_SELECTED)
         {
             ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
         }
 
-        if(sItem.state & LVIS_FOCUSED)
+        if(lv_item.state & LVIS_FOCUSED)
         {
             ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_FOCUSED, LVIS_FOCUSED);
         }
@@ -506,7 +506,7 @@ void MusicBrowserUI::PlaylistListSorted(void)
     m_bListChanged = true;
     UpdateButtonMenuStates();
 
-    HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+    //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
     //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
     //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
@@ -521,7 +521,7 @@ void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
     {
         ListView_RedrawItems(hwnd, index, index);
 
-        HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+        //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
         //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
         //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
@@ -530,22 +530,23 @@ void MusicBrowserUI::PlaylistListItemUpdated(const PlaylistItem* item)
 
 void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
 {
-    LV_ITEM       sItem;
+    LV_ITEM       lv_item;
     uint32        index = m_oPlm->IndexOf(item);
-    HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
 
     if(index != kInvalidIndex)
     {
-        if(hwnd)
+        if(m_hPlaylistView)
         {
-            sItem.mask = 0;
-            sItem.iSubItem = 0;
-            sItem.iItem = 0;
+            lv_item.mask = 0;
+            lv_item.iSubItem = 0;
+            lv_item.iItem = 0;
 
-            if(!ListView_GetItemCount(hwnd) && !m_pParent && !m_autoPlayHack)
+            if(!ListView_GetItemCount(m_hPlaylistView) && 
+               !m_pParent && 
+               !m_autoPlayHack)
                 m_context->target->AcceptEvent(new Event(CMD_Play));
 
-            ListView_InsertItem(hwnd, &sItem);
+            ListView_InsertItem(m_hPlaylistView, &lv_item);
 
             // this skips change notification
             // for initial loading of list for
@@ -566,11 +567,62 @@ void MusicBrowserUI::PlaylistListItemAdded(const PlaylistItem* item)
             m_itemsAddedBeforeWeWereCreated++;
         }
 
-        HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+        //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
 
         //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_oPlm->CanUndo() ? MF_ENABLED : MF_GRAYED));
         //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_oPlm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
+}
+
+void MusicBrowserUI::PlaylistListItemsAdded(const vector<PlaylistItem*>* items)
+{
+    uint32 count = ListView_GetItemCount(m_hPlaylistView);
+
+    if(m_oPlm->CountItems() != count)
+    {
+        uint32 newSize = ListView_GetItemCount(m_hPlaylistView);
+        newSize += items->size();
+        ListView_SetItemCount(m_hPlaylistView, newSize);
+    }
+
+    if(m_hPlaylistView)
+    {
+        LV_ITEM lv_item;
+
+        lv_item.mask = 0;
+        lv_item.iSubItem = 0;
+        lv_item.iItem = 0;
+
+        if(!count && 
+           !m_pParent && 
+           !m_autoPlayHack)
+            m_context->target->AcceptEvent(new Event(CMD_Play));
+
+        count = items->size();
+
+        for(uint32 i = 0; i < count; i++)
+            ListView_InsertItem(m_hPlaylistView, &lv_item);
+
+        // this skips change notification
+        // for initial loading of list for
+        // editing. a hack pretty much but
+        // i can't think of a better way
+        if(m_initialCount)
+            m_initialCount--;
+        else
+        {
+            m_bListChanged = true;
+            UpdateButtonMenuStates();
+        }
+
+        UpdateTotalTime();
+    }
+    else
+    {
+        m_itemsAddedBeforeWeWereCreated += items->size();
+    }
+
+
 }
 
 void MusicBrowserUI::GetSelectedPlaylistItems(vector<PlaylistItem*>* items)

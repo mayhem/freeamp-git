@@ -138,5 +138,7 @@ class EventQueue {
 #define INFO_MusicCatalogCleared    73 // sent by the MC whenever it clears its tree
 #define INFO_MusicCatalogStreamAdded  74 // sent by the MC when a stream is added
 #define INFO_MusicCatalogStreamRemoved 75 // sent by the MC when a stream is removed
+
+#define INFO_PlaylistItemsAdded 76 // sent by PLM to player to inform of a playlistitem update
 #endif // _EVENT_H_
 

@@ -867,11 +867,11 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, bool queryForMetaDa
         UndoAddMulti* undoItem = new UndoAddMulti(this, urls, index);
         m_undo.AddItem(undoItem);*/
 
-        vector<PlaylistItem *>::iterator i = list->begin();
-        for(; i != list->end(); i++)
-            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
+        //vector<PlaylistItem *>::iterator i = list->begin();
+        //for(; i != list->end(); i++)
+            //m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
 
-        
+        m_context->target->AcceptEvent(new PlaylistItemsAddedEvent(list, this));
 
         result = kError_NoErr;
     }
@@ -933,9 +933,11 @@ Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool 
         UndoAddMulti* undoItem = new UndoAddMulti(this, urls, index);
         m_undo.AddItem(undoItem);*/
 
-        vector<PlaylistItem *>::iterator i = list->begin();
-        for(; i != list->end(); i++)
-            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
+        //vector<PlaylistItem *>::iterator i = list->begin();
+        //for(; i != list->end(); i++)
+        //    m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i, this));
+
+        m_context->target->AcceptEvent(new PlaylistItemsAddedEvent(list, this));
 
         result = kError_NoErr;
     }

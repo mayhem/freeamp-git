@@ -674,6 +674,19 @@ public:
     const PlaylistManager* Manager() const { return m_plm; }
 };
 
+class PlaylistItemsAddedEvent : public Event {
+  private:
+    vector<PlaylistItem*> m_items;
+    const PlaylistManager* m_plm;
+public:
+	PlaylistItemsAddedEvent(vector<PlaylistItem*>* items, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistItemsAdded; m_items = *items; m_plm = plm;}
+	virtual ~PlaylistItemsAddedEvent() {}
+
+	const vector<PlaylistItem*>* Items() const { return &m_items; }
+    const PlaylistManager* Manager() const { return m_plm; }
+};
+
 class PlaylistItemMovedEvent : public Event {
 private:
 	const PlaylistItem* m_item;
