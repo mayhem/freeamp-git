@@ -537,8 +537,12 @@ void Player::HandleSingleArg(char *arg)
         {
             if (giveToTheme)
                 AddTheme(url);
-            else 
-                m_plm->AddItem(url); 
+            else {
+                struct stat st;
+                if (stat(path, &st) == 0) 
+                    if (!(st.st_mode & S_IFDIR))
+                        m_plm->AddItem(url); 
+            }
         }	
 #endif
     }
