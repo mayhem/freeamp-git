@@ -92,7 +92,7 @@ class SoundCardPMO:public PhysicalMediaOutput, public EventBuffer
    Thread      *m_pBufferThread;
    Mutex       *m_pPauseMutex;
    int          m_iOutputBufferSize, m_iTotalBytesWritten, m_iBytesPerSample;
-   int          m_iLastFrame;
+   int          m_iLastFrame, m_iDataSize;
 };
 
 #endif /* _SOUNDCARDPMO_H_ */

@@ -559,15 +559,18 @@ void FALcdWindow::DrawCurrentTimeState(int32 type) {
 	    BlitIcons(m_doubleBufferPixmap);
 	case TimeOnly:
 	    XCopyArea(m_display,m_pixmap,m_doubleBufferPixmap,m_timeGC,TIME_CLIP_X,TIME_CLIP_Y,TIME_CLIP_WIDTH,TIME_CLIP_HEIGHT,TIME_CLIP_X,TIME_CLIP_Y);
-	    if (m_currHours) {
-		char foo[16];
-		sprintf(foo,"%d:%.02d:%.02d",m_currHours,m_currMinutes,m_currSeconds);
-		BlitText(m_doubleBufferPixmap,m_timeGC,75,DESCRIPTION_TEXT_Y - 1,foo,LargeFont);
-	    } else {
+       // RAK: The hour code is commented out because there isn't enough
+       // space to display the hours. Next time someone works on this inter-
+       // face please fix this.
+//	    if (m_currHours) {
+//		char foo[16];
+//		sprintf(foo,"%d:%.02d:%.02d",m_currHours,m_currMinutes,m_currSeconds);
+//		BlitText(m_doubleBufferPixmap,m_timeGC,75,DESCRIPTION_TEXT_Y - 1,foo,LargeFont);
+//	    } else {
 		char foo[16];
 		sprintf(foo,"%.02d:%.02d",m_currMinutes,m_currSeconds);
 		BlitText(m_doubleBufferPixmap,m_timeGC,85,DESCRIPTION_TEXT_Y - 1, foo, LargeFont);
-	    }
+//	    }
 	    break;
 	case IconsOnly:
 	    BlitIcons(m_doubleBufferPixmap);

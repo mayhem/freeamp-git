@@ -40,11 +40,11 @@ ____________________________________________________________________________*/
 LogFile  *g_Log;
 
 #define PIECES 50
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
+#define DB //printf("%s:%d\n", __FILE__, __LINE__);
 
-const int iInitialBufferSize = 64 * 1024;
-const int iBufferSize = 512 * 1024;
-const int iOverflowSize = 24 * 1024;
+const int iDefaultBufferSize = 512 * 1024;
+const int iOrigBufferSize = 64 * 1024;
+const int iOverflowSize = 0;
 const int iWriteTriggerSize = 8 * 1024;
 const int iWriteToCard = 8 * 1024;
 
@@ -58,9 +58,8 @@ extern    "C"
 }
 
 SoundCardPMO::SoundCardPMO() :
-              EventBuffer(iInitialBufferSize, iOverflowSize, iWriteTriggerSize)
+              EventBuffer(iOrigBufferSize, iOverflowSize, iWriteTriggerSize)
 {
-   //printf("PMO ctor\n");
    m_properlyInitialized = false;
 
    myInfo = new OutputInfo();
@@ -73,6 +72,7 @@ SoundCardPMO::SoundCardPMO() :
    m_iTotalBytesWritten = 0;
    m_iBytesPerSample = 0;
    m_iLastFrame = -1;
+   m_iDataSize = 0;
 
    if (!m_pBufferThread)
    {
@@ -84,7 +84,6 @@ SoundCardPMO::SoundCardPMO() :
 
 SoundCardPMO::~SoundCardPMO()
 {
-   //printf("PMO dtor\n");
    m_bExit = true;
    m_pWriteSem->Signal();
    m_pReadSem->Signal();
@@ -125,20 +124,7 @@ void SoundCardPMO::WaitToQuit()
 
 Error SoundCardPMO::SetPropManager(Properties * p)
 {
-   PropValue *pProp;
-   int        iNewSize;
-
    m_propManager = p;
-   m_propManager->GetProperty("OutputBuffer", &pProp);
-   if (pProp)
-   {
-       iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
-       if (iNewSize > iInitialBufferSize)
-           Resize(iNewSize, iOverflowSize, iWriteTriggerSize);
-   }
-   else
-      Resize(iBufferSize, iOverflowSize, iWriteTriggerSize);
-
    return kError_NoErr;
 }
 
@@ -203,7 +189,12 @@ Error SoundCardPMO::Break()
 
 Error SoundCardPMO::Init(OutputInfo * info)
 {
+   PropValue *pProp;
+   int        iNewSize = iDefaultBufferSize;
+   Error      result;
+
    m_properlyInitialized = false;
+
    if (!info)
    {
       info = myInfo;
@@ -225,6 +216,22 @@ Error SoundCardPMO::Init(OutputInfo * info)
                         "the audio device is properly configured.");
             return (Error) pmoError_DeviceOpenFailed;
          }
+      }
+
+      m_iDataSize = info->max_buffer_size;
+      m_propManager->GetProperty("OutputBuffer", &pProp);
+      if (pProp)
+      {
+          iNewSize = atoi(((StringPropValue *)pProp)->GetString()) * 1024;
+      }
+
+      iNewSize -= iNewSize % m_iDataSize;
+      result = Resize(iNewSize, 0, m_iDataSize);
+      if (IsError(result))
+      {
+         ReportError("Internal buffer sizing error occurred.");
+         g_Log->Error("Resize output buffer failed.");
+         return result;
       }
    }
 
@@ -395,15 +402,37 @@ void SoundCardPMO::WorkerThread(void)
 
    for(; !m_bExit;)
    {
-      iToCopy = iWriteToCard;
+      if (!m_properlyInitialized)
+      {
+          pEvent = GetEvent();
 
-      //printf("before pause mutex acquire\n");
+          if (pEvent == NULL)
+          {
+              m_pReadSem->Wait();
+              continue;
+          }
+
+          if (pEvent->Type() == PMO_Init)
+          {
+              if (IsError(Init(((PMOInitEvent *)pEvent)->GetInfo())))
+              {
+                  delete pEvent;
+                  break;
+              }
+          }
+          delete pEvent;
+
+          continue;
+      }
+ 
+      iToCopy = m_iDataSize;
+
       m_pPauseMutex->Acquire();
-      //printf("after pause mutex acquire\n");
 
       eErr = BeginRead(pBuffer, iToCopy);
       //printf("after begin read\n");
-      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail)
+      if (eErr == kError_InputUnsuccessful || eErr == kError_NoDataAvail ||
+          iToCopy < m_iDataSize)
       {
           m_pPauseMutex->Release();
           m_pReadSem->Wait();
