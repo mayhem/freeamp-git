@@ -862,7 +862,6 @@ void HttpInput::WorkerThread(void)
           continue;
       }
        
-      DB
       eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadSize);
       if (eError == kError_NoErr)
       {
@@ -946,7 +945,6 @@ void HttpInput::WorkerThread(void)
               break;
           }
       }
-      DB
       if (eError == kError_BufferTooSmall)
       {
           if (m_bLoop)
