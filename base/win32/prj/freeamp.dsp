@@ -187,5 +187,20 @@ SOURCE=..\..\src\registry.cpp
 SOURCE=..\..\..\ui\src\uiregistry.cpp
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\res\freeamp.rc
+
+!IF  "$(CFG)" == "freeamp - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\res\icon1.ico
+# End Source File
 # End Target
 # End Project
