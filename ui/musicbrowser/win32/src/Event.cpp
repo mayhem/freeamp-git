@@ -446,43 +446,50 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
 
 void MusicBrowserUI::SortEvent(int id)
 {
-    PlaylistSortKey key;
+    PlaylistSortKey oldKey, newKey;
+    PlaylistSortType type;
     
     switch(id)
     {
         case ID_SORT_ARTIST:
-             key = kPlaylistSortKey_Artist;
+             newKey = kPlaylistSortKey_Artist;
         break;     
         case ID_SORT_ALBUM:
-             key = kPlaylistSortKey_Album;
+             newKey = kPlaylistSortKey_Album;
         break;     
         case ID_SORT_TITLE:
-             key = kPlaylistSortKey_Title;
+             newKey = kPlaylistSortKey_Title;
         break;     
         case ID_SORT_LENGTH:
-             key = kPlaylistSortKey_Time;
+             newKey = kPlaylistSortKey_Time;
         break;     
         case ID_SORT_YEAR:
-             key = kPlaylistSortKey_Year;
+             newKey = kPlaylistSortKey_Year;
         break;     
         case ID_SORT_TRACK:
-             key = kPlaylistSortKey_Track;
+             newKey = kPlaylistSortKey_Track;
         break;     
         case ID_SORT_GENRE:
-             key = kPlaylistSortKey_Genre;
+             newKey = kPlaylistSortKey_Genre;
         break;     
         case ID_SORT_LOCATION:
-             key = kPlaylistSortKey_Location;
+             newKey = kPlaylistSortKey_Location;
         break;     
         case IDC_RANDOMIZE:
         case ID_SORT_RANDOMIZE:
-             key = kPlaylistSortKey_Random;
+             newKey = kPlaylistSortKey_Random;
         break;     
         default:
              return;
     }
-    m_oPlm->Sort(key);
-    //UpdatePlaylistList();
+
+    oldKey = m_oPlm->GetPlaylistSortKey();
+
+    type = (oldKey == newKey && 
+            m_oPlm->GetPlaylistSortType() == PlaylistSortType_Ascending)
+            ? PlaylistSortType_Descending : PlaylistSortType_Ascending;
+
+    m_oPlm->Sort(newKey, type);
 }
 
 void MusicBrowserUI::ToggleVisEvent(void)

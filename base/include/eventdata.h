@@ -622,6 +622,18 @@ public:
     const PlaylistManager* Manager() const { return m_plm; }
 };
 
+class PlaylistSortedEvent : public Event {
+private:
+	PlaylistSortKey m_key;
+    const PlaylistManager* m_plm;
+public:
+	PlaylistSortedEvent(PlaylistSortKey key, const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistSorted; m_key = key; m_plm = plm;}
+	virtual ~PlaylistSortedEvent() {}
+
+	PlaylistSortKey GetSortKey() const { return m_key; }
+    const PlaylistManager* Manager() const { return m_plm; }
+};
 
 class PlaylistRepeatEvent : public Event {
 private:

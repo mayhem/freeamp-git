@@ -170,12 +170,15 @@ class PlaylistItem {
 class PlaylistItemSort : public binary_function<PlaylistItem*, PlaylistItem*, bool> {
 
  public:
-    PlaylistItemSort(PlaylistSortKey sortKey) : m_sortKey(sortKey) { }
+    PlaylistItemSort(PlaylistSortKey sortKey, 
+                     PlaylistSortType sortType = PlaylistSortType_Ascending) : 
+                     m_sortKey(sortKey), m_sortType(sortType) { }
 
     bool operator() (PlaylistItem* item1, PlaylistItem* item2) const;
    
  private:
     PlaylistSortKey m_sortKey;
+    PlaylistSortType m_sortType;
 };
 
 class MetaDataSort : public binary_function<PlaylistItem*, PlaylistItem*, bool> {
@@ -240,6 +243,7 @@ class PlaylistManager {
     // Functions for sorting
     Error Sort(PlaylistSortKey key, PlaylistSortType type = PlaylistSortType_Ascending);
     PlaylistSortKey GetPlaylistSortKey() const;
+    PlaylistSortType GetPlaylistSortType() const;
 
     // Which playlist are we dealing with for purposes of editing:
     // 1) Master Playlist - list of songs to play
@@ -329,11 +333,12 @@ class PlaylistManager {
     vector<PlaylistItem*>*  m_activeList; 
     vector<PlaylistItem*>   m_shuffleList;
 
-    uint32          m_current;
-    bool            m_shuffle;
-    RepeatMode      m_repeatMode;
-    PlaylistKey     m_playlistKey;
-    PlaylistSortKey m_sortKey;
+    uint32           m_current;
+    bool             m_shuffle;
+    RepeatMode       m_repeatMode;
+    PlaylistKey      m_playlistKey;
+    PlaylistSortKey  m_sortKey;
+    PlaylistSortType m_sortType;
 
     string      m_externalPlaylist;
     DeviceInfo  m_portableDevice;

@@ -123,6 +123,11 @@ bool PlaylistItemSort::operator() (PlaylistItem* item1,
         }
     }
 
+    /*if(m_sortType == PlaylistSortType_Descending)
+    {
+        result = !result;
+    }*/
+
     return result;
 }
 
@@ -153,6 +158,7 @@ PlaylistManager::PlaylistManager(FAContext* context)
     m_shuffle = false;
     m_repeatMode = kPlaylistMode_RepeatNone;
     m_sortKey = kPlaylistSortKey_Random;
+    m_sortType = PlaylistSortType_Ascending;
 
     m_context->prefs->GetPlaylistShuffle(&m_shuffle);
     m_context->prefs->GetPlaylistRepeat((int32*)&m_repeatMode);
@@ -1187,24 +1193,34 @@ Error PlaylistManager::MoveItems(vector<PlaylistItem*>* items, uint32 index)
 Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
 {
     Error result = kError_InvalidParam;
+    m_mutex.Acquire();
 
     if(key >= kPlaylistSortKey_FirstKey && key < kPlaylistSortKey_LastKey)
     {
         if(type == PlaylistSortType_Ascending)
-            sort(m_activeList->begin(), m_activeList->end(), PlaylistItemSort(key));
+            stable_sort(m_activeList->begin(), m_activeList->end(), PlaylistItemSort(key));
         else
-            sort(m_activeList->begin(), m_activeList->end(), not2(PlaylistItemSort(key)));
+            stable_sort(m_activeList->begin(), m_activeList->end(), not2(PlaylistItemSort(key)));
     
         m_sortKey = key;
+        m_sortType = type;
+
         result = kError_NoErr;
     }
     else if(key == kPlaylistSortKey_Random)
     {
         random_shuffle(m_activeList->begin(), m_activeList->end());
+        
         m_sortKey = key;
+        m_sortType = type;
+
         result = kError_NoErr;
     }
 
+    if(IsntError(result))
+        m_context->target->AcceptEvent(new PlaylistSortedEvent(key, this));
+
+    m_mutex.Release();
     return result;
 }
 
@@ -1213,6 +1229,10 @@ PlaylistSortKey PlaylistManager::GetPlaylistSortKey() const
     return m_sortKey;
 }
 
+PlaylistSortType PlaylistManager::GetPlaylistSortType() const
+{
+    return m_sortType;
+}
 
 // Which playlist are we dealing with for purposes of editing:
 // 1) Master Playlist - list of songs to play

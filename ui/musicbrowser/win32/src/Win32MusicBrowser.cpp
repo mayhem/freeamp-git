@@ -288,6 +288,29 @@ int32 MusicBrowserUI::AcceptEvent(Event *event)
           
             break; 
         }
+        
+        case INFO_PlaylistSorted:
+        {
+            PlaylistSortedEvent* pie = (PlaylistSortedEvent*)event;
+
+            if(pie->Manager() == m_oPlm)
+                PlaylistListSorted();
+            else
+            {
+                vector<MusicBrowserUI *>::iterator i;
+
+                for(i = m_oWindowList.begin(); i != m_oWindowList.end(); i++)
+                {
+                    if((*i)->PLManager() == pie->Manager())
+                    {
+                        (*i)->PlaylistListSorted();
+                        break;
+                    }
+                }
+            }
+          
+            break; 
+        }
 
         case INFO_PlaylistCurrentItemInfo:
         {

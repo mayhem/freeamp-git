@@ -169,6 +169,7 @@ class MusicBrowserUI : public UserInterface
     void  PlaylistListItemMoved(const PlaylistItem* item, 
                                 uint32 oldIndex, uint32 newIndex);
     void  PlaylistListItemRemoved(const PlaylistItem* item, uint32 oldIndex);
+    void  PlaylistListSorted(void);
     void  InitList(void);
     void  AddPlaylist(const string &oName);
     void  LoadPlaylist(const string &oPlaylist);

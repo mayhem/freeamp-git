@@ -93,18 +93,18 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             rcClip = dis->rcItem;   
         
             HWND hwndList = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+            PlaylistItem* item;
             LV_ITEM lv_item;
-            char* buf = new char[1024]; // MS is so dumb they do not give you a way to query text length
             string displayString;
 
-            lv_item.mask = LVIF_TEXT;
-            lv_item.state = 0;
-            lv_item.stateMask = 0;
+            lv_item.mask = LVIF_PARAM;
             lv_item.iItem = dis->itemID;
             lv_item.iSubItem = 0;
-            lv_item.pszText = buf;
-            lv_item.cchTextMax = 2;
             lv_item.lParam = NULL;
+
+            ListView_GetItem(hwndList, &lv_item);
+
+            item = (PlaylistItem*) lv_item.lParam;
 
             // is this the current index? if so make it bold ...
             // btw, we only do this if it is the primary browser
@@ -122,10 +122,9 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             }
 
             // Item index
-            //ListView_GetItemText(hwndList, dis->itemID, 0, buf, 1024);
+            char buf[64];
             sprintf(buf, "%d", dis->itemID + 1);
             displayString = buf;
-
             
             CalcStringEllipsis(dis->hDC, 
                                displayString, 
@@ -155,24 +154,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             SetTextAlign(dis->hDC, oldAlign);
 
-            /*ExtTextOut( dis->hDC, 
-                        rcClip.left + cxImage + 2, rcClip.top + 1, 
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        displayString.c_str(),
-                        displayString.size(),
-                        NULL);
             
-            // Draw the icon. Drawing it after the first item allows us
-            // to let ExtTextOut draw the correct background 
-            if(himl && dis->itemID == m_oPlm->GetCurrentIndex())
-            {
-                uint32 top = rcClip.top + ((rcClip.bottom - rcClip.top) - cyImage)/2;
-                ImageList_Draw( himl, 0, dis->hDC, 
-                                rcClip.left, top,
-                                uiFlags);
-            }*/
-
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 0);
 
@@ -194,11 +176,10 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
             }
 
-            
 
             // Title
-            ListView_GetItemText(hwndList, dis->itemID, 1, buf, 1024);
-            displayString = buf;
+            //ListView_GetItemText(hwndList, dis->itemID, 1, buf, 1024);
+            displayString = item->GetMetaData().Title();
 
             CalcStringEllipsis(dis->hDC, 
                                displayString, 
@@ -216,8 +197,8 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             rcClip.left += ListView_GetColumnWidth(hwndList, 1);
 
             // Artist
-            ListView_GetItemText(hwndList, dis->itemID, 2, buf, 1024);
-            displayString = buf;
+            //ListView_GetItemText(hwndList, dis->itemID, 2, buf, 1024);
+            displayString = item->GetMetaData().Artist();
 
             CalcStringEllipsis(dis->hDC, 
                                displayString, 
@@ -235,9 +216,8 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             rcClip.left += ListView_GetColumnWidth(hwndList, 2);
 
             // Album
-            ListView_GetItemText(hwndList, dis->itemID, 3, buf, 1024);
-
-            displayString = buf;
+            //ListView_GetItemText(hwndList, dis->itemID, 3, buf, 1024);
+            displayString = item->GetMetaData().Album();
 
             CalcStringEllipsis(dis->hDC, 
                                displayString, 
@@ -255,9 +235,24 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             rcClip.left += ListView_GetColumnWidth(hwndList, 3);
 
             // Length
-            ListView_GetItemText(hwndList, dis->itemID, 4, buf, 1024);
+            //ListView_GetItemText(hwndList, dis->itemID, 4, buf, 1024);
 
-            displayString = buf;
+            if(item->GetMetaData().Time() != 0)
+            {
+                int32 seconds = item->GetMetaData().Time();
+                int32 hours = seconds / 3600;
+		        int32 minutes = seconds / 60 - hours * 60;
+                seconds = seconds - minutes * 60 - hours * 3600;
+
+                if(hours)
+                    sprintf(buf, "%d:%02d:%02d", hours, minutes, seconds);
+                else
+                    sprintf(buf, "%d:%02d", minutes, seconds);
+
+                displayString = buf;
+            }
+            else    
+                displayString = "Unknown";
 
             CalcStringEllipsis(dis->hDC, 
                                displayString, 
@@ -479,18 +474,15 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
     if(index != kInvalidIndex)
     {
         LV_ITEM sItem;
-        char    szText[256];
 
         uint32 state = ListView_GetItemState(m_hPlaylistView, 
                                              oldIndex, 
                                              LVIS_SELECTED|LVIS_FOCUSED);
 
-        sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM | LVIF_STATE;
-        sItem.pszText = szText;
-        sItem.cchTextMax = strlen(szText);
+        sItem.mask = LVIF_IMAGE | LVIF_PARAM | LVIF_STATE;
         sItem.iSubItem = 0;
         sItem.iItem = index;
-        sItem.lParam = index;
+        sItem.lParam = (LPARAM)item;
         sItem.iImage = 0;
         sItem.stateMask = LVIS_FOCUSED|LVIS_SELECTED;
         sItem.state = state;
@@ -498,46 +490,6 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
         ListView_DeleteItem(hwnd, oldIndex);
 
         ListView_InsertItem(hwnd, &sItem);
-
-        sItem.mask = LVIF_TEXT;
-
-        // Update Title
-        sItem.pszText = (char*)item->GetMetaData().Title().c_str();
-        sItem.cchTextMax = item->GetMetaData().Title().length();
-        sItem.iSubItem = 1;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Artist
-        sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
-        sItem.cchTextMax = item->GetMetaData().Artist().length();
-        sItem.iSubItem = 2;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Album
-        sItem.pszText = (char*)item->GetMetaData().Album().c_str();
-        sItem.cchTextMax = item->GetMetaData().Album().length();
-        sItem.iSubItem = 3;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Time
-        if (item->GetMetaData().Time() != 0)
-        {
-            int32 seconds = item->GetMetaData().Time();
-            int32 hours = seconds / 3600;
-		    int32 minutes = seconds / 60 - hours * 60;
-            seconds = seconds - minutes * 60 - hours * 3600;
-
-            if(hours)
-                sprintf(szText, "%d:%02d:%02d", hours, minutes, seconds);
-            else
-                sprintf(szText, "%d:%02d", minutes, seconds);
-        }
-        else    
-            strcpy(szText, "Unknown");
-        sItem.pszText = szText;
-        sItem.cchTextMax = strlen(szText);
-        sItem.iSubItem = 4;
-        ListView_SetItem(hwnd, &sItem);
     }
 }
 
@@ -560,118 +512,60 @@ void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item,
     }
 }
 
+static
+int CALLBACK LVCompareFunc(LPARAM lParam1, 
+                           LPARAM lParam2, 
+	                       LPARAM lParamSort)
+{
+    int result = 0;
+    PlaylistManager* plm = (PlaylistManager*)lParamSort;
+    PlaylistItem* item1 = (PlaylistItem*)lParam1;
+    PlaylistItem* item2 = (PlaylistItem*)lParam2;
+    uint32 index1 = plm->IndexOf(item1);
+    uint32 index2 = plm->IndexOf(item2);
+    
+    if(index1 < index2)
+        result = -1;
+    else if(index2 < index1)
+        result = 1;
+    
+    return result;
+}
+
+void MusicBrowserUI::PlaylistListSorted(void)
+{
+    // instead of just removing all and then adding 
+    // again lets try to usae the sort feature of the 
+    // list and sort on index;
+    ListView_SortItems(m_hPlaylistView, LVCompareFunc, (LPARAM)m_oPlm);
+}
+
 void MusicBrowserUI::UpdatePlaylistListItem(const PlaylistItem* item)
 {
-    LV_ITEM       sItem;
-    char          szText[256];
     uint32        index = m_oPlm->IndexOf(item);
     HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
 
     if(index != kInvalidIndex)
     {
-        sItem.mask = LVIF_TEXT;
-        sItem.iItem = index;
-
-        // Update Title
-        sItem.pszText = (char*)item->GetMetaData().Title().c_str();
-        sItem.cchTextMax = item->GetMetaData().Title().length();
-        sItem.iSubItem = 1;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Artist
-        sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
-        sItem.cchTextMax = item->GetMetaData().Artist().length();
-        sItem.iSubItem = 2;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Album
-        sItem.pszText = (char*)item->GetMetaData().Album().c_str();
-        sItem.cchTextMax = item->GetMetaData().Album().length();
-        sItem.iSubItem = 3;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Time
-        if (item->GetMetaData().Time() != 0)
-        {
-            int32 seconds = item->GetMetaData().Time();
-            int32 hours = seconds / 3600;
-		    int32 minutes = seconds / 60 - hours * 60;
-            seconds = seconds - minutes * 60 - hours * 3600;
-
-            if(hours)
-                sprintf(szText, "%d:%02d:%02d", hours, minutes, seconds);
-            else
-                sprintf(szText, "%d:%02d", minutes, seconds);
-        }
-        else    
-            strcpy(szText, "Unknown");
-        sItem.pszText = szText;
-        sItem.cchTextMax = strlen(szText);
-        sItem.iSubItem = 4;
-        ListView_SetItem(hwnd, &sItem);
+        ListView_RedrawItems(hwnd, index, index);
     }
 }
 
 void MusicBrowserUI::AddPlaylistListItem(const PlaylistItem* item)
 {
     LV_ITEM       sItem;
-    char          szText[256];
     uint32        index = m_oPlm->IndexOf(item);
     HWND          hwnd = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
 
     if(index != kInvalidIndex)
     {
-        sprintf(szText, "%d", index + 1);
-
-        sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-        sItem.pszText = szText;
-        sItem.cchTextMax = strlen(szText);
+        sItem.mask = LVIF_IMAGE | LVIF_PARAM;
         sItem.iSubItem = 0;
         sItem.iItem = index;
-        sItem.lParam = index;
+        sItem.lParam = (LPARAM)item;
         sItem.iImage = 0;
 
         ListView_InsertItem(hwnd, &sItem);
-
-        sItem.mask = LVIF_TEXT;
-
-        // Update Title
-        sItem.pszText = (char*)item->GetMetaData().Title().c_str();
-        sItem.cchTextMax = item->GetMetaData().Title().length();
-        sItem.iSubItem = 1;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Artist
-        sItem.pszText = (char*)item->GetMetaData().Artist().c_str();
-        sItem.cchTextMax = item->GetMetaData().Artist().length();
-        sItem.iSubItem = 2;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Album
-        sItem.pszText = (char*)item->GetMetaData().Album().c_str();
-        sItem.cchTextMax = item->GetMetaData().Album().length();
-        sItem.iSubItem = 3;
-        ListView_SetItem(hwnd, &sItem);
-
-        // Update Time
-        if (item->GetMetaData().Time() != 0)
-        {
-            int32 seconds = item->GetMetaData().Time();
-            int32 hours = seconds / 3600;
-		    int32 minutes = seconds / 60 - hours * 60;
-            seconds = seconds - minutes * 60 - hours * 3600;
-
-            if(hours)
-                sprintf(szText, "%d:%02d:%02d", hours, minutes, seconds);
-            else
-                sprintf(szText, "%d:%02d", minutes, seconds);
-        }
-        else    
-            strcpy(szText, "Unknown");
-        sItem.pszText = szText;
-        sItem.cchTextMax = strlen(szText);
-        sItem.iSubItem = 4;
-        ListView_SetItem(hwnd, &sItem);
     }
 }
 
@@ -680,60 +574,18 @@ void MusicBrowserUI::UpdatePlaylistList(void)
     LV_ITEM       sItem;
     int           i;
     PlaylistItem *pItem;
-    char          szText[256];
 
     ListView_DeleteAllItems(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX));
     sItem.state = sItem.stateMask = 0;
     for(i = 0; pItem = m_oPlm->ItemAt(i); i++)
     {
-        sprintf(szText, "%d", i + 1);
-
-        sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-        sItem.pszText = szText;
-        sItem.cchTextMax = strlen(szText);
+        sItem.mask = LVIF_IMAGE | LVIF_PARAM;
         sItem.iSubItem = 0;
         sItem.iItem = i;
-        sItem.lParam = i;
+        sItem.lParam = (LPARAM)pItem;
         sItem.iImage = 0;
 
         ListView_InsertItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
-
-        sItem.mask = LVIF_TEXT;
-        sItem.pszText = (char *)pItem->GetMetaData().Title().c_str();
-        sItem.cchTextMax = pItem->GetMetaData().Title().length();
-        sItem.iSubItem = 1;
-
-        ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
-
-        sItem.mask = LVIF_TEXT;
-        sItem.pszText = (char *)pItem->GetMetaData().Artist().c_str();
-        sItem.cchTextMax = pItem->GetMetaData().Artist().length();
-        sItem.iSubItem = 2;
-        ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
-
-        sItem.mask = LVIF_TEXT;
-        sItem.pszText = (char *)pItem->GetMetaData().Album().c_str();
-        sItem.cchTextMax = pItem->GetMetaData().Album().length();
-        sItem.iSubItem = 3;
-        ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
-
-        if (pItem->GetMetaData().Time() != 0)
-        {
-           int iTime = pItem->GetMetaData().Time();
-           if (iTime > 3600)
-              sprintf(szText, "%d:%02d:%02d", iTime / 3600, 
-                                          (iTime % 3600) / 60,
-                                          iTime % 60);
-           else   
-               sprintf(szText, "%d:%02d", (iTime % 3600) / 60,
-                                        iTime % 60);
-        }      
-        else    
-            strcpy(szText, "Unknown");
-        sItem.pszText = szText;
-        sItem.cchTextMax = strlen(szText);
-        sItem.iSubItem = 4;
-        ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
     }
 
     if (m_currentindex >= i)
