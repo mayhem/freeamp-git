@@ -609,6 +609,22 @@ Run()
 
          name = new char[len];
       }
+#ifdef unix
+#ifndef HAVE_GTK
+      if (!strcmp("freeamp.ui", name)) {
+          pref = kTextUIPref;
+
+          while ((error = m_context->prefs->GetPrefString(pref, name, &len)) ==
+                 kError_BufferTooSmall)
+          {
+              delete [] name;
+              len++;
+
+              name = new char[len];
+          }
+      }
+#endif
+#endif
    }
    else
    {
