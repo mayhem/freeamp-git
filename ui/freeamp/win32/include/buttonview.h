@@ -65,6 +65,9 @@ class ButtonView : public View {
 
     virtual void Invoke(void);
 
+    void SetState(ButtonState state);
+
+
  protected:
     
  private:

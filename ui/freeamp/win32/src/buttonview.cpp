@@ -123,7 +123,7 @@ void
 ButtonView::
 LeftButtonUp(int32 x, int32 y, int32 modifiers)
 {
-    if(m_flags & ButtonType_ToggleButton)
+    if(0)//m_flags & ButtonType_ToggleButton)
     {
         if(m_state == Unpressed)
         {
@@ -167,6 +167,30 @@ LeftButtonUp(int32 x, int32 y, int32 modifiers)
     }
 
     Invalidate();
+}
+
+void 
+ButtonView::
+SetState(ButtonState state)
+{
+    if(m_state != state)
+    {
+        if(m_flags & ButtonType_ToggleButton)
+        {
+            m_state = state;
+
+            if(m_state == Unpressed)
+            {
+                m_offset = 0;
+            }
+            else if(m_state == Pressed)
+            {
+                m_offset = Height()*2;
+            }
+        }
+
+        Invalidate();
+    }
 }
 
 void

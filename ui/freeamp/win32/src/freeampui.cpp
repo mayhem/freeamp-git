@@ -484,7 +484,7 @@ DropFiles(HDROP dropHandle)
 							file,
 							sizeof(file));
 
-	m_target->AcceptEvent(new Event(CMD_Stop));
+	//m_target->AcceptEvent(new Event(CMD_Stop));
 
 	for(int32 i = 0; i < count; i++)
 	{
@@ -590,34 +590,14 @@ Command(int32 command,
 
         case kRepeatControl:
         {
-            bool repeat =   !m_repeatIconView->Status() && 
-                            !m_repeatAllIconView->Status() ||
-                            m_repeatIconView->Status() && 
-                            !m_repeatAllIconView->Status();
+            m_plm->ToggleRepeat();
 
-            bool all =  m_repeatIconView->Status() && 
-                        !m_repeatAllIconView->Status();
-
-            m_repeatIconView->On( repeat );
-            m_repeatAllIconView->On( all );
-
-			if(repeat && all)
-				m_plm->SetRepeat(REPEAT_ALL);
-			else if(repeat)
-				m_plm->SetRepeat(REPEAT_CURRENT);
-			else
-				m_plm->SetRepeat(REPEAT_NOT);
             break;
         }
 
         case kShuffleControl:
         {
-            m_shuffleIconView->On(!m_shuffleIconView->Status());
-
-			if(m_shuffleIconView->Status())
-				m_plm->SetShuffle(SHUFFLE_RANDOM);
-			else
-				m_plm->SetShuffle(SHUFFLE_NOT_SHUFFLED);
+            m_plm->ToggleShuffle();
 
             break;
         }
@@ -1959,11 +1939,43 @@ AcceptEvent(Event* event)
         {
 		    case INFO_PlayListRepeat:
 			{
+                PlayListRepeatEvent* plre = (PlayListRepeatEvent*)event;
+
+				switch(plre->GetRepeatMode()) 
+                {
+				    case REPEAT_CURRENT:
+                        m_repeatIconView->On( true );
+                        m_repeatAllIconView->On( false );
+					    break;
+				    case REPEAT_ALL:
+					    m_repeatIconView->On( true );
+                        m_repeatAllIconView->On( true );
+					    break;
+				    case REPEAT_NOT:
+				    default:
+					    m_repeatIconView->On( false );
+                        m_repeatAllIconView->On( false ); 
+					    break;
+				}
 				break;
 			}
 
 		    case INFO_PlayListShuffle:
 			{
+                PlayListShuffleEvent* plse = (PlayListShuffleEvent*)event;
+                
+				switch(plse->GetShuffleMode()) 
+                {
+				    case SHUFFLE_NOT_SHUFFLED:
+                        m_shuffleIconView->On(false);
+					    break;
+				    case SHUFFLE_RANDOM:
+					    m_shuffleIconView->On(true);
+					    break;
+				    default:
+					    m_shuffleIconView->On(false);
+                        break;
+				}
 				break;
 			}
 
@@ -1972,11 +1984,13 @@ AcceptEvent(Event* event)
                 m_state = STATE_Playing;
                 m_stopView->Show();
                 m_playView->Hide();
+                m_pauseView->SetState(Unpressed);
 	            break; 
             }
 
             case INFO_Paused: 
             {
+                m_pauseView->SetState(Pressed);
                 m_state = STATE_Paused;
 	            break; 
             }
@@ -1986,6 +2000,7 @@ AcceptEvent(Event* event)
                 m_state = STATE_Stopped;
                 m_playView->Show();
                 m_stopView->Hide();
+                m_pauseView->SetState(Unpressed);
 	            break; 
             }
 
