@@ -22,157 +22,124 @@
 ____________________________________________________________________________*/
 
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "preferences.h"
 
 
-#define DEFAULT_UI  
-
-#if 0
-const HKEY  kMainKey = HKEY_CURRENT_USER;
-const char* kFreeAmpKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.0";
-const char* kInstallDirPref = "InstallDirectory";
-const char* kUIPref = "UI";
-const char* kDefaultUI = "simple";
-#endif
 
 Preferences::Preferences() {
-#if 0
-    LONG    result;
-    DWORD   type;
-	DWORD   size;
-    char    temp[MAX_PATH] = {0x00};
-    char    cwd[MAX_PATH]= {0x00};
 
-    // Where are we starting the program from?
-    GetCurrentDirectory(sizeof(cwd), cwd);
-
-    m_prefsKey = NULL;
-
-    result = RegOpenKeyEx(kMainKey,kFreeAmpKey,0,KEY_ALL_ACCESS,&m_prefsKey);
-    if(result == ERROR_SUCCESS)	{
-        // people DO move their apps around on windows
-	result = RegQueryValueEx(m_prefsKey,kInstallDirPref, NULL, &type, (LPBYTE)temp, &size);
-        if(strcmp(cwd, temp)) {
-            result = RegSetValueEx( m_prefsKey, kInstallDirPref, NULL, REG_SZ, (LPBYTE)cwd, strlen(cwd) + 1);
-        }
-    } else { // keys need to be created for the first time
-        DWORD disposition;
-        // create the key in the windows registry
-        result = RegCreateKeyEx(kMainKey,kFreeAmpKey, NULL,  "", REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &m_prefsKey, &disposition);
-
-        if(result == ERROR_SUCCESS) {
-            // set install directory value
-            result = RegSetValueEx( m_prefsKey, kInstallDirPref, NULL, REG_SZ, (LPBYTE)cwd, strlen(cwd) + 1);
-            // set default ui value
-            result = RegSetValueEx( m_prefsKey, kUIPref, NULL, REG_SZ, (LPBYTE)kDefaultUI, strlen(kDefaultUI) + 1);
-        }
-    }
-#endif
 }
 
 Preferences::~Preferences() {
-#if 0
-    if(m_prefsKey) {
-        RegCloseKey(m_prefsKey);
-    }
-#endif
+
 }
 
 
 Error Preferences::GetInstallDirectory(char* path, uint32* len) {
-    getcwd(path,*len);
+//    getcwd(path,*len);
     return kError_NoErr;
-#if 0
-    return GetPrefString(kInstallDirPref, path, len);
-#endif
 }
 
 
 Error Preferences::SetInstallDirectory(char* path) {
     return kError_NoErr;
-#if 0
-    return SetPrefString(kInstallDirPref, path);
-#endif
 }
 
 
 Error Preferences::GetDefaultUI(char* name, uint32* len) {
     return kError_NoErr;
-#if 0
-    return GetPrefString(kUIPref, name, len);
-#endif
 }
 
 Error Preferences::SetDefaultUI(char* name) {
     return kError_NoErr;
-#if 0
-    return SetPrefString(kUIPref, name);
-#endif
 }
 
 
 Error Preferences::GetPrefString(const char* pref, char* buf, uint32* len) {
     return kError_NoErr;
-#if 0
-    Error   error = kError_UnknownErr;
-    DWORD   type;
-    LONG    result;
-    
-    if(!buf || !len) {
-        error = kError_InvalidParam;
-        return error;
-    }
-    *buf = 0x00;
-    if(m_prefsKey) {
-	result = RegQueryValueEx(   m_prefsKey, pref, NULL, &type, (LPBYTE)buf, (DWORD*)len);
-        if(result == ERROR_SUCCESS)
-            error = kError_NoErr;
-        else if(result == ERROR_MORE_DATA)
-            error = kError_BufferTooSmall;    
-    } else {
-        error = kError_NoPrefs;
-    }
-    return error;
-#endif
 }
 
 Error Preferences::SetPrefString(const char* pref, char* buf) {
     return kError_NoErr;
-#if 0
-    Error   error = kError_UnknownErr;
-    LONG    result;
-    
-    if(!buf) {
-        error = kError_InvalidParam;
-        return error;
-    }
-    *buf = 0x00;
-    if(m_prefsKey) {
-		// set install directory value
-        result = RegSetValueEx( m_prefsKey, pref, NULL, REG_SZ, (LPBYTE)buf, strlen(buf) + 1);
-        if(result == ERROR_SUCCESS)
-            error = kError_NoErr;
-    } else {
-        error = kError_NoPrefs;
-    }
-    
-    return error;
-#endif
 }
 
 HANDLE Preferences::GetFirstLibDir(char *path, uint32 *len) {
-    getcwd(path,*len);
-    return (HANDLE)1;
+    // if no FREEAMP_PATH, libdirs = ~/.freeamp : @lib_installdir@/freeamp : .
+    // if FREEAMP_PATH, then its FREEAMP_PATH
+    char *pEnv = getenv("FREEAMP_PATH");
+    char *pPath = NULL;
+    if (pEnv) {
+//	cout << "Using env: " << pEnv << endl;
+	pPath = strdup(pEnv);
+    } else {
+	pPath = strdup(".:~/.freeamp:/usr/local/lib/freeamp");
+//	cout << "Using default: " << pPath << endl;
+    }
+    pEnv = pPath;
+    LibDirFindHandle *pldfh = new LibDirFindHandle();
+    pldfh->m_pLibDirs = new Vector<char *>();
+    pldfh->m_current = 0;
+
+    char *pCol = (char *)1;
+    char *pPart = pPath;
+    while (pCol) {
+	pCol = strchr(pPart,':');
+	if (pCol) *pCol = '\0';
+	char *pFoo = strdup(pPart);
+	pldfh->m_pLibDirs->Insert(pFoo);
+	pPart = pCol + sizeof(char);
+    }
+
+    pPath = pldfh->m_pLibDirs->ElementAt(0);
+    if (pPath) {
+	strncpy(path,pPath,*len);
+	*len = strlen(pPath);
+    } else {
+	*path = '\0';
+	*len = 0;
+	delete pldfh->m_pLibDirs;
+	delete pldfh;
+	pldfh = NULL;
+    }
+
+    if (pEnv) delete pEnv;
+    //cout << "returning " << path << endl;
+    return (HANDLE)pldfh;
 }
 
 
 Error Preferences::GetNextLibDir(HANDLE hLibDirFind,char *path, uint32 *len) {
-
+    if (hLibDirFind) {
+	LibDirFindHandle *pldfh = (LibDirFindHandle *)hLibDirFind;
+	pldfh->m_current++;
+	char *pPath = pldfh->m_pLibDirs->ElementAt(pldfh->m_current);
+	if (pPath) {
+	    strncpy(path,pPath,*len);
+	    *len = strlen(pPath);
+//	    cout << "returning next: " << path << endl;
+	    return kError_NoErr;
+	} else {
+	    *path = '\0';
+	    *len = 0;
+//	    cout << "returning no next " << path << endl;
+	    return kError_NoMoreLibDirs;
+	}
+    }
     return kError_NoMoreLibDirs;
 }
 
 Error Preferences::GetLibDirClose(HANDLE hLibDirFind) {
-
+    if (hLibDirFind) {
+	LibDirFindHandle *p = (LibDirFindHandle *)hLibDirFind;
+	p->m_pLibDirs->DeleteAll();
+	delete p->m_pLibDirs;
+	delete p;
+    }
     return kError_NoErr;
 }
+
+
+
+

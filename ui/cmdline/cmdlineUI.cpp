@@ -132,7 +132,11 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
 		e = new Event(CMD_Play);
 		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
-	    }
+		break;}
+//	    case 'f':{
+//		Event *e = new Event(CMD_ChangePosition,(void *)200);
+//		pMe->m_playerEQ->AcceptEvent(pMe->m_playerEQ,e);
+//	    }
 	    default:
 		break;
 	}

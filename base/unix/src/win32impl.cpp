@@ -138,7 +138,7 @@ bool Match(char *pattern,char *string) {
 
 
 void FillWin32FindData(char *pF,WIN32_FIND_DATA *wfd) {
-    cout << "FillWin32FindData: Entering: " << pF << endl;
+//    cout << "FillWin32FindData: Entering: " << pF << endl;
     strcpy(wfd->cFileName,pF);
 }
 

@@ -71,7 +71,7 @@ class Player {
     Player();
     void GetUIManipLock();
     void ReleaseUIManipLock();
-
+    int32 CompareNames(const char *,const char *);
     void SendToUI(Event *);
 
     bool SetState(PlayerState);

@@ -448,12 +448,25 @@ void XingLMC::Reset() {
 
 bool XingLMC::ChangePosition(int32 position) {
     m_seekMutex->Acquire(WAIT_FOREVER);
+#if 1
     m_bsBufBytes = 0;
     m_bsBufPtr = m_bsBuffer;
     m_input->Seek(m_input, 0,SEEK_FROM_START);
     m_frameCounter = 0;
     called_times = 0;
     wait_n_times = position;
+#else
+    cout << "Changing position..." << endl;
+    m_input->Seek(m_input,(417*position),SEEK_FROM_START);
+    unsigned char buf[1024];
+    int nread = m_input->Read(m_input, buf, 1024);
+    int pBuf = 0;
+    while ((buf[pBuf] != 0xFF) && ((buf[pBuf+1] >> 4) != 0x0F)) pBuf++;
+    int pos = (417*position)+pBuf;
+    if (pos < 417) pos = 0;
+    m_input->Seek(m_input,(417*position)+pBuf, SEEK_FROM_START);
+
+#endif
     m_seekMutex->Release();
 
     return true;

@@ -115,6 +115,7 @@ int main(int argc, char **argv) {
 
 
     //cout << "Looking to start up a UI..." << endl;
+#if 0
     char *calledName = strrchr(argv[0],'/');
     if (!calledName) calledName = argv[0]; else calledName++;
     int32 index = 0;
@@ -138,6 +139,7 @@ int main(int argc, char **argv) {
 	cout << "Error initializing UI!" << endl;
 	return 1;
     }
+#endif
 
     pP->SetArgs(argc,argv);
     pP->Run();

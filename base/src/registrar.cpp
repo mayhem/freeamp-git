@@ -24,6 +24,8 @@ ____________________________________________________________________________*/
 #define STRICT
 #ifdef WIN32
 #include <windows.h>
+#else
+#include <stdlib.h>
 #endif // WIN32
 
 #include <stdio.h>
@@ -69,6 +71,18 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
     while(libDirHandle && (error != kError_NoMoreLibDirs))
 #endif
     {
+#ifndef WIN32
+        if (dir[0] == '~') {
+	    char newdir[MAX_PATH];
+	    strcpy(newdir,getenv("HOME"));
+	    char *pSlash = strchr(dir,'/');
+	    if (pSlash) {
+		strcat(newdir,pSlash);
+	    }
+	    memcpy(dir,newdir,MAX_PATH);
+	}
+#endif
+	len = sizeof(dir);
         WIN32_FIND_DATA find;
         HANDLE handle;
         char search[MAX_PATH];

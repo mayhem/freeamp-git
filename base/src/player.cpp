@@ -186,7 +186,17 @@ void Player::SetArgs(int32 argc, char** argv){
     m_argv = argv;
 
     char *arg = NULL;
-
+#ifndef WIN32
+    // grab the UI name from how we are invoked.
+    m_argUI = new char[strlen(argv[0]) + 1 + 3];
+    char *pBegin = strrchr(argv[0],'/');
+    if (pBegin) {
+	pBegin++;
+    } else {
+	pBegin = argv[0];
+    }
+    sprintf(m_argUI,"%s.ui",pBegin);
+#endif
     for(int32 i = 1;i < m_argc; i++) 
     {
 	    arg = m_argv[i];
@@ -202,6 +212,7 @@ void Player::SetArgs(int32 argc, char** argv){
                         arg[2] == 'I')
                     {
                         i++;
+			if (m_argUI) delete m_argUI;
                         m_argUI = new char[strlen(arg) + 1];
                         strcpy(m_argUI, arg);
                     }
@@ -212,11 +223,30 @@ void Player::SetArgs(int32 argc, char** argv){
     }
 }
 
+int32 Player::CompareNames(const char *p1, const char *p2) {
+// windows plugins and unix plugins are named differently...
+#ifdef WIN32
+    return strcmp(p1,p2);
+#else
+//    cout << "Comparing: " << p1 << " to " << p2 << endl;
+    int32 i=0; int32 j=0;
+    if(!p1 ||!p2) return 1;
+    while ((p1[i] == p2[j]) && p1[i] && p2[j]) {
+	i++; j++;
+    }
+    if ((p1[i]=='-') && (p2[j]=='.')) {
+	return 0;
+    } else {
+	return 1;
+    }
+#endif
+}
+
 void Player::Run(){
     Preferences* prefs;
     char* name = NULL;
     uint32 len = 256;
-    Error error;
+    Error error = kError_NoErr;
 
     // which ui should we instantiate first??
     if(m_argUI == NULL)
@@ -246,10 +276,10 @@ void Player::Run(){
         RegistryItem* item = NULL;
 		UIRef ui = NULL;
         int32 i = 0;
-		
+	int32 uisActivated = 0;
         while(item = m_uiRegistry->GetItem(i++))
         {
-            if(!strcmp(item->Name(), name))
+            if(!CompareNames(item->Name(),name))
             {
                 m_uiRef = new UI;
 			    item->InitFunction()(m_uiRef);
@@ -263,8 +293,14 @@ void Player::Run(){
                 m_uiRef->SetArgs(m_uiRef, m_argc, m_argv);
 
                 RegisterActiveUI(m_uiRef);
+		uisActivated++;
             }
         }
+	if (!uisActivated) {
+	    cerr << "No UI's to initialize!!!" << endl;
+	    Event *e = new Event(CMD_QuitPlayer);
+	    AcceptEvent(e);
+	}
     }
 
     delete [] name;
