@@ -81,6 +81,8 @@ class PullBuffer
 
     private:
 
+      void Check(void);
+
       int32          m_iReadIndex, m_iWriteIndex;
       bool           m_bEOS;
       size_t         m_iBytesToWrite, m_iBytesToRead;

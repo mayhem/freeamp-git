@@ -552,7 +552,7 @@ void XingLMC::DecodeWork()
       ((EventBuffer *)m_pOutputBuffer)->AcceptEvent(
              new PMOTimeInfoEvent(m_frameCounter));
 
-      // TODO: This loop needs to be termined after 64k worth of data..
+      // TODO: This loop needs to be terminated after 64k worth of data..
       for(; !m_bExit; )
 		{
           if (m_bPause)
