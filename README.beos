@@ -17,6 +17,7 @@ TO BUILD FREEAMP ON BEOS
 In Makefile-plugins.in, comment out the lines that say:
 
 PLUGINS += plugins/obsinput.pmi
+PLUGINS += plugins/wavout.pmo 
 PLUGINS += plugins/cd.pmo
 PLUGINS += plugins/lcd.ui
 PLUGINS += plugins/irman.ui
@@ -32,4 +33,3 @@ Then follow the ritual as usual:
 
 ./configure
 make
-
