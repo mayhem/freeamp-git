@@ -132,6 +132,11 @@ PlaylistView::MouseMoved( BPoint point, uint32 transit,
         // if the user is draggin something over, activate the inserter.
         SetInserter( IndexOf( point ) );
     }
+
+    if ( transit == B_EXITED_VIEW )
+    {
+        SetInserter( -1 );
+    }
 }
 
 void
@@ -165,6 +170,8 @@ PlaylistView::SetCurrentlyPlaying( int32 index )
 void
 PlaylistView::SetInserter( int32 index )
 {
+    if ( m_inserter == index ) return;
+
     InvalidateItem( m_inserter );
     m_inserter = index;
     InvalidateItem( m_inserter );
