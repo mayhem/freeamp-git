@@ -160,8 +160,7 @@ void submit_metadata(MetaData *pmetaData)
    }
 
    o = mb_New();
-   //mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
-   mb_SetServer(o, "musicbrainz.eorbit.net", MUSICBRAINZ_PORT);
+   mb_SetServer(o, MUSICBRAINZ_SERVER, MUSICBRAINZ_PORT);
 
    args[0] = strdup(pmetaData->Title().c_str());
    args[1] = strdup(pmetaData->GUID().c_str());
