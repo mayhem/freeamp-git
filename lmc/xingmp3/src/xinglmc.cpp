@@ -163,34 +163,34 @@ Error XingLMC::InitDecoder() {
 		static int32 l[4] = {25,3,2,1};
 		int32 layer = l[head.option];
 		static double ms_p_f_table[3][3] = {
-											{8.707483f,  8.0f, 12.0f},
-											{26.12245f, 24.0f, 36.0f},
-											{26.12245f, 24.0f, 36.0f}
+		    {8.707483f,  8.0f, 12.0f},
+		    {26.12245f, 24.0f, 36.0f},
+		    {26.12245f, 24.0f, 36.0f}
 		};
-		milliseconds_per_frame = ms_p_f_table[sampRateIndex][layer-1];
+		milliseconds_per_frame = ms_p_f_table[layer-1][head.sr_index];
 		
-		float totalSeconds = (float)((double)totalFrames * (double)milliseconds_per_frame * 1000);
-
-	    MediaInfoEvent *mvi = new MediaInfoEvent(m_input->Url(),
-                                                 m_input->Url(),
-												 totalSeconds);
-
-	    if (mvi) {
-		if (m_target)
-		    m_target->AcceptEvent(mvi);
-			mvi = NULL;
-	    } else {
-		return kError_OutOfMemory;
-	    }
+		float totalSeconds = (float)((double)totalFrames * (double)milliseconds_per_frame / 1000);
+		
+		MediaInfoEvent *mvi = new MediaInfoEvent(m_input->Url(),
+							 m_input->Url(),
+							 totalSeconds);
+		
+		if (mvi) {
+		    if (m_target)
+			m_target->AcceptEvent(mvi);
+		    mvi = NULL;
+		} else {
+		    return kError_OutOfMemory;
+		}
 		ID3TagEvent *ite = new ID3TagEvent(tag_info);
 		if (ite) {
-			if (m_target) m_target->AcceptEvent(ite);
-			ite = NULL;
+		    if (m_target) m_target->AcceptEvent(ite);
+		    ite = NULL;
 		} else {
 			return kError_OutOfMemory;
 		}
 
-		MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,m_frameBytes, bitrate, samprate, layer, ((head.sync & 1)==0)? 2:1);
+		MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,m_frameBytes, bitrate, samprate, layer, ((head.sync & 1)==0)? 2:1,head.mode);
 		if (mie) {
 			if (m_target) m_target->AcceptEvent(mie);
 			mie = NULL;

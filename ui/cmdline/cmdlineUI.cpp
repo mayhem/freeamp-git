@@ -163,15 +163,22 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
 		    cout << "Playing: " << pmvi->m_songTitle << endl;
-		    if (pmvi->m_tagInfo.m_containsInfo) {
-			cout << "Title  : " << pmvi->m_tagInfo.m_songName << endl;
-			cout << "Artist : " << pmvi->m_tagInfo.m_artist << endl;
-			cout << "Album  : " << pmvi->m_tagInfo.m_album << endl;
-			cout << "Year   : " << pmvi->m_tagInfo.m_year << endl;
-			cout << "Comment: " << pmvi->m_tagInfo.m_comment << endl;
-		    }
 		}
 		break; }
+	    case INFO_ID3TagInfo: {
+		ID3TagEvent *ite = (ID3TagEvent *)e;
+		if (ite) {
+		    Id3TagInfo ti = ite->GetId3Tag();
+		    if (ti.m_containsInfo) {
+			cout << "Title  : " << ti.m_songName << endl;
+			cout << "Artist : " << ti.m_artist << endl;
+			cout << "Album  : " << ti.m_album << endl;
+			cout << "Year   : " << ti.m_year << endl;
+			cout << "Comment: " << ti.m_comment << endl;
+		    }
+		}
+		break;
+	    }
 	    default:
 		break;
 	}

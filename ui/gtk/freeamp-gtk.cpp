@@ -70,6 +70,7 @@ GtkWidget *p_button_quit;
 GtkWidget *p_button_stop;
 GtkWidget *p_button_next;
 GtkWidget *p_button_prev;
+GtkWidget *p_titleField;
 
 bool playing = false;
 
@@ -109,7 +110,8 @@ void destroy (GtkWidget *widget, gpointer data) {
 }
 
 void GtkUI::Init() {
-    GtkWidget *theBox;
+    GtkWidget *theButtonBox;
+    GtkWidget *outerBox;
 
     /* create a new window */
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -147,17 +149,24 @@ void GtkUI::Init() {
     gtk_signal_connect (GTK_OBJECT (p_button_prev), "clicked",
 			GTK_SIGNAL_FUNC (button_general), (gpointer)6);
 
-    theBox = gtk_hbox_new(FALSE,0);
-    gtk_container_add(GTK_CONTAINER (window), theBox);
+    theButtonBox = gtk_hbox_new(FALSE,0);
+    outerBox = gtk_vbox_new(FALSE,0);
+
+    p_titleField = gtk_label_new("No Song Playing");
+
+    gtk_box_pack_start(GTK_BOX(outerBox),p_titleField,TRUE,FALSE,2);
+    gtk_box_pack_start(GTK_BOX(outerBox),theButtonBox,TRUE,FALSE,0);
+
+    gtk_container_add(GTK_CONTAINER (window), outerBox);
     
     /* this packs the button into the window (a gtk container). */
 
-    gtk_box_pack_start(GTK_BOX(theBox),p_button_play, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(theBox),p_button_pause, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(theBox),p_button_stop, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(theBox),p_button_prev, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(theBox),p_button_next, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(theBox),p_button_quit, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(theButtonBox),p_button_play, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(theButtonBox),p_button_pause, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(theButtonBox),p_button_stop, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(theButtonBox),p_button_prev, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(theButtonBox),p_button_next, TRUE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(theButtonBox),p_button_quit, TRUE, FALSE, 0);
 
     /* and the window */
     gtk_widget_show (p_button_play);
@@ -167,9 +176,12 @@ void GtkUI::Init() {
     gtk_widget_show (p_button_next);
     gtk_widget_show (p_button_quit);
     
-    gtk_widget_show (theBox);
-    
+    gtk_widget_show (p_titleField);
+    gtk_widget_show (theButtonBox);
+    gtk_widget_show (outerBox);
     gtk_widget_show (window);
+    
+    //gtk_container_disable_resize(GTK_CONTAINER(window));
     
     gtkListenThread = Thread::CreateThread();
     gtkListenThread->Create(GtkUI::gtkServiceFunction,this);
@@ -206,7 +218,15 @@ int32 GtkUI::AcceptEvent(Event *e) {
 	    case INFO_MediaInfo: {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
-		    cout << "Playing: " << pmvi->m_songTitle << endl;
+		    //cout << "Playing: " << pmvi->m_songTitle << endl;
+		    //g_print("Playing: %s\n",pmvi->m_songTitle);
+		    gtk_label_set(GTK_LABEL(p_titleField), pmvi->m_songTitle);
+		    //cout << "set label..." << endl;
+		    //g_print("set label...\n");
+		    //while (gtk_events_pending())
+		    //gtk_main_iteration(); // redraw
+		    //cout << "tried to redraw" << endl;
+		    //g_print("tried to redraw\n");
 		    if (pmvi->m_tagInfo.m_containsInfo) {
 			cout << "Title  : " << pmvi->m_tagInfo.m_songName << endl;
 			cout << "Artist : " << pmvi->m_tagInfo.m_artist << endl;

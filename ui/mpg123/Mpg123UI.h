@@ -29,6 +29,7 @@ ____________________________________________________________________________*/
 
 #include "ui.h"
 #include "event.h"
+#include "eventdata.h"
 
 class Mpg123UI : public UserInterface {
  public:
@@ -42,6 +43,12 @@ class Mpg123UI : public UserInterface {
 
     static EventQueue *m_playerEQ;
  private:
+    void DisplayStuff();
+    MediaInfoEvent m_mediaInfo;
+    bool m_mediaInfo_set;
+    MpegInfoEvent m_mpegInfo;
+    bool m_mpegInfo_set;
+    Id3TagInfo m_id3Tag;
     bool verboseMode;
     int32 totalFrames;
     float totalTime;

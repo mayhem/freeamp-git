@@ -47,7 +47,8 @@ extern "C" {
 EventQueue *Mpg123UI::m_playerEQ = NULL;
 
 Mpg123UI::Mpg123UI() {
-
+    m_mediaInfo_set = false;
+    m_mpegInfo_set = false;
     //cout << endl << "mpg123 0.59k command line compatability mode" << endl << endl;
     cerr << "High Performance MPEG 1.0 Audio Player for Layer 2, 3" << endl;
     cerr << "Version 0.05 (1998/Oct/06).  Written by Jason Woodward, Mark Elrod, others." << endl;
@@ -91,57 +92,33 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 		Event *e = new Event(CMD_QuitPlayer);
 		m_playerEQ->AcceptEvent(e);
 		break; }
+	    case INFO_ID3TagInfo: {
+		ID3TagEvent *ite = (ID3TagEvent *)e;
+		if (ite) {
+		    m_id3Tag = ite->GetId3Tag();
+		}
+		break;
+	    }
+	    case INFO_MPEGInfo: {
+		MpegInfoEvent *mie = (MpegInfoEvent *)e;
+		if (mie) {
+		    m_mpegInfo = *mie;
+		    m_mpegInfo_set = true;
+		    DisplayStuff();
+		}
+		totalFrames = m_mpegInfo.GetTotalFrames();
+		break;
+	    }
 	    case INFO_MediaInfo: {
 		MediaInfoEvent *pmvi = (MediaInfoEvent *)e;
 		if (pmvi) {
-		    totalFrames = pmvi->m_totalFrames;
-		    totalTime = pmvi->m_totalTime;
-		    char *path = pmvi->m_filename;
-		    char *pLastSlash = strrchr(path,'/');
-		    char *dir = NULL;
-		    char *fname = NULL;
-		    if (pLastSlash) {
-			*pLastSlash = '\0';
-			fname = (char *)((int)pLastSlash + 1);
-			dir = path;
-		    } else {
-			fname = path;
-		    }
-		    strncpy(fileName,fname,511);
-		    fileName[511] = '\0';
-		    if (pmvi->m_tagInfo.m_containsInfo) {
-			fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->m_tagInfo.m_songName,pmvi->m_tagInfo.m_artist);
-			fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->m_tagInfo.m_album,pmvi->m_tagInfo.m_year,(int)pmvi->m_tagInfo.m_genre);
-			fprintf(stderr,"Comment: %30s \n",pmvi->m_tagInfo.m_comment);
-		    }
-		    cerr << endl;
-
-		    if (verboseMode == false) {
-			// NORMAL MODE
-			if (dir) {
-			    cerr << "Directory: " << dir << "/" << endl;
-			}
-			cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
-			cerr << "MPEG 1.0 layer III, " << pmvi->m_bps/1000 << " KBit/s" << ", " << pmvi->m_freq << " Hz" << " joint-stereo" << endl;
-		    } else {
-			// VERBOSE MODE
-			if (pmvi->m_tagInfo.m_containsInfo) {
-			    fprintf(stderr,"Title  : %30s  Artist: %s\n",pmvi->m_tagInfo.m_songName,pmvi->m_tagInfo.m_artist);
-			    fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",pmvi->m_tagInfo.m_album,pmvi->m_tagInfo.m_year,(int)pmvi->m_tagInfo.m_genre);
-			    fprintf(stderr,"Comment: %30s \n",pmvi->m_tagInfo.m_comment);
-			}
-
-			if (dir) {
-			    cerr << "Directory: " << dir << "/" << endl;
-			}
-			cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
-			cerr << "MPEG 1.0, Layer: III, Freq: " << pmvi->m_freq << ", mode: Joint-Stereo, modext: 3, BPF : " << pmvi->m_bytesPerFrame  << endl;
-			cerr << "Channels: 2, copyright: No, original: Yes, CRC: No, emphasis: 0." << endl;
-			cerr << "Bitrate: " << pmvi->m_bps/1000 << " KBits/s, Extension value: 0" << endl;
-			cerr << "Audio: 1:1 conversion, rate: " << pmvi->m_freq << ", encoding: signed 16 bit, channels: 2" << endl;
-		    }
+		    m_mediaInfo = *pmvi;
+		    m_mediaInfo_set = true;
+		    DisplayStuff();
 		}
-		break; }
+		totalTime = m_mediaInfo.m_totalSeconds;
+		break;
+	    }
 	    case INFO_MediaTimeInfo: {
 		MediaTimeInfoEvent *pmtp = (MediaTimeInfoEvent *)e;
 		if (verboseMode == true) {
@@ -166,8 +143,58 @@ int32 Mpg123UI::AcceptEvent(Event *e) {
 		break;
 	}
     }
-    //cerr << "Done cmdlinecoo: accpet event" << endl;
+//cerr << "Done cmdlinecoo: accpet event" << endl;
     return 0;
+}
+
+void Mpg123UI::DisplayStuff() {
+    if (!m_mpegInfo_set) return;
+    if (!m_mediaInfo_set) return;
+    char *path = m_mediaInfo.m_filename;
+    char *pLastSlash = strrchr(path,'/');
+    char *dir = NULL;
+    char *fname = NULL;
+    if (pLastSlash) {
+	*pLastSlash = '\0';
+	fname = (char *)((int)pLastSlash + 1);
+	dir = path;
+    } else {
+	fname = path;
+    }
+    strncpy(fileName,fname,511);
+    fileName[511] = '\0';
+    if (m_id3Tag.m_containsInfo) {
+	fprintf(stderr,"Title  : %30s  Artist: %s\n",m_id3Tag.m_songName,m_id3Tag.m_artist);
+	fprintf(stderr,"Album  : %30s  Year: %4s, Genre: %d\n",m_id3Tag.m_album,m_id3Tag.m_year,(int)m_id3Tag.m_genre);
+	fprintf(stderr,"Comment: %30s \n",m_id3Tag.m_comment);
+    }
+    cerr << endl;
+    
+    static char *mpeg_string[4] = { "1.0","1.0","2.0","2.5"};
+    static char *mpeg_layer[4] = { "Unknown","I", "II", "III"};
+    static char *mpeg_stereo[4] = { "Stereo", "Joint-Stereo", "Dual-Channel", "Single-Channel" };
+
+    if (verboseMode == false) {
+	// NORMAL MODE
+	if (dir) {
+	    cerr << "Directory: " << dir << "/" << endl;
+	}
+	cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
+	cerr << "MPEG " << mpeg_string[m_mpegInfo.GetMpegVersion()] << " layer "<< mpeg_layer[m_mpegInfo.GetLayer()]<< ", " << m_mpegInfo.GetBitRate()/1000 << " KBit/s" << ", " << m_mpegInfo.GetSampleRate() << " Hz" << " " << mpeg_stereo[m_mpegInfo.GetStereo()] << endl;
+    } else {
+	// VERBOSE MODE
+	if (dir) {
+	    cerr << "Directory: " << dir << "/" << endl;
+	}
+	cerr << "Playing MPEG stream from " << fileName << " ..." << endl;
+	cerr << "MPEG " << mpeg_string[m_mpegInfo.GetMpegVersion()];
+	cerr << ", Layer: " << mpeg_layer[m_mpegInfo.GetLayer()];
+	cerr << ", Freq: " << m_mpegInfo.GetSampleRate();
+	cerr << ", mode: " << mpeg_stereo[m_mpegInfo.GetStereo()] << ", modext: 3, BPF : " << m_mpegInfo.GetBytesPerFrame() << endl;
+	cerr << "Channels: 2, copyright: No, original: Yes, CRC: No, emphasis: 0." << endl;
+	cerr << "Bitrate: " << m_mpegInfo.GetBitRate()/1000 << " KBits/s, Extension value: 0" << endl;
+	cerr << "Audio: 1:1 conversion, rate: " << m_mpegInfo.GetSampleRate() << ", encoding: signed 16 bit, channels: 2" << endl;
+    }
 }
 
 
