@@ -268,7 +268,7 @@ class PlaylistManager {
     // This function searches the items in the playlist
     // and updates the metadata if the tracks are the
     // same (matched based on URL)
-    Error UpdateTrackMetaData(PlaylistItem* updatedTrack);
+    Error UpdateTrackMetaData(PlaylistItem* updatedTrack, bool writeToDisk = false);
 
     // Functions for sorting
     Error Sort(PlaylistSortKey key, PlaylistSortType type = kPlaylistSortType_Ascending);

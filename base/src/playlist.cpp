@@ -1507,7 +1507,7 @@ Error PlaylistManager::MoveItems(vector<uint32>* items, uint32 index)
 // This function searches the items in the playlist
 // and updates the metadata if the tracks are the
 // same (matched based on URL)
-Error PlaylistManager::UpdateTrackMetaData(PlaylistItem* updatedTrack)
+Error PlaylistManager::UpdateTrackMetaData(PlaylistItem* updatedTrack, bool writeToDisk)
 {
     Error result = kError_InvalidParam;
     m_mutex.Acquire();
@@ -1522,6 +1522,25 @@ Error PlaylistManager::UpdateTrackMetaData(PlaylistItem* updatedTrack)
         {
             (*i)->SetMetaData(&metadata);
             m_context->target->AcceptEvent(new PlaylistItemUpdatedEvent(*i, this));
+        }
+    }
+
+    if(writeToDisk)
+    {
+        MetaData metadata = updatedTrack->GetMetaData();
+        MetaDataFormat* mdf = NULL;
+        uint32 numFormats;
+
+        numFormats = m_metadataFormats.size();
+
+        for(uint32 i = 0; i < numFormats; i++)
+        {
+            mdf = m_metadataFormats[i];
+
+            if(mdf)
+            {
+                mdf->WriteMetaData(updatedTrack->URL().c_str(), metadata);
+            }
         }
     }
 
@@ -2365,14 +2384,7 @@ MetaDataThreadFunction(vector<PlaylistItem*>* list)
                             mdf->ReadMetaData(item->URL().c_str(), &metadata);
                         }
                     }
-                }
-
-                // check to see if the song length is unknown
-                // and if so calculate it.
-                if(metadata.Time() == 0)
-                {
-
-                }
+                }                
 
                 m_mutex.Acquire();
 
