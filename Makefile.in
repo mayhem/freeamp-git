@@ -55,7 +55,7 @@ MUSICBRAINZOBJ += lib/musicbrainz/lib/http.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/xql.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/cdi.o
 MUSICBRAINZOBJ += lib/musicbrainz/lib/diskid.o
-MUSICBRAINZOBJ += lib/musicbrainz/lib/xmlparse.o
+MUSICBRAINZOBJ += lib/musicbrainz/lib/parse.o
 
 lib/musicbrainz/lib/libmusicbrainz.a: $(MUSICBRAINZOBJ)
 	+test -d lib/musicbrainz/lib || mkdir lib/musicbrainz/lib
