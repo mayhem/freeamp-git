@@ -24,7 +24,7 @@ ____________________________________________________________________________*/
 #include "stdio.h"
 #include "DialControl.h"
 #include "Window.h"
-#include "Debug.h"
+#include "debug.h"
 
 static TransitionInfo pTransitions[] =
 {  

@@ -394,7 +394,9 @@ void GTKWindow::DropFiles(char *filename)
 bool GTKWindow::LButtonDown(void)
 {
     GdkModifierType mask;
+    gdk_threads_enter();
     gdk_window_get_pointer(mainWindow->window, NULL, NULL, &mask);
+    gdk_threads_leave();
     if (mask & GDK_BUTTON1_MASK)
         return true;
     return false;
@@ -403,7 +405,6 @@ bool GTKWindow::LButtonDown(void)
 void GTKWindow::MouseLeaveCheck(void)
 {
     if (m_bMouseInWindow) {
-cout << "in window?\n";
         if (gdk_window_at_pointer(NULL, NULL) != mainWindow->window) {
             m_bMouseInWindow = false;
             MouseHasLeftWindow();
@@ -427,4 +428,11 @@ void GTKWindow::ModifyTimer(bool stop)
         gtk_timeout_remove(gtkTimer);
     else
         gtkTimer = gtk_timeout_add(250, do_timeout, this);
+}
+
+void GTKWindow::BringWindowToFront(void)
+{
+    gdk_threads_enter();
+    gdk_window_raise(mainWindow->window);
+    gdk_threads_leave();
 }
