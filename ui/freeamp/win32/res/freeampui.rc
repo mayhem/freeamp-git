@@ -42,11 +42,12 @@ BEGIN
     EDITTEXT        IDC_SAVEMUSICDIR,11,19,160,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_BROWSE,175,19,50,14
     GROUPBOX        "File Associations",IDC_STATIC,3,49,227,38
-    CONTROL         "Reclaim stolen filetypes when application starts.",
+    CONTROL         "Reclaim stolen music file associations when application starts.",
                     IDC_RECLAIMFILETYPES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,61,163,10
-    CONTROL         "Ask before reclaiming filetypes.",IDC_ASKRECLAIM,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,73,113,10
+                    WS_TABSTOP,18,61,209,10
+    CONTROL         "Ask before reclaiming music file associations.",
+                    IDC_ASKRECLAIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,
+                    73,157,10
     GROUPBOX        "Show Toolbars As",IDC_STATIC,3,94,227,32
     CONTROL         "Text only",IDC_TEXTONLY,"Button",BS_AUTORADIOBUTTON,178,
                     108,43,10
