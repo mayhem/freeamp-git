@@ -146,27 +146,27 @@ Error SoundCardPMO::SetPropManager(Properties * p)
 int SoundCardPMO::GetVolume()
 {
    int mixFd = open("/dev/audioctl",O_RDWR);
-   struct audio_prinfo audinf;
+   struct audio_info audinf;
 
    if (mixFd != -1) 
    {
       ioctl(mixFd, AUDIO_GETINFO, &audinf);
       close(mixFd);
    }
-   return audinf.gain;   
+   return audinf.play.gain;   
 }
 
 void SoundCardPMO::SetVolume(int32 iVolume)
 {
    int mixFd;
-   struct audio_prinfo audinf;
+   struct audio_info audinf;
 
    mixFd = open("/dev/audioctl",O_RDWR);
    if (mixFd >= 0) 
    {
       ioctl(mixFd, AUDIO_GETINFO, &audinf);
       /*iVolume |= (iVolume << 8);*/
-      audinf.gain=iVolume;
+      audinf.play.gain=iVolume;
       ioctl(mixFd, AUDIO_SETINFO, &audinf);
       close(mixFd);
    }    
@@ -206,8 +206,8 @@ Error SoundCardPMO::Break()
 
 Error SoundCardPMO::Init(OutputInfo * info)
 {
-   struct audio_prinfo audinf;
-   struct audio_prinfo sInfo;
+   struct audio_info audinf;
+   struct audio_info sInfo;
    m_properlyInitialized = false;
    if (!info)
    {
@@ -247,7 +247,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
       return (Error) pmoError_IOCTL_AUDIO_GETINFO;
    }
 
-   audinf.buffer_size = 0;           // SYNC;
+   audinf.play.buffer_size = 0;           // SYNC;
 
    if (ioctl(ctlfd, AUDIO_SETINFO, &audinf) < 0)
    {
@@ -273,9 +273,9 @@ Error SoundCardPMO::Init(OutputInfo * info)
       return (Error) pmoError_IOCTL_AUDIO_DRAIN;
    }
 
-   audinf.precision = play_precision;
-   audinf.channels = channels;
-   audinf.sample_rate = play_sample_rate;
+   audinf.play.precision = play_precision;
+   audinf.play.channels = channels;
+   audinf.play.sample_rate = play_sample_rate;
 
    if (ioctl(ctlfd, AUDIO_SETINFO, &audinf) == -1)
    {
@@ -290,7 +290,7 @@ Error SoundCardPMO::Init(OutputInfo * info)
    m_properlyInitialized = true;
 
    ioctl(audio_fd, AUDIO_GETINFO, &sInfo);
-   m_iOutputBufferSize = sInfo.buffer_size;
+   m_iOutputBufferSize = sInfo.play.buffer_size;
    m_iBytesPerSample = info->number_of_channels * (info->bits_per_sample / 8);
 
    close(ctlfd);
@@ -350,7 +350,7 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
    MediaTimeInfoEvent *pmtpi;
    int32               hours, minutes, seconds;
    int                 iTotalTime = 0;
-   audio_prinfo      info;
+   audio_info      info;
 
    if (pEvent->GetFrameNumber() != m_iLastFrame + 1)
    {
@@ -364,7 +364,7 @@ void SoundCardPMO::HandleTimeInfoEvent(PMOTimeInfoEvent *pEvent)
 
    ioctl(audio_fd, AUDIO_GETINFO, &info);
 
-   iTotalTime = (m_iTotalBytesWritten - info.buffer_size) /
+   iTotalTime = (m_iTotalBytesWritten - info.play.buffer_size) /
                 (m_iBytesPerSample * myInfo->samples_per_second);
 
    hours = iTotalTime / 3600;
@@ -394,7 +394,7 @@ void SoundCardPMO::WorkerThread(void)
    size_t      iRet;
    Event      *pEvent;
    OutputInfo *pInfo;
-   audio_prinfo info;
+   audio_info info;
 
    for(; !m_bExit;)
    {
@@ -459,7 +459,7 @@ void SoundCardPMO::WorkerThread(void)
       do
       {
           ioctl(audio_fd, AUDIO_GETINFO, &info);
-          if (info.buffer_size < iToCopy)
+          if (info.play.buffer_size < iToCopy)
           {
               EndRead(0);
               m_pPauseMutex->Release();
