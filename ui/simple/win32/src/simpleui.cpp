@@ -317,7 +317,30 @@ AcceptEvent(Event* event)
 
             case INFO_PlayListDonePlay:
             {
-                
+                char timeString[256] = "00:00:00";
+                char szTemp[256] = {0x00};
+
+                SetWindowText(m_hwndCurrent, timeString);
+			    SetWindowText(m_hwndTotal, timeString);
+
+
+                SendMessage(m_hwndStatus, 
+						    SB_SETTEXT, 
+						    0, 
+						    (LPARAM)szTemp);
+
+			    SendMessage(m_hwndStatus, 
+						    SB_SETTEXT, 
+						    1, 
+						    (LPARAM) szTemp);
+
+			    SendMessage(m_hwndStatus, 
+						    SB_SETTEXT, 
+						    2, 
+						    (LPARAM) szTemp);
+
+             
+                SetWindowText(m_hwnd, "FreeAmp");
                 break;
             }
 

@@ -618,6 +618,7 @@ int32 Player::ServiceEvent(Event *pC) {
             }
 
 		    m_myPlayList = (PlayList *)pC->GetArgument();
+            m_myPlayList->SetFirst();
 
 		    return 0;
 	    	break;
