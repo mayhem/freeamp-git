@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -24,6 +24,15 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef WIN32
+#include <direct.h>
+#define MKDIR(z) mkdir(z)
+#else
+#define MKDIR(z) mkdir(z, 0755)
+#endif
 
 #include "config.h"
 #include "event.h"
@@ -31,7 +40,6 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "thread.h"
 #include "debug.h"
-#include "list.h"
 #include "ui.h"
 #include "queue.h"
 #include "semaphore.h"
@@ -42,9 +50,10 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "log.h"
 #include "pmo.h"
+#include "utility.h"
+#include "downloadmanager.h"
 
-
-#define DB printf("%s:%d\n", __FILE__, __LINE__);
+#define DB Debug_v("%s:%d\n", __FILE__, __LINE__);
 
 Player   *Player::m_thePlayer = NULL;
 
@@ -59,56 +68,101 @@ Player *
 Player::
 GetPlayer(FAContext *context)
 {
-   if (m_thePlayer == NULL)
-      m_thePlayer = new Player(context);
-   return m_thePlayer;
+    if (m_thePlayer == NULL)
+        m_thePlayer = new Player(context);
+    return m_thePlayer;
 }
 
 Player::
 Player(FAContext *context):
 EventQueue()
 {
-   m_context = context;
-   // cout << "Creating player..." << endl;
-   m_eventSem = new Semaphore();
-   m_eventQueue = new Queue < Event * >();
-   // cout << "Created queue" << endl;
-   m_eventServiceThread = NULL;
-   // cout << "Started event thread" << endl;
-   m_uiList = new List < UserInterface * >();
-   // cout << "Created Lists" << endl;
-   m_uiManipLock = new Mutex();
-   m_lmcMutex = new Mutex();
-   m_pmiMutex = new Mutex();
-   m_pmoMutex = new Mutex();
-   m_uiMutex = new Mutex();
-   // cout << "Created mutex" << endl;
-   m_imQuitting = 0;
-   m_quitWaitingFor = 0;
-   m_plm = new PlayListManager((EventQueue *) this);
-   m_playerState = PlayerState_Stopped;
+    m_context = context;
+    m_context->player = this;
+    // cout << "Creating player..." << endl;
+    m_eventSem = new Semaphore();
+    m_eventQueue = new Queue < Event * >();
+    // cout << "Created queue" << endl;
+    m_eventServiceThread = NULL;
+    // cout << "Started event thread" << endl;
+    m_uiList = new vector < UserInterface * >;
+    // cout << "Created Lists" << endl;
+    m_uiManipLock = new Mutex();
+    m_lmcMutex = new Mutex();
+    m_pmiMutex = new Mutex();
+    m_pmoMutex = new Mutex();
+    m_uiMutex = new Mutex();
+    // cout << "Created mutex" << endl;
+    m_imQuitting = 0;
+    m_quitWaitingFor = 0;
+    m_plm = new PlaylistManager(m_context);
+    m_playerState = PlayerState_Stopped;
 
-   m_lmcRegistry = NULL;
-   m_pmiRegistry = NULL;
-   m_pmoRegistry = NULL;
-   m_uiRegistry = NULL;
+    m_lmcRegistry = NULL;
+    m_pmiRegistry = NULL;
+    m_pmoRegistry = NULL;
+    m_uiRegistry = NULL;
 
-   m_pmo = NULL;
-   m_lmc = NULL;
-   m_ui = NULL;
+    m_lmcExtensions = NULL;
 
-   m_argUIList = new List < char *>();
+    m_browserUI = NULL;
+    m_downloadUI = NULL;
 
-   m_argc = 0;
-   m_argv = NULL;
-   m_pTermSem = NULL;
+    m_pmo = NULL;
+    m_lmc = NULL;
+    m_ui = NULL;
 
-   m_didUsage = false;
-   m_autoplay = true;
+    m_argUIList = new vector < char *>();
 
-   m_iVolume = -1;
+    m_argc = 0;
+    m_argv = NULL;
+    m_pTermSem = NULL;
 
-   m_props.RegisterPropertyWatcher("pcm_volume", (PropertyWatcher *) this);
+    m_didUsage = false;
+    m_autoplay = true;
+
+    m_props.RegisterPropertyWatcher("pcm_volume", (PropertyWatcher *) this);
+
+    m_context->plm = m_plm;
+    m_context->props = &m_props;
+    m_context->target = (EventQueue *) this;
+
+    m_musicBrowser = new MusicBrowser(m_context);
+    m_context->browser = m_musicBrowser;
+
+    // make sure the db dir exists so we have a place to store our 
+    // stuff
+
+    char* tempDir = new char[_MAX_PATH];
+    uint32 length = _MAX_PATH;
+    struct stat st;
+
+    m_context->prefs->GetPrefString(kDatabaseDirPref, tempDir, &length);
+
+    if(-1 == stat(tempDir, &st))
+    {
+        MKDIR(tempDir);
+    }
+
+    string freeampdir = tempDir;
+    freeampdir += DIR_MARKER_STR;
+    freeampdir += "metadatabase";
+    m_musicBrowser->SetDatabase(freeampdir.c_str());
+
+    // make sure the music dir exists so we have a place to store our 
+    // stuff
+
+    length = _MAX_PATH;
+    m_context->prefs->GetPrefString(kSaveMusicDirPref, tempDir, &length);
+
+    if(-1 == stat(tempDir, &st))
+    {
+        MKDIR(tempDir);
+    }
+
+    delete [] tempDir;
+    m_dlm = new DownloadManager(m_context);
+    m_context->downloadManager = m_dlm;
 }
 
 #define TYPICAL_DELETE(x) /*printf("deleting...\n");*/ if (x) { delete x; x = NULL; }
@@ -116,59 +170,77 @@ EventQueue()
 Player::
 ~Player()
 {
-   TYPICAL_DELETE(m_pTermSem);
-   TYPICAL_DELETE(m_argUIList);
+    TYPICAL_DELETE(m_dlm);
 
-   if (m_eventServiceThread)
-   {
-      m_eventServiceThread->Join();
-      delete    m_eventServiceThread;
+    TYPICAL_DELETE(m_pTermSem);
 
-      m_eventServiceThread = NULL;
-   }
+    if(m_argUIList)
+    {
+        vector<char*>::iterator i = m_argUIList->begin();
 
-   if (m_pmo)
-   {
-      m_pmo->Pause();
-      delete    m_pmo;
+        for (; i != m_argUIList->end(); i++)
+            delete [] *i; 
 
-      m_pmo = NULL;
-   }
+        delete m_argUIList;
 
-   TYPICAL_DELETE(m_eventSem);
-   TYPICAL_DELETE(m_eventQueue);
+        m_argUIList = NULL;
+    }
 
-   // Delete CIOs
-   if (m_uiList)
-   {
-      m_uiList->DeleteAll();
-      delete    m_uiList;
+    if(m_eventServiceThread)
+    {
+        m_eventServiceThread->Join();
+        delete    m_eventServiceThread;
 
-      m_uiList = NULL;
-   }
+        m_eventServiceThread = NULL;
+    }
 
-   TYPICAL_DELETE(m_plm);
-   TYPICAL_DELETE(m_uiManipLock);
-   TYPICAL_DELETE(m_lmcMutex);
-   TYPICAL_DELETE(m_pmiMutex);
-   TYPICAL_DELETE(m_pmoMutex);
-   TYPICAL_DELETE(m_uiMutex);
-   TYPICAL_DELETE(m_lmcRegistry);
-   TYPICAL_DELETE(m_pmiRegistry);
-   TYPICAL_DELETE(m_pmoRegistry);
-   TYPICAL_DELETE(m_uiRegistry);
+    if(m_pmo)
+    {
+        m_pmo->Pause();
+        delete    m_pmo;
+
+        m_pmo = NULL;
+    }
+
+    TYPICAL_DELETE(m_eventSem);
+    TYPICAL_DELETE(m_eventQueue);
+
+    // Delete CIOs
+    if(m_uiList)
+    {
+        vector<UserInterface *>::iterator i = m_uiList->begin();
+
+        for (; i != m_uiList->end(); i++)
+            delete *i; 
+        delete m_uiList;
+
+        m_uiList = NULL;
+    }
+
+    TYPICAL_DELETE(m_plm);
+    TYPICAL_DELETE(m_uiManipLock);
+    TYPICAL_DELETE(m_lmcMutex);
+    TYPICAL_DELETE(m_pmiMutex);
+    TYPICAL_DELETE(m_pmoMutex);
+    TYPICAL_DELETE(m_uiMutex);
+    TYPICAL_DELETE(m_lmcRegistry);
+    TYPICAL_DELETE(m_pmiRegistry);
+    TYPICAL_DELETE(m_pmoRegistry);
+    TYPICAL_DELETE(m_uiRegistry);
+    TYPICAL_DELETE(m_lmcExtensions);
+    TYPICAL_DELETE(m_musicBrowser);
 }
 
 void      
 Player::
 SetTerminationSemaphore(Semaphore * pSem)
 {
-   m_pTermSem = pSem;
+    m_pTermSem = pSem;
 }
 
 /*
-   return true if parsing was successful, false otherwise. 
- */
+    return true if parsing was successful, false otherwise. 
+*/
 
 typedef char *pchar;
 
@@ -176,188 +248,231 @@ bool
 Player::
 SetArgs(int32 argc, char **argv)
 {
-   List < char *>argList;
-   bool      justGotArgvZero = false;
-   char     *arg = NULL;
-   char     *argUI = NULL;
+    bool autoplay = false;
+    char* path = new char[_MAX_PATH];
+    char* url = new char[_MAX_PATH];
 
-#ifndef WIN32
-   
-   if (argc == 1)
-   {
-       Usage(argv[0]);
-       exit(0);
-   }
+    // remember these guys so we can use them later and elsewhere
+    m_argc = argc;
+    m_argv = argv;
 
-#if 0
-   // grab the UI name from how we are invoked.
-   argUI = new char[strlen(argv[0]) + 1 + 3];
-   char     *pBegin = strrchr(argv[0], '/');
+    m_context->argv = m_argv;
+    m_context->argc = m_argc;
 
-   if (pBegin)
-   {
-      pBegin++;
-   }
-   else
-   {
-      pBegin = argv[0];
-   }
-   strcpy(argUI, pBegin);
-   m_argUIList->AddItem(argUI);
-#endif
+    // now parse them and pull out any args we know about
+    for (int32 i = 1; i < argc; i++)
+    {
+        char* arg = argv[i];
 
-   justGotArgvZero = true;
-#endif	// ndef WIN32
-
-   argList.AddItem(argv[0]);
-   for (int32 i = 1; i < argc; i++)
-   {
-      arg = argv[i];
-
-      if (arg[0] == '-')
-      {
-         switch (arg[1])
-         {
-         case 'h':
-         case 'H':
-         case '-':
-            if (!strcmp(arg + 1, "help") || !strcmp(arg + 2, "help"))
+        // is this an option?
+        if(arg[0] == '-' || arg[0] == '/')
+        {
+            switch(arg[1])
             {
-               Usage(argv[0]);
-               exit(0);
+                // print help
+                case 'h':
+                case 'H':
+                case '-':
+                    if(!strcasecmp(arg + 1, "help") || !strcasecmp(arg + 2, "help"))
+                    {
+                        Usage(argv[0]);
+                        AcceptEvent(new Event(CMD_QuitPlayer));
+                        return true;
+                    }
+                    break;
+
+                // autoplay
+                case 'p':
+                case 'P':
+                    if(!strcasecmp(arg + 1, "play"))
+                        autoplay = true;
+
+                // save streams
+                // shuffle
+                case 's':
+                case 'S':
+                    if(!strcasecmp(arg + 1, "save"))
+		                m_context->argFlags |= FAC_ARGFLAGS_SAVE_STREAMS;
+                    else if(!strcasecmp(arg + 1, "shuffle"))
+                        m_plm->SetShuffleMode(true);
+
+                    break;
+
+                // set UIs
+                case 'u':
+                case 'U':
+                {
+                    if(arg[2] == 'i' || arg[2] == 'I')
+                    {
+                        char* argUI = NULL;
+                        
+                        i++;
+                        if(i >= argc)
+                        {
+                            Usage(argv[0]);
+                            AcceptEvent(new Event(CMD_QuitPlayer));
+                            return false;
+                        }
+
+                        arg = argv[i];
+
+                        argUI = new char[strlen(arg) + 1];
+
+                        strcpy(argUI, arg);
+                        
+                        m_argUIList->push_back(argUI);
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
+
             }
-	    else
-	       goto normalArg;
-            break;
-         case 'u':
-         case 'U':
+        }
+        else
+        {
+            // is this a URL we know how to handle
+            if( !strncasecmp(arg, "http://", 7) ||
+                !strncasecmp(arg, "rtp://", 6))
             {
-               if (arg[2] == 'i' ||
-                   arg[2] == 'I')
-               {
-                  i++;
-                  if (i >= argc)
-                  {
-                     Usage(argv[0]);
-                     AcceptEvent(new Event(CMD_QuitPlayer));
-                     return false;
-                  }
-                  arg = argv[i];
-                  // if (m_argUI) delete m_argUI;
-                  argUI = new char[strlen(arg) + 1];
-
-                  strcpy(argUI, arg);
-                  if (justGotArgvZero)
-                  {
-                     m_argUIList->DeleteAll();
-                     justGotArgvZero = false;
-                  }
-                  m_argUIList->AddItem(argUI);
-               }
-	       else
-		  goto normalArg;
-               break;
-            }
-	 case 's':
-	 case 'S':
-	    if (!strcmp(&(arg[2]), "ave"))
-		m_context->argFlags |= FAC_ARGFLAGS_SAVE_STREAMS;
-	    else
-		goto normalArg;
-	    break;
-#if 0				// We use the prefs file now
-         case 'p':
-            if (!strcmp(&(arg[2]), "rop"))
-            {
-               // add in a Property=Value property
-               i++;
-               if (i >= argc)
-               {
-                  Usage(argv[0]);
-                  AcceptEvent(new Event(CMD_QuitPlayer));
-                  return false;
-               }
-               char     *pProp = argv[i];
-
-               if (pProp)
-               {
-                  char     *pVal = strchr(pProp, '=');
-
-                  if (pVal)
-                  {
-                     *pVal = '\0';
-                     pVal++;
-                     StringPropValue *spv = new StringPropValue(pVal);
-
-                     m_props.SetProperty(pProp, (PropValue *) spv);
-                  }
-                  else
-                  {
-                     cerr << "Property string '" << pProp << "' is not valid.  Needs to be of the form Property=Value." << endl;
-                     break;
-                  }
-               }
+                m_plm->AddItem(arg);
             }
             else
-	       goto normalArg;
-            break;
-#endif
-         default:
-	 normalArg:
-            argList.AddItem(argv[i]);
-	    break;
-         }
-      }
-      else
-	  {
-		 char *pPtr;
+            {
+#ifdef WIN32
+                strcpy(path, arg);
 
-		 pPtr = strrchr(argv[i], '.');
-		 if (pPtr && strcasecmp(pPtr, szPlaylistExt) == 0)
-		 { 
-		 	 Error eRet;
+                HANDLE handle;
+                WIN32_FIND_DATA data;
+        
+                handle = FindFirstFile(arg, &data);
 
-		     eRet = m_plm->ExpandM3U(argv[i], argList);
-		     if (IsError(eRet))
-#ifndef WIN32
-                printf("Error: Cannot open file '%s'.\n", argv[i]);
+                // find long filename for item and
+                // expand wildcards...
+                if(handle != INVALID_HANDLE_VALUE)
+                {
+                    do
+                    {
+                        char* cp = NULL;
+                    
+                        cp = strrchr(path, '\\');
+
+                        if(cp)
+                            cp++;
+                        else 
+                            cp = path;
+
+                        strcpy(cp, data.cFileName);
+
+                        // make sure we have an absolute path
+                        ResolvePath(&path);
+
+                        // format this path as a URL
+                        uint32 length = _MAX_PATH;
+                        FilePathToURL(path, url, &length);
+
+                        // who needs to get this, plm or dlm?
+                        bool giveToDLM = false;
+                        char* extension = NULL;
+
+                        extension = strrchr(url, '.');
+                        if(extension)
+                        {
+                            DownloadFormatInfo dlfi;
+                            uint32 i = 0;
+
+                            extension++;
+
+                            while(IsntError(m_dlm->GetSupportedDownloadFormats(&dlfi, i++)))
+                            {
+                                if(!strcasecmp(extension, dlfi.GetExtension()))
+                                {
+                                    giveToDLM = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(giveToDLM)
+                            m_dlm->ReadDownloadFile(url);
+                        else
+                            m_plm->AddItem(url); 
+
+                    }while(FindNextFile(handle, &data));
+                   
+                    FindClose(handle);
+                }
+                else // is this a URL we know how to handle ?
+                {
+                    m_plm->AddItem(arg);
+                    continue;
+                }
 #else
-                MessageBox(NULL, "Cannot open playlist file", argv[i], MB_OK); 
-#endif
-		 }
-		 else
-             argList.AddItem(argv[i]);
-      }
-   }
-   m_argc = argList.CountItems();
-   if (m_argc)
-   {
-	   //LEAK-2
-	   m_argv = new pchar[m_argc];
-      for (int f = 0; f < m_argc; f++)
-      {
-         m_argv[f] = argList.ItemAt(f);
-         // cerr << "Adding argument (" << f << "): " << m_argv[f] << endl;
-      }
-   }
+                strcpy(path, arg);
 
-   return true;
+                // make sure we have an absolute path
+                ResolvePath(&path);
+
+                // format this path as a URL
+                uint32 length = _MAX_PATH;
+                FilePathToURL(path, url, &length);
+
+                // who needs to get this, plm or dlm?
+                bool giveToDLM = false;
+                char* extension = NULL;
+
+                extension = strrchr(url, '.');
+                if(extension)
+                {
+                    DownloadFormatInfo dlfi;
+                    uint32 i = 0;
+
+                    extension++;
+
+                    while(IsntError(m_dlm->GetSupportedDownloadFormats(&dlfi, i++)))
+                    {
+                        if(!strcasecmp(extension, dlfi.GetExtension()))
+                        {
+                            giveToDLM = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(giveToDLM)
+                    m_dlm->ReadDownloadFile(url);
+                else
+                    m_plm->AddItem(url);
+#endif
+            }
+        }
+    }
+
+    if(autoplay)
+        AcceptEvent(new Event(CMD_Play));
+
+    delete [] path;
+    delete [] url;
+
+    return true;
 }
 
 void      
 Player::
 Usage(const char *progname)
 {
-   if (m_didUsage)
-      return;
+    if(m_didUsage)
+        return;
 
-   printf("FreeAmp version " FREEAMP_VERSION " -- Usage:\n\n");
-   printf("freeamp [-save] [-ui <UI plugin name>] <MP3 file/stream> "
-	  "[MP3 file/stream] ...\n\n");
-   printf("Example command line:\n\n");
-   printf("   freeamp -ui freeamp-linux.ui mysong1.mp3 mysong2.mp3\n\n");
+    printf(BRANDING " version " FREEAMP_VERSION " -- Usage:\n\n");
+    printf("%s [-save] [-ui <UI plugin name>] <MP3 file/stream> "
+      "[MP3 file/stream] ...\n\n", progname);
+    printf("Example command line:\n\n");
+    printf("   %s -ui freeamp.ui mysong1.mp3 mysong2.mp3\n\n", progname);
 
-   m_didUsage = true;
+    m_didUsage = true;
 }
 
 int32     
@@ -366,42 +481,42 @@ CompareNames(const char *p1, const char *p2)
 {
 // windows plugins and unix plugins are named differently...
 #ifdef WIN32
-   return strcmp(p1, p2);
+    return strcasecmp(p1, p2);
 #else
-   // ut << "Comparing: " << p1 << " to " << p2 << endl;
-   if (strcmp(p1, p2))
-   {
-      // no direct match, try w/ .ui appended...
-      char      foo[512];
+    // ut << "Comparing: " << p1 << " to " << p2 << endl;
+    if (strcmp(p1, p2))
+    {
+        // no direct match, try w/ .ui appended...
+        char      foo[512];
 
-      sprintf(foo, "%s.ui", p2);
-      // ut << "Comparing: " << p1 << " to " << foo << endl;
-      if (strcmp(p1, foo))
-      {
-         // no plugin.ui match, try  plugin-arch.ui
-         char      foo[512];
+        sprintf(foo, "%s.ui", p2);
+        // ut << "Comparing: " << p1 << " to " << foo << endl;
+        if (strcmp(p1, foo))
+        {
+            // no plugin.ui match, try  plugin-arch.ui
+            char      foo[512];
 
-         sprintf(foo, "%s.ui", p2);
-         // cout << "Comparing: " << p1 << " to " << foo << endl;
-         if (strcmp(p1, foo))
-         {
-            // no match
-            return 1;
-         }
-         else
-         {
+            sprintf(foo, "%s.ui", p2);
+            // cout << "Comparing: " << p1 << " to " << foo << endl;
+            if (strcmp(p1, foo))
+            {
+                // no match
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        else
+        {
             return 0;
-         }
-      }
-      else
-      {
-         return 0;
-      }
-   }
-   else
-   {
-      return 0;
-   }
+        }
+    }
+    else
+    {
+        return 0;
+    }
 #endif
 }
 
@@ -409,7 +524,7 @@ void
 Player::
 Run()
 {
-   int32     uiListIndex = 0;
+   uint32    uiListIndex = 0;
    char     *name = NULL;
    uint32    len = 256;
    Error     error = kError_NoErr;
@@ -437,7 +552,7 @@ Run()
       m_context->log->AddLogLevel(LogPerf);
 
    // which ui should we instantiate first??
-   if (m_argUIList->CountItems() == 0)
+   if (m_argUIList->size() == 0)
    {
       const char *pref = kUIPref;
       name = new char[len];
@@ -457,10 +572,36 @@ Run()
    }
    else
    {
-      char *orig = m_argUIList->ItemAt(uiListIndex);
+      char *orig = (*m_argUIList)[uiListIndex++];
+	  // RAK: This pointer is later re-used when the size of the
+      // contents may have changed. See comment below.
       name = new char[strlen(orig) + 1];
 
       strcpy(name, orig);
+   }
+
+   len = 255;
+   char *downloadName = new char[len];
+   while  ((error = m_context->prefs->GetPrefString(kDownloadManagerUIPref,
+                                                    downloadName, &len)) ==
+           kError_BufferTooSmall)
+   {
+       delete[] downloadName;
+       len++;
+     
+       downloadName = new char[len];
+   }
+
+   len = 255;
+   char *musicBrowserName = new char[len];
+   while  ((error = m_context->prefs->GetPrefString(kMusicBrowserUIPref, 
+                                                    musicBrowserName, &len)) ==
+           kError_BufferTooSmall)
+   {
+       delete[] musicBrowserName;
+       len++;
+
+       musicBrowserName = new char[len];
    }
 
    if (IsntError(error))
@@ -473,14 +614,40 @@ Run()
 
          while (NULL != (item = m_uiRegistry->GetItem(i++)))
          {
+            if (!CompareNames(item->Name(), downloadName))
+            {
+               m_ui = (UserInterface *) item->InitFunction()(m_context);
+
+               Error er = m_ui->Init(SECONDARY_UI_STARTUP);
+               if (IsntError(er)) 
+               {
+                   RegisterActiveUI(m_ui);
+                   m_downloadUI = m_ui;
+               }
+               else 
+               {
+                   delete m_ui;
+                   m_ui = NULL;
+               }
+            }
+            if (!CompareNames(item->Name(), musicBrowserName))
+            {
+               m_ui = (UserInterface *) item->InitFunction()(m_context);
+              
+               Error er = m_ui->Init(SECONDARY_UI_STARTUP);
+               if (IsntError(er))
+               {
+                   RegisterActiveUI(m_ui);
+                   m_browserUI = m_ui;
+               }
+            }
             if (!CompareNames(item->Name(), name))
             {
                m_ui = (UserInterface *) item->InitFunction()(m_context);
 
-               m_ui->SetTarget((EventQueue *) this);
-               m_ui->SetPropManager((Properties *) this);
-               m_ui->SetPlayListManager(m_plm);
-               m_ui->SetArgs(m_argc, m_argv);
+               //m_ui->SetPropManager((Properties *) this);
+               //m_ui->SetPlaylistManager(m_plm);
+               //m_ui->SetArgs(m_argc, m_argv);
                Error     er = m_ui->Init((uisActivated == 0) ? PRIMARY_UI
 					 : SECONDARY_UI_STARTUP);
                if (IsntError(er))
@@ -494,13 +661,20 @@ Run()
 
                   m_ui = NULL;
                }
-               break;
+           //    break;  Don't think this'll work now...
             }
          }
-         char     *p = m_argUIList->ItemAt(++uiListIndex);
 
-         if (p)
+         if(uiListIndex < m_argUIList->size())
          {
+            char *p = (*m_argUIList)[uiListIndex++];
+            
+            // RAK: Boundschecker was pissed about this. This copy
+            // may be larger than the space allocated on line 524
+            // So, delete the old pointer and create a new one.
+            delete name;
+            name = new char[strlen(p) + 1];
+            
             strcpy(name, p);
          }
          else
@@ -508,6 +682,7 @@ Run()
             *name = '\0';
          }
       }
+
       if (!uisActivated)
       {
 #ifdef WIN32
@@ -516,15 +691,15 @@ Run()
          uint32    size = MAX_PATH - 1;
 
          m_context->prefs->GetInstallDirectory(bar, &size);
-         sprintf(foo, "No UI plugin matched 'plugins\\%s' or 'plugins\\%s.ui' in '%s'.  FreeAmp will quit.", name, name, bar);
-         MessageBox(NULL, foo, "FreeAmp Error", MB_OK);
+         sprintf(foo, "No UI plugin matched 'plugins\\%s' or 'plugins\\%s.ui' in '%s'.  " BRANDING " will quit.", name, name, bar);
+         MessageBox(NULL, foo, BRANDING " Error", MB_OK);
 #else
          const char *thePath = getenv(FREEAMP_PATH_ENV);
 
          if (thePath == NULL)
           thePath = m_context->prefs->GetLibDirs();
          cerr << "No UI plugin in '" << thePath << "' matched 'plugins/" << name << "' or 'plugins/" << name << ".ui'" << endl;
-         cerr << "FreeAmp will quit." << endl;
+         cerr << BRANDING << " will quit." << endl;
 #endif
          Event    *e = new Event(CMD_QuitPlayer);
 
@@ -536,7 +711,9 @@ Run()
    m_eventServiceThread = Thread::CreateThread();
    m_eventServiceThread->Create(Player::EventServiceThreadFunc, this);
 
-   delete[]name;
+   delete[] name;
+   delete[] musicBrowserName;
+   delete[] downloadName;
 }
 
 void 
@@ -567,7 +744,7 @@ RegisterActiveUI(UserInterface * ui)
    GetUIManipLock();
    if (m_uiList && ui)
    {
-      m_uiList->AddItem(ui);
+      m_uiList->push_back(ui);
       ReleaseUIManipLock();
       return 0;
    }
@@ -580,7 +757,7 @@ RegisterActiveUI(UserInterface * ui)
 
 int32     
 Player::
-RegisterLMCs(LMCRegistry * registry)
+RegisterLMCs(Registry * registry)
 {
    int32     result = 0;
 
@@ -592,7 +769,33 @@ RegisterLMCs(LMCRegistry * registry)
       delete    m_lmcRegistry;
    }
 
+   if (m_lmcExtensions)
+      delete m_lmcExtensions;
+
+   m_lmcExtensions = new HashTable<RegistryItem *>;
+
    m_lmcRegistry = registry;
+
+   RegistryItem *lmc_item;
+   LogicalMediaConverter *lmc;
+   int iItems = registry->CountItems();
+
+   for (int iLoop = 0; iLoop < iItems; iLoop++)
+   {
+      RegistryItem* temp = registry->GetItem(iLoop);
+
+      lmc = (LogicalMediaConverter *)temp->InitFunction()(m_context);
+      vector<char *> *extList = lmc->GetExtensions();
+
+      for (uint32 iextLoop = 0; iextLoop < extList->size(); iextLoop++)
+      {
+          lmc_item = new RegistryItem(*temp);
+          m_lmcExtensions->Insert((*extList)[iextLoop], lmc_item);
+      }
+
+      delete extList;
+      delete lmc;
+   }
 
    m_lmcMutex->Release();
 
@@ -601,7 +804,7 @@ RegisterLMCs(LMCRegistry * registry)
 
 int32     
 Player::
-RegisterPMIs(PMIRegistry * registry)
+RegisterPMIs(Registry * registry)
 {
    int32     result = 0;
 
@@ -622,7 +825,7 @@ RegisterPMIs(PMIRegistry * registry)
 
 int32     
 Player::
-RegisterPMOs(PMORegistry * registry)
+RegisterPMOs(Registry * registry)
 {
    int32     result = 0;
 
@@ -643,7 +846,7 @@ RegisterPMOs(PMORegistry * registry)
 
 int32     
 Player::
-RegisterUIs(UIRegistry * registry)
+RegisterUIs(Registry * registry)
 {
    int32     result = 0;
 
@@ -662,28 +865,28 @@ RegisterUIs(UIRegistry * registry)
    return result;
 }
 
-LMCRegistry* 
+Registry* 
 Player::
 GetLMCRegistry() const
 {
     return m_lmcRegistry;
 }
 
-PMIRegistry* 
+Registry* 
 Player::
 GetPMIRegistry() const
 {
     return m_pmiRegistry;
 }
 
-PMORegistry* 
+Registry* 
 Player::
 GetPMORegistry() const
 {
     return m_pmoRegistry;
 }
 
-UIRegistry*  
+Registry*  
 Player::
 GetUIRegistry() const
 {
@@ -743,7 +946,7 @@ SetState(PlayerState ps)
 
 char *
 Player::
-GetExtension(char *title)
+GetExtension(const char *title)
 {
    char *temp_ext;
    char *ext_return = NULL;
@@ -754,49 +957,48 @@ GetExtension(char *title)
       temp_ext = temp_ext + 1;
       ext_return = new char [strlen(temp_ext) + 1];
       strcpy(ext_return, temp_ext);
+      char *p = ext_return;
+      while (*p) {
+         *p = toupper(*p);
+         p++;
+      }
    }
    return ext_return;
 }
 
-RegistryItem *
+bool
 Player::
-ChooseLMC(char *szUrl, char *szTitle)
+IsSupportedExtension(const char *ext)
 {
-   LogicalMediaConverter *lmc;
-   RegistryItem *lmc_item, *ret = NULL;
-   int       iLoop;
-   int       iItems;
-   char     *iExt;
+   RegistryItem *lmc_item = m_lmcExtensions->Value(ext);
 
-   iItems = m_lmcRegistry->GetNumItems();
-
-   iExt = GetExtension(szUrl);
-   if (!iExt)
-      return ret;
-
-   for (iLoop = 0; iLoop < iItems; iLoop++)
-   {
-      lmc_item = m_lmcRegistry->GetItem(iLoop);
-
-      lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
-      if (lmc->CanHandleExt(iExt))
-      {
-         ret = lmc_item;
-         delete lmc;
-
-         break;
-      }
-      delete lmc;
-   }
-
-   delete iExt;
-
-   return ret;
+   if (lmc_item)
+       return true;
+   return false;
 }
 
 RegistryItem *
 Player::
-ChoosePMI(char *szUrl, char *szTitle)
+ChooseLMC(const char *szUrl, char *szTitle)
+{
+   RegistryItem *lmc_item = NULL;
+   char     *iExt;
+
+
+   iExt = GetExtension(szUrl);
+   if (!iExt)
+      return lmc_item;
+
+   lmc_item = m_lmcExtensions->Value(iExt);
+
+   delete iExt;
+
+   return lmc_item;
+}
+
+RegistryItem *
+Player::
+ChoosePMI(const char *szUrl, char *szTitle)
 {
    PhysicalMediaInput *pmi;
    RegistryItem *pmi_item, *ret = NULL;
@@ -812,7 +1014,7 @@ ChoosePMI(char *szUrl, char *szTitle)
       szUrl = szNewUrl;
    }
 
-   for (iLoop = 0; iLoop < m_pmiRegistry->GetNumItems(); iLoop++)
+   for (iLoop = 0; iLoop < m_pmiRegistry->CountItems(); iLoop++)
    {
       pmi_item = m_pmiRegistry->GetItem(iLoop);
 
@@ -835,20 +1037,20 @@ ChoosePMI(char *szUrl, char *szTitle)
 
 void 
 Player::
-CreatePMO(PlayListItem * pc, Event * pC)
+CreatePMO(const PlaylistItem * pc, Event * pC)
 {
    Error     error = kError_NoErr;
    Event    *e;
    PhysicalMediaOutput *pmo = NULL;
    PhysicalMediaInput *pmi = NULL;
    LogicalMediaConverter *lmc = NULL;
-   RegistryItem *pmi_item = pc->GetPMIRegistryItem();
-   RegistryItem *lmc_item = pc->GetLMCRegistryItem();
+   RegistryItem *pmi_item = NULL;
+   RegistryItem *lmc_item = NULL;
    RegistryItem *item;
 
    if (!pc)
    {
-      m_plm->SetFirst();
+      m_plm->SetCurrentIndex(0);
       if (m_pmo)
       {
          m_pmo->Pause();
@@ -862,7 +1064,7 @@ CreatePMO(PlayListItem * pc, Event * pC)
       }
       GetUIManipLock();
 
-      e = new Event(INFO_PlayListDonePlay);
+      e = new Event(INFO_PlaylistDonePlay);
       SendToUI(e);
 
       ReleaseUIManipLock();
@@ -878,19 +1080,19 @@ CreatePMO(PlayListItem * pc, Event * pC)
       m_pmo = NULL;
    }
 
-   pmi_item = ChoosePMI(pc->URL());
+   pmi_item = ChoosePMI(pc->URL().c_str());
    if (!pmi_item)
    {
       char szErr[1024];
 
-      sprintf(szErr, "Cannot determine what pmi to use for %s\n", pc->URL());
+      sprintf(szErr, "Cannot determine what pmi to use for %s\n", pc->URL().c_str());
       m_context->log->Error(szErr);
       AcceptEvent(new LMCErrorEvent(szErr));
 
       return;
    }
 
-   lmc_item = ChooseLMC(pc->URL());
+   lmc_item = ChooseLMC(pc->URL().c_str());
    if (!lmc_item)
    // FIXME: Should probably have a user definable default LMC
       lmc_item = m_lmcRegistry->GetItem(0);
@@ -899,7 +1101,6 @@ CreatePMO(PlayListItem * pc, Event * pC)
    {
       pmi = (PhysicalMediaInput *) pmi_item->InitFunction()(m_context);
       pmi->SetPropManager((Properties *) this);
-      pmi->SetTarget((EventQueue *)this);
    }
 
    char defaultPMO[256];
@@ -926,11 +1127,6 @@ CreatePMO(PlayListItem * pc, Event * pC)
    {
       pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
       pmo->SetPropManager((Properties *) this);
-      pmo->SetTarget((EventQueue *)this);
-      if (m_iVolume < 0)
-         m_iVolume = pmo->GetVolume();
-      
-      pmo->SetVolume(m_iVolume);
    }
 
    error = kError_NoErr;
@@ -939,7 +1135,6 @@ CreatePMO(PlayListItem * pc, Event * pC)
       lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
 
       lmc->SetPropManager((Properties *) this);
-      lmc->SetTarget((EventQueue *) this);
    }
 
    lmc->SetPMI(pmi);
@@ -952,7 +1147,7 @@ CreatePMO(PlayListItem * pc, Event * pC)
    m_lmc = lmc;
    lmc = NULL;
 
-   error = pmo->SetTo(pc->URL());
+   error = pmo->SetTo(pc->URL().c_str());
    if (IsError(error))
    {
       char szErr[1024];
@@ -1006,7 +1201,7 @@ DoneOutputting(Event *pEvent)
 
    SEND_NORMAL_EVENT(INFO_DoneOutputting);
 
-   if (m_plm->HasAnotherSong())
+   if (m_plm->HasAnotherItem())
    {
       AcceptEvent(new Event(CMD_NextMediaPiece));
 
@@ -1021,8 +1216,8 @@ DoneOutputting(Event *pEvent)
    }
    else
    {
-      m_plm->SetFirst();
-      SEND_NORMAL_EVENT(INFO_PlayListDonePlay);
+      m_plm->SetCurrentIndex(0);
+      SEND_NORMAL_EVENT(INFO_PlaylistDonePlay);
    }
    
    delete pEvent;
@@ -1053,21 +1248,14 @@ void
 Player::
 GetVolume(Event *pEvent)
 {
-    int iVolume = 0;
+    int iVolume = -1;
 
     delete pEvent;
     if (m_pmo) 
     {
-       iVolume = m_iVolume = m_pmo->GetVolume();
-    }
-    else
-    {
-       if (m_iVolume < 0)
-          iVolume = 0;
-       else
-          iVolume = m_iVolume;
-    }
-    SendToUI(new VolumeEvent(INFO_VolumeInfo,iVolume));
+       iVolume = m_pmo->GetVolume();
+       SendToUI(new VolumeEvent(INFO_VolumeInfo,iVolume));
+    }   
 }
 
 void
@@ -1076,10 +1264,7 @@ SetVolume(Event *pEvent)
 {
     int32 v=((VolumeEvent *) pEvent)->GetVolume();
     if (m_pmo) 
-    {
         m_pmo->SetVolume(v);
-    }
-    m_iVolume = v;
     delete pEvent;
 }
 
@@ -1097,11 +1282,11 @@ void
 Player::
 GetMediaInfo(Event *pEvent)
 {
-     PlayListItem *pItem;
+     const PlaylistItem *pItem;
 
      if (m_playerState == PlayerState_Stopped)
      {
-         pItem = m_plm->GetCurrent();
+         pItem = m_plm->GetCurrentItem();
          if (pItem)
             CreatePMO(pItem, pEvent);
      }
@@ -1110,57 +1295,9 @@ GetMediaInfo(Event *pEvent)
 
 void 
 Player::
-GetMediaTitle(Event *pEventArg)
-{
-     PLMGetMediaTitleEvent *pEvent;
-     PlayListItem          *pItem;
-     RegistryItem          *pRegItem;
-     PhysicalMediaInput    *pPmi;
-     char                   szTitle[1024];
-     Id3TagInfo             sID3Tag;
-     Error                  eRet;
-
-     szTitle[0] = 0;
-
-     pEvent = (PLMGetMediaTitleEvent *)pEventArg;
-
-     pItem = pEvent->GetPlayListItem();
-     pRegItem = ChoosePMI(pItem->URL(), szTitle);
-     if (pRegItem && !strlen(szTitle))
-     {
-         pPmi = (PhysicalMediaInput *)pRegItem->InitFunction()(m_context);
-
-         pPmi->SetTarget((EventQueue *)this);
-         eRet = pPmi->SetTo(pItem->URL());
-         if (!IsError(eRet))
-         {
-            eRet = pPmi->GetID3v1Tag(sID3Tag);
-            if (!IsError(eRet))
-            {
-                strcpy(szTitle, sID3Tag.m_artist);
-                strcat(szTitle, " - ");
-                strcat(szTitle, sID3Tag.m_songName);
-             }
-         }
-
-         delete pPmi;
-     }
-
-     if(*szTitle)
-     {
-        pItem->SetDisplayString(szTitle);
-
-        SendEventToUI(new PlayListItemUpdatedEvent(pItem) );
-     }
-
-     delete pEvent;
-}
-
-void 
-Player::
 Play(Event *pEvent)
 {
-    PlayListItem *pItem;
+    const PlaylistItem               *pItem;
 
     if (m_playerState == PlayerState_Playing)
     {
@@ -1175,7 +1312,7 @@ Play(Event *pEvent)
 
     if (!m_pmo)
     {
-       pItem = m_plm->GetCurrent();
+       pItem = m_plm->GetCurrentItem();
        if (pItem)
           CreatePMO(pItem, pEvent);
 
@@ -1212,7 +1349,7 @@ Next(Event *pEvent)
       AcceptEvent(new Event(CMD_Stop));
    }
 
-   m_plm->SetNext(true);
+   m_plm->GotoNextItem(true);
 
    if (m_playerState != PlayerState_Stopped)
    {
@@ -1234,7 +1371,7 @@ Previous(Event *pEvent)
       AcceptEvent(new Event(CMD_Stop));
    }
 
-   m_plm->SetPrev(true);
+   m_plm->GotoPreviousItem(true);
 
    if (m_playerState != PlayerState_Stopped)
    {
@@ -1299,9 +1436,10 @@ Quit(Event *pEvent)
    // 1) Set "I'm already quitting flag" (or exit if its already Set)
    m_imQuitting = 1;
    // 2) Get CIO/COO manipulation lock
+
    GetUIManipLock();
    // 3) Count CIO/COO, put into m_quitWaitingFor.
-   m_quitWaitingFor = m_uiList->CountItems();
+   m_quitWaitingFor = m_uiList->size();
    // 4) Send CMD_Cleanup event to all CIO/COOs
 
    pe = new Event(CMD_Cleanup);
@@ -1366,14 +1504,14 @@ HandleMediaInfo(Event *pEvent)
    GetUIManipLock();
 
    pmvi = (MediaInfoEvent *)pEvent;
-   pmvi->m_indexOfSong = m_plm->Current() + 1;         // zero based
+   pmvi->m_indexOfSong = m_plm->GetCurrentIndex() + 1;         // zero based
    pmvi->m_totalSongs = m_plm->CountItems();
 
    SendToUI(pEvent);
 
-   for (int foobar = 0; foobar < pmvi->m_childEvents->CountItems(); foobar++)
+   for (uint32 foobar = 0; foobar < pmvi->m_childEvents->size(); foobar++)
    {
-      pe = pmvi->m_childEvents->ItemAt(foobar);
+      pe = (*pmvi->m_childEvents)[foobar];
       SendToUI(pe);
    }
 
@@ -1462,130 +1600,167 @@ LMCError(Event *pEvent)
       delete pEvent;
 }
 
+void
+Player::
+ToggleUI(Event *pEvent)
+{
+   switch (pEvent->Type()) 
+   {
+      case CMD_ToggleDownloadUI: {
+           if (!m_downloadUI) {
+              delete pEvent;
+              return;
+           }
+           m_downloadUI->AcceptEvent(pEvent);
+           break; }
+      case CMD_TogglePlaylistUI: 
+      case CMD_ToggleMusicBrowserUI: {
+           if (!m_browserUI) {
+              delete pEvent;
+              return;
+           }
+           m_browserUI->AcceptEvent(pEvent);
+           break; }
+      default:
+           break;
+   }
+   delete pEvent;
+} 
+
 int32 
 Player::
 ServiceEvent(Event * pC)
 {
-   if (!pC)
-   {
+    if (!pC)
+    {
       return 255;
-   }
+    }
 
-   //printf("Got event %d\n", pC->Type());
-   switch (pC->Type())
-   {
-      case INFO_DoneOutputting:
-           DoneOutputting(pC);
-           break;
+    //printf("Got event %d\n", pC->Type());
+    switch (pC->Type())
+    {
+        case INFO_DoneOutputting:
+            DoneOutputting(pC);
+            break;
 
-      case CMD_Stop:
-           Stop(pC);
-           break;
+        case CMD_Stop:
+            Stop(pC);
+            break;
 
-      case CMD_GetVolume:
-           GetVolume(pC);
-           break;
+        case CMD_GetVolume:
+            GetVolume(pC);
+            break;
 
-      case CMD_SetVolume:
-           SetVolume(pC);
-           break;
+        case CMD_SetVolume:
+            SetVolume(pC);
+            break;
 
-      case CMD_ChangePosition:
-           ChangePosition(pC);
-           break;
+        case CMD_ChangePosition:
+            ChangePosition(pC);
+            break;
 
-      case CMD_PLMGetMediaInfo:
-           GetMediaInfo(pC);
-           break;
+        case CMD_PLMGetMediaInfo:
+            GetMediaInfo(pC);
+            break;
 
-      case CMD_PLMGetMediaTitle:
-           GetMediaTitle(pC);
-           break;
+        case CMD_PlayPaused:
+            Play(pC);
+            break;
 
-      case CMD_PlayPaused:
-           Play(pC);
-           break;
+        case CMD_Play:
+            Play(pC);
+            break;
 
-      case CMD_Play:
-           Play(pC);
-           break;
+        case CMD_NextMediaPiece:
+            Next(pC); 
+            break;
 
-      case CMD_NextMediaPiece:
-           Next(pC); 
-           break;
+        case CMD_PrevMediaPiece:
+            Previous(pC);
+            break;
 
-      case CMD_PrevMediaPiece:
-           Previous(pC);
-           break;
+        case CMD_Pause:
+            Pause(pC);
+            break;
 
-      case CMD_Pause:
-           Pause(pC);
-           break;
+        case CMD_UnPause:
+            UnPause(pC);
+            break;
 
-      case CMD_UnPause:
-           UnPause(pC);
-           break;
+        case CMD_TogglePause:
+            TogglePause(pC);
+            break;
 
-      case CMD_TogglePause:
-           TogglePause(pC);
-           break;
+        case CMD_QuitPlayer:
+            return Quit(pC);
 
-      case CMD_QuitPlayer:
-           return Quit(pC);
+        case INFO_ReadyToDieUI:
+            return ReadyToDieUI(pC);
 
-      case INFO_ReadyToDieUI:
-           return ReadyToDieUI(pC);
+        case INFO_UserMessage:
+        case INFO_StatusMessage:
+        case INFO_BrowserMessage:
+            UserMessage(pC);
+            break;
 
-      case INFO_UserMessage:
-      case INFO_StatusMessage:
-           UserMessage(pC);
-           break;
+        case INFO_MediaInfo:
+            HandleMediaInfo(pC);
+            break;
 
-      case INFO_MediaInfo:
-           HandleMediaInfo(pC);
-           break;
+        case INFO_MediaTimeInfo:
+            HandleMediaTimeInfo(pC);
+            break;
 
-      case INFO_MediaTimeInfo:
-           HandleMediaTimeInfo(pC);
-           break;
+        case INFO_PrefsChanged:
+        case INFO_StreamInfo:
+        case INFO_PlaylistShuffle:
+        case INFO_PlaylistRepeat:
+        case INFO_PlaylistUpdated:
+        case INFO_PlaylistCurrentItemInfo:
+        case INFO_BufferStatus:
+        case INFO_SearchMusicDone:
+        case INFO_DownloadItemAdded:
+        case INFO_DownloadItemRemoved:
+        case INFO_DownloadItemNewState:
+        case INFO_DownloadItemProgress:
+            SendEventToUI(pC);
+            break;
 
-      case INFO_StreamInfo:
-      case INFO_PlayListShuffle:
-      case INFO_PlayListRepeat:
-      case INFO_PlayListUpdated:
-      case INFO_BufferStatus:
-           SendEventToUI(pC);
-           break;
+        case CMD_ToggleDownloadUI:
+        case CMD_TogglePlaylistUI:
+        case CMD_ToggleMusicBrowserUI:
+            ToggleUI(pC);
+            break;
 
-      case INFO_LMCError:
-           LMCError(pC);
-           break;
+        case INFO_LMCError:
+            LMCError(pC);
+            break;
 
 #define _EQUALIZER_ENABLE_
 #ifdef  _EQUALIZER_ENABLE_
-      case CMD_SetEQData:
-           SetEQData(pC);
-           break;
+        case CMD_SetEQData:
+            SetEQData(pC);
+            break;
 
 #endif // _EQUALIZER_ENABLE_
 #undef  _EQUALIZER_ENABLE_
 
 #define _VISUAL_ENABLE_
 #ifdef  _VISUAL_ENABLE_
-      case CMD_SendVisBuf:
-           SendVisBuf(pC);
-           break;
+        case CMD_SendVisBuf:
+            SendVisBuf(pC);
+            break;
 #endif // _VISUAL_ENABLE_
 #undef  _VISUAL_ENABLE_
 
-      default:
-           m_context->log->Error("serviceEvent: Unknown event: %d\n",
-				 pC->Type());
-           delete  pC;
-           break;
-   }
+        default:
+            m_context->log->Error("serviceEvent: Unknown event: %d\n",
+            pC->Type());
+            delete  pC;
+            break;
+    }
 
-   return 0;
+    return 0;
 }
 
 Error     
@@ -1601,11 +1776,11 @@ void
 Player::
 SendToUI(Event * pe)
 {
-   int32     i;
+   uint32     i;
 
-   for (i = 0; i < m_uiList->CountItems(); i++)
+   for (i = 0; i < m_uiList->size(); i++)
    {
-      m_uiList->ItemAt(i)->AcceptEvent(pe);
+      (*m_uiList)[i]->AcceptEvent(pe);
    }
 }
 

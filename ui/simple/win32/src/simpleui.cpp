@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ ____________________________________________________________________________*/
 #include "simpleui.h"
 #include "event.h"
 #include "eventdata.h"
-#include "playlist.h"
+#include "Playlist.h"
 #include "about.h"
 #include "prefdialog.h"
 #include "resource.h"
@@ -80,11 +80,6 @@ INT WINAPI DllMain (HINSTANCE hInst,
     return 1;                 
 }
 
-void
-SimpleUI::
-SetPlayListManager(PlayListManager *plm) {
-	m_plm = plm;
-}
 
 SimpleUI::
 SimpleUI(FAContext *context):
@@ -92,6 +87,10 @@ SimpleUI(FAContext *context):
 {
     m_context = context;
     m_prefs = context->prefs;
+    m_plm = m_context->plm;
+    m_target = m_context->target;
+    m_propManager = m_context->props;
+
     m_scrolling = false;
 
     m_uiSemaphore = new Semaphore();
@@ -106,13 +105,6 @@ SimpleUI::
 ~SimpleUI()
 {
     delete m_uiSemaphore;
-}
-
-void 
-SimpleUI::
-SetTarget(EventQueue* eq)
-{
-    m_target = eq;
 }
 
 void 
@@ -340,7 +332,7 @@ AcceptEvent(Event* event)
 	            break; 
             }
 
-            case INFO_PlayListDonePlay:
+            case INFO_PlaylistDonePlay:
             {
                 char timeString[256] = "00:00:00";
                 char szTemp[256] = {0x00};
@@ -365,7 +357,7 @@ AcceptEvent(Event* event)
 						    (LPARAM) szTemp);
 
              
-                SetWindowText(m_hwnd, "FreeAmp");
+                SetWindowText(m_hwnd, BRANDING);
                 break;
             }
 
@@ -388,9 +380,9 @@ AcceptEvent(Event* event)
 
 void  
 SimpleUI::
-SetArgs(int32 argc, char** argv)
+ParseArgs(int32 argc, char** argv)
 {
-    PlayListManager* playlist = m_plm;
+    PlaylistManager* Playlist = m_plm;
     char *arg = NULL;
     bool shuffle = false;
     bool autoplay = false;
@@ -419,15 +411,15 @@ SetArgs(int32 argc, char** argv)
         }
         else 
         {
-            playlist->AddItem(arg,0);
+            Playlist->AddItem(arg,0);
             count++;
 	    }
     }
 
-    playlist->SetFirst();
+    Playlist->SetCurrentIndex(0);
 
     if(shuffle) 
-        playlist->SetShuffle(SHUFFLE_RANDOM);
+        Playlist->SetShuffleMode(true);
     
     if(count)
     {
@@ -561,6 +553,14 @@ SetTrayTooltip(char *str)
 	Shell_NotifyIcon(NIM_MODIFY, &nid); // now, modify our tooltip
 }
 
+Error 
+SimpleUI::
+Init(int32 startup_type) 
+{ 
+    ParseArgs(m_context->argc, m_context->argv);
+    return kError_NoErr;
+}
+
 
 BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd, 
 						            UINT msg, 
@@ -607,7 +607,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 
             m_ui->ReadPreferences();
 
-            m_ui->SetTrayTooltip("Welcome to FreeAmp");
+            m_ui->SetTrayTooltip("Welcome to "BRANDING);
 
 			result = TRUE;
 
@@ -709,10 +709,10 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 					{
 						char file[MAX_PATH + 1];
 						char* cp = NULL;
-						PlayListManager* playlist = m_ui->m_plm;
+						PlaylistManager* Playlist = m_ui->m_plm;
 
 
-                        playlist->MakeEmpty();
+                        Playlist->RemoveAll();
 
 						strcpy(file, filelist);
 						strcat(file, "\\");
@@ -723,7 +723,7 @@ BOOL CALLBACK SimpleUI::MainProc(	HWND hwnd,
 						{
 							strcpy(file + ofn.nFileOffset, cp);
 
-							playlist->AddItem(file,0);
+							Playlist->AddItem(file,0);
 
 							cp += strlen(cp) + 1;
 						}

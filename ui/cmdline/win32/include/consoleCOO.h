@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ ____________________________________________________________________________*/
 // CommandLineCOO.h
 
 
-#ifndef _CONSOLE_COO_H_
-#define _CONSOLE_COO_H_
+#ifndef INCLUDED_CONSOLE_COO_H_
+#define INCLUDED_CONSOLE_COO_H_
 
 #include "ui.h"
 #include "event.h"

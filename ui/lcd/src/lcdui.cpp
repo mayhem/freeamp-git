@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -77,10 +77,6 @@ UserInterface *Initialize(FAContext *context) {
 //}
 
 
-void LcdUI::SetPlayListManager(PlayListManager *plm) {
-    m_plm = plm;
-}
-
 LcdUI::LcdUI(FAContext *context) {
     m_context = context;
     m_timeType = TIME_CURR;
@@ -113,7 +109,7 @@ LcdUI::~LcdUI() {
 #else
     lcd.clear();
     lcd.string(1,2,"  Thanks for using  ");
-    lcd.string(1,3,"       FreeAmp      ");
+    lcd.string(1,3,"       "BRANDING"      ");
     lcd.flush();
 #endif
 
@@ -148,19 +144,26 @@ Error LcdUI::Init(int32 startupType) {
     cout << "done connecting" << endl;
     sock_send_string(m_sock, "hello\n");
     sock_send_string(m_sock, "screen_add FA\n");
-    sock_send_string(m_sock, "screen_set FA name {FreeAmp}\n");
+    sock_send_string(m_sock, "screen_set FA name {"BRANDING"}\n");
     sock_send_string(m_sock, "widget_add FA songname scroller\n");
     sock_send_string(m_sock, "widget_add FA timeline string\n");
     sock_send_string(m_sock, "widget_add FA artist scroller\n");
-    sock_send_string(m_sock, "widget_set FA songname 1 1 20 1 h 2 {Welcome To FreeAmp}\n");
+    sock_send_string(m_sock, "widget_set FA songname 1 1 20 1 h 2 {Welcome To "BRANDING"}\n");
     sock_send_string(m_sock, "widget_set FA timeline 1 4 {total       00:00:00}\n");
     sock_send_string(m_sock, "widget_del FA heartbeat\n");
     //sock_send_string(m_sock, "screen_set FA priority 32\n");
 #else 
-    lcd.string(1,1," Welcome To FreeAmp");
+    lcd.string(1,1," Welcome To "BRANDING);
     lcd.flush();
 #endif
     m_lcdLock->Release();
+
+    m_plm = m_context->plm;
+    m_playerEQ = m_context->target;
+    m_propManager = m_context->props;
+ 
+    m_argc = m_context->argc;
+    m_argv = m_context->argv;
 
     if ((m_startupType = startupType) == PRIMARY_UI) {
 	ProcessArgs();
@@ -237,7 +240,7 @@ int32 LcdUI::AcceptEvent(Event *e) {
     if (e) {
 	//cout << "LcdUI: processing event " << e->Type() << endl;
 	switch (e->Type()) {
-	    case INFO_PlayListDonePlay: {
+	    case INFO_PlaylistDonePlay: {
 		if (m_startupType == PRIMARY_UI) {
 		    Event *e = new Event(CMD_QuitPlayer);
 		    m_playerEQ->AcceptEvent(e);
@@ -335,7 +338,7 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		}
 		break;
 	    }
-	    case INFO_ID3TagInfo: {
+/*	    case INFO_ID3TagInfo: {
 		ID3TagEvent *ite = (ID3TagEvent *)e;
 		if (ite) {
 		    Id3TagInfo ti = ite->GetId3Tag();
@@ -368,7 +371,7 @@ int32 LcdUI::AcceptEvent(Event *e) {
 		}
 		break;
 	    }
-	    default:
+*/	    default:
 		break;
 	}
     }
@@ -404,9 +407,6 @@ void LcdUI::BlitTimeLine() {
 #endif
 }
 
-void LcdUI::SetArgs(int argc, char **argv) {
-    m_argc = argc; m_argv = argv;
-}
 void LcdUI::ProcessArgs() {
     char *pc = NULL;
     for(int i=1;i<m_argc;i++) {
@@ -418,7 +418,7 @@ void LcdUI::ProcessArgs() {
 	    m_plm->AddItem(pc,0);
 	}
     }
-    m_plm->SetFirst();
+    m_plm->SetCurrentIndex(0);
     Event *e = new Event(CMD_Play);
     m_playerEQ->AcceptEvent(e);
 }

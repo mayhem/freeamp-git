@@ -1,7 +1,7 @@
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
-	Portions copyright (C) 1998 GoodNoise
+	Portions copyright (C) 1998-1999 EMusic.com
 
 	alsapmo.h by Gabor Fleischer <flocsy@usa.net>
 
@@ -23,8 +23,8 @@
 ____________________________________________________________________________*/
 
 
-#ifndef _ALSAPMO_H_
-#define _ALSAPMO_H_
+#ifndef INCLUDED_ALSAPMO_H_
+#define INCLUDED_ALSAPMO_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -48,7 +48,7 @@ ____________________________________________________________________________*/
 
 struct audio_info_struct
 {
-    void *handle;
+    snd_pcm_t *handle;
     snd_pcm_format_t alsa_format;
 
     char *device;
@@ -112,7 +112,11 @@ public:
     int          m_iOutputBufferSize, m_iBytesPerSample;
     int          m_iTotalFragments, m_iBaseTime;
     int          m_iDataSize;
-    int          m_iCard, m_iDevice, m_iChannel;
+    int          m_iCard, m_iDevice;
+
+    int		 m_iChannel;
+    snd_mixer_gid_t m_gid;
+    snd_mixer_group_t m_group;
  
     struct audio_info_struct *ai;
     int audio_set_all(struct audio_info_struct *);

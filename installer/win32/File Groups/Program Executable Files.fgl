@@ -5,6 +5,7 @@ file2=..\..\base\win32\prj\portio.sys
 file3=..\..\Copying.txt
 file4=..\..\Changes.txt
 file5=..\..\Authors.txt
+file6=..\..\base\win32\prj\update.exe
 
 [General]
 Type=FILELIST

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <iostream.h>
 #include <stdio.h>
+#include <sys/stat.h>
 
 #include "win32impl.h"
 
@@ -32,7 +33,7 @@ FindData::~FindData() {
 }
 
 bool Match(char *,char *);
-void FillWin32FindData(char *,WIN32_FIND_DATA *);
+void FillWin32FindData(char *,char *,WIN32_FIND_DATA *);
 
 HANDLE FindFirstFile(char *lpFileName, WIN32_FIND_DATA *lpFindFileData) {
     //cout << "FindFirstFile: begin" << endl;
@@ -45,7 +46,7 @@ HANDLE FindFirstFile(char *lpFileName, WIN32_FIND_DATA *lpFindFileData) {
     char *chopChar = '\0';
     if (!ps && !pQ) {
 	// no wildcards... fill in the win32_find_data structure
-	FillWin32FindData(lpFileName,lpFindFileData);
+	FillWin32FindData(NULL,lpFileName,lpFindFileData);
 	// no more files...
 	pFD->pDir = NULL;
 	pFD->dir = NULL;
@@ -61,10 +62,16 @@ HANDLE FindFirstFile(char *lpFileName, WIN32_FIND_DATA *lpFindFileData) {
 
     char holdChar = *chopChar;
     *chopChar = '\0';
-    char *lastSlash = strrchr(lpFileName,'/');
+    char *lastSlash = strrchr(lpFileName, '/');
     *chopChar = holdChar;
     char *pDir, *pRest;
-    if (lastSlash) {
+    if (lastSlash == lpFileName) {
+        pRest = lastSlash + 1;
+        pFD->dir = new char[2];
+        pFD->rest = new char[strlen(pRest)+1];
+        strcpy(pFD->dir, "/");
+        strcpy(pFD->rest, pRest);
+    } else if (lastSlash) {
 	pDir = lpFileName;
 	pRest = lastSlash + sizeof(char);
 	*lastSlash = '\0';
@@ -87,7 +94,7 @@ HANDLE FindFirstFile(char *lpFileName, WIN32_FIND_DATA *lpFindFileData) {
 	    while (pdirent) {
 		//cout << "FindFirstFile: matching " << pFD->rest << " to " << pdirent->d_name << endl;
 		if (Match(pFD->rest,pdirent->d_name)) {
-		    FillWin32FindData(pdirent->d_name,lpFindFileData);
+		    FillWin32FindData(pFD->dir, pdirent->d_name,lpFindFileData);
 		    return (HANDLE)pFD;
 		}
 		pdirent = readdir(pFD->pDir);
@@ -120,6 +127,8 @@ bool Match(char *pattern,char *string) {
 	    case '*': {
 	        // find existance of next block
 		ps1++;
+                if (*ps1 == '\0')
+                    return true;
 		char *pS = strchr(ps1,'*');
 		char *pQ = strchr(ps1,'?');
 		if (pS) {*pS = '\0';}  if (pQ) {*pQ = '\0';}
@@ -145,9 +154,35 @@ bool Match(char *pattern,char *string) {
 }
 
 
-void FillWin32FindData(char *pF,WIN32_FIND_DATA *wfd) {
+void FillWin32FindData(char *pDir, char *pF,WIN32_FIND_DATA *wfd) {
 //    cout << "FillWin32FindData: Entering: " << pF << endl;
     strcpy(wfd->cFileName,pF);
+
+    struct stat st;
+    char *name = new char[strlen(pDir) + strlen(DIR_MARKER_STR) + strlen(pF) + 1];
+
+    if (pDir)
+    {
+       strcpy(name, pDir);
+       if (name[strlen(name) - 1] != DIR_MARKER)
+           strcat(name, DIR_MARKER_STR);
+       strcat(name, pF);
+    }
+    else
+       strcpy(name, pF);
+
+    if (lstat(name, &st) == -1) {
+        delete name;
+        return;
+    }
+    if (S_ISLNK(st.st_mode)) 
+        wfd->dwFileAttributes = FILE_ATTRIBUTE_SYMLINK;
+    else if (S_ISDIR(st.st_mode))
+        wfd->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+    else
+        wfd->dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+
+    delete name;
 }
 
 
@@ -162,7 +197,7 @@ bool FindNextFile(HANDLE hFindHandle, WIN32_FIND_DATA *lpFindFileData) {
     struct dirent *pdirent = readdir(pFD->pDir);
     while (pdirent) {
 	if (Match(pFD->rest,pdirent->d_name)) {
-	    FillWin32FindData(pdirent->d_name,lpFindFileData);
+	    FillWin32FindData(pFD->dir, pdirent->d_name,lpFindFileData);
 	    return true;
 	}
 	pdirent = readdir(pFD->pDir);
@@ -176,6 +211,8 @@ bool FindClose(HANDLE hFindFile) {
     if (!hFindFile) return false;
     FindData *pFD = (FindData *)hFindFile;
     closedir(pFD->pDir);
+    delete pFD;
+
     return true;
 }
 
@@ -201,10 +238,10 @@ HINSTANCE LoadLibrary(char *lpLibFileName) {
             {
                printf("%s\n\nThis is *not* a fatal error. The plugin ", 
                       dlerror());
-               printf("'%s' in FreeAmp's plugin \ndirectory could not ", ptr);
-               printf("be loaded. FreeAmp will use the default PMO.\n");
+               printf("'%s' in "BRANDING"'s plugin \ndirectory could not ", ptr);
+               printf("be loaded. "BRANDING" will use the default PMO.\n");
                printf("To get rid of this warning either fix the problem, ");
-               printf("or delete the\n'%s' file from FreeAmp's plugin ", ptr);
+               printf("or delete the\n'%s' file from "BRANDING"'s plugin ", ptr);
                printf("directory.\n");
                return hInst;
             }

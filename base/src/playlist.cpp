@@ -1,1290 +1,1795 @@
 /*____________________________________________________________________________
-        
-        FreeAmp - The Free MP3 Player
+	
+	FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998 GoodNoise
-        Portions Copyright (C) 1998 "Michael Bruun Petersen" <mbp@image.dk>
+	Portions Copyright (C) 1998-1999 EMusic.com
 
-        This program is free software; you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by
-        the Free Software Foundation; either version 2 of the License, or
-        (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-        This program is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with this program; if not, write to the Free Software
-        Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-        
-        $Id$
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+	
+	$Id$
 ____________________________________________________________________________*/
 
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <sys/stat.h>
-
-
-#include "playlist.h"
-#include "event.h"
-#include "eventdata.h"
-#include "mutex.h"
-#include "thread.h"
+// The debugger can't handle symbols more than 255 characters long.
+// STL often creates symbols longer than that.
+// When symbols are longer than 255 characters, the warning is disabled.
 #ifdef WIN32
-#include "win32thread.h"
+#pragma warning(disable:4786)
 #endif
 
-#include "std.h"
-#include "rio.h"
+#include <assert.h>
+#include <time.h>
+#include <vector>
+#include <algorithm>
+#include <functional>
+#include <iostream>
 
-PlayListManager::
-PlayListManager(EventQueue * pPlayer)
+using namespace std;
+
+#include "config.h"
+
+#include "playlist.h"
+#include "errors.h"
+#include "mutex.h"
+#include "thread.h"
+#include "metadata.h"
+#include "registrar.h"
+#include "event.h"
+#include "eventdata.h"
+
+
+// Function object used for sorting PlaylistItems in PlaylistManager
+bool PlaylistItemSort::operator() (PlaylistItem* item1, 
+                                   PlaylistItem* item2) const
 {
-   m_mutex = new Mutex();
-   m_target = pPlayer;
-   m_playList = new List < PlayListItem * >();
-   m_shuffleList = NULL; 
-   m_current = -1;
-   m_skipNum = 0;
-   m_order = SHUFFLE_NOT_SHUFFLED;
-   m_repeat = REPEAT_NOT;
-   srand((unsigned int) time(NULL));
-   m_rioThread = NULL;
-}
+    bool result = true;
 
-PlayListManager::
-~PlayListManager()
-{
-   if(m_playList)
-   {
-      m_playList->DeleteAll();
-      delete m_playList;
-      m_playList = NULL;
-   }
+    assert(item1);
+    assert(item2);
 
-   if(m_shuffleList)
-   {
-      m_shuffleList->DeleteAll();
-      delete m_shuffleList;
-      m_shuffleList = NULL;
-   }
-   
-   if(m_mutex)
-   {
-      delete m_mutex;
-      m_mutex = NULL;
-   }
-}
-
-PlayListItem*
-PlayListManager::
-GetCurrent()
-{
-    GetPLManipLock();
-    PlayListItem *pli = NULL;
-
-    if ((m_current >= 0) && (m_current < m_playList->CountItems()))
+    if(item1 && item2)
     {
-        pli = m_playList->ItemAt(m_current);
+        MetaData m1 = item1->GetMetaData();
+        MetaData m2 = item2->GetMetaData();
+
+        switch(m_sortKey)
+        {
+            case kPlaylistSortKey_Artist:
+            {
+                result = m1.Artist() < m2.Artist();
+                break;
+            }
+
+            case kPlaylistSortKey_Album:
+            {
+                result = m1.Album() < m2.Album();
+                break;
+            }
+
+            case kPlaylistSortKey_Title:
+            {
+                result = m1.Title() < m2.Title();
+                break;
+            }
+
+            case kPlaylistSortKey_Year:
+            {
+                result = m1.Year() < m2.Year();
+                break;
+            }
+
+            case kPlaylistSortKey_Track:
+            {
+                result = m1.Track() < m2.Track();
+                break;
+            }
+
+            case kPlaylistSortKey_Genre:
+            {
+                result = m1.Genre() < m2.Genre();
+                break;
+            }
+
+            case kPlaylistSortKey_Time:
+            {
+                result = m1.Time() < m2.Time();
+                break;
+            }
+
+            case kPlaylistSortKey_Location:
+            {
+                result = item1->URL() < item2->URL();
+                break;
+            }
+
+            default:
+            {
+                cerr << "Whoa! Why are we here?" << endl;
+                break;
+            }
+
+        }
     }
 
-    ReleasePLManipLock();
-    return pli;
+    return result;
 }
 
-void 
-PlayListManager::
-SetFirst()
+
+// Implementation of the PlaylistManager Class
+PlaylistManager::PlaylistManager(FAContext* context)
 {
-    GetPLManipLock();
-    int32 elems = m_playList->CountItems();
+    m_context = context;
+    m_activeList = &m_masterList;
+    m_playlistKey = kPlaylistKey_MasterPlaylist;
+    m_current = kInvalidIndex;
+    m_shuffle = false;
+    m_repeatMode = kPlaylistMode_RepeatNone;
+    m_sortKey = kPlaylistSortKey_Random;
 
-    if(elems)
+    srand( (unsigned)time( NULL ) );
+
+    Registrar registrar;
+
+    registrar.SetSubDir("plugins");
+    registrar.SetSearchString("*.plf");
+    registrar.InitializeRegistry(&m_playlistRegistry, context->prefs);
+
+    registrar.SetSearchString("*.mdf");
+    registrar.InitializeRegistry(&m_metadataRegistry, context->prefs);
+
+    registrar.SetSearchString("*.ppp");
+    registrar.InitializeRegistry(&m_portableRegistry, context->prefs);
+
+    const RegistryItem* module = NULL;
+    MetaDataFormat* mdf = NULL;
+    int32 i = 0;
+
+    while((module = m_metadataRegistry.GetItem(i++)))
     {
-        m_current = 0;
+        mdf = (MetaDataFormat*) module->InitFunction()(m_context);
 
-        SendInfoToPlayer();
+        if(mdf)
+        {
+            m_metadataFormats.push_back(mdf);
+        }
+    }
+
+    i = 0;
+    PlaylistFormat* plf = NULL;
+
+    while((module = m_playlistRegistry.GetItem(i++)))
+    {
+        plf = (PlaylistFormat*) module->InitFunction()(m_context);
+
+        if(plf)
+        {
+            PlaylistFormatInfo plfi;
+
+            uint32 index = 0;
+
+            // error != kError_NoMoreFormats
+            while(IsntError(plf->GetSupportedFormats(&plfi, index++)))
+            {
+                plfi.SetRef(plf);
+                m_playlistFormats.push_back(new PlaylistFormatInfo(plfi));
+            }
+        }
+    }
+
+    i = 0;
+    PortableDevice* pd = NULL;
+
+    while((module = m_portableRegistry.GetItem(i++)))
+    {
+        pd = (PortableDevice*) module->InitFunction()(m_context);
+
+        if(pd)
+        {
+            DeviceInfo di;
+
+            uint32 index = 0;
+            // error != kError_NoMoreDevices
+            while(IsntError(pd->GetSupportedDevices(&di, index++)))
+            {
+                di.SetRef(pd);
+                m_portablePlayers.push_back(new DeviceInfo(di));
+            }
+        }
+    }
+}
+
+PlaylistManager::~PlaylistManager()
+{
+    uint32 index = 0;
+    uint32 size = 0;
+    PlaylistItem* item = NULL;
+    //uint32 count = 0;
+
+    size = m_masterList.size();
+
+    for(index = 0; index < size; index++)
+    {
+        item = m_masterList[index];
+
+        if(item)
+        {
+            // if the metadata thread is still accessing this item
+            // we don't wanna delete the item  out from under it.
+            // instead we set a flag and let the metadata thread
+            // clean up when it returns.
+            if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+            {
+                item->SetState(kPlaylistItemState_Delete);  
+            }
+            else
+            {
+                delete item;
+            }
+        }
+    }
+    
+    size = m_externalList.size();
+
+    for(index = 0; index < size; index++)
+    {
+        item = m_externalList[index];
+
+        if(item)
+        {
+            // if the metadata thread is still accessing this item
+            // we don't wanna delete the item  out from under it.
+            // instead we set a flag and let the metadata thread
+            // clean up when it returns.
+            if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+            {
+                item->SetState(kPlaylistItemState_Delete);  
+            }
+            else
+            {
+                delete item;
+            }
+        }
+    }
+
+    size = m_portableList.size();
+
+    for(index = 0; index < size; index++)
+    {
+        item = m_portableList[index];
+
+        if(item)
+        {
+            // if the metadata thread is still accessing this item
+            // we don't wanna delete the item  out from under it.
+            // instead we set a flag and let the metadata thread
+            // clean up when it returns.
+            if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+            {
+                item->SetState(kPlaylistItemState_Delete);  
+            }
+            else
+            {
+                delete item;
+            }
+        }
+    }
+
+    size = m_playlistFormats.size();
+
+    for(index = 0; index < size; index++)
+    {
+        delete m_playlistFormats[index]->GetRef();
+        delete m_playlistFormats[index];
+    }
+
+    size = m_portablePlayers.size();
+
+    for(index = 0; index < size; index++)
+    {
+        delete m_portablePlayers[index]->GetRef();
+        delete m_portablePlayers[index];
+    }
+}
+
+
+// Playlist actions
+Error PlaylistManager::SetCurrentItem(PlaylistItem* item)
+{
+    return SetCurrentIndex(IndexOf(item));
+}
+
+const PlaylistItem*  PlaylistManager::GetCurrentItem()
+{
+    PlaylistItem* result = NULL;
+    m_mutex.Acquire();
+    
+    if(m_masterList.size())
+    {
+        if(m_shuffle)
+            result = m_shuffleList[m_current];
+        else
+            result = m_masterList[m_current];
+    }
+   
+    m_mutex.Release();
+    return result;
+}
+
+
+Error PlaylistManager::SetCurrentIndex(uint32 index)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    index = CheckIndex(index);
+
+    if(index != kInvalidIndex)
+    {
+        InternalSetCurrentIndex(index);
+        
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+void PlaylistManager::InternalSetCurrentIndex(uint32 index)
+{
+    m_current = index;
+    m_context->target->AcceptEvent(new PlaylistCurrentItemInfoEvent(GetCurrentItem()));
+}
+
+uint32 PlaylistManager::GetCurrentIndex() const
+{
+    uint32 result = kInvalidIndex;
+
+    if(m_masterList.size())
+        result = m_current;
+
+    return m_current;
+}
+
+
+Error PlaylistManager::GotoNextItem(bool userAction)
+{
+    m_mutex.Acquire();
+
+    Error result = kError_NoErr;
+    uint32 count = m_masterList.size();
+    uint32 index = m_current;
+    
+    if(count)
+    {
+        if(!(kPlaylistMode_RepeatOne == m_repeatMode) || userAction)
+        {
+            index++;
+
+            if( (index >= count) && 
+                (m_repeatMode == kPlaylistMode_RepeatAll || userAction))
+            {
+                index = 0;
+
+                if(m_shuffle)
+                {
+                    random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
+                }
+            }
+            else if(index >= count)
+            {
+                index = m_current;
+            }
+        }
+
+        InternalSetCurrentIndex(index);
     }
     else
     {
-        m_current = -1;
+        m_current = kInvalidIndex;
     }
 
-    ReleasePLManipLock();
+    m_mutex.Release();
+    return result;
 }
 
-bool 
-PlayListManager::
-HasAnotherSong()
+Error PlaylistManager::GotoPreviousItem(bool userAction)
 {
-    GetPLManipLock();
+    m_mutex.Acquire();
+
+    Error result = kError_NoErr;
+    uint32 count = m_masterList.size();
+    uint32 index = m_current;
+    
+    if(count)
+    {
+        if(!(kPlaylistMode_RepeatOne == m_repeatMode) || userAction)
+        {
+            if( (index == 0) && 
+                (m_repeatMode == kPlaylistMode_RepeatAll || userAction))
+            {
+                index = count - 1;
+
+                if(m_shuffle)
+                {
+                    random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
+                }
+            }
+            else if(index != 0)
+            {
+                index--;
+            }
+        }
+
+        InternalSetCurrentIndex(index);
+    }
+    else
+    {
+        m_current = kInvalidIndex;
+    }
+
+    m_mutex.Release();
+
+    return result;
+}
+
+bool PlaylistManager::HasAnotherItem()
+{
+    m_mutex.Acquire();
     bool result = false;
 
-    if(m_repeat == REPEAT_CURRENT || m_repeat == REPEAT_ALL)
+    if(m_repeatMode == kPlaylistMode_RepeatOne || 
+        m_repeatMode == kPlaylistMode_RepeatAll)
     {
         result = true;
     }
     else
     {
-        if(m_order == SHUFFLE_RANDOM)
-        {
-            if(m_playList->CountItems() != 1)
-                result = true;
-        }
-        else
-        {
-            if (m_current != m_playList->CountItems() - 1)
-                result = true;
-        }
+        result = (m_current < m_masterList.size() - 1);
     }
 
-    ReleasePLManipLock();
+    m_mutex.Release();
     return result;
 }
 
-void 
-PlayListManager::
-SetNext(bool bUserAction)
+Error PlaylistManager::SetShuffleMode(bool shuffle)
 {
-    GetPLManipLock();
-    int32 count = m_playList->CountItems();
+    m_mutex.Acquire();
 
-    if(count)
+    m_shuffle = shuffle;
+
+    if(m_shuffle)
     {
-        if(!(m_repeat == REPEAT_CURRENT))
-        {
-            if(SHUFFLE_RANDOM == m_order)
-            {
-                m_current = 0;
-
-                if( m_shuffleList->CountItems() != m_playList->CountItems() ||
-                    m_shuffle >= count)
-                {
-                    CreateShuffleList();
-                }
-
-                m_shuffle++;
-
-                ShuffleItem* item = m_shuffleList->ItemAt(m_shuffle);
-
-                if(item)
-                {
-                    m_current = item->m_index;
-                }                
-            }
-            else
-            {
-                m_current++;
-
-                if( (m_current >= count) && 
-                    (m_repeat == REPEAT_ALL || bUserAction))
-                {
-                    m_current = 0;
-                }
-            }
-
-            SendInfoToPlayer();
-        }
-    }
-    else
-    {
-        m_current = -1;
+        random_shuffle(m_shuffleList.begin(), m_shuffleList.end());
     }
 
-    ReleasePLManipLock();
+    m_context->target->AcceptEvent(new PlaylistShuffleEvent(m_shuffle));
+
+    m_mutex.Release();
+
+    return kError_NoErr;
 }
 
-void 
-PlayListManager::
-SetPrev(bool bUserAction)
+Error PlaylistManager::SetRepeatMode(RepeatMode mode)
 {
-    GetPLManipLock();
-    int32 count = m_playList->CountItems();
-
-    if(count)
-    {
-        if(!(m_repeat == REPEAT_CURRENT))
-        {
-            if(SHUFFLE_RANDOM == m_order)
-            {
-                m_current = 0;
-
-                m_shuffle--;
-
-                if( m_shuffleList->CountItems() != m_playList->CountItems() || 
-                    m_shuffle < 0)
-                {
-                    CreateShuffleList();
-                }
-             
-                ShuffleItem* item = m_shuffleList->ItemAt(m_shuffle);
-
-                if(item)
-                {
-                    m_current = item->m_index;
-                }                
-            }
-            else
-            {
-                m_current--;
-
-                if( (m_current < 0) && 
-                    (m_repeat == REPEAT_ALL || bUserAction))
-                {
-                    m_current = count - 1;
-                }
-            }
-
-            SendInfoToPlayer();
-        }
-    }
-    else
-    {
-        m_current = -1;
-    }
-    ReleasePLManipLock();
+    m_repeatMode = mode;
+    m_context->target->AcceptEvent(new PlaylistRepeatEvent(m_repeatMode));
+    return kError_NoErr;
 }
 
-void 
-PlayListManager::
-SetCurrent(int32 index)
+Error PlaylistManager::ToggleRepeatMode()
 {
-    GetPLManipLock();
+    Error result = kError_NoErr;
+
+    if(m_repeatMode == kPlaylistMode_RepeatNone)
+        result = SetRepeatMode(kPlaylistMode_RepeatOne);
+    else if(m_repeatMode == kPlaylistMode_RepeatOne)
+        result = SetRepeatMode(kPlaylistMode_RepeatAll);
+    else if(m_repeatMode == kPlaylistMode_RepeatAll)
+        result = SetRepeatMode(kPlaylistMode_RepeatNone);
+
+    return result;
+}
+
+Error PlaylistManager::ToggleShuffleMode()
+{
+    return SetShuffleMode(!m_shuffle);
+}
+
+
+// Functions for adding items to playlist       
+Error PlaylistManager::AddItem(const char* url)
+{
+    Error result = kError_InvalidParam;
+
+    assert(url);
+
+    if(url)
+    {
+        result = ReadPlaylist(url);
+
+        if(IsError(result))
+        {
+            result = kError_OutOfMemory;
+
+            PlaylistItem* item = new PlaylistItem(url);
+
+            if(item)
+            {
+                result = AddItem(item, true);
+            }
+        }
+    }
+
+    return result;
+}
+
+Error PlaylistManager::AddItem(const char* url, uint32 index)
+{
+    Error result = kError_InvalidParam;
+
+    assert(url);
+
+    if(url)
+    {
+        result = ReadPlaylist(url);
+
+        if(IsError(result))
+        {
+            result = kError_OutOfMemory;
+
+            PlaylistItem* item = new PlaylistItem(url);
+
+            if(item)
+            {
+                result = AddItem(item, index, true);
+            }
+        }
+    }
+
+    return result;
+}
+
+Error PlaylistManager::AddItem(PlaylistItem* item, bool queryForMetaData)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(item);
+
+    if(item)
+    {
+        m_activeList->push_back(item);
+
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        {
+            AddItemToShuffleList(item);
+
+            if(m_current == kInvalidIndex && m_activeList->size())
+                InternalSetCurrentIndex(0);
+        }
+
+        if(queryForMetaData)
+            RetrieveMetaData(item);
+     
+        m_context->target->AcceptEvent(new PlaylistItemAddedEvent(item));
+
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::AddItem(PlaylistItem* item, uint32 index, bool queryForMetaData)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(item);
+
+    if(index > m_activeList->size())
+        index = kInvalidIndex;
+
+    //index = CheckIndex(index);
+
+    if(item && index != kInvalidIndex)
+    {
+        m_activeList->insert(&(*m_activeList)[index],item);
+
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        {
+            AddItemToShuffleList(item);
+
+            if(m_current == kInvalidIndex && m_activeList->size())
+                InternalSetCurrentIndex(0);
+        }
+
+        if(queryForMetaData)
+            RetrieveMetaData(item);
+
+        m_context->target->AcceptEvent(new PlaylistItemAddedEvent(item));
+
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, bool queryForMetaData)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(list);
+
+    if(list)
+    {
+        m_activeList->insert(m_activeList->end(),
+                             list->begin(), 
+                             list->end());
+
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        {
+            AddItemsToShuffleList(list);
+
+            if(m_current == kInvalidIndex && m_activeList->size())
+                InternalSetCurrentIndex(0);
+        }
+
+        // we need our own vector so user can delete theirs
+        vector<PlaylistItem*>* items = new vector<PlaylistItem*>;
+
+        if(items)
+        {
+            items->insert(items->end(), list->begin(), list->end());
+
+            if(queryForMetaData)
+                RetrieveMetaData(items);
+        }
+
+        vector<PlaylistItem *>::iterator i = list->begin();
+        for (; i != list->end(); i++)
+            m_context->target->AcceptEvent(new PlaylistItemAddedEvent(*i));
+
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+
+    return result;
+}
+
+
+
+Error PlaylistManager::AddItems(vector<PlaylistItem*>* list, uint32 index, bool queryForMetaData)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(list);
+
+    if(index > m_activeList->size())
+        index = kInvalidIndex;
+
+    //index = CheckIndex(index);
+
+    if(list && index != kInvalidIndex)
+    {
+        m_activeList->insert(&(*m_activeList)[index],
+                             list->begin(), 
+                             list->end());
+
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+        {
+            AddItemsToShuffleList(list);
+
+            if(m_current == kInvalidIndex && m_activeList->size())
+                InternalSetCurrentIndex(0);
+        }
+
+        // we need our own vector so user can delete theirs
+        vector<PlaylistItem*>* items = new vector<PlaylistItem*>;
+
+        if(items)
+        {
+            items->insert(items->end(), list->begin(), list->end());
+
+            if(queryForMetaData)
+                RetrieveMetaData(items);
+        }
+
+        vector<PlaylistItem *>::iterator i = list->begin();
+        for (; i != list->end(); i++)
+            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(*i));
+
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+
+    return result;
+}
+
+
+// Functions for removing items from playlist
+Error PlaylistManager::RemoveItem(PlaylistItem* item)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(item);
+
+    if(item)
+    {
+        result = RemoveItem(IndexOf(item));
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::RemoveItem(uint32 index)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
 
     index = CheckIndex(index);
 
-    if(index >= 0 )
+    if(index != kInvalidIndex)
     {
-        m_current = index;
-        SendInfoToPlayer();
-    }
-    ReleasePLManipLock();
-}
+        PlaylistItem* item = (*m_activeList)[index];
 
-void 
-PlayListManager::
-SendInfoToPlayer()
-{
-    PlayListItem         *pli = GetCurrent();
-    PLMGetMediaInfoEvent *gmi = new PLMGetMediaInfoEvent();
+        m_activeList->erase(&(*m_activeList)[index]);
 
-    if(gmi && pli)
-    {
-        gmi->SetPlayListItem(pli);
-        m_target->AcceptEvent(gmi);
-    }
-
-    if(pli)
-    {
-        MediaInfoEvent *mie = pli->GetMediaInfo();
-
-        if (mie)
+        if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
         {
-            m_target->AcceptEvent(mie);
+            int32 shuffleIndex = InternalIndexOf(&m_shuffleList, item);
+
+            m_shuffleList.erase(&m_shuffleList[shuffleIndex]);
+
+            if(!m_activeList->size())
+            {
+               m_current = kInvalidIndex;
+            }
+        }
+
+        // if the metadata thread is still accessing this item
+        // we don't wanna delete the item  out from under it.
+        // instead we set a flag and let the metadata thread
+        // clean up when it returns.
+        if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+        {
+            item->SetState(kPlaylistItemState_Delete);  
         }
         else
         {
-			// LEAK
-            /*LEAK*/MediaInfoEvent *pMIE = new MediaInfoEvent(pli->URL(), 0);
-
-            m_target->AcceptEvent(pMIE);
+            delete item;
         }
-    }
-}
 
-void 
-PlayListManager::
-SendShuffleModeToPlayer()
-{
-    m_target->AcceptEvent(new PlayListShuffleEvent(m_order));
-}
+        m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item));
 
-void 
-PlayListManager::
-SendRepeatModeToPlayer()
-{
-    m_target->AcceptEvent(new PlayListRepeatEvent(m_repeat));
-}
-
-void 
-PlayListManager::
-SetShuffle(ShuffleMode oop)
-{
-    GetPLManipLock();
-
-    m_order = oop;
-
-    if(m_order == SHUFFLE_RANDOM)
-    {
-        CreateShuffleList();
+        result = kError_NoErr;
     }
 
-    SendShuffleModeToPlayer();
-
-    ReleasePLManipLock();
+    m_mutex.Release();
+    return result;
 }
 
-void
-PlayListManager::
-SetRepeat(RepeatMode rp)
+Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
 {
-    GetPLManipLock();
-    m_repeat = rp;
-    SendRepeatModeToPlayer();
-    ReleasePLManipLock();
-}
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
 
-void
-PlayListManager::
-CreateShuffleList()
-{
-    if(m_shuffleList)
+    index = CheckIndex(index);
+
+    if(index != kInvalidIndex)
     {
-        m_shuffleList->DeleteAll();
-        delete m_shuffleList;
-        m_shuffleList = NULL;
-    }
-
-    m_shuffle = 0;
-
-    int32 count = CountItems();
-    int32 i = 0;
-
-    m_shuffleList = new List < ShuffleItem * >(count);
-
-    srand( (unsigned)time( NULL ) );
-
-    for (i = 0;i < count;i++) 
-    {
-        ShuffleItem* item = new ShuffleItem;
-
-        item->m_index = i;
-        item->m_random = (int32) rand();
-
-	    m_shuffleList->AddItem(item);
-    }
-
-    QuickSortShuffleList(0, count - 1);
-
-    /*for (i = 0;i < count;i++) 
-    {
-        char temp[10];
-        sprintf(temp, "%d\r\n", m_shuffleList->ItemAt(i)->m_index);
-        OutputDebugString(temp);
-    }
-
-    OutputDebugString("\r\n");*/
-
-}
-
-void 
-PlayListManager::
-QuickSortShuffleList(int32 first, int32 last) 
-{
-    if (first < last) 
-    {
-	    int32 q = PartitionShuffleList(first, last);
-	    QuickSortShuffleList(first, q);
-	    QuickSortShuffleList(q + 1,last);
-    }
-}
-
-int32 
-PlayListManager::
-PartitionShuffleList(int32 first, int32 last) 
-{
-    int32 x = m_shuffleList->ItemAt(first)->m_random;
-    int32 i = first - 1;
-    int32 j = last + 1;
-
-    for(;;) 
-    {
-	    do 
+        for(uint32 i = 0; i < count; i++)
         {
-	        j--;
-	    } while (m_shuffleList->ItemAt(j)->m_random > x);
+            PlaylistItem* item = (*m_activeList)[index + i];
 
-	    do 
-        {
-	        i++;
-	    } while (m_shuffleList->ItemAt(i)->m_random < x);
-
-	    if (i < j) 
-        {
-	        m_shuffleList->Swap(i,j);
-	    } 
-        else 
-        {
-	        return j;
-	    }
-    }
-}
-
-void 
-PlayListManager::
-AcceptEvent(Event * e)
-{
-    if(e)
-    {
-        switch(e->Type())
-        {
-            case CMD_PLMSetMediaInfo:
+            if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
             {
-                PLMSetMediaInfoEvent *smi = (PLMSetMediaInfoEvent *) e;
+                int32 shuffleIndex = InternalIndexOf(&m_shuffleList, item);
 
-                if(smi->IsComplete())
+                m_shuffleList.erase(&m_shuffleList[shuffleIndex]);
+
+                if(!m_activeList->size())
                 {
-                    PlayListItem *pItem = smi->GetPlayListItem();
+                   m_current = kInvalidIndex;
+                }
+            }
 
-                    // make sure pItem still exists
-                    pItem->SetPMIRegistryItem(smi->GetPMIRegistryItem());
-                    pItem->SetLMCRegistryItem(smi->GetLMCRegistryItem());
-                    pItem->SetMediaInfo(smi->GetMediaInfo());
-                    // if pItem is the current item, send out the info posthaste
-                    if(pItem == GetCurrent())
+            // if the metadata thread is still accessing this item
+            // we don't wanna delete the item  out from under it.
+            // instead we set a flag and let the metadata thread
+            // clean up when it returns.
+            if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+            {
+                item->SetState(kPlaylistItemState_Delete);  
+            }
+            else
+            {
+                delete item;
+            }
+
+            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item));
+        }
+
+        m_activeList->erase(&(*m_activeList)[index], &(*m_activeList)[index + count]);
+
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(items);
+
+    if(items)
+    {
+        uint32 index = 0;
+        uint32 size = 0;
+        PlaylistItem* item = NULL;
+
+        size = items->size();
+
+        for(index = 0; index < size; index++)
+        {
+            item = (*items)[index];
+
+            if(item)
+            {
+                m_activeList->erase(&(*m_activeList)[IndexOf(item)]);
+
+                if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+                {
+                    int32 shuffleIndex = InternalIndexOf(&m_shuffleList, item);
+
+                    m_shuffleList.erase(&m_shuffleList[shuffleIndex]);
+
+                    if(!m_activeList->size())
                     {
-                        SendInfoToPlayer();
+                       m_current = kInvalidIndex;
                     }
                 }
 
+                // if the metadata thread is still accessing this item
+                // we don't wanna delete the item  out from under it.
+                // instead we set a flag and let the metadata thread
+                // clean up when it returns.
+                if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+                {
+                    item->SetState(kPlaylistItemState_Delete);  
+                }
+                else
+                {
+                    delete item;
+                }
+
+                m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item));
+
+                result = kError_NoErr;
+            }
+        }  
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::RemoveAll()
+{
+    Error result = kError_InvalidParam;
+    uint32 index = 0;
+    uint32 size = 0;
+    PlaylistItem* item = NULL;
+    m_mutex.Acquire();
+
+    size = m_activeList->size();
+
+    for(index = 0; index < size; index++)
+    {
+        item = (*m_activeList)[index];
+
+        if(item)
+        {            
+            // if the metadata thread is still accessing this item
+            // we don't wanna delete the item  out from under it.
+            // instead we set a flag and let the metadata thread
+            // clean up when it returns.
+            if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+            {
+                item->SetState(kPlaylistItemState_Delete);  
+            }
+            else
+            {
+                delete item;
+            }          
+            
+            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item));
+        }
+    }  
+
+    m_activeList->clear();
+
+    if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
+    {
+        m_shuffleList.clear();
+        m_current = kInvalidIndex;
+    }
+
+    result = kError_NoErr;
+
+    m_mutex.Release();
+    return result;
+}
+
+
+// Functions for moving items around
+Error PlaylistManager::SwapItems(PlaylistItem* item1, PlaylistItem* item2)
+{
+    return SwapItems(IndexOf(item1), IndexOf(item2));
+}
+
+Error PlaylistManager::SwapItems(uint32 index1, uint32 index2)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    index1 = CheckIndex(index1);
+    index2 = CheckIndex(index2);
+
+    if(index1 != kInvalidIndex && index2 != kInvalidIndex)
+    {
+        PlaylistItem* temp;
+
+        temp = (*m_activeList)[index1];
+        (*m_activeList)[index1] = (*m_activeList)[index2];
+        (*m_activeList)[index2] = temp;
+
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::MoveItem(PlaylistItem* item, uint32 index)
+{
+    return MoveItem(IndexOf(item), index);
+}
+
+Error PlaylistManager::MoveItem(uint32 oldIndex, uint32 newIndex)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    oldIndex = CheckIndex(oldIndex);
+    newIndex = CheckIndex(newIndex);
+
+    if(oldIndex != kInvalidIndex && newIndex != kInvalidIndex)
+    {
+        PlaylistItem* item = (*m_activeList)[oldIndex];
+
+        m_activeList->erase(&(*m_activeList)[oldIndex]);
+
+        if(newIndex > m_activeList->size())
+            newIndex = m_activeList->size();
+
+        m_activeList->insert(&(*m_activeList)[newIndex],item);
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::MoveItems(vector<PlaylistItem*>* items, uint32 index)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(items);
+
+    index = CheckIndex(index);
+
+    if(items && index != kInvalidIndex)
+    {
+        uint32 size = 0;
+        PlaylistItem* item = NULL;
+
+        size = items->size();
+
+        for(uint32 i = 0; i < size; i++)
+        {
+            item = (*items)[i];
+
+            if(item)
+            {
+                cout << "Erasing " << item->URL() << endl;
+                m_activeList->erase(&(*m_activeList)[IndexOf(item)]);
+            }
+        }  
+
+        if(index > m_activeList->size())
+            index = m_activeList->size();
+
+        m_activeList->insert(&(*m_activeList)[index],
+                             items->begin(), 
+                             items->end());
+
+        result = kError_NoErr;
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+
+// Functions for sorting
+Error PlaylistManager::Sort(PlaylistSortKey key, PlaylistSortType type)
+{
+    Error result = kError_InvalidParam;
+
+    if(key >= kPlaylistSortKey_FirstKey && key < kPlaylistSortKey_LastKey)
+    {
+        if(type == PlaylistSortType_Ascending)
+            sort(m_activeList->begin(), m_activeList->end(), PlaylistItemSort(key));
+        else
+            sort(m_activeList->begin(), m_activeList->end(), not2(PlaylistItemSort(key)));
+    
+        m_sortKey = key;
+        result = kError_NoErr;
+    }
+    else if(key == kPlaylistSortKey_Random)
+    {
+        random_shuffle(m_activeList->begin(), m_activeList->end());
+        m_sortKey = key;
+        result = kError_NoErr;
+    }
+
+    return result;
+}
+
+PlaylistSortKey PlaylistManager::GetPlaylistSortKey() const
+{
+    return m_sortKey;
+}
+
+
+// Which playlist are we dealing with for purposes of editing:
+// 1) Master Playlist - list of songs to play
+// 2) Secondary Playlist - a playlist that we want to edit
+//      - External playlist
+//      - Portable playlist
+
+Error PlaylistManager::SetActivePlaylist(PlaylistKey key)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    if(key >= kPlaylistKey_FirstKey && key < kPlaylistKey_LastKey)
+    {
+        m_playlistKey = key;
+        result = kError_NoErr;
+
+        switch(key)
+        {
+            case kPlaylistKey_MasterPlaylist:
+            {
+                m_activeList = &m_masterList;
+                break;
+            }
+
+            case kPlaylistKey_ExternalPlaylist:
+            {
+                m_activeList = &m_externalList;
+                break;
+            }
+    
+
+            case kPlaylistKey_PortablePlaylist:
+            {
+                m_activeList = &m_portableList;
                 break;
             }
 
             default:
-                break;
+            {
+                result = kError_InvalidParam;
+            }
         }
     }
-}
 
-Error
-PlayListManager::
-ToggleShuffle()
-{
-    SetShuffle((ShuffleMode) ((m_order + 1) % SHUFFLE_LAST_ENUM));
-    return kError_NoErr;
-}
-
-Error
-PlayListManager::
-ToggleRepeat()
-{
-    SetRepeat((RepeatMode) ((m_repeat + 1) % REPEAT_LAST_ENUM));
-    return kError_NoErr;
-}
-
-
-PlayListItem* 
-PlayListManager::
-FirstItem()
-{
-    PlayListItem* result = NULL;
-
-    GetPLManipLock();
-
-    result = m_playList->FirstItem();
-
-    ReleasePLManipLock();
-
+    m_mutex.Release();
     return result;
 }
 
-PlayListItem* 
-PlayListManager::
-LastItem()
+PlaylistKey PlaylistManager::GetActivePlaylist() const
 {
-    PlayListItem* result = NULL;
-
-    GetPLManipLock();
-
-    result = m_playList->LastItem();
-
-    ReleasePLManipLock();
-
-    return result;
+    return m_playlistKey;  
 }
 
-bool 
-PlayListManager::
-HasItem(PlayListItem* item)
+Error PlaylistManager::SetExternalPlaylist(char* url)
 {
-    bool result = false;
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
 
-    GetPLManipLock();
-
-    result = m_playList->HasItem(item);
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-int32 
-PlayListManager::
-CountItems()
-{
-    int32 result = 0;
-
-    GetPLManipLock();
-
-    result = m_playList->CountItems();
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-PlayListItem*   
-PlayListManager::
-ItemAt(int32 index)
-{
-    PlayListItem* result = NULL;
-
-    GetPLManipLock();
-
-    result = m_playList->ItemAt(index);
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-int32
-PlayListManager::
-IndexOf(PlayListItem* item)
-{
-    int32 result = 0;
-
-    GetPLManipLock();
-
-    result = m_playList->IndexOf(item);
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-Error 
-PlayListManager::
-AddItem(char *url, int32 type)
-{
-    Error result = kError_UnknownErr;
-
-    GetPLManipLock();
+    assert(url);
 
     if(url)
     {
-        PlayListItem *item = new PlayListItem();
+        // first delete old playlist
+        uint32 index = 0;
+        uint32 numItems = 0;
+        PlaylistItem* item = NULL;
 
-        if(item)
+        numItems = m_externalList.size();
+
+        for(index = 0; index < numItems; index++)
         {
-            item->SetURL(url);
-            item->SetType(type);
-
-            m_playList->AddItem(item);
-
-            if (m_playList->CountItems() == 1)
-            {
-                m_current = 0; // set current to first
-            }
-
-            result = kError_NoErr;
-
-            PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
-            pTitle->SetPlayListItem(item);
-            m_target->AcceptEvent(pTitle);
-            m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-            //OutputDebugString("AddItem::AcceptEvent(INFO_PlayListUpdated)\r\n");
-        }  
-    }
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-Error 
-PlayListManager::
-AddItem(char *url,int32 type, int32 index)
-{
-    Error result = kError_UnknownErr;
-
-    GetPLManipLock();
-
-    index = CheckIndex(index);
-
-    if(index >= 0 )
-    {
-        if(url)
-        {
-            PlayListItem *item = new PlayListItem();
+            item = m_externalList[index];
 
             if(item)
             {
-                item->SetURL(url);
-                item->SetType(type);
-
-                m_playList->AddItem(item, index);
-
-                if (m_playList->CountItems() == 1)
+                // if the metadata thread is still accessing this item
+                // we don't wanna delete the item  out from under it.
+                // instead we set a flag and let the metadata thread
+                // clean up when it returns.
+                if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
                 {
-                    m_current = 0; // set current to first
+                    item->SetState(kPlaylistItemState_Delete);  
                 }
-
-                result = kError_NoErr;
-
-                PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
-                pTitle->SetPlayListItem(item);
-                m_target->AcceptEvent(pTitle);
-                m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-            }  
-        }
-    }
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-Error 
-PlayListManager::
-AddItem(PlayListItem* item)
-{
-    Error result = kError_UnknownErr;
-
-    GetPLManipLock();
-    
-    if(item)
-    {
-        m_playList->AddItem(item);
-
-        if(m_playList->CountItems() == 1)
-        {
-            m_current = 0;
-        }
-
-        PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
-        pTitle->SetPlayListItem(item);
-        m_target->AcceptEvent(pTitle);
-        m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-
-        result = kError_NoErr;
-    }
-    
-    ReleasePLManipLock();
-
-    return result;
-}
-
-Error 
-PlayListManager::
-AddItem(PlayListItem* item, int32 index)
-{
-    Error result = kError_UnknownErr;
-
-    GetPLManipLock();
-
-    index = CheckIndex(index);
-
-    if(index >= 0 )
-    {
-        if(item)
-        {
-            m_playList->AddItem(item, index);
-
-            if(m_playList->CountItems() == 1)
-            {
-                m_current = 0;
+                else
+                {
+                    delete item;
+                }
             }
+        }
 
-            PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
-            pTitle->SetPlayListItem(item);
-            m_target->AcceptEvent(pTitle);
-            m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+        m_externalList.clear();
 
+        result = ReadPlaylist(url, &m_externalList);
+
+        vector<PlaylistItem*>* items = new vector<PlaylistItem*>;
+
+        items->insert(items->end(), 
+                      m_externalList.begin(), 
+                      m_externalList.end());
+
+        RetrieveMetaData(items);
+    }
+
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::GetExternalPlaylist(char* url, uint32* length)
+{
+    Error result = kError_InvalidParam;
+    m_mutex.Acquire();
+
+    assert(url);
+    assert(length);
+
+    if(url && length)
+    {
+        if(*length >= m_externalPlaylist.size() + 1)
+        {
+            strcpy(url, m_externalPlaylist.c_str());
             result = kError_NoErr;
         }
+        else
+        {
+            result = kError_BufferTooSmall;
+        }
+
+        *length = m_externalPlaylist.size() + 1;
     }
 
-    ReleasePLManipLock();
+    m_mutex.Release();
+    return result;
+}
+
+Error PlaylistManager::SetPortablePlaylist(DeviceInfo* device, 
+                                           PLMCallBackFunction function,
+                                           void* cookie)
+{
+    Error result = kError_InvalidParam;
+
+    assert(device);
+
+    if(device)
+    {
+        result = ReadPortablePlaylist(device, function, cookie);
+        m_portableDevice = *device;
+    }
 
     return result;
 }
 
-Error 
-PlayListManager::
-AddList(List<PlayListItem*>* items)
+Error PlaylistManager::GetPortablePlaylist(DeviceInfo* device)
 {
-    Error result = kError_UnknownErr;
-    int   i;
+    Error result = kError_InvalidParam;
 
-    GetPLManipLock();
-    
-    if(items)
+    assert(device);
+
+    if(device)
     {
-        m_playList->AddList(*items, CountItems());
-
-        if(m_playList->CountItems() == 1)
-        {
-            m_current = 0;
-        }
-
-
-        for(i = 0; i < items->CountItems(); i++)
-        {
-            PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
-            pTitle->SetPlayListItem(items->ItemAt(i));
-            m_target->AcceptEvent(pTitle);
-        }
-        m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-
         result = kError_NoErr;
+        *device = m_portableDevice;
     }
-    
-    ReleasePLManipLock();
 
     return result;
 }
 
-Error 
-PlayListManager::
-AddList(List<PlayListItem*>* items, int32 index)
+
+// External playlist support
+Error PlaylistManager::GetSupportedPlaylistFormats(PlaylistFormatInfo* format, 
+                                                   uint32 index)
 {
-    Error result = kError_UnknownErr;
-    int   i;
+    Error result = kError_InvalidParam;
 
-    GetPLManipLock();
+    assert(format);
 
-    index = CheckIndex(index);
-
-    if(index >= 0 )
+    if(format)
     {
-        if(items)
+        result = kError_NoMoreFormats;
+
+        uint32 numFormats = m_playlistFormats.size();
+
+        if(index < numFormats)
         {
-            m_playList->AddList(*items, index);
-
-            if(m_playList->CountItems() == 1)
-            {
-                m_current = 0;
-            }
-
-            for(i = 0; i < items->CountItems(); i++)
-            {
-               PLMGetMediaTitleEvent *pTitle = new PLMGetMediaTitleEvent();
-               pTitle->SetPlayListItem(items->ItemAt(i));
-               m_target->AcceptEvent(pTitle);
-            }
-            m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-
             result = kError_NoErr;
+
+            *format = *m_playlistFormats[index];
         }
     }
 
-    ReleasePLManipLock();
-
     return result;
 }
 
-Error           
-PlayListManager::
-RemoveItem(PlayListItem* item)
+Error PlaylistManager::ReadPlaylist(const char* url, 
+                                    vector<PlaylistItem*>* items,
+                                    PLMCallBackFunction function,
+                                    void* cookie)
 {
-    Error result = kError_UnknownErr;
+    Error result = kError_InvalidParam;
 
-    if(RemoveItem(IndexOf(item)))
+    assert(url);
+
+    if(url)
     {
-        result = kError_NoErr;
-    }
+        // find a suitable plugin
+        result = kError_FormatNotSupported;
+        char* extension = strrchr(url, '.');
 
-    return result;
-}
-
-PlayListItem*   
-PlayListManager::
-RemoveItem(int32 index)
-{
-    PlayListItem* result = NULL;
-
-    GetPLManipLock();
-
-    index = CheckIndex(index);
-
-    if(index >= 0 )
-    {
-        result = m_playList->RemoveItem(index);
-    }
-
-    if(m_current >= index)
-        m_current = CountItems() - 1;
-
-    m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-Error           
-PlayListManager::
-RemoveItems(int32 index, int32 count)
-{
-    Error result = kError_UnknownErr;
-
-    GetPLManipLock();
-
-    index = CheckIndex(index);
-
-    if(index >= 0 )
-    {
-        if(count > (CountItems() - index))
-            count = CountItems() - index;
-
-        while(count--)
+        if(extension)
         {
-		    m_playList->RemoveItem(count);
-        }
+            extension++;
 
-        if(m_current >= index)
-            m_current = CountItems() - 1;
+            uint32 numFormats = m_playlistFormats.size();
 
-        m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-
-        result = kError_NoErr;
-    }
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-Error           
-PlayListManager::
-RemoveList(List<PlayListItem*>* items)
-{
-    Error result = kError_UnknownErr;
-
-    GetPLManipLock();
-
-    if(items)
-    {
-        m_playList->RemoveList(*items);
-
-        result = kError_NoErr;
-
-        if(m_current > CountItems() - 1)
-            m_current = CountItems() - 1;
-
-        m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-    }
-
-    ReleasePLManipLock();
-
-    return result;
-}
-
-Error           
-PlayListManager::
-MoveList(List<PlayListItem*>* items, int32 index)
-{
-    Error result = kError_UnknownErr;
-
-    GetPLManipLock();
-
-    if(items)
-    {
-        index = CheckIndex(index);
-
-        if(index >= 0 )
-        {
-            m_playList->RemoveList(*items);
-
-            m_playList->AddList(*items, index);
-
-            if(m_playList->CountItems() == 1)
+            for(uint32 index = 0; index < numFormats; index++)
             {
-                m_current = 0;
+                PlaylistFormatInfo* format = m_playlistFormats[index];
+                
+                if(!strcasecmp(extension, format->GetExtension()))
+                {
+                    bool addToActiveList = false;
+
+                    if(!items)
+                    {
+                        items = new vector<PlaylistItem*>;
+                        addToActiveList = true;
+                    }
+
+                    result = format->GetRef()->ReadPlaylist(url, 
+                                                            items, 
+                                                            function, 
+                                                            cookie);
+
+                    if(addToActiveList)
+                    {
+                        AddItems(items);
+                        delete items;
+                    }
+
+                    break;
+                }
             }
-
-            m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
-
-            result = kError_NoErr;
         }
     }
-
-    ReleasePLManipLock();
 
     return result;
 }
 
-void 
-PlayListManager::
-MakeEmpty()
+Error PlaylistManager::WritePlaylist(const char* url, 
+                                     PlaylistFormatInfo* format, 
+                                     vector<PlaylistItem*>* items,
+                                     PLMCallBackFunction function,
+                                     void* cookie)
 {
-    GetPLManipLock();
+    Error result = kError_InvalidParam;
 
-    m_playList->DeleteAll();
+    assert(url);
+    assert(format);
 
-    m_current = -1;
-    m_skipNum = 0;
+    if(url && format)
+    {
+        if(!items)
+        {
+            items = m_activeList;
+        }
 
-    //m_target->AcceptEvent(new MediaInfoEvent());
-    m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+        result = format->GetRef()->WritePlaylist(url, 
+                                                 format, 
+                                                 items, 
+                                                 function, 
+                                                 cookie);
+    }
 
-    ReleasePLManipLock();
+    return result;
 }
 
-bool 
-PlayListManager::
-IsEmpty()
+Error PlaylistManager::WritePlaylist(const char* url, 
+                                     vector<PlaylistItem*>* items,
+                                     PLMCallBackFunction function,
+                                     void* cookie)
+{
+    Error result = kError_InvalidParam;
+
+    assert(url);
+
+    if(url)
+    {
+        // find a suitable plugin
+        result = kError_FormatNotSupported;
+        char* extension = strrchr(url, '.');
+
+        if(extension)
+        {
+            extension++;
+
+            uint32 numFormats = m_playlistFormats.size();
+
+            for(uint32 index = 0; index < numFormats; index++)
+            {
+                PlaylistFormatInfo* format = m_playlistFormats[index];
+                
+                if(!strcasecmp(extension, format->GetExtension()))
+                {
+                    if(!items)
+                    {
+                        items = m_activeList;
+                    }
+
+                    result = format->GetRef()->WritePlaylist(url, 
+                                                             format, 
+                                                             items, 
+                                                             function, 
+                                                             cookie);
+                    break;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+
+// Portable player communication
+Error PlaylistManager::GetSupportedPortables(DeviceInfo* device, uint32 index)
+{
+    Error result = kError_InvalidParam;
+
+    assert(device);
+
+    if(device)
+    {
+        result = kError_NoMoreDevices;
+
+        uint32 numDevices = m_portablePlayers.size();
+
+        if(index < numDevices)
+        {
+            result = kError_NoErr;
+
+            *device = *m_portablePlayers[index];
+        }
+    }
+
+    return result;
+}
+
+bool PlaylistManager::IsPortableAvailable(DeviceInfo* device)
 {
     bool result = false;
 
-    GetPLManipLock();
+    assert(device);
 
-    result = m_playList->IsEmpty();
-
-    ReleasePLManipLock();
+    if(device)
+    {
+        result = device->GetRef()->IsDeviceAvailable(device);
+    }
 
     return result;
 }
 
-void 
-PlayListManager::
-DoForEach(bool (*func)(PlayListItem*))
+Error PlaylistManager::GetDeviceInfo(DeviceInfo* device)
 {
-    GetPLManipLock();
+   Error result = kError_InvalidParam;
 
-    int32 count = CountItems();
+    assert(device);
 
-	for(int32 i = 0; i < count; i++)
+    if(device)
     {
-		if((*func)((PlayListItem*) m_playList->ItemAt(i)))
-        {
-			break;
-        }
+        result = device->GetRef()->GetDeviceInfo(device);
     }
 
-    ReleasePLManipLock();
+    return result;
 }
 
-void 
-PlayListManager::
-DoForEach(bool (*func)(PlayListItem*, void*), void* cookie)
+Error PlaylistManager::InitializeDevice(DeviceInfo* device, 
+                                        PLMCallBackFunction function,
+                                        void* cookie)
 {
-    GetPLManipLock();
+    Error result = kError_InvalidParam;
 
-    int32 count = CountItems();
+    assert(device);
 
-	for(int32 i = 0; i < count; i++)
+    if(device)
     {
-		if((*func)((PlayListItem*) m_playList->ItemAt(i), cookie))
-        {
-			break;
-        }
+        result = device->GetRef()->InitializeDevice(device, function, cookie);
     }
 
-    ReleasePLManipLock();
+    return result;
+
 }
 
-const 
-PlayListItem** 
-PlayListManager::
-Items() const
+Error PlaylistManager::ReadPortablePlaylist(DeviceInfo* device,
+                                            PLMCallBackFunction function,
+                                            void* cookie)
 {
-    return (const PlayListItem**)(m_playList->Items());
+    Error result = kError_InvalidParam;
+
+    assert(device);
+
+    if(device)
+    {
+        // first delete old playlist
+        uint32 index = 0;
+        uint32 numItems = 0;
+        PlaylistItem* item = NULL;
+
+        numItems = m_portableList.size();
+
+        for(index = 0; index < numItems; index++)
+        {
+            item = m_portableList[index];
+
+            if(item)
+            {
+                // if the metadata thread is still accessing this item
+                // we don't wanna delete the item  out from under it.
+                // instead we set a flag and let the metadata thread
+                // clean up when it returns.
+                if(item->GetState() == kPlaylistItemState_RetrievingMetaData)
+                {
+                    item->SetState(kPlaylistItemState_Delete);  
+                }
+                else
+                {
+                    delete item;
+                }
+            }
+        }
+
+        m_portableList.clear();
+
+        result = device->GetRef()->ReadPlaylist(device, 
+                                                &m_portableList,
+                                                function, 
+                                                cookie);
+    }
+
+    return result;
 }
 
-
-Error 
-PlayListManager::
-RemoveAll()
+Error PlaylistManager::SyncPortablePlaylist(DeviceInfo* device,
+                                            PLMCallBackFunction function,
+                                            void* cookie)
 {
-   GetPLManipLock();
+    Error result = kError_InvalidParam;
 
-   m_playList->RemoveAll();
-   m_current = -1;
-   m_skipNum = 0;
+    assert(device);
 
-   //m_target->AcceptEvent(new MediaInfoEvent());
-   m_target->AcceptEvent(new Event(INFO_PlayListUpdated));
+    if(device)
+    {
+        result = device->GetRef()->WritePlaylist(device, 
+                                                &m_portableList,
+                                                function, 
+                                                cookie);
+    }
 
-   ReleasePLManipLock();
-
-   return kError_NoErr;
+    return result;
 }
 
-inline 
-int32 
-PlayListManager::
-CheckIndex(int32 index)
+Error PlaylistManager::DownloadItemFromPortable(DeviceInfo* device,
+                                                PlaylistItem* item,
+                                                const char* url,
+                                                PLMCallBackFunction function,
+                                                void* cookie)
+{
+    Error result = kError_InvalidParam;
+
+    assert(device);
+    assert(item);
+    assert(url);
+
+    if(device && item && url)
+    {
+        result = device->GetRef()->DownloadSong(device, 
+                                                item,
+                                                url,
+                                                function, 
+                                                cookie);
+    }
+
+    return result;
+}
+
+// Utility Functions
+bool PlaylistManager::IsEmpty()
+{
+    bool result;
+    m_mutex.Acquire();
+
+    result = m_activeList->empty();
+
+    m_mutex.Release();
+    return result;
+}
+
+uint32 PlaylistManager::CountItems()
+{
+    uint32 result;
+    m_mutex.Acquire();
+
+    result = m_activeList->size();
+
+    m_mutex.Release();
+    return result;
+}
+
+PlaylistItem* PlaylistManager::ItemAt(uint32 index)
+{
+    PlaylistItem* result = NULL;
+    m_mutex.Acquire();
+    
+    index = CheckIndex(index);
+
+    if(index != kInvalidIndex)
+    {
+        result = (*m_activeList)[index];
+    }
+    
+    m_mutex.Release();
+    return result;
+}
+
+uint32 PlaylistManager::IndexOf(PlaylistItem* item)
+{
+    return InternalIndexOf(m_activeList, item);
+}
+
+uint32 PlaylistManager::InternalIndexOf(vector<PlaylistItem*>* list,
+                                        PlaylistItem* item)
+{
+    uint32 result = kInvalidIndex;
+    uint32 index = 0;
+    uint32 size = 0;
+
+    assert(list);
+    assert(item);
+
+    if(list && item)
+    {
+        size = list->size();
+
+        for(index = 0; index < size; index++)
+        {
+            if(item == (*list)[index])
+            {
+                result = index;
+                break;
+            }
+        }
+    }
+    
+    return result;
+}
+
+bool PlaylistManager::HasItem(PlaylistItem* item)
+{
+    return (IndexOf(item) != kInvalidIndex);
+}
+
+// Internal functions
+
+inline uint32 PlaylistManager::CheckIndex(uint32 index)
 {
 	// If we're dealing with a bogus index then set it to -1.
-	if(index < 0 || index >= CountItems())
+	if(index >= CountItems())
     {
-		index = -1;
+		index = kInvalidIndex;
     }
 
 	return index;
 }
 
-// Note: This function does not clear the list ahead of time!
-Error 
-PlayListManager::
-ExpandM3U(char *szM3UFile, List<char *> &MP3List)
+void PlaylistManager::AddItemToShuffleList(PlaylistItem* item)
 {
-	FILE  *fpFile;
-	char  *szLine, *szTemp, *szMP3 = NULL;
-	int32 iIndex;
-
-	fpFile = fopen(szM3UFile, "r");
-	if (fpFile == NULL)
-        return kError_FileNotFound;
-
-	szLine = new char[iMaxFileNameLen];
-    szTemp = new char[iMaxFileNameLen];
-
-	for(;;)
-    {
-        if (fgets(szLine, iMaxFileNameLen - 1, fpFile) == NULL)
-			 break;
-
-        // enable people with different platforms 
-        // to swap files by changing the path 
-        // separator as necessary
-        if( strncmp(szLine, "http://", 7) &&
-            strncmp(szLine, "rtp://", 6))
-        {
-            for (iIndex = strlen(szLine) - 1; iIndex >=0; iIndex--)
-            {
-                if(szLine[iIndex] == '\\' && DIR_MARKER == '/')
-                    szLine[iIndex] = DIR_MARKER;
-                else if(szLine[iIndex] == '/' && DIR_MARKER == '\\')
-                    szLine[iIndex] = DIR_MARKER;
-            }
-
-            for(iIndex = strlen(szLine) -1; iIndex >= 0; iIndex--)
-                if(szLine[iIndex] == '\n' || 
-                   szLine[iIndex] == '\r' ||
-                   szLine[iIndex] == ' ')
-                    szLine[iIndex] = 0;
-                else
-                    break;
-        }
-
-        if (strlen(szLine))
-        {
-            if(!strncmp(szLine, "..", 2) ||
-               (strncmp(szLine + 1, ":\\", 2) &&
-                strncmp(szLine, "\\", 1)) &&
-               (strncmp(szLine, "http://", 7) &&
-                strncmp(szLine, "rtp://", 6)) )
-            {
-                char* cp;
-
-                strcpy(szTemp, szM3UFile);
-
-                cp = strrchr(szTemp, '\\');
-
-                if(cp)
-                {
-                    strcpy(cp + 1, szLine);
-                    strcpy(szLine, szTemp);
-                }
-            }
-
-            szMP3 = new char[strlen(szLine) + 1];
-            strcpy(szMP3, szLine);
-            MP3List.AddItem(szMP3);
-            szMP3 = NULL;
-        }
-    }
-
-	delete [] szLine;
-    delete [] szTemp;
-	fclose(fpFile);
-
-	return kError_NoErr;
+    m_shuffleList.push_back(item);
 }
 
-Error
-PlayListManager::
-ExportToM3U(const char* file)
+void PlaylistManager::AddItemsToShuffleList(vector<PlaylistItem*>* list)
 {
-    Error result = kError_FileNotFound;
-    FILE* fp;
+    random_shuffle(list->begin(), list->end());
 
-	fp = fopen(file, "w");
-
-	if(fp)
-    {
-        int32 i = 0;
-        PlayListItem* item = NULL;
-
-        while((item = m_playList->ItemAt(i++)))
-        {
-            fprintf(fp, "%s%s", item->URL(), LINE_END_MARKER_STR);
-            result = kError_NoErr;
-        }
-
-	    fclose(fp);
-    }
-
-	return result;
-}
-
-Error
-PlayListManager::
-ExportToRio()
-{
-    Error result = kError_NoErr;
-
-    if(!m_rioThread)
-    {
-        m_rioThread = Thread::CreateThread();
-        m_rioThread->Create(rio_thread_function, this);
-    }
-
-	return result;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// return file size
-static long GetFileSize( char* pszPathFile )
-{
-	long lReturn = 0;
-
-	FILE* fpFile = fopen( pszPathFile, "rb" );
-	if ( fpFile )
-	{
-		struct stat sStat;
-		if ( !stat(pszPathFile, &sStat) )
-			lReturn = sStat.st_size;
-
-		fclose( fpFile );
-	}
-
-	return lReturn;
-}
-
-
-BOOL
-PlayListManager:: 
-ProgressCallBack( int pos, int count)
-{
-    char foo[1024];
-    int32 percentDone = (100 * pos)/count;
-    sprintf(foo, "%d%% - %s", percentDone, m_txSong);
-    m_target->AcceptEvent(new StatusMessageEvent(foo));
-    return TRUE;
-}
-
-BOOL
-PlayListManager:: 
-progress_call_back( int pos, int count, void* cookie)
-{
-    PlayListManager* plm = (PlayListManager*)cookie;
-
-	return plm->ProgressCallBack(pos, count);
+    m_shuffleList.insert(m_shuffleList.end(),
+                         list->begin(), 
+                         list->end());
 }
 
 void
-PlayListManager::
-RioThreadFunction()
+PlaylistManager::
+MetaDataThreadFunction(vector<PlaylistItem*>* list)
 {
-#ifdef WIN32
-    int32 ports[] = { 0x378, 0x278, 0x03BC };
-    bool rioPresent = false;
+    assert(list);
 
-    CRio* rio = new CRio;
-
-    // try to find the rio
-
-    m_target->AcceptEvent(new StatusMessageEvent("Searching for Rio..."));
-
-    for(int32 count = 0; count < sizeof(ports); count++)
+    if(list)
     {
-        if(rio->Set(ports[count]) && rio->CheckPresent())
+        uint32 index = 0;
+        uint32 numItems = 0;
+        PlaylistItem* item = NULL;
+
+        numItems = list->size();
+
+        for(index = 0; index < numItems; index++)
         {
-            rioPresent = true;
-            break;
-        }
-    }
+            item = (*list)[index];
 
-    if(rioPresent)
-    {
-        m_target->AcceptEvent(new StatusMessageEvent("Rio found!"));
-
-        if(rio->RxDirectory())
-        {
-            rio->RemoveAllFiles();
-
-            rio->TxDirectory();
-
-            CDirBlock& cDirBlock = rio->GetDirectoryBlock();
-	        CDirHeader& cDirHeader = cDirBlock.m_cDirHeader;
-            int32 lSizeAvailable = (int32)cDirHeader.m_usCount32KBlockAvailable * CRIO_SIZE_32KBLOCK;
-	        int32 lSizeCurrent = (int32)cDirHeader.m_usCount32KBlockUsed * CRIO_SIZE_32KBLOCK;
-	        int32 iCountEntryCurrent = cDirHeader.m_usCountEntry;
-            
-            int32 i = 0;
-            PlayListItem* item = NULL;
-
-            while(item = m_playList->ItemAt(i++))
+            if(item)
             {
-                // get file size
-		        int32 lSize = GetFileSize( item->URL() );
+                MetaData metadata = item->GetMetaData();
+                MetaDataFormat* mdf = NULL;
+                // const RegistryItem* module = NULL;
+                uint32 numFormats;
 
-                // check space
-		        lSizeCurrent += lSize;
+                numFormats = m_metadataFormats.size();
 
-                if( lSizeCurrent > lSizeAvailable )
+                for(uint32 i = 0; i < numFormats; i++)
                 {
-                    break;
+                    mdf = m_metadataFormats[i];
+
+                    if(mdf)
+                    {
+                        mdf->ReadMetaData(item->URL().c_str(), &metadata);
+                    }
                 }
 
-                // check enough entries
-		        ++iCountEntryCurrent;
+                m_mutex.Acquire();
 
-                if( iCountEntryCurrent > CRIO_MAX_DIRENTRY )
+                if(item->GetState() == kPlaylistItemState_Delete)
                 {
-                    break;
+                    delete item;
+                }
+                else
+                {
+                    item->SetMetaData(&metadata);
+                    item->SetState(kPlaylistItemState_Normal);
+
+                    m_context->target->AcceptEvent(new PlaylistItemUpdatedEvent(item));
                 }
 
-                m_txSong = item->StringForPlayerToDisplay();
-
-                char foo[1024];
-                sprintf(foo, "0%% - %s", m_txSong);
-                m_target->AcceptEvent(new StatusMessageEvent(foo));
-                
-                rio->TxFile(item->URL(), progress_call_back, this);
+                m_mutex.Release();
             }
-
-            rio->TxDirectory();
         }
-        else
-        {
-            m_target->AcceptEvent(new StatusMessageEvent("Error Reading Directory"));
-        }
-    }
-    else
-    {
-        m_target->AcceptEvent(new StatusMessageEvent("Unable to find Rio!"));
-    }
 
-    delete rio;
-
-    delete m_rioThread;
-    m_rioThread = NULL;
-#endif    
+        delete list;
+    }
 }
+
+typedef struct MetaDataThreadStruct{
+    PlaylistManager* plm;
+    vector<PlaylistItem*>* items;
+    Thread* thread;
+} MetaDataThreadStruct;
 
 void 
-PlayListManager::
-rio_thread_function(void* arg)
+PlaylistManager::
+metadata_thread_function(void* arg)
 {
-    PlayListManager* plm = (PlayListManager*)arg;
+    MetaDataThreadStruct* mts = (MetaDataThreadStruct*)arg;
 
-    plm->RioThreadFunction();
+    mts->plm->MetaDataThreadFunction(mts->items);
+
+    delete mts->thread;
+    delete mts;
 }
+
+void PlaylistManager::RetrieveMetaData(PlaylistItem* item)
+{
+    assert(item);
+
+    if(item)
+    {
+        vector<PlaylistItem*>* items = new vector<PlaylistItem*>;
+
+        if(items)
+        {
+            items->push_back(item);
+    
+            RetrieveMetaData(items);
+        }
+    }
+}
+
+void PlaylistManager::RetrieveMetaData(vector<PlaylistItem*>* list)
+{
+    uint32 index = 0;
+    uint32 size = 0;
+    PlaylistItem* item = NULL;
+
+    assert(list);
+
+    if(list)
+    {
+        size = list->size();
+
+        for(index = 0; index < size; index++)
+        {
+            item = (*list)[index];
+
+            if(item && item->GetState() == kPlaylistItemState_Normal)
+            {
+                item->SetState(kPlaylistItemState_RetrievingMetaData);
+            }
+        }
+
+        Thread* thread = Thread::CreateThread();
+
+        if(thread)
+        {
+            MetaDataThreadStruct* mts = new MetaDataThreadStruct;
+
+            mts->plm = this;
+            mts->items = list;
+            mts->thread = thread;
+
+            thread->Create(metadata_thread_function, mts);
+        }
+    }
+}
+

@@ -1,7 +1,7 @@
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
-	Portions copyright (C) 1998-1999 GoodNoise
+	Portions copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -37,8 +37,9 @@ ____________________________________________________________________________*/
 /* Project Includes */
 #include "config.h"
 #include "registrar.h"
-#include "errors.h"
 #include "hashtable.h"
+#include "errors.h"
+#include "debug.h"
 
 Error 
 Registrar::
@@ -46,7 +47,10 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 {
     Error error = kError_NoErr;
     char dir[MAX_PATH];
-    HashTable<int32 *> *pHT = new HashTable<int32 *>();
+
+#ifndef WIN32
+    HashTable<int32 *> *pHT = new HashTable<int32 *>;
+#endif
 
     if(registry == NULL)
         error = kError_InvalidParam;
@@ -165,23 +169,21 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
                     {
                         error = kError_NoErr;
                         item->SetInitFunction(init);
-			totalFilesFound++;
+			            totalFilesFound++;
 #ifndef WIN32
-			int32 *pInt = new int32;
-			*pInt = 1;
-			pHT->Insert(find.cFileName,pInt);
+			            int32 *pInt = new int32;
+			            *pInt = 1;
+			            pHT->Insert(find.cFileName,pInt);
 #endif
                     }
                 }
                 
                 if(IsntError(error))
-                    registry->Add(item);
+                    registry->AddItem(item);
                 else
                 {
                     if(module)
                         FreeLibrary(module);
-
-                    delete item;
                 }
                 
             }while(FindNextFile(handle, &find));
@@ -193,10 +195,12 @@ InitializeRegistry(Registry* registry, Preferences* prefs)
 
     if (libDirHandle) 
         prefs->GetLibDirClose(libDirHandle);
+#ifndef WIN32
     if (pHT) {
 	delete pHT;
 	pHT = NULL;
     }
+#endif
     if (totalFilesFound == 0) 
 	    error = kError_NoFiles;
 
@@ -208,18 +212,6 @@ Registrar::
 CleanupRegistry(Registry* registry)
 {
     Error           error   = kError_NoErr;
-    RegistryItem*   item    = NULL;
-    int32           index   = 0;
-
-    while((item = registry->GetItem(index++)))
-    {
-        HMODULE module = NULL;
-
-        module = (HMODULE)item->Module();
-
-        if(module)
-            FreeLibrary(module);
-    }
- 
+    
     return error;
 }

@@ -2,6 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
+        Portions Copyright (C) 1999 EMusic.com
 	Copyright (C) 1999 Mark H. Weaver <mhw@netris.org>
 
 	This program is free software; you can redistribute it and/or modify
@@ -21,18 +22,27 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _FACONTEXT_H_
-#define _FACONTEXT_H_
+#ifndef INCLUDED_FACONTEXT_H_
+#define INCLUDED_FACONTEXT_H_
 
 #include "config.h"
 #include "preferences.h"
 #include "log.h"
+#include "mutex.h"
 
 static const int32 c_majorVersion = 1;
 static const int32 c_minorVersion = 0;
 
 // argFlags bits
 #define FAC_ARGFLAGS_SAVE_STREAMS 1
+
+class PlaylistManager;
+class Properties;
+class EventQueue;
+class MusicBrowser;
+class DownloadManager;
+class UpdateManager;
+class Player;
 
 class FAContext
 {
@@ -42,14 +52,26 @@ class FAContext
 	  minorVersion(c_minorVersion),
 	  prefs(0),
 	  log(0),
+          props(0),
+          plm(0),
+          target(0),
+	  browser(0),
+          downloadManager(0),
+          //updateManager(0),
+          player(0),
+#ifndef WIN32	  
+	  gtkInitialized(false),
+#endif	  
+	  argc(0),
+          argv(0),	  
 	  argFlags(0) { }
     
     ~FAContext()
     {
-	if (log)
-	    delete log;
-	if (prefs)
-	    delete prefs;
+	    if (log)
+	        delete log;
+	    if (prefs)
+	        delete prefs;
     }
 
     bool CompatibleVersion() { return majorVersion == c_majorVersion; }
@@ -57,6 +79,19 @@ class FAContext
     int32 majorVersion, minorVersion;
     Preferences *prefs;
     LogFile *log;
+    Properties *props;
+    PlaylistManager *plm;
+    EventQueue *target;
+    MusicBrowser *browser;
+    DownloadManager *downloadManager;
+    //UpdateManager *updateManager;
+    Player *player;
+#ifndef WIN32
+    Mutex gtkLock;
+    bool gtkInitialized;
+#endif    
+    int32 argc;
+    char** argv;
     uint32 argFlags;
 };
 

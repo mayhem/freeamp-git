@@ -5,7 +5,7 @@
         MP3 Decoder originally Copyright (C) 1995-1997 Xing Technology
         Corp.  http://www.xingtech.com
 
-   Portions Copyright (C) 1998 GoodNoise
+   Portions Copyright (C) 1998-1999 EMusic.com
    Portions Copyright (C) 1998 "Michael Bruun Petersen" <mbp@image.dk>
 
    This program is free software; you can redistribute it and/or modify
@@ -84,7 +84,6 @@ static int sample_rate_table[8] =
     22050L, 24000L, 16000L, 1L, 44100L, 48000L, 32000L, 1L
 };
 
-const int ID3_TAG_SIZE = 128;
 const int iMaxDecodeRetries = 32;
 const int iStreamingBufferSize = 64;  // in kbytes 
 const int iDefaultBufferUpInterval = 3;
@@ -268,23 +267,16 @@ Error XingLMC::GetHeadInfo()
    return (Error)lmcError_DecodeFailed;
 }
 
-/*
- * Quick function to determine if this LMC can handle a file, by looking at
- * the file extension.  This might be better done by a hashtable outside of
- * the LMC, but this is good for now. - ijr
- */
-bool XingLMC::CanHandleExt(char *ext)
+vector<char *> *XingLMC::GetExtensions(void)
 {
-   bool ret = false;
-   if (!strncasecmp(ext, "MP3", 3))
-      ret = true;
-   else if (!strncasecmp(ext, "MP2", 3))
-      ret = true;
-   else if (!strncasecmp(ext, "MP1", 3))
-      ret = true;
-   else if (!strncasecmp(ext, "MPG", 3))
-      ret = true;
-   return ret;
+   vector<char *> *extList = new vector<char *>;
+
+   extList->push_back("MP3");
+   extList->push_back("MP2");
+   extList->push_back("MP1");
+   extList->push_back("MPG");
+
+   return extList;
 }
 
 Error XingLMC::CanDecode()
@@ -322,7 +314,6 @@ Error XingLMC::ExtractMediaInfo()
    Error           Err;
    float           totalSeconds;
    MediaInfoEvent *pMIE;
-   Id3TagInfo      tag_info;
 
    if (!m_pPmi)
       return kError_NullValueInvalid;
@@ -336,8 +327,6 @@ Error XingLMC::ExtractMediaInfo()
 
    if (m_pPmi->GetLength(end) == kError_FileSeekNotSupported)
       end = 0;
-
-   m_pPmi->GetID3v1Tag(tag_info);
 
    int32     sampRateIndex = 4 * m_sMpegHead.id + m_sMpegHead.sr_index;
    int32     samprate = sample_rate_table[sampRateIndex];
@@ -365,22 +354,9 @@ Error XingLMC::ExtractMediaInfo()
    }
 
    pMIE = new MediaInfoEvent(m_pPmi->Url(), totalSeconds);
+
    if (!pMIE)
       return kError_OutOfMemory;
-
-   if (tag_info.m_containsInfo)
-   {
-       ID3TagEvent *ite = new ID3TagEvent(tag_info);
-       if (ite)
-       {
-           pMIE->AddChildEvent((Event *) ite);
-           ite = NULL;
-       }
-       else
-       {
-           return kError_OutOfMemory;
-       }
-   }
 
    /*LEAK*/MpegInfoEvent *mie = new MpegInfoEvent(totalFrames,
                        (float)(milliseconds_per_frame / 1000), m_frameBytes,

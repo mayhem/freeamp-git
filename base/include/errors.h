@@ -1,7 +1,7 @@
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
-	Portions copyright (C) 1998 GoodNoise
+	Portions copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -66,10 +66,34 @@ typedef enum Error
     kError_CantCreateSocket     = 35,
     kError_CannotSetSocketOpts  = 36,
     kError_CannotBind           = 37,
-
+    kError_DbaseItemNotStored   = 38,
+    kError_ParseError           = 39,
+    kError_NotFound             = 40,
+    kError_NoMoreFormats        = 41,
+    kError_FormatNotSupported   = 42,
+    kError_NoMoreDevices        = 43,
+    kError_DeviceNotFound       = 44,
+    kError_FeatureNotSupported  = 45,
+    kError_UserCancel           = 46,
+    kError_LoadBitmapFailed     = 47,
+    kError_ProtocolNotSupported = 48,
+    kError_InvalidURL           = 49,
+    kError_CantFindHost         = 50,
+    kError_IOError              = 51,
+    kError_UnknownServerError   = 52,
+    kError_BadHTTPRequest       = 53,
+    kError_AccessNotAuthorized  = 54,
+    kError_AccessForbidden      = 55,  
+    kError_RangeNotExceptable   = 56,
+    kError_WriteFile            = 57,
+    kError_ReadFile             = 58,
+    kError_InvalidVersion       = 59,
+    kError_AlreadyUpdating      = 60,
+    kError_UnlinkFailed         = 61,
+    kError_CopyFailed           = 62,
 
     kError_LastError            = 9999
-}Error;
+};
 
 
 #define IsError( err )		( (err) != kError_NoErr )

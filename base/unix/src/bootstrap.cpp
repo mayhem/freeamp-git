@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -42,9 +42,6 @@ extern "C" {
 }
 #endif
 
-void testList();
-void testHashTable();
-
 #if 0
 bool CompareName(const char *p1, const char *p2) {
     //cout << "Comparing " << p1 << " to " << p2 << endl;
@@ -60,29 +57,27 @@ bool CompareName(const char *p1, const char *p2) {
     }
 }
 #endif
+
 int main(int argc, char **argv) {
-    //testList();
-    //testBuffer();
-    //testHashTable();
     //exit(1);
 
     FAContext *context = new FAContext;
-    UnixPrefs *unixPrefs = new UnixPrefs();
+    UnixPrefs *unixPrefs = new UnixPrefs;
 
     int errLine = unixPrefs->GetErrorLineNumber();
     if (errLine)
-    	cerr << "ERROR parsing line " << errLine << " of ~/.freeamp_prefs\n";
+    	cerr << "ERROR parsing line " << errLine << " of ~/.freeamp/preferences\n";
 
     context->prefs = unixPrefs;
     context->log = new LogFile("freeamp.log");
 
     Registrar *registrar= new Registrar();
-    LMCRegistry *lmc;
-    PMIRegistry *pmi;
-    PMORegistry *pmo;
-    UIRegistry* ui;
+    Registry *lmc;
+    Registry *pmi;
+    Registry *pmo;
+    Registry* ui;
     
-    lmc = new LMCRegistry();
+    lmc = new Registry();
 #if MP3_PROF
     {
 	RegistryItem* item = new RegistryItem;
@@ -103,18 +98,18 @@ int main(int argc, char **argv) {
 //    registrar->SetSubDir("io");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.pmi");
-    pmi = new PMIRegistry;
+    pmi = new Registry;
     registrar->InitializeRegistry(pmi,context->prefs);
 
     registrar->SetSearchString("*.pmo");
-    pmo = new PMORegistry;
+    pmo = new Registry;
     registrar->InitializeRegistry(pmo,context->prefs);
 
 
 //    registrar->SetSubDir("ui");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.ui");
-    ui = new UIRegistry;
+    ui = new Registry;
     registrar->InitializeRegistry(ui,context->prefs);
 
     delete registrar;
@@ -142,58 +137,3 @@ int main(int argc, char **argv) {
     delete context;
     return 0;
 }
-
-#if 0
-void testList() {
-    cout << "Beginning testList..." << endl;
-    List<char *> *pVect = new List<char *>(2);
-    char *p1 = "Hey man!";
-    char *p2 = "Yo dude!";
-    char *p3 = "And, the fourth.";
-    char *p4 = "third :)";
-    pVect->AddItem(p1);
-    pVect->AddItem(p2);
-    pVect->AddItem(p3);
-    pVect->AddItem(p4,2);
-    
-    cout << pVect->ItemAt(0) << endl;
-    cout << pVect->ItemAt(1) << endl;
-    cout << pVect->ItemAt(2) << endl;
-    cout << pVect->ItemAt(3) << endl;
-
-    pVect->RemoveItemAt(1);
-
-    cout << pVect->ItemAt(0) << endl;
-    cout << pVect->ItemAt(1) << endl;
-    cout << pVect->ItemAt(2) << endl;
-
-    pVect->RemoveAll();
-
-    if (pVect->ItemAt(0) != NULL) {
-	cout << "Final Test failed!!" << endl;
-    }
-    cout << "Ending testList..." << endl;
-}
-#endif
-
-void testHashTable() {
-    HashTable<int32 *> *pHT = new HashTable<int32 *>();
-    cout << "Adding 'foo'->1" << endl;
-    char *foo = "foo";
-    char *bar = "bar";
-    int32 *bb = new int32;
-    *bb = 1;
-    pHT->Insert(foo,bb);
-    cout << "Adding 'bar'->2" << endl;
-    int32 *bc = new int32;
-    *bc = 2;
-    pHT->Insert(bar,bc);
-
-    int32 *out = pHT->Value(foo);
-    cout << "out 1:  " << *out << endl;
-    out = pHT->Value(bar);
-    cout << "out 2:  " << *out << endl;
-    exit(1);
-}
-
-

@@ -1,9 +1,10 @@
 /*____________________________________________________________________________
         
         FreeAmp - The Free MP3 Player
-        Driver for Advanced Linux Sound Architecture, http://alsa.jcu.cz
+        Driver for Advanced Linux Sound Architecture 
+              http://www.alsa-project.org
  
-        Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         alsapmo.cpp by Fleischer Gabor <flocsy@usa.net>
         uses code by Anders Semb Hermansen <ahermans@vf.telia.no>
@@ -50,13 +51,31 @@ extern "C"
    }
 }
 
+static int parse_gid(const char *str, snd_mixer_gid_t *gid)
+{
+    unsigned int size;
+    unsigned char *ptr;
+
+    bzero(gid, sizeof(*gid));
+    ptr = gid->name;
+    size = 0;
+    while (*str) {
+        if (size < sizeof(gid->name)) {
+            *ptr++ = *str;
+            size++;
+        }
+        str++;
+    }
+    return 0;
+}
+
 AlsaPMO::AlsaPMO(FAContext *context) :
 	    PhysicalMediaOutput(context)
 {
 	uint32 deviceNameSize = 128;
    char scard[128];
-   void *pMixer;
-   char  mixer_id[13]=SND_MIXER_ID_MASTER;
+   snd_mixer_t *pMixer;
+   char  mixer_id[25]="Master";
 
    m_properlyInitialized = false;
    myInfo = new OutputInfo();
@@ -120,19 +139,27 @@ AlsaPMO::AlsaPMO(FAContext *context) :
    switch (m_iDevice)
    {
        case 0:
-          strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));
+          strncpy(mixer_id,"PCM",sizeof(mixer_id));
           break;
        case 1:
-          strncpy(mixer_id,SND_MIXER_ID_PCM1,sizeof(mixer_id));
+          strncpy(mixer_id,"PCM1",sizeof(mixer_id));
           break;
    }
 
+   parse_gid(mixer_id, &m_gid);
+
    snd_mixer_open(&pMixer, m_iCard, 0);
-   m_iChannel = snd_mixer_channel(pMixer, mixer_id );
-   if (m_iChannel < 0)
+
+   bzero(&m_group, sizeof(m_group));
+   m_group.gid = m_gid;
+
+   if ((m_iChannel = snd_mixer_group_read(pMixer, &m_group )) < 0)
    {
-       strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));
-       m_iChannel = snd_mixer_channel(pMixer, mixer_id );
+       strncpy(mixer_id,"Master",sizeof(mixer_id));
+
+       parse_gid(mixer_id, &m_gid);
+       m_group.gid = m_gid;
+       m_iChannel = snd_mixer_group_read(pMixer, &m_group );
    }
    snd_mixer_close(pMixer);
 
@@ -166,8 +193,7 @@ AlsaPMO::~AlsaPMO()
 void AlsaPMO::SetVolume(int32 iVolume)
 {
    int   err;
-   void *pMixer;
-   snd_mixer_channel_t channel;
+   snd_mixer_t *pMixer;
 
    err = snd_mixer_open(&pMixer, m_iCard, 0);
    if (err < 0)
@@ -175,12 +201,18 @@ void AlsaPMO::SetVolume(int32 iVolume)
 
    if (m_iChannel >= 0)
    {
-      err = snd_mixer_channel_read(pMixer, m_iChannel, &channel);
+      err = snd_mixer_group_read(pMixer, &m_group);
       if (err < 0)
          return;
 
-      channel.left=channel.right=iVolume;
-      snd_mixer_channel_write(pMixer, m_iChannel, &channel);
+      int actualVolume = (int)((double)(m_group.max - m_group.min) * 
+                          (double)iVolume * 0.01) + m_group.min;
+      for (int chn = 0; chn <= SND_MIXER_CHN_LAST; chn++) {
+          if (!(m_group.channels & (1<<chn)))
+              continue;
+          m_group.volume.values[chn] = actualVolume;
+      }
+      snd_mixer_group_write(pMixer, &m_group);
    }
    snd_mixer_close(pMixer);
 } 
@@ -188,8 +220,7 @@ void AlsaPMO::SetVolume(int32 iVolume)
 int32 AlsaPMO::GetVolume()
 {
    int   err;
-   void *pMixer = NULL;
-   snd_mixer_channel_t channel;
+   snd_mixer_t *pMixer = NULL;
 
    err = snd_mixer_open(&pMixer, m_iCard, 0);
    if (err != 0)
@@ -199,7 +230,7 @@ int32 AlsaPMO::GetVolume()
 
    if (m_iChannel >= 0)
    {
-      err = snd_mixer_channel_read(pMixer, m_iChannel, &channel);
+      err = snd_mixer_group_read(pMixer, &m_group);
       if (err < 0)
          return 0;
    }
@@ -207,7 +238,10 @@ int32 AlsaPMO::GetVolume()
       return 0;
 
    snd_mixer_close(pMixer);
-   return channel.left;
+   int actualVolume = (int)((double)(m_group.max - m_group.min) *
+                       (double)m_group.volume.values[0] * 0.01) + 
+                      m_group.min;
+   return actualVolume;
 } 
 
 Error AlsaPMO::Init(OutputInfo* info) {

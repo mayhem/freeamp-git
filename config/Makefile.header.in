@@ -29,7 +29,7 @@ top_builddir = .
 AUTOCONF = @AUTOCONF@
 
 INSTALL = @INSTALL@
-# INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
@@ -44,6 +44,7 @@ CXXLD = $(CXX)
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_CONFIG = @GTK_CONFIG@
 GTK_LIBS = @GTK_LIBS@
+ESD_LIBS = @ESD_LIBS@
 MAKEINFO = @MAKEINFO@
 NASM = @NASM@
 PACKAGE = @PACKAGE@
@@ -51,15 +52,16 @@ PERL = @PERL@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 HOST_OS = @host_os@
-CFLAGS = -Wall @CFLAGS@ -D_REENTRANT
+CFLAGS = -Wall -Wno-return-type @CFLAGS@ -D_REENTRANT
 OSDEP = @OSDEP@
 OSINC = @OSINC@
 OSTYPE = @OSTYPE@
 LINKMOD = @LINKMOD@ $(LDFLAGS)
+LIBMOD = @LIBMOD@
 
 OSDEPOBJ = @OSDEPOBJ@
 
-INCLUDES = -Ibase/include -Iconfig -Iio/include -Iui/include -Ilmc/include $(OSINC) -Iio/soundcard/$(OSDEP)/include -Iui/lcd/include -Iui/irman/include -Ilmc/xingmp3/include
+INCLUDES = -Ilib/gdbm -Ibase/include -Iconfig -Iio/include -Iui/include -Ilmc/include $(OSINC) -Iio/soundcard/$(OSDEP)/include -Iui/lcd/include -Iui/irman/include -Ilmc/xingmp3/include -Iplm/portable/pmp300/sba -Ilib/xml/include -Ilib/zlib/include
 CXXFLAGS = $(EXTRA_CXXFLAGS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(srcdir)/config/mkinstalldirs
@@ -76,27 +78,22 @@ EXTRALIBS = @EXTRALIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 
-FREEAMPOBJ =  base/src/hashtable.o base/src/log.o base/src/player.o
-FREEAMPOBJ += base/src/playlist.o base/src/propimpl.o base/src/registrar.o
-FREEAMPOBJ += base/src/registry.o base/src/thread.o io/src/eventbuffer.o
-FREEAMPOBJ += base/src/prefixprefs.o base/src/preferences.o
-FREEAMPOBJ += io/src/pmiregistry.o io/src/pmoregistry.o
-FREEAMPOBJ += io/src/pullbuffer.o io/src/streambuffer.o
-FREEAMPOBJ += lmc/src/lmcregistry.o ui/src/uiregistry.o
-FREEAMPOBJ += $(OSDEPOBJ)
-
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS)
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS) $(RELOC)
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS)
+CXXCOMPILE += $(RELOC)
 
 CXXLINK = $(CXXLD) $(CXXFLAGS) $(LDFLAGS) $(RELOC) -o $@
 
-.SUFFIXES: .S .c .cpp .o .s .asm .asm1
+.SUFFIXES: .S .c .cpp .o .s .doh .asm .asm1
 
 .cpp.o:
-	$(CXXCOMPILE) $(RELOC) -c $< -o $@
+	$(CXXCOMPILE) -c $< -o $@
+
+.cpp.doh:
+	$(CXXCOMPILE) -O0 -c $< -o $@
 
 .c.o:
-	$(COMPILE) $(RELOC) -c $< -o $@
+	$(COMPILE) -c $< -o $@
 
 .asm.asm1:
 	$(PERL) -pe 's/\b_//g' $< > $@

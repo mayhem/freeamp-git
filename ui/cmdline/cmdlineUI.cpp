@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -64,10 +64,6 @@ int getKey() {
 }
 #endif
 
-void cmdlineUI::SetPlayListManager(PlayListManager *plm) {
-    m_plm = plm;
-}
-
 cmdlineUI::cmdlineUI(FAContext *context) {
     m_context = context;
     m_plm = NULL;
@@ -86,6 +82,9 @@ Error cmdlineUI::Init(int32 startup_level) {
 	::rawTTY.c_lflag &= ~ECHO;
 	tcsetattr(stdinfd, TCSANOW, &rawTTY);
 	
+        m_propManager = m_context->props;
+        m_plm = m_context->plm;
+        m_playerEQ = m_context->target;
 	
 	keyboardListenThread = Thread::CreateThread();
 	keyboardListenThread->Create(cmdlineUI::keyboardServiceFunction,this);
@@ -96,6 +95,10 @@ Error cmdlineUI::Init(int32 startup_level) {
 	cout << " * -    Prev Song" << endl;
 	cout << " * p    Pause / UnPause" << endl;
 	cout << " * s    Shuffle" << endl << endl;
+
+        m_argc = m_context->argc;
+        m_argv = m_context->argv;
+
 	ProcessArgs();
     }
     return kError_NoErr;
@@ -149,8 +152,8 @@ void cmdlineUI::keyboardServiceFunction(void *pclcio) {
 	    case 's':
 	    case 'S': {
 		if (pMe->m_plm) {
-		    pMe->m_plm->SetShuffle(SHUFFLE_RANDOM);
-		    pMe->m_plm->SetFirst();
+		    pMe->m_plm->SetShuffleMode(true);
+		    pMe->m_plm->SetCurrentIndex(0);
 		}
 		Event *e = new Event(CMD_Stop);
 		pMe->m_playerEQ->AcceptEvent(e);
@@ -172,7 +175,7 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
     if (e) {
 	//cout << "cmdlineUI: processing event " << e->getEvent() << endl;
 	switch (e->Type()) {
-	    case INFO_PlayListDonePlay: {
+	    case INFO_PlaylistDonePlay: {
 		Event *e = new Event(CMD_QuitPlayer);
 		m_playerEQ->AcceptEvent(e);
 		break; }
@@ -188,7 +191,7 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 		    cout << "Playing: " << pmvi->m_filename << endl;
 		}
 		break; }
-	    case INFO_ID3TagInfo: {
+/*	    case INFO_ID3TagInfo: {
 		ID3TagEvent *ite = (ID3TagEvent *)e;
 		if (ite) {
 		    Id3TagInfo ti = ite->GetId3Tag();
@@ -203,16 +206,13 @@ int32 cmdlineUI::AcceptEvent(Event *e) {
 		}
 		break;
 	    }
-	    default:
+*/	    default:
 		break;
 	}
     }
     return 0;
 }
 
-void cmdlineUI::SetArgs(int32 argc, char **argv) {
-    m_argc = argc; m_argv = argv;
-}
 void cmdlineUI::ProcessArgs() {
     char *pc = NULL;
     for(int i=1;i<m_argc;i++) {
@@ -224,7 +224,7 @@ void cmdlineUI::ProcessArgs() {
 	    m_plm->AddItem(pc,0);
 	}
     }
-    m_plm->SetFirst();
+    m_plm->SetCurrentIndex(0);
     Event *e = new Event(CMD_Play);
     m_playerEQ->AcceptEvent(e);
 }

@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,11 +20,9 @@
 	
 	$Id$
 ____________________________________________________________________________*/
-// LcdUI.h
 
-
-#ifndef _LcdUI_H_
-#define _LcdUI_H_
+#ifndef INCLUDED_LcdUI_H_
+#define INCLUDED_LcdUI_H_
 
 #include "ui.h"
 #include "event.h"
@@ -42,13 +40,9 @@ class LcdUI : public UserInterface {
  public:
     LcdUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
-    virtual void SetArgs(int argc, char **argv);
-    virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
     virtual Error Init(int32);
-    virtual void SetPlayListManager(PlayListManager *);
     static void keyboardServiceFunction(void *);
     virtual ~LcdUI();
-   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
 
  protected:
     FAContext *m_context;
@@ -69,7 +63,7 @@ class LcdUI : public UserInterface {
     EventQueue *m_playerEQ;
     void processSwitch(char *);
     Thread *keyboardListenThread;
-    PlayListManager *m_plm;
+    PlaylistManager *m_plm;
     Mutex *m_lcdLock;
     bool Quit;
 };

@@ -1,9 +1,9 @@
-// PlayListDlg.cpp : implementation file
+// PlaylistDlg.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "rainplay.h"
-#include "PlayListDlg.h"
+#include "PlaylistDlg.h"
 #include "playlist.h"
 #include "RainplayUI.h"
 
@@ -15,17 +15,17 @@ static char THIS_FILE[] = __FILE__;
 
 extern CRainplayUI *g_ui;
 
-BOOL SavePlayListToFile(CString szFile, PlayListManager *plm)
+BOOL SavePlaylistToFile(CString szFile, PlaylistManager *plm)
 {
 	if (szFile.GetLength()==0 || !plm || plm->Total()==0)
 		return FALSE;
 
-	PlayListItem *pli, *oldpli;
+	PlaylistItem *pli, *oldpli;
 	FILE *fp;
 	RepeatMode oldRepeatMode;
 
 	if ((fp=fopen(LPCTSTR(szFile), "wt"))!=NULL) {
-		//plm->DumpPlayList();
+		//plm->DumpPlaylist();
 		oldRepeatMode = plm->GetRepeat();
 		plm->SetRepeat(REPEAT_NOT);
 		oldpli = plm->GetCurrent();
@@ -50,7 +50,7 @@ BOOL SavePlayListToFile(CString szFile, PlayListManager *plm)
 	}
 	return FALSE;
 }
-BOOL ReadPlaylistFromFile(CString szFile, PlayListManager *plm)
+BOOL ReadPlaylistFromFile(CString szFile, PlaylistManager *plm)
 {
 	if (szFile.GetLength()==0 || !plm)
 		return FALSE;
@@ -79,30 +79,30 @@ BOOL ReadPlaylistFromFile(CString szFile, PlayListManager *plm)
 
 
 /////////////////////////////////////////////////////////////////////////////
-// CPlayListDlg dialog
+// CPlaylistDlg dialog
 
 
-CPlayListDlg::CPlayListDlg(BOOL* bActive, CWnd* pParent /*=NULL*/)
+CPlaylistDlg::CPlaylistDlg(BOOL* bActive, CWnd* pParent /*=NULL*/)
 	:	m_pbActive(bActive),
-		CDialog(CPlayListDlg::IDD, pParent)
+		CDialog(CPlaylistDlg::IDD, pParent)
 {
-	//{{AFX_DATA_INIT(CPlayListDlg)
+	//{{AFX_DATA_INIT(CPlaylistDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 }
 
 
-void CPlayListDlg::DoDataExchange(CDataExchange* pDX)
+void CPlaylistDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CPlayListDlg)
+	//{{AFX_DATA_MAP(CPlaylistDlg)
 		// NOTE: the ClassWizard will add DDX and DDV calls here
 	//}}AFX_DATA_MAP
 }
 
 
-BEGIN_MESSAGE_MAP(CPlayListDlg, CDialog)
-	//{{AFX_MSG_MAP(CPlayListDlg)
+BEGIN_MESSAGE_MAP(CPlaylistDlg, CDialog)
+	//{{AFX_MSG_MAP(CPlaylistDlg)
 	ON_COMMAND(IDM_PLAYLIST_CLOSE, OnPlaylistClose)
 	ON_COMMAND(IDM_PLAYLIST_LOAD, OnPlaylistLoad)
 	ON_WM_CLOSE()
@@ -110,9 +110,9 @@ BEGIN_MESSAGE_MAP(CPlayListDlg, CDialog)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
-// CPlayListDlg message handlers
+// CPlaylistDlg message handlers
 
-BOOL CPlayListDlg::OnInitDialog() 
+BOOL CPlaylistDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
 	// TODO: Add extra initialization here
@@ -121,13 +121,13 @@ BOOL CPlayListDlg::OnInitDialog()
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CPlayListDlg::OnPlaylistClose() 
+void CPlaylistDlg::OnPlaylistClose() 
 {
 	// TODO: Add your command handler code here
 	DestroyWindow();
 }
 
-void CPlayListDlg::OnPlaylistLoad() 
+void CPlaylistDlg::OnPlaylistLoad() 
 {
 	// TODO: Add your command handler code here
 	CFileDialog *dialog;
@@ -154,7 +154,7 @@ void CPlayListDlg::OnPlaylistLoad()
 }
 
 
-void CPlayListDlg::OnClose() 
+void CPlaylistDlg::OnClose() 
 {
 	// TODO: Add your message handler code here and/or call default
 	*m_pbActive = FALSE;

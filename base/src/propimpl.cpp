@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -73,8 +73,8 @@ Error PropertiesImpl::SetProperty(const char *pProp, PropValue *pVal) {
 		    m_props->Insert(pProp, ppe);
 		}
 		PropertyWatcher *pw = NULL;
-		for(int i = 0;i<ppe->m_propWatchers.CountItems();i++) {
-		    pw = ppe->m_propWatchers.ItemAt(i);
+		for(uint32 i = 0; i < ppe->m_propWatchers.size(); i++) {
+		    pw = ppe->m_propWatchers[i];
 		    if (pw) {
 			pw->PropertyChange(pProp, pVal);
 		    }
@@ -96,7 +96,7 @@ Error PropertiesImpl::RegisterPropertyWatcher(const char *pProp, PropertyWatcher
 	if (pProp) {
 	    PropElem *ppe = m_props->Value(pProp);
 	    if (ppe) {
-		ppe->m_propWatchers.AddItem(pw);
+		ppe->m_propWatchers.push_back(pw);
 		rtn = kError_NoErr;
 	    }
 	}
@@ -114,10 +114,10 @@ Error PropertiesImpl::RemovePropertyWatcher(const char *pProp, PropertyWatcher *
 	if (pProp) {
 	    PropElem *ppe = m_props->Value(pProp);
 	    if (ppe) {
-		int32 endNum = ppe->m_propWatchers.CountItems();
+		int32 endNum = ppe->m_propWatchers.size();
 		for (int i = 0; i < endNum ; i++) {
-		    if (pw == ppe->m_propWatchers.ItemAt(i)) {
-			ppe->m_propWatchers.RemoveItem(i);
+		    if (pw == ppe->m_propWatchers[i]) {
+			ppe->m_propWatchers.erase(&ppe->m_propWatchers[i]);
 			endNum--;
 		    }
 		}

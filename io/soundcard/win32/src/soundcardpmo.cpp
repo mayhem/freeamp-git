@@ -2,7 +2,7 @@
    
    FreeAmp - The Free MP3 Player
 
-   Portions Copyright (C) 1998 GoodNoise
+   Portions Copyright (C) 1998-1999 EMusic.com
    Portions Copyright (C) 1997 Jeff Tsay (ctsay@pasteur.eecs.berkeley.edu)
 
    This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@ ____________________________________________________________________________*/
 #include "SoundCardPMO.h"
 #include "eventdata.h"
 #include "log.h"
+#include "debug.h"
 
 #define DB Debug_v("%s:%d", __FILE__, __LINE__);
 
@@ -87,7 +88,6 @@ SoundCardPMO::SoundCardPMO(FAContext *context) :
    m_iBaseTime = MAXINT32;
    m_iBytesPerSample = 0;
    m_num_headers = 0;
-   m_iLastVolume = 0;
    
    if (!m_pBufferThread)
    {
@@ -143,7 +143,6 @@ void SoundCardPMO::SetVolume(int32 volume)
    waveOutSetVolume(   (HWAVEOUT)WAVE_MAPPER, 
                         MAKELPARAM( 0xFFFF*volume/100,  
                                     0xFFFF*volume/100));
-   m_iLastVolume = volume;
 }
 
 int32 SoundCardPMO::GetVolume() 
@@ -192,10 +191,6 @@ Error SoundCardPMO::Init(OutputInfo * info)
    {
       result = kError_NoErr;
    }
-
-   waveOutSetVolume(m_hwo, 
-            MAKELPARAM( 0xFFFF*m_iLastVolume/100,  
-                        0xFFFF*m_iLastVolume/100));
 
    uint32    i;
 

@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ ____________________________________________________________________________*/
 // CommandLineCIO.h
 
 
-#ifndef _COMMANDLINECIO_H_
-#define _COMMANDLINECIO_H_
+#ifndef INCLUDED_COMMANDLINECIO_H_
+#define INCLUDED_COMMANDLINECIO_H_
 
 #include "ui.h"
 #include "event.h"
@@ -37,13 +37,9 @@ class cmdlineUI : public UserInterface {
  public:
     cmdlineUI(FAContext *context);
     virtual int32 AcceptEvent(Event *);
-    virtual void SetArgs(int32 argc, char **argv);
-    virtual void SetTarget(EventQueue *eqr) { m_playerEQ = eqr; }
     virtual Error Init(int32);
-    virtual void SetPlayListManager(PlayListManager *);
     static void keyboardServiceFunction(void *);
     virtual ~cmdlineUI();
-   virtual Error SetPropManager(Properties *p) { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
 
  protected:
    FAContext *m_context;
@@ -57,7 +53,7 @@ class cmdlineUI : public UserInterface {
    EventQueue *m_playerEQ;
    void processSwitch(char *);
    Thread *keyboardListenThread;
-   PlayListManager *m_plm;
+   PlaylistManager *m_plm;
    int32 m_lastIndexPlayed;
    bool m_id3InfoPrinted;
 };

@@ -1,9 +1,8 @@
-
 /*____________________________________________________________________________
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -23,8 +22,8 @@
 ____________________________________________________________________________*/
 
 
-#ifndef _SOUNDCARDPMO_H_
-#define _SOUNDCARDPMO_H_
+#ifndef INCLUDED_SOUNDCARDPMO_H_
+#define INCLUDED_SOUNDCARDPMO_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -79,7 +78,7 @@ public:
 	uint32          m_samples_per_second;
 	uint32			m_hdr_size;
 	uint32			m_data_size;
-	uint32			m_num_headers, m_iLastVolume;
+	uint32			m_num_headers;
 	bool			m_initialized, m_bPaused;
 
     Thread         *m_pBufferThread;

@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998-1999 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 	Portions Copyright (C) 1999 Mark H. Weaver <mhw@netris.org>
 
 	This program is free software; you can redistribute it and/or modify
@@ -23,8 +23,8 @@
 ____________________________________________________________________________*/
 
 
-#ifndef _PREFIXPREFS_H
-#define _PREFIXPREFS_H
+#ifndef INCLUDED_PREFIXPREFS_H
+#define INCLUDED_PREFIXPREFS_H
 
 #include "config.h"
 #include "errors.h"

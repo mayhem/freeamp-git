@@ -1,7 +1,7 @@
 /*____________________________________________________________________________
 	
 	FreeAMP - The Free MP3 Player
-	Portions copyright (C) 1998 GoodNoise
+	Portions copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -27,12 +27,13 @@ ____________________________________________________________________________*/
 #include <commctrl.h>
 #include <stdio.h>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
 
 /* Project Includes */
 #include "player.h"
 #include "event.h"
 #include "registrar.h"
+#include "registry.h"
 #include "log.h"
 #include "facontext.h"
 #include "win32prefs.h"
@@ -45,7 +46,7 @@ EnumThreadWndProc(  HWND hwnd,
 {
     BOOL    result = TRUE;
     char    windowTitle[256];
-    char    freeampTitle[] = "FreeAmp";
+    char    freeampTitle[] = BRANDING;
     int32   count;
 
     count = GetWindowText(hwnd, windowTitle, sizeof(windowTitle));
@@ -70,7 +71,7 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
 
     runOnceMutex = CreateMutex(	NULL,
 							    TRUE,
-							    "FreeAmp Should Only Run One Time!");
+							    BRANDING " Should Only Run One Time!");
 
     if(GetLastError() == ERROR_ALREADY_EXISTS)
     {
@@ -118,38 +119,34 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     WSAStartup(0x0002,  &sGawdIHateMicrosoft);
 
     FAContext *context = new FAContext;
-    Win32Prefs* prefs = new Win32Prefs();
-    //prefs->Initialize();
 
-    context->prefs = prefs;
+    context->prefs = new Win32Prefs();
     context->log = new LogFile("freeamp.log");
-
-    
 
     // find all the plug-ins we use
     Registrar* registrar;
-    LMCRegistry* lmc;
-    PMIRegistry* pmi;
-    PMORegistry* pmo;
-    UIRegistry*  ui;
+    Registry* lmc;
+    Registry* pmi;
+    Registry* pmo;
+    Registry*  ui;
 
     registrar = new Registrar;
 
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
-    lmc = new LMCRegistry;
+    lmc = new Registry;
     registrar->InitializeRegistry(lmc, context->prefs);
 
     registrar->SetSearchString("*.pmi");
-    pmi = new PMIRegistry;
+    pmi = new Registry;
     registrar->InitializeRegistry(pmi, context->prefs);
 
     registrar->SetSearchString("*.pmo");
-    pmo = new PMORegistry;
+    pmo = new Registry;
     registrar->InitializeRegistry(pmo, context->prefs);
 
     registrar->SetSearchString("*.ui");
-    ui = new UIRegistry;
+    ui = new Registry;
     registrar->InitializeRegistry(ui, context->prefs);
 
     delete registrar;

@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998-1999 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
         Portions Copyright (C) 1999 Mark H. Weaver <mhw@netris.org>
 
         This program is free software; you can redistribute it and/or modify
@@ -28,11 +28,14 @@ ____________________________________________________________________________*/
 #include <errno.h>
 #endif
 
+#include <string>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include "utility.h"
 #include "unixprefs.h"
 #include "prefixprefs.h"
 
@@ -41,15 +44,6 @@ ____________________________________________________________________________*/
 // (among others) which will in turn use delete to reclaim the memory.
 // This is NOT VALID! A strdup()ed string must be free()ed, not deleted!
 // WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
-char *strdup_new(const char *str)
-{
-    char *n;
-
-    n = new char[strlen(str) + 1];
-    strcpy(n, str);
-
-    return n;
-}
 
 // default values
 const char*  kDefaultLibraryPath = ".:~/.freeamp:" UNIX_LIBDIR "/freeamp";
@@ -62,7 +56,7 @@ const char*  kDefaultESOUNDHost = "localhost";
 
 class LibDirFindHandle {
  public:
-    List <char *> *m_pLibDirs;
+    vector <char *> *m_pLibDirs;
     int32 m_current;
 };
 
@@ -349,14 +343,26 @@ UnixPrefEntry::
     if (suffix)    delete[] suffix;
 }
 
+static bool file_exists(char *s)
+{
+    struct stat st;
+    if ((!s) || (!*s))
+        return false;
+    if (stat(s, &st) < 0)
+        return false;
+    return true;
+}
 
 UnixPrefs::
 UnixPrefs()
      : m_prefsFilePath(0), m_errorLineNumber(0),
        m_saveEnable(true), m_changed(false)
 {
-    const char *suffix = "/.freeamp_prefs";
-    char *homeDir = getenv("HOME");
+    const char *old_suffix = "/.freeamp_prefs";
+    char *old_prefsFilePath;
+    const char *fadir = "/.freeamp";
+    const char *suffix = "/preferences";
+    char *homeDir = getenv("HOME"); 
 
     if (!homeDir)
     {
@@ -365,9 +371,20 @@ UnixPrefs()
     }
 
     // Compute pathname of preferences file
-    m_prefsFilePath = new char[strlen(homeDir) + strlen(suffix) + 1];
+    old_prefsFilePath = new char[strlen(homeDir) + strlen(old_suffix) + 1];
+    strcpy(old_prefsFilePath, homeDir);
+    strcat(old_prefsFilePath, old_suffix);
+
+    m_prefsFilePath = new char[strlen(homeDir) + strlen(fadir) + strlen(suffix) 
+                               + 1];
     strcpy(m_prefsFilePath, homeDir);
+    strcat(m_prefsFilePath, fadir);
+    if (!file_exists(m_prefsFilePath))
+        mkdir(m_prefsFilePath, S_IRWXU);
     strcat(m_prefsFilePath, suffix);
+
+    if (file_exists(old_prefsFilePath))
+        rename(old_prefsFilePath, m_prefsFilePath);
 
     FILE *prefsFile = fopen(m_prefsFilePath, "r");
     if (!prefsFile && errno != ENOENT)
@@ -439,13 +456,13 @@ UnixPrefs()
                 }
                 AppendToString(&entry->suffix, p, length);
                 
-                m_entries.AddItem(entry);
+                m_entries.push_back(entry);
                 entry = new UnixPrefEntry;
             }
         }
 
         if (entry->prefix)
-            m_entries.AddItem(entry);
+            m_entries.push_back(entry);
         else
             delete entry;
         
@@ -511,6 +528,20 @@ SetDefaults()
     if (GetPrefString(kESOUNDHostPref, buf, &size) == kError_NoPrefValue)
         SetPrefString(kESOUNDHostPref, kDefaultESOUNDHost);
 
+    size = sizeof(buf);
+    if (GetPrefString(kDatabaseDirPref, buf, &size) == kError_NoPrefValue) {
+        string tempdir = FreeampDir(NULL);
+        tempdir += "/db/";
+        SetPrefString(kDatabaseDirPref, tempdir.c_str());
+    }
+
+    size = sizeof(buf);
+    if (GetPrefString(kSaveMusicDirPref, buf, &size) == kError_NoPrefValue) {
+        string tempdir = FreeampDir(NULL);
+        tempdir += "/MyMusic";
+        SetPrefString(kSaveMusicDirPref, tempdir.c_str());
+    }
+
     Preferences::SetDefaults();
 
     return kError_NoErr;
@@ -552,13 +583,13 @@ Save()
 
         m_mutex.Acquire();
                 
-        int32 numEntries = m_entries.CountItems();
+        int32 numEntries = m_entries.size();
         int32 i;
         UnixPrefEntry *entry;
         
         for (i = 0; i < numEntries; i++)
         {
-            entry = m_entries.ItemAt(i);
+            entry = m_entries[i];
             if (entry->prefix)
                 fputs(entry->prefix, prefsFile);
             if (entry->key && entry->separator && entry->value)
@@ -644,19 +675,6 @@ GetPrefString(const char* pref, char* buf, uint32* len)
     memcpy(buf, value, value_len);
     *len = value_len;
     m_mutex.Release();
-   
-    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-    if (strcmp(pref, "UI") == 0 ||
-        strcmp(pref, "TextUI") == 0 ||
-        strcmp(pref, "PMO") == 0)
-    {
-        char base[512], ext[512];
-
-        if (sscanf(buf, "%[^-.]-linux.%s", base, ext) == 2)
-           sprintf(buf, "%s.%s", base, ext);
-    }
-    // HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-
     return kError_NoErr;
 }
 
@@ -680,7 +698,7 @@ SetPrefString(const char* pref, const char* buf)
         AppendToString(&entry->key, pref, strlen(pref));
         AppendToString(&entry->separator, ": ", 2);
         AppendToString(&entry->suffix, "\n", 1);
-        m_entries.AddItem(entry);
+        m_entries.push_back(entry);
         m_ht.Insert(pref, entry);
     }
     AppendToString(&entry->value, buf, strlen(buf));
@@ -722,7 +740,7 @@ GetFirstLibDir(char *path, uint32 *len)
     }
     pEnv = pPath;
     LibDirFindHandle *hLibDirFind = new LibDirFindHandle();
-    hLibDirFind->m_pLibDirs = new List<char *>();
+    hLibDirFind->m_pLibDirs = new vector<char *>();
     hLibDirFind->m_current = 0;
 
     char *pCol = (char *)1;
@@ -731,11 +749,11 @@ GetFirstLibDir(char *path, uint32 *len)
         pCol = strchr(pPart,':');
         if (pCol) *pCol = '\0';
         char *pFoo = strdup_new(pPart);
-        hLibDirFind->m_pLibDirs->AddItem(pFoo);
+        hLibDirFind->m_pLibDirs->push_back(pFoo);
         pPart = pCol + sizeof(char);
     }
 
-    pPath = hLibDirFind->m_pLibDirs->ItemAt(0);
+    pPath = (*hLibDirFind->m_pLibDirs)[0];
     if (pPath) {
         strncpy(path,pPath,*len);
         *len = strlen(pPath);
@@ -758,7 +776,7 @@ GetNextLibDir(LibDirFindHandle *hLibDirFind, char *path, uint32 *len)
 {
     if (hLibDirFind) {
         hLibDirFind->m_current++;
-        char *pPath = hLibDirFind->m_pLibDirs->ItemAt(hLibDirFind->m_current);
+        char *pPath = (*hLibDirFind->m_pLibDirs)[hLibDirFind->m_current];
         if (pPath) {
             strncpy(path,pPath,*len);
             *len = strlen(pPath);
@@ -779,7 +797,10 @@ UnixPrefs::
 GetLibDirClose(LibDirFindHandle *hLibDirFind)
 {
     if (hLibDirFind) {
-        hLibDirFind->m_pLibDirs->DeleteAll();
+        vector <char *>::iterator i = hLibDirFind->m_pLibDirs->begin();
+
+        for (; i != hLibDirFind->m_pLibDirs->end(); i++)
+             delete *i;
         delete hLibDirFind->m_pLibDirs;
         delete hLibDirFind;
     }

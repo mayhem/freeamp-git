@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ ____________________________________________________________________________*/
 PipelineUnit::PipelineUnit(FAContext *context)
 {
     m_pContext = context;
-    m_pTarget = NULL;
+    m_pTarget = context->target;
     m_bPause = false;
     m_pPropManager = NULL;
     m_bExit = false;
@@ -104,13 +104,6 @@ void PipelineUnit::ReportError(const char *szError)
 
     m_pTarget->AcceptEvent(new LMCErrorEvent(szError));
 }   
-
-void PipelineUnit::SetTarget(EventQueue *target)
-{
-    m_pMutex->Acquire();
-    m_pTarget = target; 
-    m_pMutex->Release();
-}
 
 void PipelineUnit::Pause(void)
 {

@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _PREF_DIALOG_H_
-#define _PREF_DIALOG_H_
+#ifndef INCLUDED_PREF_DIALOG_H_
+#define INCLUDED_PREF_DIALOG_H_
 
 /* system headers */
 #define STRICT
@@ -31,7 +31,7 @@ ____________________________________________________________________________*/
 
 /* project headers */
 #include "config.h"
-#include "player.h"
+#include "preferences.h"
 
 bool DisplayPreferences(HWND hwndParent, Preferences* prefs);
 

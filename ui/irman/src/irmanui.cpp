@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -55,10 +55,6 @@ UserInterface *Initialize(FAContext *context) {
     
 	   }
 
-void IRManUI::SetPlayListManager(PlayListManager *plm) {
-    m_plm = plm;
-}
-
 
 #define ASSOCIATE(x,y) pInt = new int32; *pInt = y; m_commands.Insert(x,pInt);
 
@@ -98,6 +94,14 @@ IRManUI::~IRManUI() {
 
 Error IRManUI::Init(int32 startupType) {
     m_startupType = startupType;
+
+    m_plm = m_context->plm;
+    m_playerEQ = m_context->target;
+    m_propManager = m_context->props;    
+    
+    m_argc = m_context->argc;
+    m_argv = m_context->argv;
+
     if (m_startupType == PRIMARY_UI) {
 	ProcessArgs();
     }
@@ -207,7 +211,7 @@ int32 IRManUI::AcceptEvent(Event *e) {
     if (e) {
 	//cout << "IRManUI: processing event " << e->Type() << endl;
 	switch (e->Type()) {
-	    case INFO_PlayListDonePlay: {
+	    case INFO_PlaylistDonePlay: {
 		if (m_startupType == PRIMARY_UI) {
 		    Event *e = new Event(CMD_QuitPlayer);
 		    m_playerEQ->AcceptEvent(e);
@@ -225,10 +229,6 @@ int32 IRManUI::AcceptEvent(Event *e) {
     return 0;
 }
 
-void IRManUI::SetArgs(int argc, char **argv) {
-    m_argc = argc; m_argv = argv;
-}
-
 void IRManUI::ProcessArgs() {
     char *pc = NULL;
     for(int i=1;i<m_argc;i++) {
@@ -240,7 +240,7 @@ void IRManUI::ProcessArgs() {
 	    m_plm->AddItem(pc,0);
 	}
     }
-    m_plm->SetFirst();
+    m_plm->SetCurrentIndex(0);
     Event *e = new Event(CMD_Play);
     m_playerEQ->AcceptEvent(e);
 }

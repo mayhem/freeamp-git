@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -23,11 +23,12 @@ ____________________________________________________________________________*/
 
 // debug.h
 
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
-
+#ifndef INCLUDED_DEBUG_H_
+#define INCLUDED_DEBUG_H_
 
 void debug_string(char*);
 
+void DebugInit_v(void);
+void Debug_v(char * format, ...);
 
 #endif // _DEBUG_H_

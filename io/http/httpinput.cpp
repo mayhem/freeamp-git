@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ HttpInput::~HttpInput()
     delete m_szError; 
 }
 
-bool HttpInput::CanHandle(char *szUrl, char *szTitle)
+bool HttpInput::CanHandle(const char *szUrl, char *szTitle)
 {
     bool bRet;
 
@@ -163,22 +163,6 @@ bool HttpInput::CanHandle(char *szUrl, char *szTitle)
        strcpy(szTitle, szDefaultStreamTitle);
 
     return bRet;
-}
-
-Error HttpInput::GetID3v1Tag(Id3TagInfo &sTag)
-{
-    if (m_pID3Tag)
-    {
-        memcpy(&sTag, m_pID3Tag, sizeof(sTag));
-        return kError_NoErr;
-    }
-
-    // Let's make up a ficticous ID3 tag.
-    memset(&sTag, 0, sizeof(sTag));
-    sTag.m_containsInfo = true;
-    strcpy(sTag.m_songName, szDefaultStreamTitle); 
-
-    return kError_NoErr;
 }
 
 Error HttpInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
@@ -443,7 +427,7 @@ Error HttpInput::Open(void)
         sprintf(szQuery, "GET / HTTP/1.0\n"
                          "Host %s\n"
                          "Accept: */*\n" 
-                         "User-Agent: FreeAmp/%s\n", 
+                         "User-Agent: "BRANDING"/%s\n", 
                          szLocalName, FREEAMP_VERSION);
 
     m_pContext->prefs->GetPrefBoolean(kUseTitleStreamingPref, &bUseTitleStreaming);
@@ -565,27 +549,17 @@ Error HttpInput::Open(void)
                 return (Error)kError_Interrupt;
         }
 
-        // Let's make up a ficticous ID3 tag.
-        if (m_pID3Tag)
-           delete m_pID3Tag;
-
-        m_pID3Tag = new Id3TagInfo();
-        memset(m_pID3Tag, 0, sizeof(Id3TagInfo));
-        m_pID3Tag->m_containsInfo = true;
-       
         pPtr = strstr(pHeaderData, "icy-name");
         if (pPtr)
         {
             pPtr += strlen("icy-name:");
             sscanf(pPtr, "%254[^\r\n]", szStreamName);
-            sscanf(pPtr, "%30[^\r\n]", m_pID3Tag->m_songName);
         }
 
         pPtr = strstr(pHeaderData, "icy-url");
         if (pPtr)
         {
             pPtr += strlen("icy-url:");
-            sscanf(pPtr, "%30[^\r\n]", m_pID3Tag->m_artist);
         }
 
         pPtr = strstr(pHeaderData, "x-audiocast-udpport:");
@@ -628,19 +602,7 @@ Error HttpInput::Open(void)
 		      closesocket(m_hHandle);
 				return (Error)httpError_CustomError;
 		  }
-
-        // Let's make up a ficticous ID3 tag.
-        if (m_pID3Tag)
-           delete m_pID3Tag;
-
-        m_pID3Tag = new Id3TagInfo();
-        memset(m_pID3Tag, 0, sizeof(Id3TagInfo));
-        m_pID3Tag->m_containsInfo = true;
-		if (szFile)
-            sscanf(szFile, "%30[^\r\n]", m_pID3Tag->m_songName);
-        else
-		    *m_pID3Tag->m_songName = 0;
-
+       
         // Its a regular HTTP download. Let's save the bytes we've
         // read into the pullbuffer.
         iSize = iRead;

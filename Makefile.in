@@ -1,11 +1,21 @@
+# Generated automatically from Makefile.in by configure.
 # Freeamp master Makefile
 # $Id$
 
 FPIC=
-# RELOC = null for freeamp main; RELOC = @FPIC@ for plugins.
-INSTALL_PROGRAM = @INSTALL@
+# RELOC = null for freeamp main; RELOC = -fpic for plugins.
 
 include config/Makefile.header
+
+GDBMOBJ  = lib/gdbm/bucket.o lib/gdbm/falloc.o lib/gdbm/findkey.o
+GDBMOBJ += lib/gdbm/gdbmclose.o lib/gdbm/gdbmdelete.o lib/gdbm/gdbmerrno.o
+GDBMOBJ += lib/gdbm/gdbmexists.o lib/gdbm/gdbmfdesc.o lib/gdbm/gdbmfetch.o
+GDBMOBJ += lib/gdbm/gdbmopen.o lib/gdbm/gdbmreorg.o lib/gdbm/gdbmseq.o
+GDBMOBJ += lib/gdbm/gdbmsetopt.o lib/gdbm/gdbmstore.o lib/gdbm/gdbmsync.o
+GDBMOBJ += lib/gdbm/global.o lib/gdbm/hash.o lib/gdbm/update.o
+GDBMOBJ += lib/gdbm/version.o
+
+PARSEOBJ += lib/xml/src/Parse.o
 
 FREEAMPunixOBJ  = base/unix/src/bootstrap.o base/unix/src/unixprefs.o
 FREEAMPunixOBJ += base/unix/src/win32impl.o
@@ -28,14 +38,15 @@ FREEAMPbeosOBJ += base/beos/src/mutex.o base/beos/src/semaphore.o
 FREEAMPbeosOBJ += base/beos/src/utility.o
 FREEAMPbeosOBJ += base/beos/src/win32impl.o
 
-FREEAMPOBJ =  base/src/hashtable.o base/src/log.o base/src/player.o
+FREEAMPOBJ =  base/src/log.o base/src/player.o base/src/musiccatalog.o
 FREEAMPOBJ += base/src/playlist.o base/src/propimpl.o base/src/registrar.o
 FREEAMPOBJ += base/src/registry.o base/src/thread.o io/src/eventbuffer.o
 FREEAMPOBJ += base/src/prefixprefs.o base/src/preferences.o
-FREEAMPOBJ += io/src/pmiregistry.o io/src/pmoregistry.o
+FREEAMPOBJ += base/src/debug.o base/src/utility.o base/src/database.o 
+FREEAMPOBJ += base/src/downloadmanager.o
 FREEAMPOBJ += io/src/pullbuffer.o io/src/streambuffer.o io/src/tstream.o
-FREEAMPOBJ += lmc/src/lmcregistry.o ui/src/uiregistry.o
 FREEAMPOBJ += $(FREEAMP$(HOST_OS)OBJ)
+FREEAMPOBJ += $(GDBMOBJ) $(PARSEOBJ)
 #FREEAMPOBJ += $(OSDEPOBJ)
 
 all: freeamp plugins
@@ -48,7 +59,7 @@ FREEAMPLIBS = $($(OSTYPE)FREEAMPLIBS)
 
 freeamp: $(FREEAMPOBJ) $(freeamp_DEPENDENCIES)
 	@rm -f freeamp
-	$(CXXLINK) $(FREEAMPOBJ) $(LDFLAGS) $(FREEAMPLIBS)
+	$(CXXLINK) $(FREEAMPOBJ) $(LDFLAGS) -ldl -lpthread $(EXTRALIBS)
 
 clean: freeamp-clean plugins-clean
 
@@ -58,25 +69,38 @@ clean-freeamp freeamp-clean:
 plugins: plugins-cc
 
 plugins-cc install-plugins clean-plugins plugins-install plugins-clean:
+	+test -d plugins || mkdir plugins
 	+$(PIMAKE) $@
 
 distclean: clean
-	-rm -f config.cache config.log config.status config/config.h
-	-rm -f Makefile Makefile-plugins config/Makefile.header
+	-rm -f config.status Makefile config.cache config/config.h
+	-rm -f config/Makefile.header Makefile-plugins
 
-install: install-freeamp install-plugins
+install: install-freeamp install-themes install-plugins
 
 install-freeamp: freeamp
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) freeamp $(DESTDIR)$(bindir)
+	if test -f "MakeTheme"; then \
+		$(INSTALL_PROGRAM) MakeTheme $(DESTDIR)$(bindir);\
+	fi;
+
+install-themes:
+	$(mkinstalldirs) $(DESTDIR)$(datadir)/freeamp/themes
+	@list=`ls themes/*.*`; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo "  $(INSTALL_PROGRAM) $$p $(DESTRIR)$(datadir)/freeamp/`echo $$p|sed '$(transform)'`"; \
+	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(datadir)/freeamp/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; \
+	done
 
 depend:
 	makedepend -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(FREEAMPOBJ) | sed -e 's,\.o,.cpp,g'`
 	+$(PIMAKE) depend
 
-Makefile: Makefile.in Makefile-plugins.in config/Makefile.header.in
+Makefile: Makefile.in Makefile-plugins.in
 	./config.status
-	@echo 'Makefile has been rebuilt; please run `make` again.'
+	echo 'Makefile has been rebuilt; please run `make` again.'
 
 
 #Makefile: configure.in configure

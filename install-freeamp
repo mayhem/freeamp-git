@@ -9,10 +9,13 @@ bindir="$prefix/bin"
 libdir="$prefix/lib"
 fadir="$libdir/freeamp"
 plugdir="$fadir/plugins"
+sharedir="$prefix/share"
+fathemedir="$prefix/freeamp"
+themedir="$prefix/themes"
 ldconf="/sbin/ldconfig"
 
 # We could use mkdir -p, but not all unix systems' mkdir's support -p
-for dir in "$bindir" "$libdir" "$fadir" "$plugdir"; do
+for dir in "$bindir" "$libdir" "$fadir" "$plugdir" "$sharedir" "$fathemedir" "$themedir"; do
     if [ \! -d "$dir" ]; then
 	echo "mkdir $dir"
 	mkdir "$dir"
@@ -24,6 +27,13 @@ for dir in "$bindir" "$libdir" "$fadir" "$plugdir"; do
 done
 
 install -c -m 755 freeamp "$bindir"
+if test -f "MakeTheme"; then
+    install -c -m 755 MakeTheme "$bindir"
+fi
+for file in themes/*.*; do
+    echo "install -c -o root -m 644 $file $themedir"
+    install -c -o root -m 644 "$file" "$themedir"
+done
 for file in plugins/*.*; do
     enable=f
     case "$file" in

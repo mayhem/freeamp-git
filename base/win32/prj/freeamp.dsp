@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /I "..\..\..\ui\dummy\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # SUBTRACT CPP /X
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
@@ -55,7 +55,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe"
+# ADD LINK32 zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib"
+# Begin Special Build Tool
+SOURCE=$(InputPath)
+PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
+        ..\..\..\themes\freeamp.fat themes
+# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
 
@@ -71,7 +76,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\ui\dummy\include" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # SUBTRACT CPP /X
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
@@ -82,8 +87,13 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept
+# ADD LINK32 zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib"
 # SUBTRACT LINK32 /profile
+# Begin Special Build Tool
+SOURCE=$(InputPath)
+PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
+        ..\..\..\themes\freeamp.fat themes
+# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
 
@@ -101,7 +111,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /I "..\..\..\ui\dummy\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # SUBTRACT BASE CPP /X
-# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /I "..\..\..\ui\dummy\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /Op /Ob2 /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /FD /c
 # SUBTRACT CPP /X
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o NUL /win32
@@ -112,7 +122,12 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe"
-# ADD LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe"
+# ADD LINK32 zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"freeamp.exe" /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib"
+# Begin Special Build Tool
+SOURCE=$(InputPath)
+PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
+        ..\..\..\themes\freeamp.fat themes
+# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
 
@@ -130,7 +145,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\ui\dummy\include" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # SUBTRACT BASE CPP /X
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\ui\dummy\include" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\lib\zlib\include" /I "..\..\..\lib\xml\include" /I "..\..\..\lib\gdbm" /I "..\include" /I "..\..\include" /I "..\..\..\config" /I "..\..\..\ui\win32Test\include" /I "..\..\..\ui\win32Test\res" /I "..\..\..\io\include" /I "..\..\..\ui\include" /I "..\..\..\lmc\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /FD /c
 # SUBTRACT CPP /X
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o NUL /win32
@@ -142,8 +157,13 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept
 # SUBTRACT BASE LINK32 /profile
-# ADD LINK32 winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept
+# ADD LINK32 zlib.lib gdbm.lib version.lib winmm.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /out:"freeamp.exe" /pdbtype:sept /libpath:"..\..\..\lib\gdbm" /libpath:"..\..\..\lib\zlib"
 # SUBTRACT LINK32 /profile
+# Begin Special Build Tool
+SOURCE=$(InputPath)
+PostBuild_Cmds=IF NOT EXIST themes mkdir themes	copy\
+        ..\..\..\themes\freeamp.fat themes
+# End Special Build Tool
 
 !ENDIF 
 
@@ -158,7 +178,15 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\src\hashtable.cpp
+SOURCE=..\..\src\database.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\debug.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\downloadmanager.cpp
 # End Source File
 # Begin Source File
 
@@ -167,6 +195,14 @@ SOURCE=..\..\src\log.cpp
 # Begin Source File
 
 SOURCE=..\src\main.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\musiccatalog.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\xml\src\Parse.cpp
 # End Source File
 # Begin Source File
 
@@ -182,15 +218,11 @@ SOURCE=..\..\src\propimpl.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\src\registrar.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\io\rio\rio.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\src\thread.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\src\utility.cpp
 # End Source File
 # End Group
 # Begin Group "system"
@@ -269,23 +301,11 @@ SOURCE=..\src\win32thread.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\..\lmc\src\lmcregistry.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\io\src\pmiregistry.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\io\src\pmoregistry.cpp
+SOURCE=..\..\src\registrar.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\src\registry.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\ui\src\uiregistry.cpp
 # End Source File
 # End Group
 # Begin Group "text files"
@@ -480,6 +500,9 @@ InputPath=..\..\..\README
 
 # End Source File
 # End Group
+# Begin Group "resources"
+
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\res\freeamp.rc
@@ -490,50 +513,51 @@ SOURCE=..\res\icon1.ico
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\io\rio\win32\i386\free\portio.sys
+SOURCE=..\..\..\lib\portio\i386\free\portio.sys
 
 !IF  "$(CFG)" == "freeamp - Win32 Release"
 
 # Begin Custom Build
-InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+InputPath=..\..\..\lib\portio\i386\free\portio.sys
 
 ".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+	copy ..\..\..\lib\portio\i386\free\portio.sys .\portio.sys
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 Debug"
 
 # Begin Custom Build
-InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+InputPath=..\..\..\lib\portio\i386\free\portio.sys
 
 ".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+	copy ..\..\..\lib\portio\i386\free\portio.sys .\portio.sys
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Release"
 
 # Begin Custom Build
-InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+InputPath=..\..\..\lib\portio\i386\free\portio.sys
 
 ".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+	copy ..\..\..\lib\portio\i386\free\portio.sys .\portio.sys
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "freeamp - Win32 NASM Debug"
 
 # Begin Custom Build
-InputPath=..\..\..\io\rio\win32\i386\free\portio.sys
+InputPath=..\..\..\lib\portio\i386\free\portio.sys
 
 ".\portio.sys" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy ..\..\..\io\rio\win32\i386\free\portio.sys .\portio.sys
+	copy ..\..\..\lib\portio\i386\free\portio.sys .\portio.sys
 
 # End Custom Build
 
 !ENDIF 
 
 # End Source File
+# End Group
 # End Target
 # End Project

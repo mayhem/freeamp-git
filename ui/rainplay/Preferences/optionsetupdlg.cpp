@@ -1,6 +1,7 @@
 // optionsetupdlg.cpp : implementation file
 //
 
+#include "config.h"
 #include "stdafx.h"
 #include "..\rainplay.h"
 #include "optionsetupdlg.h"
@@ -70,10 +71,10 @@ BOOL COptionSetupDlg::OnInitDialog()
 void COptionSetupDlg::OnRegisterFiles() 
 {
 	// TODO: Add your control notification handler code here
-	if (RegisterMPxFile(".mp3", "MPEG File", "Freeamp MPEG File"))
-		AfxMessageBox("Freeamp had been set as the default player of .mp3");
+	if (RegisterMPxFile(".mp3", "MPEG File", BRANDING " MPEG File"))
+		AfxMessageBox(BRANDING " had been set as the default player of .mp3");
 	if (RegisterMPxFile(".m3u", "Playlist File", "MPEG Playlist file"))
-		AfxMessageBox("Freeamp had been set as the default player of .m3u");
+		AfxMessageBox(BRANDING " had been set as the default player of .m3u");
 }
 
 BOOL COptionSetupDlg::RegisterMPxFile(CString fileext, CString filetype, CString descri)

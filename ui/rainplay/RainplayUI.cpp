@@ -10,7 +10,7 @@
 
 CRainplayUI *g_ui;
 
-extern BOOL ReadPlaylistFromFile(CString szFile, PlayListManager *plm);
+extern BOOL ReadPlaylistFromFile(CString szFile, PlaylistManager *plm);
 
 extern "C" CRainplayUI *Initialize(FAContext *context)
 {
@@ -45,7 +45,7 @@ CRainplayUI::
 
 void 
 CRainplayUI::
-SetPlayListManager(PlayListManager *plm) {
+SetPlaylistManager(PlaylistManager *plm) {
 	m_plm = plm;
 }
 void 

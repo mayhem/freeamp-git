@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1999 EMusic.com 
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -40,15 +40,11 @@ ____________________________________________________________________________*/
 #include "facontext.h"
 #include "beosprefs.h"
 
-#define TINYMAIN 0
-#if TINYMAIN
-#include "../local/localfileinput.h"
-#include "../soundcard/beos/include/soundcardpmo.h"
-#include "../xingmp3/include/xinglmc.h"
+#if MP3_PROF
+extern "C" {
+  Initialize();
+}
 #endif
-
-void testList();
-void testHashTable();
 
 #if 0
 bool CompareName(const char *p1, const char *p2) {
@@ -66,20 +62,6 @@ bool CompareName(const char *p1, const char *p2) {
 }
 #endif
 int main(int argc, char **argv) {
-#if TINYMAIN
-	LocalFileInput*	pLFI = new LocalFileInput( argv[1] );
-	SoundCardPMO*	pSCO = new SoundCardPMO();
-	XingLMC*		pLMC = new XingLMC();
-	pLMC->SetPMI( pLFI );
-	pLMC->SetPMO( pSCO );
-	pLMC->InitDecoder();
-	pLMC->Decode();
-	delete pLMC;
-	return 0;
-#else
-    //testList();
-    //testBuffer();
-    //testHashTable();
 
 	// *** BeOS specific section begin ***
 
@@ -101,32 +83,43 @@ int main(int argc, char **argv) {
     context->prefs = new BeOSPrefs();
     context->log = new LogFile("freeamp.log");
     Registrar *registrar= new Registrar();
-    LMCRegistry *lmc;
-    PMIRegistry *pmi;
-    PMORegistry *pmo;
-    UIRegistry* ui;
+    Registry *lmc;
+    Registry *pmi;
+    Registry *pmo;
+    Registry* ui;
     
+    lmc = new Registry();
+#if MP3_PROF
+    {
+	RegistryItem* item = new RegistryItem;
+	item->SetPath("[builtin]");
+	item->SetName("xingmp3-linux.lmc");
+	item->SetDescription("xingmp3-linux.lmc");
+	item->SetInitFunction((InitializeFunction)Initialize);
+	lmc->Add(item);
+    }
+#else
 //    registrar->SetSubDir("lmc");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.lmc");
-    lmc = new LMCRegistry();
     registrar->InitializeRegistry(lmc,context->prefs);
+#endif
 
 //    registrar->SetSubDir("io");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.pmi");
-    pmi = new PMIRegistry;
+    pmi = new Registry;
     registrar->InitializeRegistry(pmi,context->prefs);
 
     registrar->SetSearchString("*.pmo");
-    pmo = new PMORegistry;
+    pmo = new Registry;
     registrar->InitializeRegistry(pmo,context->prefs);
 
 
 //    registrar->SetSubDir("ui");
     registrar->SetSubDir("plugins");
     registrar->SetSearchString("*.ui");
-    ui = new UIRegistry;
+    ui = new Registry;
     registrar->InitializeRegistry(ui,context->prefs);
 
     delete registrar;
@@ -153,69 +146,6 @@ int main(int argc, char **argv) {
     delete pP;
     delete context;
     return 0;
-#endif
-}
-
-#if 0
-void testList() {
-    cout << "Beginning testList..." << endl;
-    List<char *> *pVect = new List<char *>(2);
-    char *p1 = "Hey man!";
-    char *p2 = "Yo dude!";
-    char *p3 = "And, the third.";
-    pVect->AddItem(p1);
-    pVect->AddItem(p2);
-    pVect->AddItem(p3);
-    
-    cout << pVect->ItemAt(0) << endl;
-    cout << pVect->ItemAt(1) << endl;
-    cout << pVect->ItemAt(2) << endl;
-
-    pVect->RemoveItem(1);
-
-    cout << pVect->ItemAt(0) << endl;
-    cout << pVect->ItemAt(1) << endl;
-
-    pVect->RemoveAll();
-
-    if (pVect->ItemAt(0) != NULL) {
-	cout << "Final Test failed!!" << endl;
-    }
-
-    List<DummyUI *> *pVect2 = new List<DummyUI *>(2);
-    DummyUI *pd = new DummyUI(NULL);
-    pVect2->AddItem(pd);
-    pd = new DummyUI(NULL);
-    pVect2->AddItem(pd);
-    pd = new DummyUI(NULL);
-    pVect2->AddItem(pd);
-
-    pVect2->DeleteAll();
-    if (pVect2->ItemAt(0) != NULL) {
-	cout << "Final Test failed!! (2nd one)" << endl;
-   }
-    cout << "Ending testList..." << endl;
-}
-#endif
-
-void testHashTable() {
-    HashTable<int32 *> *pHT = new HashTable<int32 *>();
-    cout << "Adding 'foo'->1" << endl;
-    char *foo = "foo";
-    char *bar = "bar";
-    int32 *bb = new int32;
-    *bb = 1;
-    pHT->Insert(foo,bb);
-    cout << "Adding 'bar'->2" << endl;
-    int32 *bc = new int32;
-    *bc = 2;
-    pHT->Insert(bar,bc);
-
-    int32 *out = pHT->Value(foo);
-    cout << "out 1:  " << *out << endl;
-    out = pHT->Value(bar);
-    cout << "out 2:  " << *out << endl;
-    exit(1);
 }
 
 

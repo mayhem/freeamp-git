@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,363 +21,322 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _PLAYLIST_H_
-#define _PLAYLIST_H_
+#ifndef INCLUDED_PLAYLIST_H_
+#define INCLUDED_PLAYLIST_H_
 
 #include <assert.h>
+#include <string>
+#include <vector>
+#include <functional>
+
+using namespace std;
 
 #include "config.h"
+#include "facontext.h"
 
-#include "list.h"
 #include "errors.h"
-#include "event.h"
-#include "registry.h"
-#include "eventdata.h"
 #include "mutex.h"
-#include "pmi.h"
 #include "thread.h"
+#include "metadata.h"
+#include "playlistformat.h"
+#include "portabledevice.h"
+#include "registry.h"
+#include "plmevent.h"
 
-const int iMaxFileNameLen = 1024;
+typedef enum {
+    kPlaylistSortKey_FirstKey,
+    kPlaylistSortKey_Artist = kPlaylistSortKey_FirstKey,
+    kPlaylistSortKey_Album,
+    kPlaylistSortKey_Title,
+    kPlaylistSortKey_Year,
+    kPlaylistSortKey_Track,
+    kPlaylistSortKey_Genre,
+    kPlaylistSortKey_Time,
+    kPlaylistSortKey_Location,
+    kPlaylistSortKey_LastKey,
+    kPlaylistSortKey_Random // not used with normal sort function
 
-#ifndef WIN32
-#include "std.h"
-#endif
+} PlaylistSortKey;
 
-class PlayListItem {
+typedef enum {
+    PlaylistSortType_Ascending,
+    PlaylistSortType_Descending
+} PlaylistSortType;
+
+typedef enum {
+    kPlaylistKey_FirstKey,
+    kPlaylistKey_MasterPlaylist = kPlaylistKey_FirstKey,
+    kPlaylistKey_ExternalPlaylist,
+    kPlaylistKey_PortablePlaylist,
+    kPlaylistKey_LastKey
+
+} PlaylistKey;
+
+typedef enum {
+    kPlaylistMode_RepeatNone,
+    kPlaylistMode_RepeatOne,
+    kPlaylistMode_RepeatAll
+
+} RepeatMode;
+
+#define kInvalidIndex 0xFFFFFFFF
+
+typedef enum {
+    kPlaylistItemState_Normal,
+    kPlaylistItemState_RetrievingMetaData,
+    kPlaylistItemState_Delete
+
+} PlaylistItemState;
+
+class PlaylistItem {
 
  public:
-    
-    PlayListItem() 
+    PlaylistItem():m_state(kPlaylistItemState_Normal){}
+
+    PlaylistItem(const char* url, const MetaData* metadata = NULL)
     {
-	    m_mie = NULL;
-	    m_url = NULL;
-	    m_pmi = NULL;
-	    m_pmiRegItem = NULL;
-	    m_lmcRegItem = NULL;
-        m_DisplayString = NULL;
-    }
-
-    virtual ~PlayListItem() 
-    {
-	    if (m_mie) 
-        {
-	        delete m_mie;
-	        m_mie = NULL;
-	    }
-
-	    if (m_pmi) 
-        {
-	        delete m_pmi;
-	        m_pmi = NULL;
-	    }
-
-	    m_pmiRegItem = NULL;
-	    m_lmcRegItem = NULL;
-
-	    if (m_url) 
-        {
-	        delete m_url;
-	        m_url = NULL;
-	    }
-        if (m_DisplayString)
-        {
-            delete m_DisplayString;
-            m_DisplayString = NULL;
-        }
-    }
-
-    char* URL() const { return m_url;}
-
-    void SetURL(char* url)
-    { 
         assert(url);
 
         if(url)
-        {
-            if(m_url)
-            {
-                delete [] m_url;
-                m_url = NULL;
-            }
+            SetURL(url);
 
-            m_url = new char[strlen(url) + 1];
-            
-            if(m_url)
-            {
-                strcpy(m_url, url);
-            }
-        }
+        if(metadata)
+            SetMetaData(metadata);
+
+        m_state = kPlaylistItemState_Normal;
     }
 
-    int32 Type() const { return m_type; }
-    void SetType(int32 type) { m_type = type; }
+    virtual ~PlaylistItem() {}
 
-    int32 StartFrame() const { return m_startFrame; }
-    void SetStartFrame(int32 frame) { m_startFrame = frame; }
-
-    char* StringForPlayerToDisplay() const 
-	{ 
-        char* result = NULL;
-
-        if(m_DisplayString)
-            result = m_DisplayString;
-        else if(m_url)
-        {
-            result = strrchr(m_url, '\\');
-
-            if(result)
-                result++;
-            else
-                result = m_url;
-        }
-        else
-            result = "";
-
-		return result;
-	}
-
-    void SetDisplayString(char *pDisplayString)
+    Error SetMetaData(const MetaData* metadata)
     {
-        if (m_DisplayString)
-            delete m_DisplayString;
+        Error result = kError_InvalidParam;
+        assert(metadata);
 
-        m_DisplayString = new char[strlen(pDisplayString) + 1];
-        strcpy(m_DisplayString, pDisplayString);
+        if(metadata)
+        {
+            result = kError_NoErr;
+
+            m_metadata = *metadata;
+        }
+
+        return result;
     }
 
+    const MetaData& GetMetaData() const { return m_metadata; }
 
-    RegistryItem *GetPMIRegistryItem() { return m_pmiRegItem; }
-    void SetPMIRegistryItem(RegistryItem *ri) { m_pmiRegItem = ri; }
-    RegistryItem *GetLMCRegistryItem() { return m_lmcRegItem; }
-    void SetLMCRegistryItem(RegistryItem *ri) { m_lmcRegItem = ri; }
-    MediaInfoEvent *GetMediaInfo() { return m_mie; }
-    void SetMediaInfo(MediaInfoEvent *mie) { m_mie = mie; }
-    PhysicalMediaInput *GetPMI() { return m_pmi; }
-    void SetPMI(PhysicalMediaInput *pmi) { m_pmi = pmi; }
+    Error SetURL(const char* url) { m_url = url; return kError_NoErr;}
+    Error GetURL(char* buf, uint32* len) { return SetBuffer(buf, m_url.c_str(), len); }
+    const string& URL() const { return m_url; }
 
- private:
-    RegistryItem *m_pmiRegItem;
-    RegistryItem *m_lmcRegItem;
-    MediaInfoEvent *m_mie;
-    PhysicalMediaInput *m_pmi;
-
-    char* m_url, *m_DisplayString;
-    int32 m_type;
-    int32 m_startFrame;
-};
-
-
-class PLMGetMediaInfoEvent : public Event {
- private:
-    PlayListItem *m_plItem;
- public:
-    PLMGetMediaInfoEvent() {
-	m_type = CMD_PLMGetMediaInfo;
-	m_plItem = NULL;
-    }
-    virtual ~PLMGetMediaInfoEvent() {}
-    void SetPlayListItem(PlayListItem *pli) { m_plItem = pli; }
-    PlayListItem *GetPlayListItem() { return m_plItem; }
-};
-
-class PLMSetMediaInfoEvent : public Event {
- private:
-    bool m_complete;
-    RegistryItem *m_pmiRegItem;
-    RegistryItem *m_lmcRegItem;
-    MediaInfoEvent *m_mie;
-    PlayListItem *m_pli;
-	 PhysicalMediaInput *m_pmi;
- public:
-    PLMSetMediaInfoEvent() {
-	m_type = CMD_PLMSetMediaInfo;
-	m_complete = false;
-	m_pmiRegItem = NULL;
-	m_lmcRegItem = NULL;
-	m_mie = NULL;
-	m_pli = NULL;
-	m_pmi = NULL;
-    }
-    virtual ~PLMSetMediaInfoEvent() {}
-    void SetPlayListItem(PlayListItem *pli) { m_pli = pli; }
-    PlayListItem *GetPlayListItem() { return m_pli; }
-    void SetComplete() { m_complete = true; }
-    bool IsComplete() { return m_complete; }
-    void SetPMIRegistryItem(RegistryItem *item) { m_pmiRegItem = item; }
-    RegistryItem *GetPMIRegistryItem() { return m_pmiRegItem; }
-    void SetLMCRegistryItem(RegistryItem *item) { m_lmcRegItem = item; }
-    RegistryItem *GetLMCRegistryItem() { return m_lmcRegItem; }
-    void SetMediaInfo(MediaInfoEvent *mie) { m_mie = mie; }
-    MediaInfoEvent *GetMediaInfo() { return m_mie; }
-    PhysicalMediaInput *GetPMI() { return m_pmi; }
-    void SetPMI(PhysicalMediaInput *pmi) { m_pmi = pmi; }
-};
-
-enum ShuffleMode {
-	SHUFFLE_NOT_SHUFFLED = 0,
-	SHUFFLE_RANDOM,                             
-    SHUFFLE_LAST_ENUM
-
-};
-    
-enum RepeatMode {
-	REPEAT_NOT = 0,
-	REPEAT_CURRENT,
-	REPEAT_ALL,
-	REPEAT_LAST_ENUM
-};
-
-class PlayListItemUpdatedEvent : public Event {
-private:
-	PlayListItem* m_item;
-public:
-	PlayListItemUpdatedEvent(PlayListItem* item) 
-    { m_type = INFO_PlayListItemUpdated; m_item = item; }
-	virtual ~PlayListItemUpdatedEvent() {}
-
-	PlayListItem* UpdatedItem() { return m_item; }
-};
-
-class PlayListRepeatEvent : public Event {
-private:
-	RepeatMode m_rm;
-public:
-	PlayListRepeatEvent(RepeatMode rm) 
-    { m_type = INFO_PlayListRepeat; m_rm = rm; }
-	virtual ~PlayListRepeatEvent() {}
-
-	RepeatMode GetRepeatMode() { return m_rm; }
-};
-
-class PlayListShuffleEvent : public Event {
-private:
-	ShuffleMode m_sm;
-public:
-	PlayListShuffleEvent(ShuffleMode sm) 
-    { m_type = INFO_PlayListShuffle; m_sm = sm; }
-	virtual ~PlayListShuffleEvent() {}
-
-	ShuffleMode GetShuffleMode() { return m_sm; }
-};
-
-
-class ShuffleItem {
- public:
-    int32 m_index;
-    int32 m_random;
-};
-
-class PlayListManager {
- public:
-    PlayListManager(EventQueue *);
-    virtual ~PlayListManager();
-    // logical media units to skip at beginning
-    // helps us get past id3v2 tags
-    void SetSkip(int32 f) { m_skipNum = f; } 
-    int32 GetSkip() { return m_skipNum; }
-
-    void AcceptEvent(Event *);
-
-    bool HasAnotherSong();
-
-    PlayListItem *GetCurrent();
-    void SetFirst();
-    void SetNext(bool bUserAction = false);
-    void SetPrev(bool bUserAction = false);
-
-    int32 Current() const {return m_current;}
-    void SetCurrent(int32 index);
-
-    void SetShuffle(ShuffleMode oop);
-    void SetRepeat(RepeatMode rp);
-    ShuffleMode GetOrder() {return m_order;}
-    RepeatMode GetRepeat() {return m_repeat;}
-    Error ToggleRepeat();
-    Error ToggleShuffle();
-
-    PlayListItem* FirstItem();
-	PlayListItem* LastItem();
-
-	bool HasItem(PlayListItem* item);
-	int32 CountItems();
-
-    PlayListItem*   ItemAt(int32 index);
-	int32	        IndexOf(PlayListItem* item);
-
-    virtual	Error AddItem(char *url,int32 type);
-    virtual	Error AddItem(char *url,int32 type, int32 index);
-
-    virtual	Error AddItem(PlayListItem* item);
-    virtual Error AddItem(PlayListItem* item, int32 index);
-    virtual Error AddList(List<PlayListItem*>* items);
-    virtual Error AddList(List<PlayListItem*>* items, int32 index);
-
-    virtual Error           RemoveItem(PlayListItem* item);
-    virtual PlayListItem*   RemoveItem(int32 index);
-    virtual Error           RemoveItems(int32 index, int32 count);
-    virtual Error           RemoveList(List<PlayListItem*>* items);
-    virtual Error           RemoveAll();
-
-    virtual Error           MoveList(List<PlayListItem*>* items, int32 index);
-
-    virtual	void MakeEmpty();
-		    bool IsEmpty();
-
-    void DoForEach(bool (*func)(PlayListItem*));
-    void DoForEach(bool (*func)(PlayListItem*, void*), void*);
-
-    const PlayListItem** Items() const;
-
-    Error ExpandM3U(char *szM3UFile, List<char *> &MP3List);
-    Error ExportToM3U(const char* file);
-    Error ExportToRio(void);
-
+    void SetState(PlaylistItemState state) { m_state = state; }
+    PlaylistItemState GetState() const { return m_state; }
 
  protected:
-    inline int32 CheckIndex(int32 index);
+    Error SetBuffer(char* dest, const char* src, uint32* len)
+    {
+        Error result = kError_InvalidParam;
 
-    void SendInfoToPlayer();
-    void SendShuffleModeToPlayer();
-    void SendRepeatModeToPlayer();
+        assert(dest);
+        assert(src);
+        assert(len);
 
-    void InitializeOrder();
-    void ShuffleOrder();
-    void QuickSortOrderList(int32 first, int32 last);
-    int32 PartitionOrderList(int32 first, int32 last);
+        if(dest && src)
+        {
+            uint32 srclen = strlen(src) + 1;
 
-    inline void GetPLManipLock() { m_mutex->Acquire(WAIT_FOREVER); }
-    inline void ReleasePLManipLock() { m_mutex->Release(); }
+            if(*len >= srclen)
+            {
+                strcpy(dest, src);
+                result = kError_NoErr;
+            }
+            else
+            {
+                result = kError_BufferTooSmall;
+            }
 
-    static void rio_thread_function(void*);
-    void RioThreadFunction();
+            *len = srclen;
+        }
 
-    static BOOL progress_call_back( int pos, int count, void* cookie);
-    BOOL ProgressCallBack( int pos, int count);
-
-    void CreateShuffleList();
-    void QuickSortShuffleList(int32 first, int32 last);
-    int32 PartitionShuffleList(int32 first, int32 last);
+        return result;
+    }
 
  private:
-    
-    EventQueue*			    m_target;
-    List<PlayListItem*>*    m_playList;
-    List<ShuffleItem*>*     m_shuffleList;
-    int32                   m_current;
-    int32                   m_shuffle;;
-    int32                   m_skipNum;
-	Mutex*					m_mutex;
-
-    
-    ShuffleMode             m_order;
-    RepeatMode              m_repeat;
-
-    Thread*                 m_rioThread;
-    char*                   m_txSong;
-
-    
+    MetaData m_metadata;
+    string m_url;
+    PlaylistItemState m_state;
 };
 
+class PlaylistItemSort : public binary_function<PlaylistItem*, PlaylistItem*, bool> {
+
+ public:
+    PlaylistItemSort(PlaylistSortKey sortKey) : m_sortKey(sortKey) { }
+
+    bool operator() (PlaylistItem* item1, PlaylistItem* item2) const;
+   
+ private:
+    PlaylistSortKey m_sortKey;
+};
+
+class PlaylistManager {
+
+ public:
+    PlaylistManager(FAContext* context);
+    virtual ~PlaylistManager();
+
+    // Playlist actions
+    Error SetCurrentItem(PlaylistItem* item);
+    const PlaylistItem* GetCurrentItem();
+    
+    Error SetCurrentIndex(uint32 index);
+    uint32 GetCurrentIndex() const;
+
+    Error GotoNextItem(bool userAction = false);
+    Error GotoPreviousItem(bool userAction = false);
+
+    bool HasAnotherItem();
+
+    Error SetShuffleMode(bool shuffle);
+    bool GetShuffleMode() const {return m_shuffle;}
+    Error SetRepeatMode(RepeatMode mode);
+    RepeatMode GetRepeatMode() const {return m_repeatMode;}
+    Error ToggleRepeatMode();
+    Error ToggleShuffleMode();
+
+    // Functions for adding items to playlist       
+    Error AddItem(const char* url);
+    Error AddItem(const char* url, uint32 index);
+    Error AddItem(PlaylistItem* item, bool queryForMetaData = true);
+    Error AddItem(PlaylistItem* item, uint32 index, bool queryForMetaData = true);
+    Error AddItems(vector<PlaylistItem*>* list, bool queryForMetaData = true);
+    Error AddItems(vector<PlaylistItem*>* list, uint32 index, bool queryForMetaData = true);
+
+    // Functions for removing items from playlist
+    Error RemoveItem(PlaylistItem* item);
+    Error RemoveItem(uint32 index);
+    Error RemoveItems(uint32 index, uint32 count);
+    Error RemoveItems(vector<PlaylistItem*>* items);
+    Error RemoveAll();
+
+    // Functions for moving items around
+    Error SwapItems(uint32 index1, uint32 index2);
+    Error SwapItems(PlaylistItem* item1, PlaylistItem* item2);
+    Error MoveItem(PlaylistItem* item, uint32 index);
+    Error MoveItem(uint32 oldIndex, uint32 newIndex);
+    Error MoveItems(vector<PlaylistItem*>* items, uint32 index);
+
+    // Functions for sorting
+    Error Sort(PlaylistSortKey key, PlaylistSortType type = PlaylistSortType_Ascending);
+    PlaylistSortKey GetPlaylistSortKey() const;
+
+    // Which playlist are we dealing with for purposes of editing:
+    // 1) Master Playlist - list of songs to play
+    // 2) Secondary Playlist - a playlist that we want to edit
+    //      - External playlist
+    //      - Portable playlist
+
+    Error SetActivePlaylist(PlaylistKey key);
+    PlaylistKey GetActivePlaylist() const;
+    Error SetExternalPlaylist(char* url);
+    Error GetExternalPlaylist(char* url, uint32* length);
+    Error SetPortablePlaylist(DeviceInfo* device, 
+                              PLMCallBackFunction function = NULL,
+                              void* cookie = NULL);
+    Error GetPortablePlaylist(DeviceInfo* device);
+
+    // External playlist support
+    Error GetSupportedPlaylistFormats(PlaylistFormatInfo* format, uint32 index);
+    Error ReadPlaylist(const char* url, 
+                       vector<PlaylistItem*>* items = NULL, 
+                       PLMCallBackFunction function = NULL,
+                       void* cookie = NULL);
+
+    Error WritePlaylist(const char* url, 
+                        PlaylistFormatInfo* format, 
+                        vector<PlaylistItem*>* items = NULL,
+                        PLMCallBackFunction function = NULL,
+                        void* cookie = NULL);
+
+    Error WritePlaylist(const char* url,
+                        vector<PlaylistItem*>* items = NULL,
+                        PLMCallBackFunction function = NULL,
+                        void* cookie = NULL);
+
+    // Portable player communication
+    Error GetSupportedPortables(DeviceInfo* device, uint32 index);
+    bool IsPortableAvailable(DeviceInfo* device);
+
+    Error GetDeviceInfo(DeviceInfo* device);
+
+    Error InitializeDevice(DeviceInfo* device, 
+                           PLMCallBackFunction function = NULL,
+                           void* cookie = NULL);
+
+    Error ReadPortablePlaylist(DeviceInfo* device, 
+                               PLMCallBackFunction function = NULL,
+                               void* cookie = NULL);
+    Error SyncPortablePlaylist(DeviceInfo* device, 
+                               PLMCallBackFunction function = NULL,
+                               void* cookie = NULL);
+
+    Error DownloadItemFromPortable(DeviceInfo* device,
+                                   PlaylistItem* item,
+                                   const char* url,
+                                   PLMCallBackFunction function = NULL,
+                                   void* cookie = NULL);
+    // Utility Functions
+    bool            IsEmpty();
+    uint32          CountItems();
+    PlaylistItem*   ItemAt(uint32 index);
+	uint32          IndexOf(PlaylistItem* item);
+    bool            HasItem(PlaylistItem* item);
+
+    void RetrieveMetaData(PlaylistItem* item);
+    void RetrieveMetaData(vector<PlaylistItem*>* list);
+
+ protected:
+    inline uint32 CheckIndex(uint32 index);
+    uint32 InternalIndexOf(vector<PlaylistItem*>* list, PlaylistItem* item);
+
+    void AddItemToShuffleList(PlaylistItem* item);
+    void AddItemsToShuffleList(vector<PlaylistItem*>* list);
+
+    static void metadata_thread_function(void* arg);
+    void MetaDataThreadFunction(vector<PlaylistItem*>* list);
+
+    void InternalSetCurrentIndex(uint32 index);
+
+
+ private:
+
+    FAContext* m_context;
+
+    vector<PlaylistItem*>   m_masterList;
+    vector<PlaylistItem*>   m_externalList;
+    vector<PlaylistItem*>   m_portableList;
+    vector<PlaylistItem*>*  m_activeList; 
+    vector<PlaylistItem*>   m_shuffleList;
+
+    uint32          m_current;
+    bool            m_shuffle;
+    RepeatMode      m_repeatMode;
+    PlaylistKey     m_playlistKey;
+    PlaylistSortKey m_sortKey;
+
+    string      m_externalPlaylist;
+    DeviceInfo  m_portableDevice;
+
+    Mutex       m_mutex;
+
+    Registry m_playlistRegistry;
+    Registry m_portableRegistry;
+    Registry m_metadataRegistry;
+
+    vector<MetaDataFormat*>         m_metadataFormats;
+    vector<PlaylistFormatInfo*>     m_playlistFormats;
+    vector<DeviceInfo*>             m_portablePlayers;
+
+};
 
 #endif // _PLAYLIST_H_
 

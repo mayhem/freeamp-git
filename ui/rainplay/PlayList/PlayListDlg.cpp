@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 
 extern CRainplayUI *g_ui;
 
-BOOL SavePlayListToFile(CString szFile, PlayListManager *plm)
+BOOL SavePlayListToFile(CString szFile, PlaylistManager *plm)
 {
 	if (szFile.GetLength()==0 || !plm || plm->CountItems()==0)
 		return FALSE;
@@ -51,7 +51,7 @@ BOOL SavePlayListToFile(CString szFile, PlayListManager *plm)
 	}
 	return FALSE;
 }
-BOOL ReadPlaylistFromFile(CString szFile, PlayListManager *plm)
+BOOL ReadPlaylistFromFile(CString szFile, PlaylistManager *plm)
 {
 	if (szFile.GetLength()==0 || !plm)
 		return FALSE;

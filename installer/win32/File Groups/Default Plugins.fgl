@@ -1,0 +1,11 @@
+[TopDir]
+file0=..\..\base\win32\prj\plugins\freeamp.ui
+file1=..\..\base\win32\prj\plugins\download.ui
+file2=..\..\base\win32\prj\plugins\musicbrowser.ui
+file3=..\..\base\win32\prj\plugins\xing.lmc
+file4=..\..\base\win32\prj\plugins\fileinput.pmi
+
+[General]
+Type=FILELIST
+Version=1.00.000
+

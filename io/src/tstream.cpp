@@ -2,7 +2,7 @@
    
    FreeAmp - The Free MP3 Player
 
-   Copyright (C) 1998 GoodNoise
+   Copyright (C) 1998-1999 EMusic.com
    Copyright (C) 1999 Alexander Haväng <eel@musiknet.se>
 
    This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@ ____________________________________________________________________________*/
 #endif  
 
 /* project headers */
-#include <config.h>
+#include "config.h"
 #include "tstream.h"
 #include "facontext.h"
 #include "log.h" 

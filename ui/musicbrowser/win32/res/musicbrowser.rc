@@ -1,0 +1,187 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MUSICBROWSER DIALOGEX 0, 0, 359, 180
+STYLE DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Music Browser"
+MENU IDR_MENU1
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Close",IDOK,307,153,50,14
+    CONTROL         "Tree1",IDC_MUSICTREE,"SysTreeView32",TVS_HASBUTTONS | 
+                    TVS_HASLINES | WS_BORDER | WS_TABSTOP,2,19,134,149,
+                    WS_EX_CLIENTEDGE
+    LTEXT           "My Music Catalog:",IDC_MUSICCATALOGTEXT,4,6,59,8
+    LTEXT           "Playlist:",IDC_PLAYLISTTEXT,142,6,24,8
+    PUSHBUTTON      "&Up",IDC_UP,307,21,50,14
+    PUSHBUTTON      "D&elete",IDC_DELETE,307,69,50,14
+    PUSHBUTTON      "&Add",IDC_ADD,307,55,50,14
+    PUSHBUTTON      "&Down",IDC_DOWN,307,35,50,14
+    PUSHBUTTON      "&New List",IDC_NEWLIST,307,108,50,14
+    PUSHBUTTON      "Clear List",IDC_CLEARLIST,307,123,50,14
+    CONTROL         "List1",IDC_PLAYLISTBOX,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | WS_BORDER | WS_TABSTOP,138,19,166,149,
+                    WS_EX_CLIENTEDGE
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,0,357,1
+    PUSHBUTTON      "&Randomize",IDC_RANDOMIZE,307,88,50,14
+    PUSHBUTTON      "Music Search",IDC_SEARCH,84,4,50,13
+    EDITTEXT        IDC_PLAYLISTNAME,169,4,134,13,ES_AUTOHSCROLL | 
+                    ES_READONLY
+END
+
+IDD_OPENURL DIALOG FIXED IMPURE  0, 0, 280, 21
+STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",IDS_URL,"Static",SS_ETCHEDHORZ,-2,0,282,1
+    LTEXT           "URL:",IDS_URL,6,6,17,8
+    EDITTEXT        IDC_URL,29,4,188,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Open URL",IDC_OPEN_URL,222,3,50,13
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_MUSICBROWSER, DIALOG
+    BEGIN
+        RIGHTMARGIN, 357
+<<<<<<< musicbrowser.rc
+        BOTTOMMARGIN, 169
+=======
+        BOTTOMMARGIN, 168
+>>>>>>> 1.1.2.15
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New Playlist",               ID_FILE_NEWPLAYLIST
+        MENUITEM "&Open Playlist",              ID_FILE_OPENPLAYLIST
+        MENUITEM "Save Playlist",               ID_FILE_SAVEPLAYLIST
+        MENUITEM SEPARATOR
+        MENUITEM "Search for &Music",           ID_FILE_SEARCHFORMUSIC
+        MENUITEM SEPARATOR
+        MENUITEM "&Close",                      ID_FILE_EXIT
+    END
+    POPUP "E&dit"
+    BEGIN
+        MENUITEM "&View Info",                  ID_EDIT_VIEWINFO, GRAYED
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "View &playlist only",         ID_VIEW_MUSICCATALOG
+    END
+    POPUP "&Sort"
+    BEGIN
+        MENUITEM "&Artist",                     ID_SORT_ARTIST
+        MENUITEM "Al&bum",                      ID_SORT_ALBUM
+        MENUITEM "&Title",                      ID_SORT_TITLE
+        MENUITEM "&Year",                       ID_SORT_YEAR
+        MENUITEM "Trac&k",                      ID_SORT_TRACK
+        MENUITEM "&Genre",                      ID_SORT_GENRE
+        MENUITEM "&Length",                     ID_SORT_LENGTH
+        MENUITEM "L&ocation",                   ID_SORT_LOCATION
+        MENUITEM "&Random",                     ID_SORT_RANDOMIZE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ARROW               ICON    DISCARDABLE     "arrow.ico"
+IDI_BLANK               ICON    DISCARDABLE     "blank.ico"
+IDI_ACTIVELIST          ICON    DISCARDABLE     "active.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_DRAG                CURSOR  DISCARDABLE     "drag.cur"
+IDC_NODROP              CURSOR  DISCARDABLE     "nodrop.cur"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

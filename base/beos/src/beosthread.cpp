@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ Create( thread_function function, void* arg )
 	m_arg = arg;
 	m_threadHandle = spawn_thread(
 						beosThread::internalThreadFunction,
-						"FreeAmp",
+						BRANDING,
 						beos_priority( m_priority ),
 						this
 						);

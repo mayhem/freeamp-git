@@ -62,8 +62,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
-                           ..\..\..\..\base\win32\prj\plugins
+                                   ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
+                              ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 Debug"
@@ -95,8 +95,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
-                           ..\..\..\..\base\win32\prj\plugins
+                                   ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
+                              ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Debug"
@@ -130,8 +130,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
-                           ..\..\..\..\base\win32\prj\plugins
+                                   ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
+                              ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "soundcard - Win32 NASM Release"
@@ -163,8 +163,8 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
-                                ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
-                           ..\..\..\..\base\win32\prj\plugins
+                                   ..\..\..\..\base\win32\prj\plugins	copy soundcard.pmo\
+                              ..\..\..\..\base\win32\prj\plugins
 # End Special Build Tool
 
 !ENDIF 
@@ -175,6 +175,9 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir\
 # Name "soundcard - Win32 Debug"
 # Name "soundcard - Win32 NASM Debug"
 # Name "soundcard - Win32 NASM Release"
+# Begin Group "src"
+
+# PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=..\..\..\..\config\config.win32
@@ -260,10 +263,6 @@ SOURCE=.\soundcard.def
 # End Source File
 # Begin Source File
 
-SOURCE=..\res\soundcard.rc
-# End Source File
-# Begin Source File
-
 SOURCE=..\src\soundcardpmo.cpp
 # End Source File
 # Begin Source File
@@ -278,5 +277,14 @@ SOURCE=..\..\..\..\base\win32\src\win32prefs.cpp
 
 SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
 # End Source File
+# End Group
+# Begin Group "res"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\res\soundcard.rc
+# End Source File
+# End Group
 # End Target
 # End Project

@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998-1999 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 	Portions Copyright (C) 1999 Mark H. Weaver <mhw@netris.org>
 
 	This program is free software; you can redistribute it and/or modify
@@ -23,16 +23,18 @@
 ____________________________________________________________________________*/
 
 
-#ifndef _UNIXPREFS_H
-#define _UNIXPREFS_H
+#ifndef INCLUDED_UNIXPREFS_H
+#define INCLUDED_UNIXPREFS_H
+
+#include <vector>
+using namespace std;
 
 #include "config.h"
 #include "errors.h"
-#include "list.h"
 #include "preferences.h"
-#include "hashtable.h"
 #include "win32impl.h"
 #include "mutex.h"
+#include "hashtable.h"
 
 class UnixPrefEntry
 {
@@ -80,7 +82,7 @@ class UnixPrefs : public Preferences
     int m_errorLineNumber;      // 0 if no error
     bool m_saveEnable, m_changed;
 
-    List<UnixPrefEntry *> m_entries;
+    vector<UnixPrefEntry *> m_entries;
     HashTable<UnixPrefEntry *> m_ht;
 };
 

@@ -30,8 +30,8 @@ static char THIS_FILE[] = __FILE__;
 
 extern CRainplayUI *g_ui;
 extern BOOL EnumUIFont(CClientDC *dc, LPLOGFONT lpLogFont, CString szFont);
-extern BOOL ReadPlaylistFromFile(CString szFile, PlayListManager *plm);
-extern BOOL SavePlayListToFile(CString szFile, PlayListManager *plm);
+extern BOOL ReadPlaylistFromFile(CString szFile, PlaylistManager *plm);
+extern BOOL SavePlayListToFile(CString szFile, PlaylistManager *plm);
 /////////////////////////////////////////////////////////////////////////////
 // CRainplayDlg dialog
 

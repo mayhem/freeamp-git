@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,141 +21,97 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
+#include <iostream>
 #include "registry.h"
 
 
-Registry::
-Registry()
+Registry::Registry()
 {
-    m_elements = new List<RegistryItem*>();
-    m_count = 0;
+    
 }
 
-Registry::
-~Registry()
+Registry::~Registry()
 {
-    if (m_elements) {
-        m_elements->DeleteAll();
-	    delete m_elements;
-	    m_elements = NULL;
+    uint32 count = m_elements.size();
+
+    for(uint32 i = 0; i < count; i++)
+        delete m_elements[i];
+}
+
+void Registry::AddItem(RegistryItem* item)
+{
+    m_elements.push_back(item);
+}
+
+RegistryItem* Registry::GetItem(int32 index)
+{
+    RegistryItem* result = NULL;
+
+    if(index < (int32) m_elements.size())
+    {
+        result = m_elements[index];
     }
+
+    return result;
 }
 
-void 
-Registry::
-Add(RegistryItem* info)
+int32 Registry::CountItems()
 {
-    if (info) {
-	    m_elements->AddItem(info);
-    }
+    return m_elements.size();
 }
 
-RegistryItem* 
-Registry::
-GetItem(int32 index)
+RegistryItem::RegistryItem()
 {
-    return m_elements->ItemAt(index);
-}
-
-int32 
-Registry::
-GetNumItems()
-{
-    return m_elements->CountItems();
-}
-
-RegistryItem::
-RegistryItem()
-{
-    m_path = NULL;
-    m_description = NULL;
-    m_name = NULL;
     m_init = NULL;
     m_module = NULL;
 }
 
-RegistryItem::
-~RegistryItem()
+RegistryItem::~RegistryItem()
 {
-    if(m_path)
-        delete [] m_path;
-
-    if(m_name)
-        delete [] m_name;
-
-    if(m_description)
-        delete [] m_description;
-
 #ifdef WIN32
     if(m_module)
-        FreeLibrary((HMODULE)m_module);
+        FreeLibrary(m_module);
+
+    m_module = NULL;
 #endif
+
+//    cout << "Delete Registry Item" << endl;
 
 }
 
-void 
-RegistryItem::
-SetPath(char* path)
+void RegistryItem::SetPath(char* path)
 {
     if(path)
     {
-        if(m_path)
-            delete [] m_path;
-
-        m_path = new char [strlen(path) + 1];
-
-        strcpy(m_path, path);
+       m_path = path;
     }
 }
 
-void 
-RegistryItem::
-SetName(char* name)
+void RegistryItem::SetName(char* name)
 {
     if(name)
     {
-        if(m_name)
-            delete [] m_name;
-
-        m_name = new char [strlen(name) + 1];
-
-        strcpy(m_name, name);
+        m_name = name;
     }
 }
  
 
-void 
-RegistryItem::
-SetDescription(char* description)
+void RegistryItem::SetDescription(char* description)
 {
     if(description)
     {
-        if(m_description)
-            delete [] m_description;
-
-        m_description = new char [strlen(description) + 1];
-
-        strcpy(m_description, description);
+        m_description = description;
     }
 }
 
-void 
-RegistryItem::
-SetInitFunction(InitializeFunction function)
+void RegistryItem::SetInitFunction(InitializeFunction function)
 {
     if(function)
         m_init = function;
 }
 
-void 
-RegistryItem::
-SetModule(void* module)
+void RegistryItem::SetModule(ModuleRef module)
 {
     if(module)
         m_module = module;
 }
-

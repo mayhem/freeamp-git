@@ -24,6 +24,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "download"=..\..\..\ui\download\win32\prj\download.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name gdbm
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "dsoundcard"=..\..\..\io\dsound\win32\prj\dsoundcard.dsp - Package Owner=<4>
 
 Package=<5>
@@ -57,34 +72,64 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
+    Project_Dep_Name freeampdev
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name download
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dsoundcard
+    End Project Dependency
+    Begin Project Dependency
     Project_Dep_Name fileinput
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name soundcard
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name xing
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name freeampui
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name freeampdev
+    Project_Dep_Name gdbm
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name httpinput
     End Project Dependency
     Begin Project Dependency
+    Project_Dep_Name id3v1
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name id3v2
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name m3u
+    End Project Dependency
+    Begin Project Dependency
     Project_Dep_Name obsinput
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name simple
+    Project_Dep_Name rmp
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name Rainplay
+    Project_Dep_Name soundcard
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name dsoundcard
+    Project_Dep_Name theme
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name update
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name xing
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name zlib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name pmp300
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name musicbrowser
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name toolbar
     End Project Dependency
 }}}
 
@@ -99,14 +144,20 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
-    Project_Dep_Name fileinput
+    Project_Dep_Name zlib
     End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name soundcard
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name xing
-    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "gdbm"=..\..\..\lib\gdbm\prj\gdbm.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -123,7 +174,97 @@ Package=<4>
 
 ###############################################################################
 
+Project: "id3v1"=..\..\..\plm\metadata\id3v1\prj\id3v1.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "id3v2"=..\..\..\plm\metadata\id3v2\prj\id3v2.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "m3u"=..\..\..\plm\playlist\m3u\prj\m3u.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "musicbrowser"=..\..\..\ui\musicbrowser\win32\prj\musicbrowser.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name gdbm
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "obsinput"=..\..\..\io\obs\win32\prj\obsinput.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "pmp300"=..\..\..\plm\portable\pmp300\prj\pmp300.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name riolib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "riolib"=..\..\..\plm\portable\pmp300\sba\prj\riolib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "rmp"=..\..\..\dlm\rmp\prj\rmp.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -168,7 +309,43 @@ Package=<4>
 
 ###############################################################################
 
+Project: "toolbar"=..\..\..\ui\toolbar\win32\prj\toolbar.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "update"=..\..\..\update\win32\prj\update.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "xing"=..\..\..\lmc\xingmp3\win32\prj\xing.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "zlib"=..\..\..\lib\zlib\prj\zlib.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

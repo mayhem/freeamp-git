@@ -3,7 +3,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1999 EMusic.com 
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ ____________________________________________________________________________*/
 
 
 
-#ifndef _SEMAPHORE_H_
-#define _SEMAPHORE_H_
+#ifndef INCLUDED_SEMAPHORE_H_
+#define INCLUDED_SEMAPHORE_H_
 
 #include <kernel/OS.h>
 #include "mutex.h"

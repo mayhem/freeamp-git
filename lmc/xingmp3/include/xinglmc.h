@@ -1,7 +1,7 @@
 /*____________________________________________________________________________
    
    FreeAmp - The Free MP3 Player
-   Portions Copyright (C) 1998 GoodNoise
+   Portions Copyright (C) 1998-1999 EMusic.com
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 
 ____________________________________________________________________________*/
 
-#ifndef _XINGLMC_H_
-#define _XINGLMC_H_
+#ifndef INCLUDED_XINGLMC_H_
+#define INCLUDED_XINGLMC_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -92,30 +92,31 @@ class     XingLMC:public LogicalMediaConverter
    virtual Error SetEQData(float *);
    virtual Error SetEQData(bool);
 
-   virtual bool CanHandleExt(char *ext);
+   virtual vector<char *> *GetExtensions(void);
+   
  private:
 
    static void          DecodeWorkerThreadFunc(void *);
    void                 DecodeWork();
-	Error                BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
-                             bool bBufferUp = true);
-	Error                BlockingBeginRead(void *&pBuffer, 
+   Error                BeginRead(void *&pBuffer, unsigned int iBytesNeeded,
+                                  bool bBufferUp = true);
+   Error                BlockingBeginRead(void *&pBuffer, 
                                           unsigned int iBytesNeeded);
-	Error                AdvanceBufferToNextFrame();
-	Error                GetHeadInfo();
+   Error                AdvanceBufferToNextFrame();
+   Error                GetHeadInfo();
 
    PhysicalMediaInput  *m_pPmi;
    PhysicalMediaOutput *m_pPmo;
 
    int                  m_iMaxWriteSize;
    int32                m_frameBytes, m_iBufferUpInterval, m_iBufferSize;
-	MPEG_HEAD            m_sMpegHead;
-	int32                m_iBitRate;
+   MPEG_HEAD            m_sMpegHead;
+   int32                m_iBitRate;
    bool                 m_bBufferingUp;
    Thread              *m_decoderThread;
 
    int32                m_frameCounter;
-	time_t               m_iBufferUpdate;
+   time_t               m_iBufferUpdate;
    char                *m_szUrl;
    const char          *m_szError;
    AUDIO                m_audioMethods; 

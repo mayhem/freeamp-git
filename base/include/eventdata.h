@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -21,18 +21,19 @@
         $Id$
 ____________________________________________________________________________*/
 
-#ifndef _EVENTDATA_H_
-#define _EVENTDATA_H_
+#ifndef INCLUDED_EVENTDATA_H_
+#define INCLUDED_EVENTDATA_H_
 
-#include <iostream.h>
 #include <string.h>
 #include <stdlib.h>
 
-//#include "lmc.h"
-// #include "playlist.h"
+#include <iostream>
+#include <vector>
+using namespace std;
+
 #include "event.h"
-#include "id3v1.h"
-#include "list.h"
+#include "playlist.h"
+#include "utility.h"
 
 class     LogicalMediaConverter;
 
@@ -59,7 +60,7 @@ class     UserMessageEvent:public Event
    UserMessageEvent(const char *info)
    {
       m_type = INFO_UserMessage;
-      m_info = strdup(info);
+      m_info = strdup_new(info);
    }
    const char *GetInfo()
    {
@@ -89,7 +90,7 @@ class     StatusMessageEvent:public Event
    StatusMessageEvent(const char *info)
    {
       m_type = INFO_StatusMessage;
-      m_info = strdup(info);
+      m_info = strdup_new(info);
    }
    const char *GetStatusMessage()
    {
@@ -97,67 +98,70 @@ class     StatusMessageEvent:public Event
    }
 };
 
-class     PlayListItem;
-class     PLMGetMediaTitleEvent:public Event
+class     BrowserMessageEvent:public Event
 {
-   public:
-
-   PLMGetMediaTitleEvent(void)
-   {
-      m_type = CMD_PLMGetMediaTitle;
-   }
-
-   virtual ~ PLMGetMediaTitleEvent(void)
-   {
-   };
-
-   void      SetPlayListItem(PlayListItem * pItem)
-   {
-      m_pItem = pItem;
-   }
-   PlayListItem *GetPlayListItem(void)
-   {
-      return m_pItem;
-   }
-
    private:
+   char     *m_info;
 
-             PlayListItem * m_pItem;
-
+   public:
+   virtual ~ BrowserMessageEvent()
+   {
+      if (m_info)
+      {
+         delete    m_info;
+      }
+   }
+   BrowserMessageEvent()
+   {
+      m_type = INFO_BrowserMessage;
+      m_info = "";
+   }
+   BrowserMessageEvent(const char *info)
+   {
+      m_type = INFO_BrowserMessage;
+      m_info = strdup_new(info);
+   }
+   const char *GetBrowserMessage()
+   {
+      return m_info;
+   }
 };
 
 class     MediaInfoEvent:public Event
 {
    public:
 
-   List < Event * >*m_childEvents;
-   bool      m_filled;
-   float     m_totalSeconds;
-   int32     m_indexOfSong;
-   int32     m_totalSongs;
-   char      m_filename[512];
-   uint32    m_plmID;
+   vector<Event*>*  m_childEvents;
+   bool             m_filled;
+   float            m_totalSeconds;
+   int32            m_indexOfSong;
+   int32            m_totalSongs;
+   char             m_filename[512];
+   uint32           m_plmID;
 
    virtual ~ MediaInfoEvent()
    {
-      if (m_childEvents)
+      if (m_childEvents && (m_childEvents->size() != 0))
       {
-         m_childEvents->DeleteAll();
-         delete    m_childEvents;
-                   m_childEvents = NULL;
+            vector<Event *>::iterator i = m_childEvents->begin();
+
+            for (; i != m_childEvents->end(); i++) 
+                delete *i;
+            delete m_childEvents;
+            m_childEvents = NULL;
       }
    }
+
    MediaInfoEvent()
    {
       m_type = INFO_MediaInfo;
       m_filled = false;
       m_filename[0] = '\0';
-      m_childEvents = new List < Event * >();
+      m_childEvents = new vector<Event *>;
    }
+
    MediaInfoEvent(MediaInfoEvent &other)
    {
-      Event *pEvent;
-
       m_type = other.m_type;
       m_filled = other.m_filled;
       m_totalSeconds = other.m_totalSeconds;
@@ -165,21 +169,19 @@ class     MediaInfoEvent:public Event
       m_totalSongs = other.m_totalSongs;
       strcpy(m_filename, other.m_filename);
 
-      m_childEvents = new List <Event *>();
+      m_childEvents = new vector <Event *>;
 
-      for(;;)
-      {
-          pEvent = other.m_childEvents->RemoveItem(0);
-          if (pEvent == NULL)
-              break;
+      m_childEvents->insert(m_childEvents->end(), 
+                            other.m_childEvents->begin(),
+                            other.m_childEvents->end());
 
-          m_childEvents->AddItem(pEvent, 0);
-      }
+      other.m_childEvents->clear();
    }
+
    MediaInfoEvent(const char *fn,
                   float ts)
    {
-      m_childEvents = new List < Event * >();
+      m_childEvents = new vector<Event *>;
       m_filled = true;
       m_type = INFO_MediaInfo;
       m_totalSeconds = ts;
@@ -200,7 +202,7 @@ class     MediaInfoEvent:public Event
    {
       if (pE)
       {
-         m_childEvents->AddItem(pE);
+         m_childEvents->push_back(pE);
       }
    }
 };
@@ -395,29 +397,10 @@ class     MpegInfoEvent:public Event
    {
       return m_crc;
    }
-   virtual ~ MpegInfoEvent()
+   virtual ~MpegInfoEvent()
    {
    }
 
-};
-
-class     ID3TagEvent:public Event
-{
-   private:
-   Id3TagInfo m_tagInfo;
-   public:
-   ID3TagEvent(Id3TagInfo & t)
-   {
-      m_type = INFO_ID3TagInfo;
-      m_tagInfo = t;
-   }
-   Id3TagInfo GetId3Tag()
-   {
-      return m_tagInfo;
-   }
-   virtual ~ ID3TagEvent()
-   {
-   }
 };
 
 #define _EQUALIZER_ENABLE_
@@ -557,6 +540,119 @@ public:
       strncpy(szTitle, m_streamTitle, iSize - 1);
       szTitle[iSize - 1] = 0;
    }
+};
+
+class PlaylistItemAddedEvent : public Event {
+private:
+	const PlaylistItem* m_item;
+public:
+	PlaylistItemAddedEvent(const PlaylistItem* item) 
+    { m_type = INFO_PlaylistItemAdded; m_item = item; }
+	virtual ~PlaylistItemAddedEvent() {}
+
+	const PlaylistItem* Item() { return m_item; }
+};
+
+class PlaylistItemRemovedEvent : public Event {
+private:
+	const PlaylistItem* m_item;
+public:
+	PlaylistItemRemovedEvent(const PlaylistItem* item) 
+    { m_type = INFO_PlaylistItemRemoved; m_item = item; }
+	virtual ~PlaylistItemRemovedEvent() {}
+
+	const PlaylistItem* Item() { return m_item; }
+};
+
+class PlaylistItemUpdatedEvent : public Event {
+private:
+	const PlaylistItem* m_item;
+public:
+	PlaylistItemUpdatedEvent(const PlaylistItem* item) 
+    { m_type = INFO_PlaylistItemUpdated; m_item = item; }
+	virtual ~PlaylistItemUpdatedEvent() {}
+
+	const PlaylistItem* Item() { return m_item; }
+};
+
+class PlaylistCurrentItemInfoEvent : public Event {
+private:
+	const PlaylistItem* m_item;
+public:
+	PlaylistCurrentItemInfoEvent(const PlaylistItem* item) 
+    { m_type = INFO_PlaylistCurrentItemInfo; m_item = item; }
+	virtual ~PlaylistCurrentItemInfoEvent() {}
+
+	const PlaylistItem* Item() { return m_item; }
+};
+
+
+class PlaylistRepeatEvent : public Event {
+private:
+	RepeatMode m_rm;
+public:
+	PlaylistRepeatEvent(RepeatMode rm) 
+    { m_type = INFO_PlaylistRepeat; m_rm = rm; }
+	virtual ~PlaylistRepeatEvent() {}
+
+	RepeatMode GetRepeatMode() { return m_rm; }
+};
+
+class PlaylistShuffleEvent : public Event {
+private:
+	bool m_sm;
+public:
+	PlaylistShuffleEvent(bool sm) 
+    { m_type = INFO_PlaylistShuffle; m_sm = sm; }
+	virtual ~PlaylistShuffleEvent() {}
+
+	bool GetShuffleMode() { return m_sm; }
+};
+
+class DownloadItem;
+
+class DownloadItemAddedEvent : public Event {
+public:
+    DownloadItemAddedEvent(DownloadItem* item) 
+    { m_type = INFO_DownloadItemAdded; m_item = item; }
+	virtual ~DownloadItemAddedEvent() {}
+
+	DownloadItem* Item() { return m_item; }
+private:
+    DownloadItem* m_item;
+};
+
+class DownloadItemRemovedEvent : public Event {
+public:
+    DownloadItemRemovedEvent(DownloadItem* item) 
+    { m_type = INFO_DownloadItemRemoved; m_item = item; }
+	virtual ~DownloadItemRemovedEvent() {}
+
+	DownloadItem* Item() { return m_item; }
+private:
+    DownloadItem* m_item;
+};
+
+class DownloadItemNewStateEvent : public Event {
+public:
+    DownloadItemNewStateEvent(DownloadItem* item) 
+    { m_type = INFO_DownloadItemNewState; m_item = item; }
+	virtual ~DownloadItemNewStateEvent() {}
+
+	DownloadItem* Item() { return m_item; }
+private:
+    DownloadItem* m_item;
+};
+
+class DownloadItemProgressEvent : public Event {
+public:
+    DownloadItemProgressEvent(DownloadItem* item) 
+    { m_type = INFO_DownloadItemProgress; m_item = item; }
+	virtual ~DownloadItemProgressEvent() {}
+
+	DownloadItem* Item() { return m_item; }
+private:
+    DownloadItem* m_item;
 };
 
 #endif /* _EVENTDATA_H_ */

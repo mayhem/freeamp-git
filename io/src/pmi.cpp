@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -51,7 +51,6 @@ ____________________________________________________________________________*/
 PhysicalMediaInput::PhysicalMediaInput(FAContext *context):
                 PipelineUnit(context)
 {
-    m_pID3Tag = NULL;
     m_path = NULL;
 }
 
@@ -67,15 +66,9 @@ PhysicalMediaInput::~PhysicalMediaInput()
        delete m_path;
        m_path = NULL;
     }
-
-    if (m_pID3Tag)
-    {
-       delete m_pID3Tag;
-       m_pID3Tag = NULL;
-    }
 }
 
-Error PhysicalMediaInput::SetTo(char *url)
+Error PhysicalMediaInput::SetTo(const char *url)
 {
     delete m_path;
 
@@ -83,38 +76,6 @@ Error PhysicalMediaInput::SetTo(char *url)
     strcpy(m_path, url);
 
     return kError_NoErr;
-}
-
-Error PhysicalMediaInput::GetID3v1Tag(Id3TagInfo &sTag)
-{
-    Error eRet = kError_NoErr;
-
-    if (m_pOutputBuffer == NULL)
-    {
-        eRet = Open();
-        if (!IsError(eRet))
-        {
-            if (m_pID3Tag)
-            {
-               memcpy(&sTag, m_pID3Tag, iID3TagSize);
-            }
-            else
-               eRet = kError_NoDataAvail;
-        }
-       
-        Close();
- 
-        return eRet;
-    }
-    else
-    {
-       if (m_pID3Tag)
-          memcpy(&sTag, m_pID3Tag, iID3TagSize);
-       else
-          eRet = kError_NoDataAvail;
-
-       return eRet;
-    }
 }
 
 Error PhysicalMediaInput::Close(void)

@@ -1,6 +1,6 @@
 // $Id$
-#ifndef _SOUND_UTILS_H
-#define _SOUND_UTILS_H
+#ifndef INCLUDED_SOUND_UTILS_H
+#define INCLUDED_SOUND_UTILS_H
 
 #include "config.h"
 #include <support/SupportDefs.h> 

@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _SIMPLE_UI_H_
-#define _SIMPLE_UI_H_
+#ifndef INCLUDED_SIMPLE_UI_H_
+#define INCLUDED_SIMPLE_UI_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -48,13 +48,8 @@ class SimpleUI : public UserInterface {
     SimpleUI(FAContext *context);
     ~SimpleUI();
 
-    virtual Error Init(int32 startup_type) { return kError_NoErr;}
-    virtual void SetTarget(EventQueue*);
+    virtual Error Init(int32 startup_type);
     virtual int32 AcceptEvent(Event*);
-    virtual void SetArgs(int32,char**);
-    virtual void SetPlayListManager(PlayListManager*);
-    virtual Error SetPropManager(Properties* p) 
-    { m_propManager = p; if (p) return kError_NoErr; else return kError_UnknownErr; }
     void CreateUI();
 
     static BOOL CALLBACK MainProc(	HWND hwnd, 
@@ -75,15 +70,15 @@ class SimpleUI : public UserInterface {
     Preferences*    m_prefs;
     int32		    m_state;
 
-
-
  protected:
+    void ParseArgs(int32 argc, char** argv);
+
     static void UIThreadFunc(void *);
 
     FAContext*		m_context;
 
  private:
-    PlayListManager*    m_plm;
+    PlaylistManager*    m_plm;
     Properties*         m_propManager;
     int32			    m_totalSeconds;
     float			    m_secondsPerFrame;

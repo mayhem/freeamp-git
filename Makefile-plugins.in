@@ -4,7 +4,6 @@
 RELOC = @FPIC@
 
 include config/Makefile.header
-INSTALL_PROGRAM = @INSTALL@
 
 plugins-install install_plugins: install-plugins
 
@@ -28,18 +27,26 @@ uninstall_plugins uninstall-plugins:
 OSDEPPLUGINS = @OSDEPPLUGINS@
 
 clean-plugins plugins-clean:
-	-rm -f $(LFIOBJ) $(HTTPOBJ) $(SCPMOOBJ) $(CMDUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) plugins/*.*
+	-rm -f $(ZLIBOBJ) $(MUSICBROWSEROBJ) $(MAKETHEMEOBJ) $(LFIOBJ) $(HTTPOBJ) $(OBSPMI) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(DOWNLOADUIOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(FREEAMPUIOBJ) $(ID3V1OBJ) $(ID3V2OBJ) $(M3UOBJ) $(PMP300OBJ) $(XINGLMCOBJ) MakeTheme plugins/*.*
 
-PLUGINS =  plugins/localfileinput.pmi
+PLUGINS =  lib/zlib/lib/libzlib.a
+PLUGINS += plugins/localfileinput.pmi
 PLUGINS += plugins/httpinput.pmi
 PLUGINS += plugins/obsinput.pmi
+
 PLUGINS += plugins/soundcard.pmo
+
 PLUGINS += plugins/freeampcmd.ui
 PLUGINS += plugins/mpg123.ui
-#PLUGINS += plugins/ncurses.ui
 PLUGINS += plugins/lcd.ui
 PLUGINS += plugins/irman.ui
+
 PLUGINS += plugins/xingmp3.lmc
+
+PLUGINS += plugins/id3v1.mdf
+PLUGINS += plugins/id3v2.mdf
+
+PLUGINS += plugins/m3u.plf
 
 plugins plugins-cc: $(PLUGINS) $(OSDEPPLUGINS)
 
@@ -94,10 +101,53 @@ plugins/alsa.pmo: $(ALSAOBJ)
 ESNDOBJ = io/esound/src/esoundpmo.o io/src/pipeline.o io/src/pmo.o
 
 plugins/esound.pmo: $(ESNDOBJ)
-	$(LINKMOD) -o $@ $(ESNDOBJ) @ESD_LIBS@
+	echo "$(ESD_LIBS)"
+	$(LINKMOD) -o $@ $(ESNDOBJ) $(ESD_LIBS)
 
 #
 # UI section
+
+# download manager ui
+DOWNLOADUIOBJ = ui/download/unix/src/downloadui.o \
+                ui/download/unix/src/gtkdownloadui.o
+
+plugins/download.ui: $(DOWNLOADUIOBJ)
+	$(LINKMOD) -o $@ $(DOWNLOADUIOBJ) $(GTK_LIBS)
+
+# musicbrowser ui
+MUSICBROWSEROBJ = ui/musicbrowser/unix/gtkmusicbrowser.o \
+                  ui/musicbrowser/src/musicbrowser.o \
+                  ui/musicbrowser/unix/infoeditor.o \
+                  ui/musicbrowser/unix/fileselector.o \
+                  ui/musicbrowser/unix/browsermenu.o
+
+plugins/musicbrowser.ui: $(MUSICBROWSEROBJ)
+	$(LINKMOD) -o $@ $(MUSICBROWSEROBJ) $(GTK_LIBS)
+
+# freeamp ui
+FREEAMPUIOBJ = ui/freeamp/src/Theme.doh ui/freeamp/src/Bitmap.o \
+               ui/freeamp/src/Canvas.o ui/freeamp/src/SliderControl.o \
+               ui/freeamp/src/Window.o ui/freeamp/src/ButtonControl.o \
+               ui/freeamp/src/Control.o ui/freeamp/src/TextControl.o \
+               ui/freeamp/src/DialControl.o ui/freeamp/src/Font.o \
+               ui/freeamp/src/FreeAmpTheme.o ui/freeamp/src/ThemeZip.o \
+               ui/freeamp/src/MultiStateControl.o \
+               ui/freeamp/unix/src/GTKFont.o ui/freeamp/unix/src/GTKUtility.o \
+               ui/freeamp/unix/src/GTKMessageDialog.o \
+               ui/freeamp/unix/src/GTKWindow.o ui/freeamp/unix/src/GTKBitmap.o \
+               ui/freeamp/unix/src/GTKCanvas.o \
+	       ui/freeamp/unix/src/ThemeManager.o \
+               ui/freeamp/unix/src/GTKPreferenceWindow.o 
+
+plugins/freeamp.ui: $(FREEAMPUIOBJ)
+	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) lib/zlib/lib/libzlib.a $(GTK_LIBS)
+
+# MakeTheme, only built if we're building the theme.ui
+
+MAKETHEMEOBJ = ui/freeamp/tools/src/MakeTheme.o ui/freeamp/src/ThemeZip.o
+
+MakeTheme: $(MAKETHEMEOBJ)
+	$(CXXLINK) $(MAKETHEMEOBJ) lib/zlib/lib/libzlib.a 
 
 # cmdline
 CMDUIOBJ = ui/cmdline/cmdlineUI.o
@@ -121,7 +171,7 @@ plugins/ncurses.ui: $(NCURSESUIOBJ)
 LCDUIOBJ = ui/lcd/src/lcdui.o ui/lcd/src/sockets.o
 
 plugins/lcd.ui: $(LCDUIOBJ)
-	$(LINKMOD) -o $@ $(LCDUIOBJ) $(X_EXTRA_LIBS)
+	$(LINKMOD) -o $@ $(LCDUIOBJ)
 
 # IRman
 IRMANUIOBJ = ui/irman/src/irmanui.o ui/irman/src/ircmd.o 
@@ -129,19 +179,6 @@ IRMANUIOBJ += ui/irman/src/irfunc.o ui/irman/src/irio.o
 
 plugins/irman.ui: $(IRMANUIOBJ)
 	$(LINKMOD) -o $@ $(IRMANUIOBJ)
-
-GTKUIOBJ = ui/gtk/freeamp-gtk.o
-
-plugins/gtk.ui: $(GTKUIOBJ)
-	$(LINKMOD) -o $@ $(GTKUIOBJ) -lgtk
-
-# The studly X11 freeamp interface
-FREEAMPUIOBJ = ui/freeamp/unix/src/freeamp.o ui/freeamp/unix/src/windowhash.o
-FREEAMPUIOBJ += ui/freeamp/unix/src/res.o ui/freeamp/unix/src/fawindow.o
-
-plugins/freeamp.ui: $(FREEAMPUIOBJ)
-	$(LINKMOD) -o $@ $(FREEAMPUIOBJ) $(X_LIBS) $(X_EXTRA_LIBS) -lXpm
-
 
 #
 # LMC section
@@ -169,8 +206,52 @@ XINGLMCOBJ = $(XINGLMCOBJC) $(XINGLMCOBJCXX)
 plugins/xingmp3.lmc: $(XINGLMCOBJ)
 	$(LINKMOD) -o $@ $(XINGLMCOBJ)
 
+
+# MDF section 
+
+#id3v1
+ID3V1OBJ = plm/metadata/id3v1/id3v1.o
+
+plugins/id3v1.mdf: $(ID3V1OBJ)
+	$(LINKMOD) -o $@ $(ID3V1OBJ)
+
+#id3v2
+ID3V2OBJ = plm/metadata/id3v2/id3v2.o
+
+plugins/id3v2.mdf: $(ID3V2OBJ)
+	$(LINKMOD) -o $@ $(ID3V2OBJ)
+
+# PLF section
+
+#m3u
+M3UOBJ = plm/playlist/m3u/m3u.o
+
+plugins/m3u.plf: $(M3UOBJ)
+	$(LINKMOD) -o $@ $(M3UOBJ)
+
+
+# PPP section
+
+#pmp300
+PMP300OBJ = plm/portable/pmp300/pmp300.o plm/portable/pmp300/sba/rio.o
+
+plugins/pmp300.ppp: $(PMP300OBJ)
+	$(LINKMOD) -o $@ $(PMP300OBJ)
+
+# zlib section
+
+ZLIBOBJ  = lib/zlib/src/adler32.o lib/zlib/src/compress.o lib/zlib/src/crc32.o
+ZLIBOBJ += lib/zlib/src/deflate.o lib/zlib/src/gzio.o lib/zlib/src/infblock.o
+ZLIBOBJ += lib/zlib/src/infcodes.o lib/zlib/src/inffast.o lib/zlib/src/inflate.o
+ZLIBOBJ += lib/zlib/src/inftrees.o lib/zlib/src/infutil.o lib/zlib/src/trees.o
+ZLIBOBJ += lib/zlib/src/uncompr.o lib/zlib/src/zutil.o
+
+lib/zlib/lib/libzlib.a: $(ZLIBOBJ)
+	+test -d lib/zlib/lib || mkdir lib/zlib/lib 
+	$(LIBMOD) $@ $(ZLIBOBJ)
+
 depend:
-	makedepend -fMakefile-plugins -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(LFIOBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) | sed -e 's,\.o,.cpp,g'`
+	makedepend -fMakefile-plugins -- $(DEFS) $(INCLUDES) $(CFLAGS) -- `echo $(LFIOBJ) $(THEMEUIOBJ) $(MUSICBROWSEROBJ) $(HTTPOBJ) $(SCPMOOBJ) $(ALSAOBJ) $(ESNDOBJ) $(CMDUIOBJ) $(MPG123UIOBJ) $(NCURSESUIOBJ) $(LCDUIOBJ) $(IRMANUIOBJ) $(GTKUIOBJ) $(FREEAMPUIOBJ) $(XINGLMCOBJ) $(PMP300OBJ) $(M3UOBJ) $(ID3V1OBJ) $(ID3V2OBJ) | sed -e 's,\.o,.cpp,g' | sed -e 's,\.doh,.cpp,g'`
  
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 

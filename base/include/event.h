@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,15 +21,16 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _EVENT_H_
-#define _EVENT_H_
+#ifndef INCLUDED_EVENT_H_
+#define INCLUDED_EVENT_H_
 
 #include "config.h"
 
 class Event {
 
  public:
-    Event(int32 c) { m_type = c; }
+    Event(int32 c) 
+        { m_type = c; };
 
     virtual ~Event() {}
     int32 Type() { return m_type; }
@@ -37,7 +38,6 @@ class Event {
  protected:
     Event() {}
     int32 m_type;
- 
 };
 
 class EventQueue {
@@ -56,7 +56,7 @@ class EventQueue {
 #define CMD_Cleanup             8  // player tells modules to cleanup and get ready for termination (no arg)
 //#define CMD_Terminate           9  // is sent by player to COOs, and the DummyCOO makes the main thread delete player and exit (no arg)
 #define INFO_ReadyToDieUI      10 // sent by CIO to player notifying it that their cleanup has completed. (if arg !null, it is a ptr to this module, it wants to be deleted)
-#define INFO_PlayListDonePlay   11 // sent by player when the playlist has been exhausted (no arg)
+#define INFO_PlaylistDonePlay   11 // sent by player when the playlist has been exhausted (no arg)
 #define INFO_DoneOutputting     12 // sent by PMO (or LMC controlling PMO) to Player when its done outputing (i.e. playing is done)
 #define CMD_KillEventThread     13 // sent by player to various modules so they kill their event threads before deletion (no arg)
 #define CMD_StartRead           14 // sent by player to PMI to start/continue reading bytes from source to its output buffer (no arg)
@@ -74,14 +74,13 @@ class EventQueue {
 #define INFO_LMCError           28 // sent by LMC to player to signal an error condition in the decoder
 #define INFO_MPEGInfo			29 // info about MPEG stuff (layer, samprate, etc.)
 #define INFO_ID3TagInfo			30 // info about ID3 tag
-#define CMD_PLMGetMediaInfo             31 // sent by PlayListManager to player to get vital info about a particular playlistitem
-#define CMD_PLMSetMediaInfo             32 // sent by Player to PlayListManger to set the info the PLM requested.
-#define INFO_PlayListRepeat     33 // sent by PLM to player to inform of a setting of repeat mode
-#define INFO_PlayListShuffle    34 // sent by PLM to player to inform of a setting of shuffle mode
-#define INFO_PlayListUpdated	35 // sent by PLM to player to inform of a playlist update
-#define INFO_PlayListItemUpdated    36 // sent by PLM to player to inform of a playlistitem update
+#define CMD_PLMGetMediaInfo             31 // sent by PlaylistManager to player to get vital info about a particular playlistitem
+#define CMD_PLMSetMediaInfo             32 // sent by Player to PlaylistManger to set the info the PLM requested.
+#define INFO_PlaylistRepeat     33 // sent by PLM to player to inform of a setting of repeat mode
+#define INFO_PlaylistShuffle    34 // sent by PLM to player to inform of a setting of shuffle mode
+#define INFO_PlaylistUpdated	35 // sent by PLM to player to inform of a playlist update
+#define INFO_PlaylistItemUpdated    36 // sent by PLM to player to inform of a playlistitem update
 #define INFO_UserMessage        37 // sent by UI to Player, diseminated by Player to each UI
-
 #define _EQUALIZER_ENABLE_
 #ifdef  _EQUALIZER_ENABLE_
 #define CMD_SetEQData                   38      //set EQ data
@@ -101,20 +100,31 @@ class EventQueue {
 #define INFO_BufferingEnd         43 // Network rebuffering just stopped
 #define INFO_BufferStatus         44 // Buffer percent full information
 
-#define CMD_PLMGetMediaTitle      45 // sent by PlayListManager to player to get title about a particular playlistitem
+#define CMD_PLMGetMediaTitle      45 // sent by PlaylistManager to player to get title about a particular playlistitem
 #define INFO_StatusMessage      46 // sent to UIs so they can display status info
 
 #define INFO_VolumeInfo         47
 #define INFO_StreamInfo         48
 
+
+#define INFO_SearchMusicDone    49 // sent by the music search thread on completion
+#define INFO_BrowserMessage     50 // status updates sent to the music browser
+
+#define INFO_DownloadItemAdded    51  // sent by DownloadManager to UIs by way of Player so the UIs know that an item has been added to the download manager
+#define INFO_DownloadItemRemoved  52  // sent by DownloadManager to UIs by way of Player so the UIs know that an item has been removed from the download manager
+#define INFO_DownloadItemNewState 53  // sent by DownloadManager to UIs by way of Player so the UIs know that an item in the download manager has changed state
+#define INFO_DownloadItemProgress 54  // sent by DownloadManager to UIs by way of Player so the UIs know that progress has been made on a download
+
+#define CMD_ToggleDownloadUI     55 // sent to the DownloadManager UI via Player to toggle its visibility
+#define CMD_TogglePlaylistUI     56 // sent to the MusicBrowserUI via Player to popup/disappear in Playlist Manager ui mode
+#define CMD_ToggleMusicBrowserUI 57 // sent to the MusicBrowserUI via the Player to popup/disappear in MusicBrowser mode
+
+#define INFO_PlaylistItemAdded    58 // sent by PLM to player to inform of a playlistitem update
+#define INFO_PlaylistItemRemoved    59 // sent by PLM to player to inform of a playlistitem update
+#define INFO_PlaylistCurrentItemInfo 60 // sent by PLM to player to inform of the current items info
+#define INFO_PrefsChanged           61 // send by a preferences window whenever the preferences changed
+#define INFO_ActivePlaylistChanged 62 // sent by the player when a playlist becomes the active playlist
+#define INFO_ActivePlaylistCleared 63 // sent by the player when the active playlist is no longer needed
+
 #endif // _EVENT_H_
-
-
-
-
-
-
-
-
-
 

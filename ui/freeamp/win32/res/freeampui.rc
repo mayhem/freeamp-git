@@ -1,0 +1,341 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PREF1 DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "General"
+FONT 8, "MS Sans Serif"
+BEGIN
+    COMBOBOX        IDC_UI,81,13,125,50,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_PMO,81,31,125,54,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Slider1",IDC_PRIORITY,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    WS_TABSTOP,9,66,214,15
+    EDITTEXT        IDC_INPUT,73,122,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_OUTPUT,73,138,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_PREBUFFER,73,154,25,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Stay on top",IDC_STAYONTOP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,153,126,52,10
+    CONTROL         "Manifest in Tray instead of Taskbar",IDC_TRAY,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,153,145,75,
+                    17
+    LTEXT           "User Interface:",IDC_STATIC,27,15,48,8
+    LTEXT           "Output:",IDC_STATIC,50,32,25,8
+    GROUPBOX        "Plug-Ins",IDC_STATIC,3,2,227,48
+    GROUPBOX        "Decoder Priority",IDC_STATIC,3,54,227,52
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,110,136,60
+    LTEXT           "Input Buffer Size:",IDC_STATIC,13,124,57,8
+    LTEXT           "Output Buffer Size:",IDC_STATIC,8,140,60,8
+    LTEXT           "Kilobytes",IDC_STATIC,103,124,29,8
+    LTEXT           "Kilobytes",IDC_STATIC,103,140,29,8
+    LTEXT           "Low",IDC_STATIC,41,84,14,8
+    LTEXT           "Normal",IDC_STATIC,104,84,23,8
+    LTEXT           "High",IDC_STATIC,175,84,16,8
+    LTEXT           "Realtime",IDC_STATIC,199,84,28,8
+    GROUPBOX        "Misc",IDC_STATIC,145,110,85,60
+    LTEXT           "Idle",IDC_STATIC,10,84,12,8
+    CTEXT           "Below Normal",IDC_STATIC,69,84,29,15
+    CTEXT           "Above Normal",IDC_STATIC,135,84,27,16
+    LTEXT           "Prebuffer Streams:",IDC_STATIC,9,156,59,8
+    LTEXT           "Seconds",IDC_STATIC,103,156,29,8
+END
+
+IDD_PREF3 DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Debug"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "",IDC_STATIC,3,84,227,86
+    LTEXT           " ",IDC_STATIC,9,84,8,8
+    CONTROL         "Enable Logging",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,11,83,63,10
+    CONTROL         "Log general player errors (e.g. Loading plugins)",
+                    IDC_LOGMAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,98,
+                    163,10
+    CONTROL         "Log input from PMIs (e.g. File, HTTP, ShoutCAST)",
+                    IDC_LOGINPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
+                    112,174,10
+    CONTROL         "Log output from PMOs (e.g. Wave, DirectSound)",
+                    IDC_LOGOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,
+                    126,169,10
+    CONTROL         "Log decoding process (e.g. MP3, CDDA)",IDC_LOGDECODER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,140,145,10
+    CONTROL         "Log performance issues (e.g. Timings, Buffer Under/Overflows)",
+                    IDC_LOGPERFORMANCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    13,154,213,10
+    LTEXT           "If you are experiencing a problem with FreeAmp it is possible to log what the program is doing in order to help us track down the cause. When you enable logging a file is created in the program's install directory ",
+                    IDC_STATIC,3,3,227,24
+    LTEXT           "called freeamp.log. You should send us the log file when you report a bug.",
+                    IDC_STATIC,3,27,227,17
+    LTEXT           "You have the ability to narrow the logging to a particular portion of FreeAmp by selecting the various logging options. If you are not sure in which portion of the program the problem is occuring you can simply enable all the logging options.",
+                    IDC_STATIC,3,46,227,32
+END
+
+IDD_PREF2 DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Streaming"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Buffer Streams For",IDC_STATIC,57,17,59,8
+    EDITTEXT        IDC_STREAM_INTERVAL,117,15,25,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "Seconds",IDC_STATIC,146,17,29,8
+    GROUPBOX        "",IDC_STATIC,3,40,227,42
+    LTEXT           " ",IDC_STATIC,9,42,8,8
+    CONTROL         "Save Streams Locally",IDC_SAVESTREAMS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,41,83,10
+    LTEXT           "Save Location:",IDC_SAVELOCATION_TEXT,11,52,49,8
+    EDITTEXT        IDC_STREAMSAVEDIR,11,62,160,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,175,62,50,14
+    GROUPBOX        "",IDC_STATIC,3,89,227,41
+    LTEXT           " ",IDC_STATIC,9,90,8,8
+    CONTROL         "Use Proxy Server",IDC_USEPROXY,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,11,89,69,10
+    EDITTEXT        IDC_PROXYADDRESS,11,111,173,14,ES_AUTOHSCROLL
+    CTEXT           ":",IDC_COLON_TEXT,185,114,8,8
+    EDITTEXT        IDC_PORT,193,111,29,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Port:",IDC_PORT_TEXT,193,101,15,8
+    LTEXT           "Proxy Address:",IDC_PROXYADDRESS_TEXT,11,101,47,8
+    GROUPBOX        "",IDC_STATIC,3,137,227,32
+    LTEXT           " ",IDC_STATIC,9,138,8,8
+    CONTROL         "Use Alternate IP",IDC_USETHISIP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,137,64,10
+    EDITTEXT        IDC_IPADDRESS1,90,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "IP Address:",IDC_IPADDRESS_TEXT,47,153,37,8
+    CTEXT           ".",IDC_PERIOD1,108,155,8,8
+    EDITTEXT        IDC_IPADDRESS2,116,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           ".",IDC_PERIOD2,134,155,8,8
+    EDITTEXT        IDC_IPADDRESS3,143,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           ".",IDC_PERIOD3,161,155,8,8
+    EDITTEXT        IDC_IPADDRESS4,169,149,18,14,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Buffer Sizes",IDC_STATIC,3,3,227,30
+END
+
+IDD_PREF4 DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "FreeAmp is an Open Source effort to build the best digital audio player available.  In the interest of supporting the free software community, while at the same time fostering the growth of the online delivery of",
+                    IDC_STATIC,3,24,227,24
+    LTEXT           "music, EMusic.com, THE Source for Downloadable Music, is funding both the FreeAmp.org domain and the efforts of the FreeAmp team. The FreeAmp team consists of: Mark B. Elrod, Robert Kaye, Brett Thomas, Jason Woodward, and Isaac Richards.",
+                    IDC_STATIC,3,48,227,33
+    LTEXT           "Other people have also contributed to FreeAmp:",
+                    IDC_STATIC,3,83,227,9
+    LTEXT           "FreeAmp is being released under the terms of the GPL. As is provided by the GPL, all of EMusic.com's and your efforts toward FreeAmp will be released back to the community at large.",
+                    IDC_STATIC,3,122,227,25
+    LTEXT           "Alan Cutter, Gabor Fleischer, Jean-Michel HERVE, Hiromasa Kato, Michael Bruun Petersen, Sylvain Rebaud, The Snowblind Alliance, Tom Spindler, Valters Vingolds, Bill Yuan, and Bill Bull.",
+                    IDC_STATIC,3,92,227,24
+    LTEXT           "version 2.0 beta 1",IDC_STATIC,98,14,36,8
+    LTEXT           "FreeAmp",IDC_STATIC,102,5,29,8
+    PUSHBUTTON      "Visit FreeAmp.org",IDC_GOTOFREEAMP,30,156,67,14
+    PUSHBUTTON      "Visit EMusic.com",IDC_GOTOEMUSIC,136,156,67,14
+END
+
+IDD_PREF5 DIALOG DISCARDABLE  0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Themes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         IDC_THEMELISTBOX,11,13,153,88,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Theme Selection",IDC_STATIC,5,3,224,106
+    PUSHBUTTON      "&Add Theme",IDC_ADDTHEME,170,14,54,14
+    PUSHBUTTON      "&Delete Theme",IDC_DELETETHEME,170,33,54,14
+    GROUPBOX        "Default Font",IDC_STATIC,5,116,224,53
+    LTEXT           "A theme may specify a font type that is not installed on your system. The default font will be substituted in place of the missing font.",
+                    IDC_STATIC,11,127,212,19
+    PUSHBUTTON      "Choose &Font",IDC_CHOOSEFONT,172,149,50,14
+    LTEXT           "Note: Only the font name will be used. The font will appear in the style specified in the theme.",
+                    IDC_STATIC,11,146,156,17
+END
+
+IDD_PREF6 DIALOGEX 0, 0, 233, 174
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Update"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Description",-1,3,103,227,48
+    PUSHBUTTON      "Update Components",IDC_UPDATE,121,157,90,14
+    PUSHBUTTON      "Check for Latest Versions",IDC_CHECK,23,157,90,14
+    LTEXT           "This is a test. This text will tell the user what the hell the component actually does.By filling in this text I can see how the text will appear to the user when it is asctually filled in by the program and see if it looks good or bad the way it is.",
+                    IDC_DESCRIPTION,10,114,214,33
+    CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_OWNERDRAWFIXED | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,3,3,227,95,
+                    WS_EX_CLIENTEDGE
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_EXE_ICON            ICON    DISCARDABLE     "icon1.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_PREF1, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 171
+    END
+
+    IDD_PREF3, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 170
+    END
+
+    IDD_PREF2, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 169
+    END
+
+    IDD_PREF4, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 170
+    END
+
+    IDD_PREF6, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 230
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 171
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,0,0,0
+ PRODUCTVERSION 2,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "For the latest version go to http://www.freeamp.org\0"
+            VALUE "CompanyName", "FreeAmp Open Source Development Effort\0"
+            VALUE "FileDescription", "The Theme User Interface plugin is the default user interface for FreeAmp. It provides a way for FreeAmp to change it's look through theme files which are similiar to, but more powerful than skins.\0"
+            VALUE "FileVersion", "2.0\0"
+            VALUE "InternalName", "FreeAmp\0"
+            VALUE "LegalCopyright", "Copyright © EMusic.com 1999\0"
+            VALUE "LegalTrademarks", "FreeAmp, EMusic\0"
+            VALUE "OriginalFilename", "freeamp.ui\0"
+            VALUE "ProductName", "FreeAmp\0"
+            VALUE "ProductVersion", "2.0\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

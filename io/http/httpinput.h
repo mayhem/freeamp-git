@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
         $Id$
 ____________________________________________________________________________*/
 
-#ifndef _HTTPINPUT_H_
-#define _HTTPINPUT_H_
+#ifndef INCLUDED_HTTPINPUT_H_
+#define INCLUDED_HTTPINPUT_H_
 
 /* system headers */
 #include <stdlib.h>
@@ -64,12 +64,11 @@ class HttpInput:public PhysicalMediaInput
    virtual Error Prepare(PullBuffer *&pBuffer, bool bStartThread);  
    virtual Error Run(void);  
 
-   virtual bool  CanHandle(char *szUrl, char *szTitle);
+   virtual bool  CanHandle(const char *szUrl, char *szTitle);
    virtual bool  IsStreaming(void)
                  { return m_bIsStreaming; };
    virtual bool  PauseLoop(bool bLoop);  
    virtual Error Close(void);
-   virtual Error GetID3v1Tag(Id3TagInfo &sTag);
    virtual const char *Url(void) const
    {
       return m_path;

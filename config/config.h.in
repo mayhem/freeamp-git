@@ -2,7 +2,7 @@
 	
 	FreeAmp - The Free MP3 Player
 
-	Portions Copyright (C) 1998 GoodNoise
+	Portions Copyright (C) 1998-1999 EMusic.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -27,13 +27,33 @@ ____________________________________________________________________________*/
 #include <limits.h>
 
 
+#define BRANDING "FreeAmp"
+
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
 #define FREEAMP_VERSION "unknown"
 
+#undef HAVE_GTK
 
 #define HAVE_UNISTD_H 0
 #define HAVE_IO_H 0
 #define HAVE_ERRNO_H 0
+
+/* gdbm stuff */
+
+#undef const
+#undef HAVE_ST_BLKSIZE
+#undef off_t
+#undef HAVE_RENAME
+#undef HAVE_FTRUNCATE
+#undef HAVE_FLOCK
+#undef HAVE_FSYNC
+#undef HAVE_SYS_FILE_H
+#undef HAVE_STRING_H
+#undef HAVE_STDLIB_H
+#undef HAVE_MEMORY_H
+#undef HAVE_FCNTL_H
+
+/* end gdbm stuff */
 
 #define HAVE_BASELINUXTHREADS 0
 #define HAVE_ENHLINUXTHREADS 0
@@ -155,6 +175,10 @@ typedef short			int32;
 #define LINE_END_MARKER_STR "\n"
 #endif /* WIN32 */
 
+#if !defined(WIN32) || !defined(OS2) || !defined(__DOS__)
+#define ROOT_DIR "/"
+#endif
+
 #ifndef NULL
 #ifdef  __cplusplus
 #define NULL    0
@@ -162,6 +186,18 @@ typedef short			int32;
 #define NULL    ((void *)0)
 #endif
 #endif /* NULL */
+
+#ifndef _MAX_PATH
+#define _MAX_PATH 4096
+#endif
+
+#ifndef MAX_PATH
+#define MAX_PATH 4096
+#endif
+
+#ifndef socklen_t
+#undef socklen_t
+#endif
 
 #endif /* CONFIG_H */
 

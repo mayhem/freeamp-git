@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by freeamp.rc
+// Used by freeampui.rc
 //
 #define IDI_EXE_ICON                    101
 #define IDC_URL                         101
@@ -85,6 +85,7 @@
 #define IDD_PREF2                       223
 #define IDD_PREF4                       224
 #define IDD_PREF5                       225
+#define IDD_PREF6                       226
 #define IDC_SAVE_RIO                    1002
 #define IDC_UI                          1005
 #define IDC_PMO                         1006
@@ -124,6 +125,14 @@
 #define IDC_PERIOD3                     1035
 #define IDC_GOTOFREEAMP                 1036
 #define IDC_GOTOEMUSIC                  1037
+#define IDC_THEMELISTBOX                1040
+#define IDC_ADDTHEME                    1041
+#define IDC_DELETETHEME                 1042
+#define IDC_CHOOSEFONT                  1043
+#define IDC_UPDATE                      1044
+#define IDC_CHECK                       1045
+#define IDC_LIST                        1046
+#define IDC_DESCRIPTION                 1048
 #define IDC_ITEM                        40001
 #define IDC_ABOUT                       40002
 #define IDC_OPEN                        40003
@@ -143,9 +152,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        195
+#define _APS_NEXT_RESOURCE_VALUE        197
 #define _APS_NEXT_COMMAND_VALUE         40013
-#define _APS_NEXT_CONTROL_VALUE         1037
+#define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

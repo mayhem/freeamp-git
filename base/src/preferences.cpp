@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998-1999 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@ const char* kInstallDirPref = "InstallDirectory";
 const char* kLibraryPathPref = "LibraryPath";
 const char* kUIPref = "UI";
 const char* kTextUIPref = "TextUI";
+const char* kMusicBrowserUIPref = "MusicBrowserUI";
+const char* kDownloadManagerUIPref = "DownloadManagerUI";
 const char* kPMOPref = "PMO";
 const char* kALSADevicePref = "ALSADevice";
 const char* kESOUNDHostPref = "EsounDHost";
@@ -53,6 +55,11 @@ const char* kPreBufferPref = "PreBuffer";
 const char* kUseAlternateNICPref = "UseAlternateNIC";  
 const char* kAlternateNICAddressPref = "AlternateNICAddress";  
 const char* kUseTitleStreamingPref = "UseTitleStreaming";  
+const char* kThemePathPref = "ThemePath";  
+const char* kMainWindowPosPref = "MainWindowPos";  
+const char* kThemeDefaultFontPref = "ThemeDefaultFont";
+const char* kSaveMusicDirPref = "SaveMusicDirectory";
+const char* kDatabaseDirPref = "DatabaseDirectory";
 
 //logging
 const char* kUseDebugLogPref = "UseDebugLog";
@@ -69,13 +76,22 @@ const int32 kDefaultStreamBufferInterval = 3;
 const int32 kDefaultDecoderThreadPriority = 4;
 const bool  kDefaultLogging = false;
 const bool  kDefaultSaveStreams = false;
-const char* kDefaultSaveStreamsDir = ".";
+const char *kDefaultSaveStreamsDir = ".";
 const int32 kDefaultPreBuffer = 0;
 const char *kDefaultProxyHost = "http://proxy.yourdomain.com:8080";
 const bool  kDefaultUseProxy = false;
 const bool  kDefaultUseNIC = false;
 const char *kDefaultNICAddress = "192.168.1.1";
 const bool  kDefaultUseTitleStreaming = true;
+const char *kDefaultThemePath = "";  
+const char *kDefaultMainWindowPos = "100,100";  
+#ifdef WIN32
+const char *kDefaultThemeDefaultFont = "Arial";
+#else
+const char *kDefaultThemeDefaultFont = "Helvetica";
+#endif
+const char *kDefaultDownloadManagerUI = "download.ui";
+const char *kDefaultMusicBrowserUI = "musicbrowser.ui";
 
 Error
 Preferences::
@@ -147,6 +163,31 @@ SetDefaults()
 
     if (GetPrefBoolean(kUseTitleStreamingPref, &dummyBool) == kError_NoPrefValue)
         SetPrefBoolean(kUseTitleStreamingPref, kDefaultUseTitleStreaming);
+
+    dummyInt = 255;
+    if (GetPrefString(kThemePathPref, dummyString, 
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kThemePathPref, kDefaultThemePath);
+
+    dummyInt = 255;
+    if (GetPrefString(kMainWindowPosPref, dummyString, 
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kMainWindowPosPref, kDefaultMainWindowPos);
+
+    dummyInt = 255;
+    if (GetPrefString(kThemeDefaultFontPref, dummyString, 
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kThemeDefaultFontPref, kDefaultThemeDefaultFont);
+
+    dummyInt = 255;
+    if (GetPrefString(kMusicBrowserUIPref, dummyString,
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kMusicBrowserUIPref, kDefaultMusicBrowserUI);
+
+    dummyInt = 255;
+    if (GetPrefString(kDownloadManagerUIPref, dummyString,
+        (uint32 *)&dummyInt) == kError_NoPrefValue)
+        SetPrefString(kDownloadManagerUIPref, kDefaultDownloadManagerUI);
 
     return kError_NoErr;
 }
@@ -618,6 +659,34 @@ Preferences::
 SetAlternateNICAddress(char* address)
 {
     return SetPrefString(kAlternateNICAddressPref, address);
+}
+
+Error
+Preferences::
+GetThemeDefaultFont(char* font, uint32* len)
+{
+    return GetPrefString(kThemeDefaultFontPref, font, len);
+}
+
+Error
+Preferences::
+SetThemeDefaultFont(char* font)
+{
+    return SetPrefString(kThemeDefaultFontPref, font);
+}
+
+Error
+Preferences::
+GetThemePath(char* path, uint32* len)
+{
+    return GetPrefString(kThemePathPref, path, len);
+}
+
+Error
+Preferences::
+SetThemePath(char* path)
+{
+    return SetPrefString(kThemePathPref, path);
 }
 
 LibDirFindHandle *

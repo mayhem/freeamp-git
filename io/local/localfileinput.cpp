@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
 
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ ____________________________________________________________________________*/
 #include "pullbuffer.h"
 #include "facontext.h"
 #include "log.h"
+#include "utility.h"
 
 const uint32 iReadBlock = 8192;
 
@@ -130,7 +131,7 @@ Error LocalFileInput::Prepare(PullBuffer *&pBuffer, bool bStartThread)
 }
 
 
-bool LocalFileInput::CanHandle(char *szUrl, char *szTitle)
+bool LocalFileInput::CanHandle(const char *szUrl, char *szTitle)
 {
     bool bRet;
  
@@ -141,10 +142,10 @@ bool LocalFileInput::CanHandle(char *szUrl, char *szTitle)
     return bRet;
 }
 
-Error LocalFileInput::SetTo(char *url)
+Error LocalFileInput::SetTo(const char *url)
 {
     Error  result = kError_NoErr;
-    int32  len = strlen(url) + 1;
+    uint32  len = strlen(url) + 1;
     
     if (m_path)
     {
@@ -156,7 +157,9 @@ Error LocalFileInput::SetTo(char *url)
     if (m_path)
     {
         if (strncmp(url, "file://", 7) == 0)
-           memcpy(m_path, url + 7, len);
+        {
+            URLToFilePath(url, m_path, &len);
+        }
         else
            memcpy(m_path, url, len);
     }
@@ -209,6 +212,8 @@ void LocalFileInput::Clear(void)
     PipelineUnit::Clear();
 }
 
+#define iID3TagSize 128
+
 Error LocalFileInput::Open(void)
 {
     char pBuffer[iID3TagSize];
@@ -255,19 +260,11 @@ Error LocalFileInput::Open(void)
 
     fseek(m_fpFile, -iID3TagSize, SEEK_CUR);
 
-    if (m_pID3Tag)
-       delete m_pID3Tag;
-
     int iRet = fread(pBuffer, sizeof(char), iID3TagSize, m_fpFile);
+
     if (iRet == iID3TagSize)
     {
-        m_pID3Tag = new Id3TagInfo(pBuffer);
-        if (!m_pID3Tag->m_containsInfo)
-        {
-            delete m_pID3Tag;
-            m_pID3Tag = NULL;
-        }
-        else
+        if (!strncmp(pBuffer, "TAG", 3))
         {
             m_iFileSize -= iID3TagSize;
         }

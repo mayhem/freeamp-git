@@ -2,7 +2,7 @@
 
   FreeAmp - The Free MP3 Player
 
-  Portions Copyright (C) 1998 GoodNoise
+  Portions Copyright (C) 1998-1999 EMusic.com
   Portions Copyright (C) 1998.Sylvain Rebaud (soothe@jps.net)
 
   This program is free software; you can redistribute it and/or modify

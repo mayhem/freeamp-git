@@ -2,7 +2,7 @@
         
         FreeAmp - The Free MP3 Player
 
-        Portions Copyright (C) 1998-1999 GoodNoise
+        Portions Copyright (C) 1998-1999 EMusic.com
         Portions Copyright (C) 1999 Mark H. Weaver <mhw@netris.org>
 
         This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,7 @@ ____________________________________________________________________________*/
 #include <errno.h>
 #endif
 
+#include <string>
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -38,6 +39,7 @@ ____________________________________________________________________________*/
 #include <be/storage/Directory.h>
 #include <be/storage/Path.h>
 
+#include "utility.h"
 #include "beosprefs.h"
 #include "prefixprefs.h"
 
@@ -46,15 +48,6 @@ ____________________________________________________________________________*/
 // (among others) which will in turn use delete to reclaim the memory.
 // This is NOT VALID! A strdup()ed string must be free()ed, not deleted!
 // WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
-char *strdup_new(char *str)
-{
-    char *n;
-
-    n = new char[strlen(str) + 1];
-    strcpy(n, str);
-
-    return n;
-}
 
 // default values
 const char*  kDefaultLibraryPath = ".:~/.freeamp:" UNIX_LIBDIR "/freeamp";
@@ -66,7 +59,7 @@ const char*  kDefaultALSADevice = "1:1";
 
 class LibDirFindHandle {
  public:
-    List <char *> *m_pLibDirs;
+    vector <char *> *m_pLibDirs;
     int32 m_current;
 };
 
@@ -411,7 +404,7 @@ BeOSPrefs()
             if (*p)
             {
                 char *end;
-                char *out;
+                // char *out;
                 int32 length;
                 
                 entry->key = ReadQuotableString(p, (const char **)&end, ":#");
@@ -445,13 +438,13 @@ BeOSPrefs()
                 }
                 AppendToString(&entry->suffix, p, length);
                 
-                m_entries.AddItem(entry);
+                m_entries.push_back(entry);
                 entry = new BeOSPrefEntry;
             }
         }
 
         if (entry->prefix)
-            m_entries.AddItem(entry);
+            m_entries.push_back(entry);
         else
             delete entry;
         
@@ -512,7 +505,23 @@ SetDefaults()
     if (GetPrefString(kALSADevicePref, buf, &size) == kError_NoPrefValue)
         SetPrefString(kALSADevicePref, kDefaultALSADevice);
     
+    size = sizeof(buf);
+    if (GetPrefString(kDatabaseDirPref, buf, &size) == kError_NoPrefValue) {
+        string tempdir = FreeampDir(NULL);
+        tempdir += "/db";
+        SetPrefString(kDatabaseDirPref, tempdir.c_str());
+    }
+
+    size = sizeof(buf);
+    if (GetPrefString(kSaveMusicDirPref, buf, &size) == kError_NoPrefValue) {
+        string tempdir = FreeampDir(NULL);
+        tempdir += "/MyMusic";
+        SetPrefString(kSaveMusicDirPref, tempdir.c_str());
+    }
+
     Preferences::SetDefaults();
+
+    return kError_NoErr;
 }
 
 Error
@@ -551,13 +560,13 @@ Save()
 
         m_mutex.Acquire();
                 
-        int32 numEntries = m_entries.CountItems();
+        int32 numEntries = m_entries.size();
         int32 i;
         BeOSPrefEntry *entry;
         
         for (i = 0; i < numEntries; i++)
         {
-            entry = m_entries.ItemAt(i);
+            entry = m_entries[i];
             if (entry->prefix)
                 fputs(entry->prefix, prefsFile);
             if (entry->key && entry->separator && entry->value)
@@ -618,7 +627,7 @@ BeOSPrefs::
 GetPrefString(const char* pref, char* buf, uint32* len)
 {
     BeOSPrefEntry *entry;
-    int32 index;
+    // int32 index;
 
     m_mutex.Acquire();
 
@@ -666,7 +675,7 @@ SetPrefString(const char* pref, const char* buf)
         AppendToString(&entry->key, pref, strlen(pref));
         AppendToString(&entry->separator, ": ", 2);
         AppendToString(&entry->suffix, "\n", 1);
-        m_entries.AddItem(entry);
+        m_entries.push_back(entry);
         m_ht.Insert(pref, entry);
     }
     AppendToString(&entry->value, buf, strlen(buf));
@@ -708,7 +717,7 @@ GetFirstLibDir(char *path, uint32 *len)
     }
     pEnv = pPath;
     LibDirFindHandle *hLibDirFind = new LibDirFindHandle();
-    hLibDirFind->m_pLibDirs = new List<char *>();
+    hLibDirFind->m_pLibDirs = new vector<char *>();
     hLibDirFind->m_current = 0;
 
     char *pCol = (char *)1;
@@ -717,11 +726,11 @@ GetFirstLibDir(char *path, uint32 *len)
         pCol = strchr(pPart,':');
         if (pCol) *pCol = '\0';
         char *pFoo = strdup_new(pPart);
-        hLibDirFind->m_pLibDirs->AddItem(pFoo);
+        hLibDirFind->m_pLibDirs->push_back(pFoo);
         pPart = pCol + sizeof(char);
     }
 
-    pPath = hLibDirFind->m_pLibDirs->ItemAt(0);
+    pPath = (*hLibDirFind->m_pLibDirs)[0];
     if (pPath) {
         strncpy(path,pPath,*len);
         *len = strlen(pPath);
@@ -744,8 +753,10 @@ GetNextLibDir(LibDirFindHandle *hLibDirFind, char *path, uint32 *len)
 {
     if (hLibDirFind) {
         hLibDirFind->m_current++;
-        char *pPath = hLibDirFind->m_pLibDirs->ItemAt(hLibDirFind->m_current);
-        if (pPath) {
+        char *pPath = (*hLibDirFind->m_pLibDirs)[hLibDirFind->m_current];
+        if ( pPath &&
+             hLibDirFind->m_current < (int32)hLibDirFind->m_pLibDirs->size() )
+        {
             strncpy(path,pPath,*len);
             *len = strlen(pPath);
 //          cout << "returning next: " << path << endl;
@@ -765,7 +776,10 @@ BeOSPrefs::
 GetLibDirClose(LibDirFindHandle *hLibDirFind)
 {
     if (hLibDirFind) {
-        hLibDirFind->m_pLibDirs->DeleteAll();
+        vector <char*>::iterator i = hLibDirFind->m_pLibDirs->begin();
+
+        for (; i != hLibDirFind->m_pLibDirs->end(); i++)
+            delete *i;
         delete hLibDirFind->m_pLibDirs;
         delete hLibDirFind;
     }
