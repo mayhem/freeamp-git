@@ -1,2 +1,2 @@
 #!/bin/sh
-cp config.beos config.h
+cp ../../../config/config.beos ../../../config/config.h
