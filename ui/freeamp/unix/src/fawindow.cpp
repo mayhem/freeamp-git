@@ -99,7 +99,7 @@ FAMainWindow::FAMainWindow(Display *display, int32 screen_num,GC gc, Window pare
     mwmhints = XInternAtom(m_display, "_MOTIF_WM_HINTS", false);
     hints.decorations = 0;
     hints.flags |= MWM_HINTS_DECORATIONS;
-    XChangeProperty(m_display, m_me, mwmhints, mwmhints, 32, PropModeReplace, (unsigned char *)&hints, 4);
+    XChangeProperty(m_display, m_me, mwmhints, mwmhints, 32, PropModeReplace, (unsigned char *)&hints, 5);
 
 }
 
