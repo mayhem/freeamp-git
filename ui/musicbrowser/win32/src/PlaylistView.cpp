@@ -89,6 +89,77 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             himl = ListView_GetImageList(dis->hwndItem, LVSIL_SMALL);
             ImageList_GetIconSize(himl, &cxImage, &cyImage);
 
+            rcClip = dis->rcItem;   
+        
+            HWND hwndList = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
+            LV_ITEM lv_item;
+            char* buf = new char[1024]; // MS is so dumb they do not give you a way to query text length
+            string displayString;
+
+            lv_item.mask = LVIF_TEXT;
+            lv_item.state = 0;
+            lv_item.stateMask = 0;
+            lv_item.iItem = dis->itemID;
+            lv_item.iSubItem = 0;
+            lv_item.pszText = buf;
+            lv_item.cchTextMax = 2;
+            lv_item.lParam = NULL;
+
+            // Item index
+            //ListView_GetItemText(hwndList, dis->itemID, 0, buf, 1024);
+            sprintf(buf, "%d", dis->itemID + 1);
+            displayString = buf;
+
+            
+            CalcStringEllipsis(dis->hDC, 
+                               displayString, 
+                               ListView_GetColumnWidth(hwndList, 0) /*- (cxImage + 1)*/);
+
+            UINT oldAlign;
+
+            oldAlign = SetTextAlign(dis->hDC, TA_CENTER | TA_TOP );
+
+            UINT left = rcClip.left + (ListView_GetColumnWidth(hwndList, 0)/2);
+            RECT indexColumnRect;
+
+            GetClientRect(hwndList, &indexColumnRect);
+            indexColumnRect.top = rcClip.top;
+            indexColumnRect.right = indexColumnRect.left + ListView_GetColumnWidth(hwndList, 0);
+            
+            SetTextColor(dis->hDC, GetSysColor(COLOR_INFOTEXT));
+            SetBkColor(dis->hDC, GetSysColor(COLOR_INFOBK ));
+
+            ExtTextOut( dis->hDC, 
+                        left, rcClip.top + 1,
+                        ETO_CLIPPED | ETO_OPAQUE,
+                        &indexColumnRect, 
+                        displayString.c_str(),
+                        displayString.size(),
+                        NULL);
+
+            SetTextAlign(dis->hDC, oldAlign);
+
+            /*ExtTextOut( dis->hDC, 
+                        rcClip.left + cxImage + 2, rcClip.top + 1, 
+                        ETO_CLIPPED | ETO_OPAQUE,
+                        &rcClip, 
+                        displayString.c_str(),
+                        displayString.size(),
+                        NULL);
+            
+            // Draw the icon. Drawing it after the first item allows us
+            // to let ExtTextOut draw the correct background 
+            if(himl && dis->itemID == m_oPlm->GetCurrentIndex())
+            {
+                uint32 top = rcClip.top + ((rcClip.bottom - rcClip.top) - cyImage)/2;
+                ImageList_Draw( himl, 0, dis->hDC, 
+                                rcClip.left, top,
+                                uiFlags);
+            }*/
+
+            // Move over to the next column
+            rcClip.left += ListView_GetColumnWidth(hwndList, 0);
+
             // Check to see if this item is selected
             if(dis->itemState & ODS_SELECTED)
             {
@@ -107,78 +178,9 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                 SetBkColor(dis->hDC, GetSysColor(COLOR_WINDOW));
             }
 
-            rcClip = dis->rcItem;   
-        
-            HWND hwndList = GetDlgItem(m_hWnd, IDC_PLAYLISTBOX);
-            LV_ITEM lv_item;
-            char* buf = new char[1024]; // MS is so dumb they do not give you a way to query text length
-            string displayString;
-
-            lv_item.mask = LVIF_TEXT;
-            lv_item.state = 0;
-            lv_item.stateMask = 0;
-            lv_item.iItem = dis->itemID;
-            lv_item.iSubItem = 0;
-            lv_item.pszText = buf;
-            lv_item.cchTextMax = 2;
-            lv_item.lParam = NULL;
-
-            /*
-            // Item index
-            ListView_GetItemText(hwndList, dis->itemID, 0, buf, 1024);
-            displayString = buf;
-
             
-            CalcStringEllipsis(dis->hDC, 
-                               displayString, 
-                               ListView_GetColumnWidth(hwndList, 0) - (cxImage + 1));
-
-            ExtTextOut( dis->hDC, 
-                        rcClip.left + cxImage + 2, rcClip.top + 1, 
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        displayString.c_str(),
-                        displayString.size(),
-                        NULL);
-            
-
-            
-
-            // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 0);
-
-            */
 
             // Title
-            ListView_GetItemText(hwndList, dis->itemID, 0, buf, 1024);
-            displayString = buf;
-
-            CalcStringEllipsis(dis->hDC, 
-                               displayString, 
-                               ListView_GetColumnWidth(hwndList, 0) - kPrePadding);
-
-            ExtTextOut( dis->hDC, 
-                        rcClip.left + cxImage + 2, rcClip.top + 1, 
-                        ETO_CLIPPED | ETO_OPAQUE,
-                        &rcClip, 
-                        displayString.c_str(),
-                        displayString.size(),
-                        NULL);
-
-            // Draw the icon. Drawing it after the first item allows us
-            // to let ExtTextOut draw the correct background 
-            if(himl && dis->itemID == m_oPlm->GetCurrentIndex())
-            {
-                uint32 top = rcClip.top + ((rcClip.bottom - rcClip.top) - cyImage)/2;
-                ImageList_Draw( himl, 0, dis->hDC, 
-                                rcClip.left, top,
-                                uiFlags);
-            }
-
-            // Move over to the next column
-            rcClip.left += ListView_GetColumnWidth(hwndList, 0);
-
-            // Artist
             ListView_GetItemText(hwndList, dis->itemID, 1, buf, 1024);
             displayString = buf;
 
@@ -192,14 +194,13 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
                         &rcClip, 
                         displayString.c_str(),
                         displayString.size(),
-                        NULL);
+                        NULL);            
 
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 1);
 
-            // Album
+            // Artist
             ListView_GetItemText(hwndList, dis->itemID, 2, buf, 1024);
-
             displayString = buf;
 
             CalcStringEllipsis(dis->hDC, 
@@ -217,7 +218,7 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 2);
 
-            // Length
+            // Album
             ListView_GetItemText(hwndList, dis->itemID, 3, buf, 1024);
 
             displayString = buf;
@@ -236,6 +237,26 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
 
             // Move over to the next column
             rcClip.left += ListView_GetColumnWidth(hwndList, 3);
+
+            // Length
+            ListView_GetItemText(hwndList, dis->itemID, 4, buf, 1024);
+
+            displayString = buf;
+
+            CalcStringEllipsis(dis->hDC, 
+                               displayString, 
+                               ListView_GetColumnWidth(hwndList, 4) - kPrePadding);
+
+            ExtTextOut( dis->hDC, 
+                        rcClip.left + kPrePadding, rcClip.top + 1, 
+                        ETO_CLIPPED | ETO_OPAQUE,
+                        &rcClip, 
+                        displayString.c_str(),
+                        displayString.size(),
+                        NULL);
+
+            // Move over to the next column
+            rcClip.left += ListView_GetColumnWidth(hwndList, 4);
 
 
             // If we changed the colors for the selected item, undo it
@@ -262,6 +283,10 @@ BOOL MusicBrowserUI::DrawItem(int32 controlId, DRAWITEMSTRUCT* dis)
     return result;
 }
 
+#define LENGTH_COLUMN_WIDTH 55
+#define INDEX_COLUMN_WIDTH 30
+#define FIXED_COLUMN_WIDTH (LENGTH_COLUMN_WIDTH + INDEX_COLUMN_WIDTH)
+
 void MusicBrowserUI::InitList(void)
 {
     LV_COLUMN lvc;
@@ -271,41 +296,37 @@ void MusicBrowserUI::InitList(void)
     GetClientRect(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sRect);
 
     lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
-    lvc.fmt = LVCFMT_RIGHT; // right align column
+    lvc.fmt = LVCFMT_LEFT; // left align column
 
-    /*
     lvc.pszText = "#";
     lvc.cchTextMax = strlen(lvc.pszText);
     lvc.iSubItem = 0;
-    lvc.cx = (sRect.right-sRect.left)/8; // width of column in pixels
+    lvc.cx = INDEX_COLUMN_WIDTH; // width of column in pixels
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 0, &lvc);
-    */
 
-    lvc.fmt = LVCFMT_LEFT; // left align column
-
-    int32 remainder = (sRect.right-sRect.left - 55)%3;
+    int32 remainder = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)%3;
 
     lvc.pszText = "Title";
     lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 0;
-    lvc.cx = (sRect.right-sRect.left - 55)/3; // width of column in pixels
+    lvc.iSubItem = 1;
+    lvc.cx = (sRect.right-sRect.left - FIXED_COLUMN_WIDTH)/3; // width of column in pixels
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 1, &lvc);
     
     lvc.pszText = "Artist";
     lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 1;
+    lvc.iSubItem = 2;
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 2, &lvc);
 
     lvc.pszText = "Album";
     lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 2;
+    lvc.iSubItem = 3;
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 3, &lvc);
 
     
     lvc.pszText = "Length";
-    lvc.cx = 55 + remainder;//((sRect.right-sRect.left)/4) - 3; // width of column in pixels
+    lvc.cx = LENGTH_COLUMN_WIDTH + remainder;//((sRect.right-sRect.left)/4) - 3; // width of column in pixels
     lvc.cchTextMax = strlen(lvc.pszText);
-    lvc.iSubItem = 3;
+    lvc.iSubItem = 4;
     ListView_InsertColumn(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), 4, &lvc);
 }
 
@@ -437,11 +458,11 @@ void MusicBrowserUI::UpdatePlaylistList(void)
     sItem.state = sItem.stateMask = 0;
     for(i = 0; pItem = m_oPlm->ItemAt(i); i++)
     {
-        //sprintf(szText, "%d", i + 1);
+        sprintf(szText, "%d", i + 1);
 
         sItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-        sItem.pszText = (char *)pItem->GetMetaData().Title().c_str();
-        sItem.cchTextMax = pItem->GetMetaData().Title().length();
+        sItem.pszText = szText;
+        sItem.cchTextMax = strlen(szText);
         sItem.iSubItem = 0;
         sItem.iItem = i;
         sItem.lParam = i;
@@ -450,15 +471,22 @@ void MusicBrowserUI::UpdatePlaylistList(void)
         ListView_InsertItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
 
         sItem.mask = LVIF_TEXT;
+        sItem.pszText = (char *)pItem->GetMetaData().Title().c_str();
+        sItem.cchTextMax = pItem->GetMetaData().Title().length();
+        sItem.iSubItem = 1;
+
+        ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
+
+        sItem.mask = LVIF_TEXT;
         sItem.pszText = (char *)pItem->GetMetaData().Artist().c_str();
         sItem.cchTextMax = pItem->GetMetaData().Artist().length();
-        sItem.iSubItem = 1;
+        sItem.iSubItem = 2;
         ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
 
         sItem.mask = LVIF_TEXT;
         sItem.pszText = (char *)pItem->GetMetaData().Album().c_str();
         sItem.cchTextMax = pItem->GetMetaData().Album().length();
-        sItem.iSubItem = 2;
+        sItem.iSubItem = 3;
         ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
 
         if (pItem->GetMetaData().Time() != 0)
@@ -467,7 +495,7 @@ void MusicBrowserUI::UpdatePlaylistList(void)
             strcpy(szText, "Unknown");
         sItem.pszText = szText;
         sItem.cchTextMax = strlen(szText);
-        sItem.iSubItem = 3;
+        sItem.iSubItem = 4;
         ListView_SetItem(GetDlgItem(m_hWnd, IDC_PLAYLISTBOX), &sItem);
     }
 
@@ -604,4 +632,107 @@ void MusicBrowserUI::OpenPlaylist(void)
         //FillPlaylistCombo();
         LoadPlaylist(playlist);
     }
+}
+
+LRESULT WINAPI 
+ListViewWndProc(HWND hwnd, 
+                UINT msg, 
+                WPARAM wParam, 
+                LPARAM lParam)
+{
+    WNDPROC lpOldProc = (WNDPROC)GetProp( hwnd, "oldproc" );
+
+	switch(msg)
+	{
+		case WM_DESTROY:   
+		{
+			//  Put back old window proc and
+			SetWindowLong( hwnd, GWL_WNDPROC, (DWORD)lpOldProc );
+
+			// remove window property
+			RemoveProp( hwnd, "oldproc" ); 
+
+			break;
+		}
+
+        case WM_DRAWITEM:
+        {
+            DRAWITEMSTRUCT* dis = (DRAWITEMSTRUCT*) lParam;
+
+            if(dis->CtlType == ODT_HEADER)
+            {
+                RECT rcClip = rcClip = dis->rcItem;
+                UINT oldAlign;
+
+                oldAlign = SetTextAlign(dis->hDC, TA_CENTER | TA_TOP );
+
+                UINT left = rcClip.left + ((rcClip.right - rcClip.left)/2);
+                UINT top = rcClip.top + 2; // + ((rcClip.bottom - rcClip.top)/2);
+
+                ExtTextOut( dis->hDC,left, top, 
+                        ETO_CLIPPED | ETO_OPAQUE,
+                        &rcClip, 
+                        "#",
+                        strlen("#"),
+                        NULL);
+
+                SetTextAlign(dis->hDC, oldAlign);
+            }
+
+            break;
+        }
+
+        case WM_PAINT:
+        {
+            LRESULT result = CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
+            
+            HWND hwndHeader = FindWindowEx(hwnd, NULL, WC_HEADER, NULL);
+
+            if(hwndHeader && !ListView_GetItemCount(hwnd))
+            {
+                RECT headerRect;
+                
+                GetWindowRect(hwndHeader, &headerRect);
+        
+                HDC hdc;
+
+                hdc = GetDC(hwnd);
+
+                RECT rect;
+
+                GetClientRect(hwnd, &rect);
+
+                rect.top += (headerRect.bottom - headerRect.top);
+                rect.right = rect.left + ListView_GetColumnWidth(hwnd, 0);
+            
+                FillRect(hdc, &rect, (HBRUSH)(COLOR_INFOBK + 1));
+
+                ReleaseDC(hwnd, hdc);
+               
+            }
+
+            
+            return result;
+            break;
+        }
+
+        case WM_NOTIFY:
+        {
+            int idCtrl = wParam; 
+            HD_NOTIFY* hdn = (HD_NOTIFY*) lParam; 
+
+            if(hdn->hdr.code == HDN_BEGINTRACKW)
+            {
+                if(hdn->iItem == 0)
+                    return TRUE; 
+            }
+
+            break;
+        }
+
+        
+    } 
+	
+	//  Pass all non-custom messages to old window proc
+	return CallWindowProc((int (__stdcall *)(void))lpOldProc, hwnd, msg, wParam, lParam );
 }

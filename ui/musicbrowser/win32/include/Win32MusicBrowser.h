@@ -55,6 +55,12 @@ bool FileOpenDialog(HWND hwnd,
                     vector<char*>* fileList,
                     Preferences* prefs);
 
+LRESULT WINAPI 
+ListViewWndProc(HWND hwnd, 
+                UINT msg, 
+                WPARAM wParam, 
+                LPARAM lParam);
+
 class MusicBrowserUI : public UserInterface 
 {
  public:
@@ -173,6 +179,8 @@ class MusicBrowserUI : public UserInterface
     bool                 m_trackSplitter;
     RECT                 m_splitterRect;
     HBRUSH               m_splitterBrush;
+
+    HWND                 m_hPlaylistHeader;
 };
 
 #endif
