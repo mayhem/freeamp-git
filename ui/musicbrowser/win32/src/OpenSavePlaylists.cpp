@@ -268,7 +268,7 @@ bool MusicBrowserUI::SaveNewPlaylist(string &oName)
             int yes_no;
             const char* kFileExist = "%s\r\n\r\n"
                                      "A playlist with the name already exists. "
-                                     "Would you like to replace\r\n
+                                     "Would you like to replace\r\n"
                                      "the existing playlist with this one?";
 
             const char* cp = NULL;
