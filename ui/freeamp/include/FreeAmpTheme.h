@@ -57,6 +57,13 @@ enum FreeAmpMenuCommand
 	kMCExit    = 6906
 };
 
+enum SignatureDisplayState
+{
+    kIdle,
+    kSigsPending,
+    kGeneratingSigs
+};
+
 class FreeAmpTheme : public UserInterface, public Theme
 {
     public:
@@ -110,6 +117,7 @@ class FreeAmpTheme : public UserInterface, public Theme
         TimeDisplayState m_eTimeDisplayState;
         UpdateManager   *m_pUpdateMan;
         Equalizer       *m_eq;
+        SignatureDisplayState m_sigState;
 };
 
 #endif
