@@ -21,10 +21,11 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <unistd.h>
 #include <string.h>
+#include <iostream.h>
 #include <sys/asoundlib.h>
 
 #include "alsavolume.h"
@@ -32,38 +33,56 @@ ____________________________________________________________________________*/
 ALSAVolumeManager::ALSAVolumeManager(int iCard, int iDevice)
                   :VolumeManager()
 {
+   void *pMixer;
+   char  mixer_id[13]=SND_MIXER_ID_MASTER; 
+
    this->iCard = iCard;
    this->iDevice = iDevice;
+   switch (iDevice) 
+   {
+	    case 0: 
+          strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));
+          break;
+	    case 1: 
+          strncpy(mixer_id,SND_MIXER_ID_PCM1,sizeof(mixer_id));
+          break;
+   }
+
+   snd_mixer_open(&pMixer, iCard, 0);
+   iChannel = snd_mixer_channel(pMixer, mixer_id );
+   if (iChannel < 0)
+   {
+       strncpy(mixer_id,SND_MIXER_ID_PCM,sizeof(mixer_id));
+       iChannel = snd_mixer_channel(pMixer, mixer_id );
+   }  
+   snd_mixer_close(pMixer);
 }
 
 void ALSAVolumeManager::SetVolume(int32 iVolume) 
 {
-   int   err, mixer_channel;
+   int   err;
    void *pMixer;
-   char  mixer_id[13]=SND_MIXER_ID_MASTER; 
    snd_mixer_channel_t channel;
 
    err = snd_mixer_open(&pMixer, iCard, 0);
    if (err < 0)
       return;
 
-   mixer_channel = snd_mixer_channel(pMixer, SND_MIXER_ID_PCM);   
-   if (mixer_channel >= 0) 
+   if (iChannel >= 0) 
    {
-      err = snd_mixer_channel_read(pMixer, mixer_channel, &channel);
+      err = snd_mixer_channel_read(pMixer, iChannel, &channel);
       if (err < 0)
          return;
 
       channel.left=channel.right=iVolume;
-      snd_mixer_channel_write(pMixer, mixer_channel, &channel);
+      snd_mixer_channel_write(pMixer, iChannel, &channel);
    } 
-
    snd_mixer_close(pMixer);
 }
 
 int32 ALSAVolumeManager::GetVolume() 
 {
-   int   err, mixer_channel;
+   int   err;
    void *pMixer = NULL;
    snd_mixer_channel_t channel;
 
@@ -73,10 +92,9 @@ int32 ALSAVolumeManager::GetVolume()
       return 0;
    }
 
-   mixer_channel = snd_mixer_channel(pMixer, SND_MIXER_ID_PCM);   
-   if (mixer_channel >= 0) 
+   if (iChannel >= 0) 
    {
-      err = snd_mixer_channel_read(pMixer, mixer_channel, &channel);
+      err = snd_mixer_channel_read(pMixer, iChannel, &channel);
       if (err < 0)
          return 0;
    } 
@@ -84,6 +102,5 @@ int32 ALSAVolumeManager::GetVolume()
       return 0;
 
    snd_mixer_close(pMixer);
-
    return channel.left;
 }

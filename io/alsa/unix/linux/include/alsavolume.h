@@ -38,7 +38,7 @@ class ALSAVolumeManager : public VolumeManager
 
     private:
 
-    int iCard, iDevice;
+    int iCard, iDevice, iChannel;
 };
 
 #endif // _ALSAVOLUME_H_

@@ -93,7 +93,6 @@ AlsaPMO::AlsaPMO(FAContext *context) :
    ai->channels = -1;
    ai->rate = -1;
    ai->mixer_handle=0;
-   ai->mixer_channel=-1;
 
 	ai->device = (char *) malloc(deviceNameSize);
 	m_context->prefs->GetPrefString(kALSADevicePref, ai->device,

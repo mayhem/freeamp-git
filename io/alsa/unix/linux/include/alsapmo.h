@@ -54,7 +54,6 @@ struct audio_info_struct
     int channels;
     long rate;
     void * mixer_handle;
-    int mixer_channel;
     snd_mixer_channel_t channel;
 };
 
