@@ -2493,6 +2493,7 @@ ServiceEvent(Event * pC)
         case CMD_EditCurrentPlaylistItemInfo:
         case CMD_GeneratePlaylist:
         case INFO_CDNotFound:
+        case INFO_DatabaseUpgraded:
             SendEventToUI(pC);
             delete pC;
             break;

@@ -187,6 +187,20 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             delete dialog;
 
             break; }
+        case INFO_DatabaseUpgraded: {
+            GTKMessageDialog *dialog = new GTKMessageDialog();
+            string message = "Due to internal changes, "the_BRANDING" has "
+                             "modified the format of the database that stores "
+                             "the My Music tree.  Unfortunately, this means "
+                             "that you need to Search For Music again to "
+                             "rebuild "the_BRANDING"'s internal catalog.";
+
+            gdk_threads_enter();
+            dialog->Show(message.c_str(), "Database Upgraded", kMessageOk); 
+            gdk_threads_leave();
+            delete dialog;
+
+            break; }
         default:
             break;
     }

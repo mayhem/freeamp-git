@@ -44,12 +44,15 @@ class Database
    char *NextKey(char *key);
    void  Sync(void);
 
+   bool  IsUpgraded(void);
+
  private:
    bool  TestDatabaseVersion(int version);
    void  StoreDatabaseVersion(int version);
 
    GDBM_FILE m_dbase;
    Mutex    *m_lock;
+   bool      m_upgraded;
 };
 
 #endif

@@ -56,6 +56,12 @@ const char *mbcdNotFoundMessage =
     "This CD was not found in MusicBrainz. Would "
     "you like to enter the information for this CD and submit "
     "the data for inclusion in the MusicBrainz metadatabase?";
+const char *dbaseUpgradedMessage =
+    "Due to internal changes, "the_BRANDING" has "
+    "modified the format of the database that stores the "
+    "My Music tree. Unfortunatley, this means that you need "
+    "to search for music again to rebuild "the_BRANDING"'s "
+    "internal catalog.";
 
 bool operator<(const TreeData &A, const TreeData &b)
 {
@@ -1015,13 +1021,17 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             CDNotFoundEvent *ev = (CDNotFoundEvent *)event;
 
             if (MessageBox(m_hWnd, mbcdNotFoundMessage, "CD Not Found", 
-                MB_YESNO) == IDYES)
+                MB_YESNO|MB_SETFOREGROUND) == IDYES)
             {
                 ShellExecute(m_hParent, "open", ev->URL().c_str(), NULL,
                              NULL, SW_SHOWNORMAL);
             }
 
             break; } 
+        case INFO_DatabaseUpgraded: {
+            MessageBox(m_hWnd, dbaseUpgradedMessage, "Database Upgraded",
+                       MB_OK|MB_SETFOREGROUND);
+            break; }
         default:
             break;
     }
