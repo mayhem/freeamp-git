@@ -37,8 +37,6 @@ ____________________________________________________________________________*/
 #endif
 #define DB printf("%s:%d\n",  __FILE__, __LINE__);
 
-const int iDebugPad = 16384;
-
 PullBuffer::PullBuffer(size_t iBufferSize,
                        size_t iOverflowSize,
 		                 FAContext *context)
@@ -56,18 +54,8 @@ PullBuffer::PullBuffer(size_t iBufferSize,
    m_iOverflowSize = iOverflowSize;
    m_iBufferSize = iBufferSize;
 
-   m_pPullBuffer = new unsigned char[m_iBufferSize + iOverflowSize + 
-                                     iDebugPad + iDebugPad];
+   m_pPullBuffer = new unsigned char[m_iBufferSize + iOverflowSize];
    assert(m_pPullBuffer != NULL);
-
-   memset(m_pPullBuffer, 0x45, iDebugPad);
-   m_pPullBuffer = (unsigned char *)((char *)m_pPullBuffer + iDebugPad);
-
-   memset((char *)m_pPullBuffer + m_iBufferSize + iOverflowSize, 
-          0x45, iDebugPad);
-
-   Check();
-   printf("Initial check passed...\n");
 
    m_pMutex = new Mutex();
 }
@@ -77,34 +65,13 @@ PullBuffer::~PullBuffer(void)
    m_bExit = true;
 
    if (m_pPullBuffer)
-   {
-      m_pPullBuffer = (unsigned char *)((char *)m_pPullBuffer - iDebugPad);
       delete m_pPullBuffer;
-   }
 
    delete m_pMutex;
 }
 
-void PullBuffer::Check(void)
-{
-   unsigned char *p;
-   int   i;
-
-   for(p = (unsigned char *)m_pPullBuffer - iDebugPad; p < m_pPullBuffer; p++)
-      assert(*p == 0x45);
-
-   for(p = (unsigned char *)m_pPullBuffer + m_iBufferSize + m_iOverflowSize, 
-       i = 0; i < iDebugPad; p++, i++)
-       if (*p != 0x45)
-       {
-           printf("End element %d not proper...", i);
-           assert(0);
-       }
-}
-
 Error PullBuffer::Clear(void)
 {
-   Check();
    for(;;)
    {
        if (m_bExit)
@@ -126,7 +93,6 @@ Error PullBuffer::Clear(void)
    m_iBytesInBuffer = 0;
 
    m_pMutex->Release();
-   Check();
 
    return kError_NoErr;
 }
@@ -134,7 +100,6 @@ Error PullBuffer::Clear(void)
 int PullBuffer::GetReadIndex(void)
 {
    int iRet;
-   Check();
 
    for(;;)
    {
@@ -155,7 +120,6 @@ int PullBuffer::GetReadIndex(void)
    iRet = m_iReadIndex;
 
    m_pMutex->Release();
-   Check();
  
    return iRet;
 }
@@ -163,7 +127,6 @@ int PullBuffer::GetReadIndex(void)
 int PullBuffer::GetWriteIndex(void)
 {
    int iRet;
-   Check();
 
    for(;;)
    {
@@ -184,7 +147,6 @@ int PullBuffer::GetWriteIndex(void)
    iRet = m_iWriteIndex;
 
    m_pMutex->Release();
-   Check();
  
    return iRet;
 }
@@ -193,21 +155,18 @@ void PullBuffer::WrapPointer(void *&pBuffer)
 {
    char *pPtr;
 
-   Check();
    pPtr = (char *)pBuffer;
 
    if (pPtr >= (char *)((unsigned int)m_pPullBuffer + m_iBufferSize))
 	   pPtr -= m_iBufferSize;
 
    pBuffer = (void *)pPtr;
-   Check();
 }
 
 
 Error PullBuffer::Resize(size_t iNewSize, 
                          size_t iNewOverflowSize)
 {
-   Check();
    unsigned char *pNew;
 
    if (iNewSize < m_iBytesInBuffer)
@@ -239,13 +198,8 @@ Error PullBuffer::Resize(size_t iNewSize,
        break;
    }
 
-   pNew = new unsigned char[iNewSize + iNewOverflowSize + iDebugPad + iDebugPad];
-   memset(pNew, 0x45, iDebugPad);
-   pNew = (unsigned char *)pNew + iDebugPad;
-   memset(pNew + iNewSize + iNewOverflowSize, 0x45, iDebugPad);
+   pNew = new unsigned char[iNewSize + iNewOverflowSize];
    memcpy(pNew, m_pPullBuffer, m_iBytesInBuffer);
-   Check();
-   printf("check after resize passed\n");
 
    delete m_pPullBuffer;
    m_pPullBuffer = pNew;
@@ -254,7 +208,6 @@ Error PullBuffer::Resize(size_t iNewSize,
    m_iWriteIndex = m_iBytesInBuffer;
 
    m_pMutex->Release();
-   Check();
 
    return kError_NoErr;
 }
@@ -263,22 +216,18 @@ bool PullBuffer::IsEndOfStream(void)
 {
    bool bRet;
 
-   Check();
    m_pMutex->Acquire();
    bRet = m_bEOS; 
    m_pMutex->Release();
-   Check();
 
    return bRet;
 }
 
 void PullBuffer::SetEndOfStream(bool bEOS)
 {
-   Check();
    m_pMutex->Acquire();
    m_bEOS = bEOS;
    m_pMutex->Release();
-   Check();
 }
 
 // BeginWrite requests writing a certain number of bytes. If that number
@@ -286,7 +235,6 @@ void PullBuffer::SetEndOfStream(bool bEOS)
 // Returns kError_Interrupt, kError_BufferTooSmall, kError_NoErr
 Error PullBuffer::BeginWrite(void *&pBuffer, size_t iBytesNeeded)
 {
-   Check();
    Error    eError = kError_NoErr;
    unsigned iAvail = 0;
 
@@ -338,14 +286,12 @@ Error PullBuffer::BeginWrite(void *&pBuffer, size_t iBytesNeeded)
 
    m_iBytesToWrite = iBytesNeeded;
    m_pMutex->Release();
-   Check();
   
    return eError;
 }
 
 Error PullBuffer::EndWrite(size_t iBytesWritten)
 {
-   Check();
    m_pMutex->Acquire();
 
    assert(m_pPullBuffer != NULL);
@@ -356,6 +302,7 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
    if ((uint32)m_iWriteIndex > m_iBufferSize)
    {  
       assert(m_iOverflowSize > 0);
+      assert(m_iOverflowSize >= m_iWriteIndex - m_iBufferSize);
       memmove(m_pPullBuffer, m_pPullBuffer + m_iBufferSize,
               m_iWriteIndex - m_iBufferSize);
    }
@@ -371,14 +318,12 @@ Error PullBuffer::EndWrite(size_t iBytesWritten)
    m_context->log->Log(LogInput, "EndWrite: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
    m_pMutex->Release();
 
-   Check();
    return kError_NoErr;
 }
 
 // returns: kError_EndOfStream, kError_NoDataAvail, kError_NoErr
 Error PullBuffer::BeginRead(void *&pBuffer, size_t iBytesNeeded)
 {
-   Check();
    assert(m_pPullBuffer != NULL);
    assert(m_iBytesToRead == 0);
    assert(iBytesNeeded <= m_iBufferSize);
@@ -448,22 +393,22 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t iBytesNeeded)
 
        return kError_InvalidParam;
    } 
-   Check();
    if (m_iOverflowSize != 0 && iOverflow > 0)
+   {
+       assert(m_iOverflowSize >= iOverflow);
        memcpy(m_pPullBuffer + m_iBufferSize, m_pPullBuffer, iOverflow);
+   }
 
    m_iBytesToRead = iBytesNeeded;
    m_pMutex->Release();
 
    pBuffer = m_pPullBuffer + m_iReadIndex;
-   Check();
  
    return eError = kError_NoErr;
 }
 
 Error PullBuffer::EndRead(size_t iBytesUsed)
 {
-   Check();
    assert(m_pPullBuffer != NULL);
    assert(iBytesUsed <= m_iBytesToRead);
    assert(iBytesUsed >= 0);
@@ -481,14 +426,12 @@ Error PullBuffer::EndRead(size_t iBytesUsed)
    m_context->log->Log(LogInput, "EndRead: ReadIndex: %d WriteIndex %d\n", m_iReadIndex, m_iWriteIndex);
 
    m_pMutex->Release();
-   Check();
 
    return kError_NoErr;
 }
 
 Error PullBuffer::DiscardBytes()
 {
-   Check();
    int iBytesToDiscard;
 
    for(;;)
@@ -515,7 +458,6 @@ Error PullBuffer::DiscardBytes()
    }
 
    m_pMutex->Release();
-   Check();
 
    return kError_NoErr;
 }

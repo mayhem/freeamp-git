@@ -71,8 +71,6 @@ Error EventBuffer::BeginRead(void *&pBuffer, size_t iBytesWanted)
       iMaxBytes = (GetBufferSize() - iReadIndex) + pEvent->iIndex;
    }
 
-   //Debug_v("Mb: %d wn: %d (event at: %d, ri: %d, wi: %d bi: %d bs: %d)",  iMaxBytes, iBytesWanted,
-   //    pEvent->iIndex, iReadIndex, GetWriteIndex(), GetNumBytesInBuffer(), GetBufferSize());
    if (iBytesWanted >= iMaxBytes)
       return kError_EventPending;
    else
