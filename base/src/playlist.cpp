@@ -1037,7 +1037,13 @@ Error PlaylistManager::RemoveItem(uint32 index)
             }
         }
 
-        m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, index, this));
+        vector<PlaylistItem*> itemList;
+        vector<uint32> indexList;
+
+        itemList.push_back(item);
+        indexList.push_back(index);
+
+        m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(&itemList, &indexList, this));
 
         result = kError_NoErr;
     }
@@ -1057,6 +1063,8 @@ Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
     {
         uint32 i;
         const PlaylistItem* currentItem = GetCurrentItem();
+        vector<PlaylistItem*> itemList;
+        vector<uint32> indexList;
 
         /*UndoMultiItem* multiItem= new UndoMultiItem();
 
@@ -1100,8 +1108,11 @@ Error PlaylistManager::RemoveItems(uint32 index, uint32 count)
                 delete item;
             }
 
-            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, index + i, this));
+            itemList.push_back(item);
+            indexList.push_back(index + i);
         }
+
+        m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(&itemList, &indexList, this));
 
         m_activeList->erase(m_activeList->begin() + index, 
                             m_activeList->begin() + index + count);
@@ -1145,6 +1156,8 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
         PlaylistItem* item = NULL;
         uint32 oldIndex;
         const PlaylistItem* currentItem = GetCurrentItem();
+        vector<PlaylistItem*> itemList;
+        vector<uint32> indexList;
 
         size = items->size();
 
@@ -1191,12 +1204,14 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
                     delete item;
                 }
 
-                m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, oldIndex, this));
+                itemList.push_back(item);
+                indexList.push_back(oldIndex);                
 
                 result = kError_NoErr;
             }
         }  
 
+        m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(&itemList, &indexList, this));
 
         if(kPlaylistKey_MasterPlaylist == GetActivePlaylist())
         {
@@ -1223,11 +1238,14 @@ Error PlaylistManager::RemoveItems(vector<PlaylistItem*>* items)
 
 Error PlaylistManager::RemoveAll()
 {
+    m_mutex.Acquire();
+
     Error result = kError_InvalidParam;
     uint32 index = m_activeList->size() - 1;
     //uint32 size = m_activeList->size();
     PlaylistItem* item = NULL;
-    m_mutex.Acquire();
+    vector<PlaylistItem*> itemList;
+    vector<uint32> indexList;
 
     vector<PlaylistItem*>::reverse_iterator i;
 
@@ -1254,9 +1272,12 @@ Error PlaylistManager::RemoveAll()
                 delete item;
             }          
             
-            m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(item, index, this));
+            itemList.push_back(item);
+            indexList.push_back(index);
         }
     }  
+
+    m_context->target->AcceptEvent(new PlaylistItemRemovedEvent(&itemList, &indexList, this));
 
     m_activeList->clear();
 

@@ -574,7 +574,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
             PlaylistItemRemovedEvent* pie = (PlaylistItemRemovedEvent*)event;
 
             if(pie->Manager() == m_plm)
-                PlaylistListItemRemoved(pie->Item(), pie->Index());
+                PlaylistListItemRemoved(pie->Items(), pie->Indices());
             else
             {
                 vector<MusicBrowserUI *>::iterator i;
@@ -583,7 +583,7 @@ Error MusicBrowserUI::AcceptEvent(Event *event)
                 {
                     if((*i)->PLManager() == pie->Manager())
                     {
-                        (*i)->PlaylistListItemRemoved(pie->Item(), pie->Index());
+                        (*i)->PlaylistListItemRemoved(pie->Items(), pie->Indices());
                         break;
                     }
                 }

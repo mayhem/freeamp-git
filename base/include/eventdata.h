@@ -739,16 +739,18 @@ public:
 
 class PlaylistItemRemovedEvent : public Event {
 private:
-	const PlaylistItem* m_item;
+	vector<PlaylistItem*> m_items;
     const PlaylistManager* m_plm;
-    uint32 m_index;
+    vector<uint32> m_indices;
 public:
-	PlaylistItemRemovedEvent(const PlaylistItem* item, uint32 index, const PlaylistManager* plm) 
-    { m_type = INFO_PlaylistItemRemoved; m_item = item; m_plm = plm; m_index = index; }
+	PlaylistItemRemovedEvent(vector<PlaylistItem*>* items, 
+                             vector<uint32>* indices, 
+                             const PlaylistManager* plm) 
+    { m_type = INFO_PlaylistItemRemoved; m_items = *items; m_plm = plm; m_indices = *indices; }
 	virtual ~PlaylistItemRemovedEvent() {}
 
-	const PlaylistItem* Item() const { return m_item; }
-    uint32 Index() const { return m_index; }
+	const vector<PlaylistItem*>* Items() const { return &m_items; }
+    const vector<uint32>* Indices() const { return &m_indices; }
     const PlaylistManager* Manager() const { return m_plm; }
 };
 

@@ -454,51 +454,60 @@ void MusicBrowserUI::PlaylistListItemMoved(const PlaylistItem* item,
     }
 }
 
-void MusicBrowserUI::PlaylistListItemRemoved(const PlaylistItem* item, 
-                                             uint32 oldIndex)
+void MusicBrowserUI::PlaylistListItemRemoved(const vector<PlaylistItem*>* itemList, 
+                                             const vector<uint32>* oldIndexList)
 {
     // item has already been deleted when we get this 
     // msg so don't access it. only use it for comparison
 
-    if(oldIndex != kInvalidIndex)
+
+    vector<uint32>::const_iterator i = oldIndexList->begin();
+
+    for(;i != oldIndexList->end(); i++)
     {
-        LV_ITEM lv_item;
-        
-        lv_item.mask = LVIF_PARAM|LVIF_STATE;
-        lv_item.iItem = oldIndex;
-        lv_item.iSubItem = 0;
-        lv_item.lParam = 0;
-        lv_item.stateMask = LVIS_SELECTED|LVIS_FOCUSED;
+        uint32 oldIndex = *i;
 
-        ListView_GetItem(m_hPlaylistView, &lv_item);
-        
-        ListView_DeleteItem(m_hPlaylistView, oldIndex);
-
-        if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
-            oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
-
-        if(lv_item.state & LVIS_SELECTED)
+        if(oldIndex != kInvalidIndex)
         {
-            ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
+            LV_ITEM lv_item;
+        
+            lv_item.mask = LVIF_PARAM|LVIF_STATE;
+            lv_item.iItem = oldIndex;
+            lv_item.iSubItem = 0;
+            lv_item.lParam = 0;
+            lv_item.stateMask = LVIS_SELECTED|LVIS_FOCUSED;
+
+            ListView_GetItem(m_hPlaylistView, &lv_item);
+        
+            ListView_DeleteItem(m_hPlaylistView, oldIndex);
+
+            if(oldIndex >= ListView_GetItemCount(m_hPlaylistView))
+                oldIndex = ListView_GetItemCount(m_hPlaylistView) - 1;
+
+            if(lv_item.state & LVIS_SELECTED)
+            {
+                ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_SELECTED, LVIS_SELECTED);
+            }
+
+            if(lv_item.state & LVIS_FOCUSED)
+            {
+                ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_FOCUSED, LVIS_FOCUSED);
+            }
+
+            m_bListChanged = true;
         }
-
-        if(lv_item.state & LVIS_FOCUSED)
-        {
-            ListView_SetItemState(m_hPlaylistView, oldIndex, LVIS_FOCUSED, LVIS_FOCUSED);
-        }
-
-        ListView_RedrawItems(m_hPlaylistView, oldIndex, ListView_GetItemCount(m_hPlaylistView) - 1);        
-
-        m_bListChanged = true;
-        UpdateTotalTime();
-        UpdateButtonStates();
-        SetFocus(m_hPlaylistView);
-
-        //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
-
-        //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
-        //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
     }
+    
+    UpdateTotalTime();
+    UpdateButtonStates();
+    SetFocus(m_hPlaylistView);
+
+    //HMENU menu = GetSubMenu(GetMenu(m_hWnd), 1);
+
+    //EnableMenuItem(menu, ID_EDIT_UNDO_ACTION, (m_plm->CanUndo() ? MF_ENABLED : MF_GRAYED));
+    //EnableMenuItem(menu, ID_EDIT_REDO_ACTION, (m_plm->CanRedo() ? MF_ENABLED : MF_GRAYED));
+
+    ListView_RedrawItems(m_hPlaylistView, ListView_GetTopIndex(m_hPlaylistView), ListView_GetItemCount(m_hPlaylistView) - 1);
 }
 
 void MusicBrowserUI::PlaylistListSorted(void)

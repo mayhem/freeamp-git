@@ -238,7 +238,8 @@ class MusicBrowserUI : public UserInterface
     void  PlaylistListItemUpdated(const PlaylistItem* item);
     void  PlaylistListItemMoved(const PlaylistItem* item, 
                                 uint32 oldIndex, uint32 newIndex);
-    void  PlaylistListItemRemoved(const PlaylistItem* item, uint32 oldIndex);
+    void  PlaylistListItemRemoved(const vector<PlaylistItem*>* itemList, 
+                                  const vector<uint32>* oldIndexList);
     void  PlaylistListSorted();
     void  InitList();
     void  LVBeginDrag(HWND hwnd, NM_LISTVIEW* nmlv);
