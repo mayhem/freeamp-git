@@ -33,7 +33,7 @@ ____________________________________________________________________________*/
 #include "pmo.h"
 #include "pmoevent.h"
 #include "eventbuffer.h"
-#include "facontext"
+#include "facontext.h"
 #include "preferences.h"
 
 #define BIT_SELECT  0x1f
