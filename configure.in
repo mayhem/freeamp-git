@@ -210,16 +210,9 @@ case "$host_os" in
       FPIC="-Kpic"
       LINKMOD="$CC -G"	
     else
-      z=`gcc -v 2>&1`;
-      if expr "$z" : ".*gcc version 2.95" >/dev/null; then
-        dnl running gcc 2.95.2, -fsquangle is not needed and breaks the build
-        if expr "$x_includes" : "/usr/openwin/include" >/dev/null; then
-          CFLAGS="$CFLAGS -fpermissive"
-          echo "adding -fpermissive to CFLAGS for openwin headers"
-        fi
-      fi
-      UNIX_AUDIO_API="solaris"
+      CFLAGS="$CFLAGS -fpermissive"
     fi	
+    UNIX_AUDIO_API="solaris"
     ;;
   *)
     echo "what are you?"
