@@ -60,6 +60,17 @@ CDPMO::CDPMO(FAContext *context) :
    cddbid = 0;
    sentData = false;
    trackDone = false;
+   Int32PropValue *pProp;
+
+    hWnd = 0;
+
+    if (IsError(m_pContext->props->GetProperty("MainWindow", 
+              (PropValue **)&pProp)))
+        return;        
+    else
+        hWnd = (HWND)pProp->GetInt32();
+
+   m_volume = Win32Volume::GetInstance( Win32Volume::eCDOut, hWnd );
 }
 
 CDPMO::~CDPMO()
@@ -83,32 +94,15 @@ void CDPMO::SetVolume(int32 left, int32 right)
 {
     if (m_cdDesc != "")
     {
-        left = (int32)(((double)left / (double)100) * (double)255);
-        right = (int32)(((double)right / (double)100) * (double)255);
-        struct disc_volume vol;
-
-        vol.vol_front.left = left;
-        vol.vol_back.right = right;
-
-		m_locker.Acquire();
-        cd_set_volume(m_cdDesc, vol);
-		m_locker.Release();
+        m_volume->SetVolume( left, right );
     }
 }
 
 void CDPMO::GetVolume(int &left, int &right)
 {
-    int32 volume = 0;
     if (m_cdDesc != "")
     {
-        struct disc_volume vol;
-      
-		m_locker.Acquire();
-        cd_get_volume(m_cdDesc, &vol);
-		m_locker.Release();
-
-        left = (int32)(((double)vol.vol_front.left / (double)255) * 100);
-        right = (int32)(((double)vol.vol_front.right / (double)255) * 100);
+        m_volume->GetVolume( left, right );
     }
 } 
 
