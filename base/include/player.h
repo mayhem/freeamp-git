@@ -187,6 +187,7 @@ class Player : public EventQueue, Properties, PropertyWatcher
     Mutex    *m_pmiMutex;
     Mutex    *m_pmoMutex;
     Mutex    *m_uiMutex;
+    Mutex    *m_sigStopMutex;
 
     Semaphore *m_signatureSem;
 

@@ -112,6 +112,7 @@ Player(FAContext *context) : EventQueue()
     m_pmiMutex = new Mutex();
     m_pmoMutex = new Mutex();
     m_uiMutex = new Mutex();
+	m_sigStopMutex = new Mutex();
     m_signatureSem = new Semaphore(SEM_UNLOCKED);
     // cout << "Created mutex" << endl;
     m_imQuitting = 0;
@@ -275,7 +276,8 @@ Player::
     TYPICAL_DELETE(m_uiRegistry);
     TYPICAL_DELETE(m_lmcExtensions);
     TYPICAL_DELETE(m_context->timerManager);
-    TYPICAL_DELETE(m_plm);
+	TYPICAL_DELETE(m_sigStopMutex);
+    //TYPICAL_DELETE(m_plm);
 }
 
 void      
@@ -1272,6 +1274,7 @@ void
 Player::
 KillSigThread(Event *pEvent)
 {
+	m_sigStopMutex->Acquire();
     if (m_signatureThread) {
         m_bKillSignature = true;
         if (m_sigspmo) {
@@ -1284,6 +1287,7 @@ KillSigThread(Event *pEvent)
         m_signatureThread = NULL;
     }
     m_signatureThread = NULL;
+	m_sigStopMutex->Release();
 }
     
 typedef struct GenerateSigsStruct {
@@ -1299,21 +1303,19 @@ GenerateSignature(Event *pEvent)
     GenerateSignatureEvent *gse = (GenerateSignatureEvent *)pEvent;
     set<string> *tracks = gse->Tracks();
 
+	m_sigStopMutex->Acquire();
     if (m_signatureThread) {
-cout << "killing sig thread\n";
         m_bKillSignature = true;
         if (m_sigspmo) {
-cout << "need to delete sigspmo\n";
             delete m_sigspmo;
             m_sigspmo = NULL;
         }
-cout << "joining thread\n";
         m_signatureThread->Join();
 
         delete m_signatureThread;
         m_signatureThread = NULL;
-cout << "done killing thread\n";
     }
+	m_sigStopMutex->Release();
         
     m_signatureThread = Thread::CreateThread();
     if (m_signatureThread) {
@@ -1346,8 +1348,10 @@ GenerateSigsWork(set<string> *items)
     set<string>::iterator i = items->begin();
     for (; i != items->end(); i++) 
     {
-        if (m_bKillSignature)
-            break;
+		m_sigspmo = NULL;
+
+        if (m_bKillSignature) 
+			break;
 
         Error  error = kError_NoErr;
         PhysicalMediaOutput *pmo = NULL;
@@ -1393,7 +1397,19 @@ GenerateSigsWork(set<string> *items)
         pmo = (PhysicalMediaOutput *) item->InitFunction()(m_context);
         pmo->SetPropManager((Properties *) this);
 
-        error = kError_NoErr;
+		while (!m_signatureSem->Wait(50)) {
+            if (m_bKillSignature) {
+                delete pmo;
+    			delete pmi;
+				m_sigspmo = NULL;
+				break;
+			}
+        }
+
+		if (m_bKillSignature) 
+			break;
+
+		error = kError_NoErr;
         lmc = (LogicalMediaConverter *) lmc_item->InitFunction()(m_context);
         lmc->SetPropManager((Properties *) this);
 
@@ -1410,13 +1426,6 @@ GenerateSigsWork(set<string> *items)
         lmc->SetEQData(m_eqValues);
         lmc->SetEQData(m_eqEnabled);
 
-        m_signatureSem->Wait();
-     
-        if (m_bKillSignature) {
-            m_signatureSem->Signal();
-            break; 
-        }
- 
         error = pmo->SetTo(url.c_str());
         if (error == kError_FileNotFound) {
             delete pmo;
