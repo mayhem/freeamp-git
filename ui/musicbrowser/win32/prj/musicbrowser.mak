@@ -68,6 +68,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MusicSearchDialog.obj"
 	-@erase "$(INTDIR)\MusicTree.obj"
 	-@erase "$(INTDIR)\OpenSavePlaylists.obj"
+	-@erase "$(INTDIR)\PerformDBCheckDialog.obj"
 	-@erase "$(INTDIR)\PlaylistView.obj"
 	-@erase "$(INTDIR)\RemoveTracksDialog.obj"
 	-@erase "$(INTDIR)\SavePlaylistDialog.obj"
@@ -102,6 +103,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
 	"$(INTDIR)\FavoriteDialog.obj" \
+	"$(INTDIR)\FreeAmpStreams.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
 	"$(INTDIR)\MissingFileDialog.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
@@ -113,7 +115,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
-	"$(INTDIR)\FreeAmpStreams.obj" \
+	"$(INTDIR)\PerformDBCheckDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -139,11 +141,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\musicbrowser.ui"
+ALL : "..\..\..\..\config\config.h" ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
+ALL : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
 
 !ENDIF 
 
@@ -169,6 +171,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MusicSearchDialog.obj"
 	-@erase "$(INTDIR)\MusicTree.obj"
 	-@erase "$(INTDIR)\OpenSavePlaylists.obj"
+	-@erase "$(INTDIR)\PerformDBCheckDialog.obj"
 	-@erase "$(INTDIR)\PlaylistView.obj"
 	-@erase "$(INTDIR)\RemoveTracksDialog.obj"
 	-@erase "$(INTDIR)\SavePlaylistDialog.obj"
@@ -180,6 +183,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\musicbrowser.pdb"
 	-@erase ".\musicbrowser.ilk"
 	-@erase ".\musicbrowser.ui"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -203,6 +207,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
 	"$(INTDIR)\FavoriteDialog.obj" \
+	"$(INTDIR)\FreeAmpStreams.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
 	"$(INTDIR)\MissingFileDialog.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
@@ -214,7 +219,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
-	"$(INTDIR)\FreeAmpStreams.obj" \
+	"$(INTDIR)\PerformDBCheckDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -228,7 +233,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 Debug" "fabaselib - Win32 Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -240,11 +245,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\musicbrowser.ui"
+ALL : "..\..\..\..\config\config.h" ".\musicbrowser.ui"
 
 !ELSE 
 
-ALL : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" ".\musicbrowser.ui"
+ALL : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
 
 !ENDIF 
 
@@ -270,6 +275,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MusicSearchDialog.obj"
 	-@erase "$(INTDIR)\MusicTree.obj"
 	-@erase "$(INTDIR)\OpenSavePlaylists.obj"
+	-@erase "$(INTDIR)\PerformDBCheckDialog.obj"
 	-@erase "$(INTDIR)\PlaylistView.obj"
 	-@erase "$(INTDIR)\RemoveTracksDialog.obj"
 	-@erase "$(INTDIR)\SavePlaylistDialog.obj"
@@ -281,6 +287,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\musicbrowser.pdb"
 	-@erase ".\musicbrowser.ilk"
 	-@erase ".\musicbrowser.ui"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -304,6 +311,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
 	"$(INTDIR)\FavoriteDialog.obj" \
+	"$(INTDIR)\FreeAmpStreams.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
 	"$(INTDIR)\MissingFileDialog.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
@@ -315,7 +323,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
-	"$(INTDIR)\FreeAmpStreams.obj" \
+	"$(INTDIR)\PerformDBCheckDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -329,7 +337,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" ".\musicbrowser.ui"
+$(DS_POSTBUILD_DEP) : "gdbm - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\musicbrowser.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                                                                     ..\..\..\..\base\win32\prj\plugins
 	copy musicbrowser.ui                                                                                       ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -371,6 +379,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MusicSearchDialog.obj"
 	-@erase "$(INTDIR)\MusicTree.obj"
 	-@erase "$(INTDIR)\OpenSavePlaylists.obj"
+	-@erase "$(INTDIR)\PerformDBCheckDialog.obj"
 	-@erase "$(INTDIR)\PlaylistView.obj"
 	-@erase "$(INTDIR)\RemoveTracksDialog.obj"
 	-@erase "$(INTDIR)\SavePlaylistDialog.obj"
@@ -405,6 +414,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\EnumFormatEtc.obj" \
 	"$(INTDIR)\Event.obj" \
 	"$(INTDIR)\FavoriteDialog.obj" \
+	"$(INTDIR)\FreeAmpStreams.obj" \
 	"$(INTDIR)\IntroductionWizard.obj" \
 	"$(INTDIR)\MissingFileDialog.obj" \
 	"$(INTDIR)\MultiSelectTreeView.obj" \
@@ -416,7 +426,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SavePlaylistDialog.obj" \
 	"$(INTDIR)\Win32MusicBrowser.obj" \
 	"$(INTDIR)\musicbrowser.res" \
-	"$(INTDIR)\FreeAmpStreams.obj" \
+	"$(INTDIR)\PerformDBCheckDialog.obj" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\gdbm\gdbm.lib"
 
@@ -619,6 +629,12 @@ SOURCE=..\src\MusicTree.cpp
 SOURCE=..\src\OpenSavePlaylists.cpp
 
 "$(INTDIR)\OpenSavePlaylists.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\src\PerformDBCheckDialog.cpp
+
+"$(INTDIR)\PerformDBCheckDialog.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

@@ -801,7 +801,7 @@ void MusicBrowserUI::UpdateStreams(vector<FreeAmpStreamInfo> &list)
         insert.item.cChildren= 0;
         insert.item.lParam = (LPARAM) new TreeData(data);
         insert.hInsertAfter = TVI_LAST;
-        insert.hParent = m_hStreamsItem;//CreateStreamFolder(i->m_treePath);
+        insert.hParent = CreateStreamFolder(i->m_treePath);
         TreeView_InsertItem(m_hMusicView, &insert);
     }
 
@@ -837,39 +837,50 @@ HTREEITEM MusicBrowserUI::CreateStreamFolder(string& treePath)
         }
 
         HTREEITEM treeItem = TreeView_GetChild(m_hMusicView, result);
+        bool found = false;
 
-        if(treeItem)
+        while(treeItem)
         {
-            while(treeItem)
+            TV_ITEM tv_item;
+            char buf[512];
+
+            tv_item.hItem = treeItem;
+            tv_item.mask = TVIF_TEXT;
+            tv_item.pszText = buf;
+            tv_item.cchTextMax = sizeof(buf);
+
+            TreeView_GetItem(m_hMusicView, &tv_item);
+
+            if(!folder.compare(buf))
             {
-                TV_ITEM tv_item;
-                char buf[512];
-
-                tv_item.hItem = treeItem;
-                tv_item.mask = TVIF_TEXT;
-                tv_item.pszText = buf;
-                tv_item.cchTextMax = sizeof(buf);
-
-                TreeView_GetItem(m_hMusicView, &tv_item);
-
-                if(!folder.compare(buf))
-                {
-                    result = treeItem;
-                    break;
-                }
-
-                treeItem = TreeView_GetNextSibling(m_hMusicView, treeItem);
+                found = true;
+                break;
             }
+
+            treeItem = TreeView_GetNextSibling(m_hMusicView, treeItem);
         }
 
-        TV_INSERTSTRUCT insert;
-        TreeData        data;
+        if(found)
+        {
+            result = treeItem;
+        }
+        else
+        {
+            TV_INSERTSTRUCT insert;
 
-        insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
-                            TVIF_SELECTEDIMAGE | TVIF_PARAM;
+            insert.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN |
+                                TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-
-        
+            insert.item.pszText = (char*)folder.c_str();
+            insert.item.cchTextMax = strlen(insert.item.pszText);
+            insert.item.iImage = 14;
+            insert.item.iSelectedImage = 14;
+            insert.item.cChildren= 1;
+            insert.item.lParam = NULL;
+            insert.hInsertAfter = TVI_LAST;
+            insert.hParent = result;
+            result = TreeView_InsertItem(m_hMusicView, &insert);
+        }
     }
 
     return result;

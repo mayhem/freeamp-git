@@ -300,6 +300,10 @@ SOURCE=..\src\OpenSavePlaylists.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\PerformDBCheckDialog.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\PlaylistView.cpp
 # End Source File
 # Begin Source File

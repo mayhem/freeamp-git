@@ -108,6 +108,12 @@ RemoveTracksDlgProc(HWND hwnd,
                     WPARAM wParam, 
                     LPARAM lParam);
 
+BOOL CALLBACK 
+PerformDBCheckDlgProc(HWND hwnd, 
+                      UINT msg, 
+                      WPARAM wParam, 
+                      LPARAM lParam );
+
 class MusicBrowserUI : public UserInterface 
 {
  public:

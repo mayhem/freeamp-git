@@ -65,8 +65,10 @@ CLEAN :
 	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\Median.obj"
 	-@erase "$(INTDIR)\MultiStateControl.obj"
+	-@erase "$(INTDIR)\Panel.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\PixFontControl.obj"
+	-@erase "$(INTDIR)\PixSliderControl.obj"
 	-@erase "$(INTDIR)\PixTimeControl.obj"
 	-@erase "$(INTDIR)\SliderControl.obj"
 	-@erase "$(INTDIR)\TextControl.obj"
@@ -115,6 +117,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Http.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
+	"$(INTDIR)\Panel.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\PixFontControl.obj" \
 	"$(INTDIR)\PixTimeControl.obj" \
@@ -132,6 +135,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
+	"$(INTDIR)\PixSliderControl.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -185,8 +189,10 @@ CLEAN :
 	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\Median.obj"
 	-@erase "$(INTDIR)\MultiStateControl.obj"
+	-@erase "$(INTDIR)\Panel.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\PixFontControl.obj"
+	-@erase "$(INTDIR)\PixSliderControl.obj"
 	-@erase "$(INTDIR)\PixTimeControl.obj"
 	-@erase "$(INTDIR)\SliderControl.obj"
 	-@erase "$(INTDIR)\TextControl.obj"
@@ -238,6 +244,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Http.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
+	"$(INTDIR)\Panel.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\PixFontControl.obj" \
 	"$(INTDIR)\PixTimeControl.obj" \
@@ -255,6 +262,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
+	"$(INTDIR)\PixSliderControl.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -281,11 +289,11 @@ INTDIR=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : ".\freeamp.ui"
+ALL : "..\..\..\..\config\config.h" ".\freeamp.ui"
 
 !ELSE 
 
-ALL : "unzip - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" "zlib - Win32 NASM Debug" ".\freeamp.ui"
+ALL : "unzip - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" "zlib - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\freeamp.ui"
 
 !ENDIF 
 
@@ -308,8 +316,10 @@ CLEAN :
 	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\Median.obj"
 	-@erase "$(INTDIR)\MultiStateControl.obj"
+	-@erase "$(INTDIR)\Panel.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\PixFontControl.obj"
+	-@erase "$(INTDIR)\PixSliderControl.obj"
 	-@erase "$(INTDIR)\PixTimeControl.obj"
 	-@erase "$(INTDIR)\SliderControl.obj"
 	-@erase "$(INTDIR)\TextControl.obj"
@@ -331,6 +341,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\freeamp.pdb"
 	-@erase ".\freeamp.ilk"
 	-@erase ".\freeamp.ui"
+	-@erase "..\..\..\..\config\config.h"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -360,6 +371,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Http.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
+	"$(INTDIR)\Panel.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\PixFontControl.obj" \
 	"$(INTDIR)\PixTimeControl.obj" \
@@ -377,6 +389,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
+	"$(INTDIR)\PixSliderControl.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -391,7 +404,7 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 
 ALL : $(DS_POSTBUILD_DEP)
 
-$(DS_POSTBUILD_DEP) : "unzip - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" "zlib - Win32 NASM Debug" ".\freeamp.ui"
+$(DS_POSTBUILD_DEP) : "unzip - Win32 NASM Debug" "fabaselib - Win32 NASM Debug" "zlib - Win32 NASM Debug" "..\..\..\..\config\config.h" ".\freeamp.ui"
    IF NOT EXIST ..\..\..\..\base\win32\prj\plugins mkdir                                                          ..\..\..\..\base\win32\prj\plugins
 	copy freeamp.ui                                         ..\..\..\..\base\win32\prj\plugins
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
@@ -430,8 +443,10 @@ CLEAN :
 	-@erase "$(INTDIR)\Http.obj"
 	-@erase "$(INTDIR)\Median.obj"
 	-@erase "$(INTDIR)\MultiStateControl.obj"
+	-@erase "$(INTDIR)\Panel.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\PixFontControl.obj"
+	-@erase "$(INTDIR)\PixSliderControl.obj"
 	-@erase "$(INTDIR)\PixTimeControl.obj"
 	-@erase "$(INTDIR)\SliderControl.obj"
 	-@erase "$(INTDIR)\TextControl.obj"
@@ -480,6 +495,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Http.obj" \
 	"$(INTDIR)\Median.obj" \
 	"$(INTDIR)\MultiStateControl.obj" \
+	"$(INTDIR)\Panel.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\PixFontControl.obj" \
 	"$(INTDIR)\PixTimeControl.obj" \
@@ -497,6 +513,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Win32Window.obj" \
 	"$(INTDIR)\Window.obj" \
 	"$(INTDIR)\freeampui.res" \
+	"$(INTDIR)\PixSliderControl.obj" \
 	"..\..\..\..\lib\zlib\zlib.lib" \
 	"..\..\..\..\base\win32\fabaselib.lib" \
 	"..\..\..\..\lib\unzip\unzip.lib"
@@ -685,6 +702,12 @@ SOURCE=..\..\src\MultiStateControl.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\..\src\Panel.cpp
+
+"$(INTDIR)\Panel.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\..\..\..\lib\xml\src\Parse.cpp
 
 "$(INTDIR)\Parse.obj" : $(SOURCE) "$(INTDIR)"
@@ -694,6 +717,12 @@ SOURCE=..\..\..\..\lib\xml\src\Parse.cpp
 SOURCE=..\..\src\PixFontControl.cpp
 
 "$(INTDIR)\PixFontControl.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\src\PixSliderControl.cpp
+
+"$(INTDIR)\PixSliderControl.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -800,7 +829,7 @@ SOURCE=..\res\freeampui.rc
 !ELSEIF  "$(CFG)" == "freeampui - Win32 NASM Debug"
 
 
-"$(INTDIR)\freeampui.res" : $(SOURCE) "$(INTDIR)" "..\..\..\..\config\config.h"
+"$(INTDIR)\freeampui.res" : $(SOURCE) "$(INTDIR)"
 	$(RSC) /l 0x409 /fo"$(INTDIR)\freeampui.res" /i "\Local\src\freeamp\ui\freeamp\win32\res" /d "_DEBUG" $(SOURCE)
 
 

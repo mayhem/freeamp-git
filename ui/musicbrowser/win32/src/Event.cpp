@@ -1437,31 +1437,35 @@ void MusicBrowserUI::AddFileEvent(HWND hwndParent, bool playNow)
 }
 
 void MusicBrowserUI::EmptyDBCheck(void)
-{
-    int iRet;
-    
+{    
     if (m_context->catalog->GetPlaylists()->size() > 0 ||
         m_context->catalog->GetMusicList()->size() > 0 ||
         m_context->catalog->GetUnsortedMusic()->size() > 0)
         return;
 
     bool welcome = false;
+    bool checkDB = true;
 
     m_context->prefs->GetPrefBoolean(kWelcomePref, &welcome);
+    m_context->prefs->GetPrefBoolean(kPerformDBCheckPref, &checkDB);
 
     if(welcome)
     {
         m_context->prefs->SetPrefBoolean(kWelcomePref, false);
         StartStopMusicSearch(true); 
     }
-    else
+    else if(checkDB)
     {
-        iRet = MessageBox(m_hWnd, "Your music database does not contain any items.\r\n"
-                                  "Would you like to start a search to find music\r\n"
-                                  "and playlists on your machine?",
-                                  "Search For Music", MB_YESNO|MB_SETFOREGROUND);
-        if (iRet == IDYES)
-            StartStopMusicSearch();   
+        if(0 < DialogBoxParam(g_hinst, 
+                              MAKEINTRESOURCE(IDD_CHECKDB),
+                              m_hWnd, 
+                              ::PerformDBCheckDlgProc, 
+                              (LPARAM)&checkDB))
+        {     
+            StartStopMusicSearch();
+        }
+
+        m_context->prefs->SetPrefBoolean(kPerformDBCheckPref, checkDB);
     }
 }
 

@@ -284,6 +284,10 @@ SOURCE=..\..\src\PixFontControl.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\src\PixSliderControl.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\PixTimeControl.cpp
 # End Source File
 # Begin Source File

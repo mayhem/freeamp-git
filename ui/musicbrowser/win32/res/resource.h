@@ -48,6 +48,7 @@
 #define IDD_INTROWIZARD_HELLO1          264
 #define IDD_MISSINGTRACK                264
 #define IDD_FAVORITE                    265
+#define IDD_CHECKDB                     266
 #define IDB_PLAYING                     542
 #define IDB_CATALOG                     543
 #define IDB_ARTIST                      544
@@ -94,6 +95,7 @@
 #define IDC_DESCRIPTION                 1041
 #define IDC_EDIT1                       1042
 #define IDC_PATH                        1042
+#define IDC_CHECK                       1042
 #define IDC_BUTTON1                     1043
 #define IDC_RADIO3                      1044
 #define IDC_EDIT2                       1045
