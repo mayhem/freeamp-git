@@ -7,6 +7,8 @@ Changes for version 2.1.1
 - Added John Cantrrill's WAV LMC
 - Fixed the streaming http redirect to work for more general 
   (not just dot notation) URLS.
+- Fixed some track move and drag and drop issues in the playlist
+  manager for Linux.
 
 Changes for version 2.1.0 final
 --------------------------------------------------------------------
