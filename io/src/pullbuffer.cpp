@@ -421,6 +421,7 @@ Error PullBuffer::BeginRead(void *&pBuffer, size_t &iBytesNeeded, bool bBlock)
 Error PullBuffer::EndRead(size_t iBytesUsed)
 {
    assert(m_pPullBuffer != NULL);
+   assert(iBytesUsed >= 0);
 
    m_pMutex->Acquire();
 

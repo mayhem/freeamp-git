@@ -33,7 +33,9 @@ ____________________________________________________________________________*/
 #include "eventdata.h"
 #include "mutex.h"
 #include "thread.h"
+#ifdef WIN32
 #include "win32thread.h"
+#endif
 
 #include "std.h"
 #include "rio.h"
@@ -1019,6 +1021,7 @@ void
 PlayListManager::
 RioThreadFunction()
 {
+#ifdef WIN32
     int32 ports[] = { 0x378, 0x278, 0x03BC };
     bool rioPresent = false;
 
@@ -1091,6 +1094,7 @@ RioThreadFunction()
     }
 
     delete rio;
+#endif    
 }
 
 void 

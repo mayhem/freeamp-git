@@ -38,6 +38,10 @@ ____________________________________________________________________________*/
 
 const int iMaxFileNameLen = 1024;
 
+#ifndef WIN32
+#include "std.h"
+#endif
+
 class PlayListItem {
 
  public:
