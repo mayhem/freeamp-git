@@ -58,6 +58,8 @@ typedef struct PrefsStruct {
     char saveStreamsDirectory[MAX_PATH + 1];
     bool useProxyServer;
     char proxyServer[256]; // is there a domain name length limit???
+    bool useAlternateIP;
+    char alternateIP[16];
     
     // page 3
     bool enableLogging;
@@ -73,6 +75,7 @@ typedef struct PrefsStruct {
         memset(defaultPMO, 0x00, sizeof(defaultPMO));
         memset(saveStreamsDirectory, 0x00, sizeof(saveStreamsDirectory));
         memset(proxyServer, 0x00, sizeof(proxyServer));
+        memset(alternateIP, 0x00, sizeof(alternateIP));
     }
 
 }PrefsStruct;
@@ -105,6 +108,9 @@ GetPrefsValues(Preferences* prefs,
     prefs->GetUseProxyServer(&values->useProxyServer);
     size = MAX_PATH;
     prefs->GetSaveStreamsDirectory(values->saveStreamsDirectory, &size);
+    size = 16;
+    prefs->GetAlternateNICAddress(values->alternateIP, &size);
+    prefs->GetUseAlternateNIC(&values->useAlternateIP);
 
     prefs->GetUseDebugLog(&values->enableLogging);
     prefs->GetLogMain(&values->logMain);
@@ -112,12 +118,11 @@ GetPrefsValues(Preferences* prefs,
     prefs->GetLogInput(&values->logInput);
     prefs->GetLogOutput(&values->logOutput);
     prefs->GetLogPerformance(&values->logPerformance);
-
 }
 
 static 
 void 
-SavePrefsValues( Preferences* prefs, 
+SavePrefsValues(Preferences* prefs, 
                 PrefsStruct* values)
 {
     prefs->SetDefaultPMO(values->defaultPMO);
@@ -134,6 +139,8 @@ SavePrefsValues( Preferences* prefs,
     prefs->SetSaveStreamsDirectory(values->saveStreamsDirectory);
     prefs->SetProxyServerAddress(values->proxyServer);
     prefs->SetUseProxyServer(values->useProxyServer);
+    prefs->SetAlternateNICAddress(values->alternateIP);
+    prefs->SetUseAlternateNIC(values->useAlternateIP);
 
     prefs->SetUseDebugLog(values->enableLogging);
     prefs->SetLogMain(values->logMain);
@@ -141,7 +148,6 @@ SavePrefsValues( Preferences* prefs,
     prefs->SetLogInput(values->logInput);
     prefs->SetLogOutput(values->logOutput);
     prefs->SetLogPerformance(values->logPerformance);
-
 }
 
 
@@ -538,6 +544,16 @@ PrefPage2Proc(  HWND hwnd,
     static HWND hwndProxyServerAddressText = NULL;
     static HWND hwndProxyServerPortText = NULL;
     static HWND hwndColon = NULL;
+
+    static HWND hwndUseAlternateIP = NULL;
+    static HWND hwndUseAlternateIPText = NULL;
+    static HWND hwndAlternateIPAddress1 = NULL;
+    static HWND hwndAlternateIPAddress2 = NULL;
+    static HWND hwndAlternateIPAddress3 = NULL;
+    static HWND hwndAlternateIPAddress4 = NULL;
+    static HWND hwndPeriod1 = NULL;
+    static HWND hwndPeriod2 = NULL;
+    static HWND hwndPeriod3 = NULL;
    
     switch(msg)
     {
@@ -561,6 +577,17 @@ PrefPage2Proc(  HWND hwnd,
             hwndProxyServerPort = GetDlgItem(hwnd, IDC_PORT);
             hwndProxyServerPortText = GetDlgItem(hwnd, IDC_PORT_TEXT);
             hwndColon = GetDlgItem(hwnd, IDC_COLON_TEXT);
+
+            hwndUseAlternateIP = GetDlgItem(hwnd, IDC_USETHISIP);
+            hwndUseAlternateIPText = GetDlgItem(hwnd, IDC_IPADDRESS_TEXT);
+            hwndAlternateIPAddress1 = GetDlgItem(hwnd, IDC_IPADDRESS1);
+            hwndAlternateIPAddress2 = GetDlgItem(hwnd, IDC_IPADDRESS2);
+            hwndAlternateIPAddress3 = GetDlgItem(hwnd, IDC_IPADDRESS3);
+            hwndAlternateIPAddress4 = GetDlgItem(hwnd, IDC_IPADDRESS4);
+            hwndPeriod1 = GetDlgItem(hwnd, IDC_PERIOD1);
+            hwndPeriod2 = GetDlgItem(hwnd, IDC_PERIOD2);
+            hwndPeriod3 = GetDlgItem(hwnd, IDC_PERIOD3);
+   
 
             // initialize our controls
             int32 value;
@@ -606,6 +633,7 @@ PrefPage2Proc(  HWND hwnd,
 
             Edit_LimitText(hwndProxyServerPort, 5);
 
+
             Button_SetCheck(hwndUseProxyServer, originalValues.useProxyServer);
 
 
@@ -623,6 +651,57 @@ PrefPage2Proc(  HWND hwnd,
 
             Button_Enable(  hwndColon, 
                             originalValues.useProxyServer);
+
+            char* dot = NULL;
+            char* ip[4];
+            int32 i = 1;
+
+            strcpy(temp, originalValues.alternateIP);
+            ip[0] = temp;
+            dot = temp;
+
+            while(dot = strchr(dot, '.'))
+            {
+                *dot = 0x00;
+                ip[i++] = ++dot;
+            }
+
+            Edit_SetText(hwndAlternateIPAddress1, ip[0]);
+            Edit_SetText(hwndAlternateIPAddress2, ip[1]);
+            Edit_SetText(hwndAlternateIPAddress3, ip[2]);
+            Edit_SetText(hwndAlternateIPAddress4, ip[3]);
+
+            Edit_LimitText(hwndAlternateIPAddress1, 3);
+            Edit_LimitText(hwndAlternateIPAddress2, 3);
+            Edit_LimitText(hwndAlternateIPAddress3, 3);
+            Edit_LimitText(hwndAlternateIPAddress4, 3);
+
+            Button_SetCheck(hwndUseAlternateIP, originalValues.useAlternateIP);
+
+
+            Button_Enable(  hwndUseAlternateIPText, 
+                            originalValues.useAlternateIP);
+
+            Button_Enable(  hwndAlternateIPAddress1,
+                            originalValues.useAlternateIP);
+
+            Button_Enable(  hwndPeriod1, 
+                            originalValues.useAlternateIP);
+
+            Button_Enable(  hwndAlternateIPAddress2, 
+                            originalValues.useAlternateIP);
+
+            Button_Enable(  hwndPeriod2, 
+                            originalValues.useAlternateIP);
+
+            Button_Enable(  hwndAlternateIPAddress3, 
+                            originalValues.useAlternateIP);
+
+            Button_Enable(  hwndPeriod3, 
+                            originalValues.useAlternateIP);
+
+            Button_Enable(  hwndAlternateIPAddress4, 
+                            originalValues.useAlternateIP);
 
             
             break;
@@ -829,6 +908,123 @@ PrefPage2Proc(  HWND hwnd,
 
                     break;
                 }
+
+                case IDC_USETHISIP:
+                {
+                    BOOL enabled;
+
+                    if(Button_GetCheck(hwndUseAlternateIP) == BST_CHECKED)
+                    {
+                        currentValues.useAlternateIP = true;
+                    }
+                    else
+                    {
+                        currentValues.useAlternateIP = false;
+                    }
+
+                    enabled = (currentValues.useAlternateIP ? TRUE : FALSE);
+
+                    Button_Enable(hwndUseAlternateIPText, enabled);
+                    Button_Enable(hwndAlternateIPAddress1, enabled);
+                    Button_Enable(hwndPeriod1, enabled);
+                    Button_Enable(hwndAlternateIPAddress2, enabled);
+                    Button_Enable(hwndPeriod2, enabled);
+                    Button_Enable(hwndAlternateIPAddress3, enabled);
+                    Button_Enable(hwndPeriod3, enabled);
+                    Button_Enable(hwndAlternateIPAddress4, enabled);
+                    
+
+
+                    if(memcmp(  &originalValues, 
+                                &currentValues, 
+                                sizeof(PrefsStruct)))
+                    {
+                        PropSheet_Changed(GetParent(hwnd), hwnd);
+                    }
+                    else
+                    {
+                        PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                    }
+
+                    break;
+                }
+
+                case IDC_IPADDRESS1:
+                case IDC_IPADDRESS2:
+                case IDC_IPADDRESS3:
+                case IDC_IPADDRESS4:
+                {
+                    if(HIWORD(wParam) == EN_CHANGE)
+                    {
+                        char ip[4];
+
+                        memset(currentValues.alternateIP, 0x00, 16);
+                        Edit_GetText(hwndAlternateIPAddress1, ip, 4);
+
+                        if(*ip)
+                        {
+                            strcat(currentValues.alternateIP, ip);
+                        }
+                        else
+                        {
+                            strcat(currentValues.alternateIP, "0");
+                        }
+
+                        strcat(currentValues.alternateIP, ".");
+
+
+                        Edit_GetText(hwndAlternateIPAddress2, ip, 4);
+
+                        if(*ip)
+                        {
+                            strcat(currentValues.alternateIP, ip);
+                        }
+                        else
+                        {
+                            strcat(currentValues.alternateIP, "0");
+                        }
+
+                        strcat(currentValues.alternateIP, ".");
+
+                        Edit_GetText(hwndAlternateIPAddress3, ip, 4);
+
+                        if(*ip)
+                        {
+                            strcat(currentValues.alternateIP, ip);
+                        }
+                        else
+                        {
+                            strcat(currentValues.alternateIP, "0");
+                        }
+
+                        strcat(currentValues.alternateIP, ".");
+
+                        Edit_GetText(hwndAlternateIPAddress4, ip, 4);
+
+                        if(*ip)
+                        {
+                            strcat(currentValues.alternateIP, ip);
+                        }
+                        else
+                        {
+                            strcat(currentValues.alternateIP, "0");
+                        }
+
+                        if(memcmp(  &originalValues, 
+                                    &currentValues, 
+                                    sizeof(PrefsStruct)))
+                        {
+                            PropSheet_Changed(GetParent(hwnd), hwnd);
+                        }
+                        else
+                        {
+                            PropSheet_UnChanged(GetParent(hwnd), hwnd);
+                        }
+                    }
+
+                    break;
+                }
+
             }
 
             break;

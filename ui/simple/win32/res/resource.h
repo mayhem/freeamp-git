@@ -56,6 +56,15 @@
 #define IDC_USEPROXY                    1023
 #define IDC_PROXYADDRESS                1024
 #define IDC_COLON_TEXT                  1025
+#define IDC_USETHISIP                   1026
+#define IDC_IPADDRESS1                  1027
+#define IDC_IPADDRESS_TEXT              1028
+#define IDC_PERIOD1                     1030
+#define IDC_PERIOD2                     1031
+#define IDC_IPADDRESS2                  1032
+#define IDC_IPADDRESS3                  1033
+#define IDC_IPADDRESS4                  1034
+#define IDC_PERIOD3                     1035
 #define IDC_FIND                        20156
 #define IDC_RECENTF1                    31000
 #define IDC_SELECTALL                   32901
