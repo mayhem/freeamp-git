@@ -552,6 +552,8 @@ void GTKPreferenceWindow::SavePrefsValues(Preferences* prefs,
         m_pContext->target->AcceptEvent(new Event(INFO_PrefsChanged));
         currentValues = proposedValues = *values;
     }
+
+    m_pContext->prefs->Save();
 }
 
 void GTKPreferenceWindow::SetToolbar(bool text, bool pics)

@@ -723,7 +723,7 @@ Run()
     char* cp = secondaries;
     char* ui = cp;
 
-    while(cp = strchr(cp, ';'))
+    while((cp = strchr(cp, ';')))
     {
         *cp = 0x00;
         secondaryUIList.insert(string(ui));
