@@ -83,14 +83,19 @@ Create(thread_function function, void* arg)
     m_function      = function;
     m_arg           = arg;
 
-	//m_threadHandle = (HANDLE) _beginthreadex(
-	/*LEAK-2*/m_threadHandle = ::CreateThread(
-									NULL,
+	m_threadHandle = ::CreateThread(NULL,
 									0,
 									internalThreadFunction,
 									this,
 									0,
 									&m_threadId);
+	//m_threadHandle = (HANDLE) _beginthreadex(
+	//								NULL,
+	//								0,
+	//								(unsigned int (__stdcall *)(void *))internalThreadFunction,
+	//								this,
+	//								0,
+	//								(unsigned int *)&m_threadId);
 	if(m_threadHandle)
 	{
 		result = true;
