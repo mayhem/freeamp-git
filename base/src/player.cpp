@@ -787,9 +787,9 @@ Run()
       if (!uisActivated)
       {
 #ifdef WIN32
-         MessageBox(NULL, BRANDING" Cannot find user a valid interface module.\r\n"
-                          "Please make sure that FreeAmp is installed correctly.\r\n"
-                          "You may wish to remove and reinstall FreeAmp to fix this problem",
+         MessageBox(NULL, BRANDING" cannot find user a valid interface module.\r\n"
+                          "Please make sure that " BRANDING" is installed correctly.\r\n"
+                          "You may wish to remove and reinstall " BRANDING" to fix this problem",
                     BRANDING " Error", MB_OK);
 #else
          const char *thePath = getenv(FREEAMP_PATH_ENV);

@@ -177,7 +177,7 @@ Error EsounDPMO::Init(OutputInfo * info)
       return (Error) pmoError_DeviceOpenFailed;
    }
 
-   sprintf(stream_name, "FreeAMP%d", getpid());
+   sprintf(stream_name, "FreeAmp%d", getpid());
 
    audio_fd = esd_play_stream( esd_format, info->samples_per_second,
                                m_espeaker, stream_name );

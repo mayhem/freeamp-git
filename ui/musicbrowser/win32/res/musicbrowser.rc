@@ -257,18 +257,18 @@ BEGIN
     END
     POPUP "&Controls"
     BEGIN
-        MENUITEM "Play the CurrentTrack",       ID_CONTROLS_PLAYPAUSE
-        MENUITEM "Stop the Current Track",      ID_CONTROLS_STOP
+        MENUITEM "&Play the Current Track",     ID_CONTROLS_PLAYPAUSE
+        MENUITEM "&Stop the Current Track",     ID_CONTROLS_STOP
         MENUITEM SEPARATOR
-        MENUITEM "Move to Previous Track",      ID_CONTROLS_PREVIOUSSONG
-        MENUITEM "Move to Next Track",          ID_CONTROLS_NEXTSONG
+        MENUITEM "Move to Pre&vious Track",     ID_CONTROLS_PREVIOUSSONG
+        MENUITEM "Move to &Next Track",         ID_CONTROLS_NEXTSONG
         MENUITEM SEPARATOR
-        MENUITEM "Play Tracks in Normal Order", ID_CONTROLS_NORMALORDER
-        MENUITEM "Play Tracks in Random Order", ID_CONTROLS_SHUFFLE
+        MENUITEM "Play Tracks in Nor&mal Order", ID_CONTROLS_NORMALORDER
+        MENUITEM "Play Tracks in &Random Order", ID_CONTROLS_SHUFFLE
         MENUITEM SEPARATOR
-        MENUITEM "Repeat No Tracks",            ID_CONTROLS_REPEATNONE
-        MENUITEM "Repeat Current Track",        ID_CONTROLS_REPEATONE
-        MENUITEM "Repeat All Tracks",           ID_CONTROLS_REPEATALL
+        MENUITEM "Repeat N&o Tracks",           ID_CONTROLS_REPEATNONE
+        MENUITEM "Repeat &Current Track",       ID_CONTROLS_REPEATONE
+        MENUITEM "Repeat &All Tracks",          ID_CONTROLS_REPEATALL
     END
     POPUP "&Sort Playlist"
     BEGIN
@@ -289,7 +289,7 @@ BEGIN
         MENUITEM "&FreeAmp Web Site",           ID_HELP_FREEAMPWEBSITE
         MENUITEM "&EMusic.com Web Site",        ID_HELP_EMUSICCOMWEBSITE
         MENUITEM SEPARATOR
-        MENUITEM "About...",                    ID_HELP_ABOUT
+        MENUITEM "&About...",                   ID_HELP_ABOUT
     END
 END
 

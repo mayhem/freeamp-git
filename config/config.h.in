@@ -29,9 +29,11 @@ ____________________________________________________________________________*/
 
 #define BRANDING "FreeAmp"
 #define BRANDING_URL "http://www.freeamp.org"
+#define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
+#define BRANDING_UPDATE_PATH "/update/freeamp/"
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
-#define FREEAMP_VERSION "unknown"
+#define FREEAMP_VERSION "2.0"
 
 #undef HAVE_GTK
 #undef HAVE_FREETYPE_FREETYPE_H

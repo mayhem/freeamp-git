@@ -2260,10 +2260,10 @@ static void update_function(void* arg)
         HWND hwnd = GetParent(GetParent(ts->hwndList));
 
         response = MessageBox(hwnd, 
-                            "FreeAmp needs to close down and restart in order to replace components\r\n"
+                            BRANDING" needs to close down and restart in order to replace components\r\n"
                             "which are being used. If you do not wish to quit the application you\r\n"
                             "can choose \"Cancel\" and update again at a later time.",
-                            "Restart FreeAmp?", 
+                            "Restart "BRANDING"?", 
                             MB_OKCANCEL|MB_ICONQUESTION);
 
         if(response == IDOK)

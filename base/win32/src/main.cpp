@@ -456,9 +456,9 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
                         ret = MessageBox(NULL, 
                                    kNotifyStolen,
                                    "Reclaim File Types?", 
-                                   MB_OKCANCEL|MB_ICONQUESTION);
+                                   MB_YESNO|MB_ICONQUESTION);
 
-                        if(ret == IDOK)
+                        if(ret == IDYES)
                             permission = true;
                         else
                         {
@@ -508,9 +508,9 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
                         ret = MessageBox(NULL, 
                                    kNotifyStolen,
                                    "Reclaim File Types?", 
-                                   MB_OKCANCEL|MB_ICONQUESTION);
+                                   MB_YESNO|MB_ICONQUESTION);
 
-                        if(ret == IDOK)
+                        if(ret == IDYES)
                             permission = true;
                         else
                         {
@@ -567,9 +567,9 @@ void ReclaimFileTypes(const char* path, bool askBeforeReclaiming)
                         ret = MessageBox(NULL, 
                                    kNotifyStolen,
                                    "Reclaim File Types?", 
-                                   MB_OKCANCEL|MB_ICONQUESTION);
+                                   MB_YESNO|MB_ICONQUESTION);
 
-                        if(ret == IDOK)
+                        if(ret == IDYES)
                             permission = true;
                         else
                         {

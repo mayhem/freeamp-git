@@ -24,10 +24,14 @@ ____________________________________________________________________________*/
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <limits.h>
-
-#define BRANDING "FreeAmp"
+#define BRANDING "EMusic"
 #define BRANDING_URL "http://www.freeamp.org"
+#define BRANDING_UPDATE_SERVER "fatman.freeamp.org"
+#define BRANDING_UPDATE_PATH "/update/freeamp/"
+
+#if !defined(RC_INVOKED)
+
+#include <limits.h>
 
 #define FREEAMP_PATH_ENV "FREEAMP_PATH"
 #define FREEAMP_VERSION "2.0"
@@ -136,5 +140,6 @@ typedef short			int32;
 #endif
 #endif /* NULL */
 
+#endif /* RC_INVOKED */
 
 #endif /* CONFIG_H */

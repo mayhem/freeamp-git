@@ -69,12 +69,12 @@ typedef ostrstream ostringstream;
 #include "zlib.h"
 
 
-const char* kUpdateServer = "fatman.freeamp.org";
-const char* kUpdatePath = "/update/freeamp/";
-const char* kUpdateFile = "/update/freeamp/version_info.xml";
+const char* kUpdateServer = BRANDING_UPDATE_SERVER;
+const char* kUpdatePath = BRANDING_UPDATE_PATH;
+const char* kUpdateFile = BRANDING_UPDATE_PATH"/version_info.xml";
 const char* kUpdateRequest = "GET %s HTTP/1.0\n"
                              "Host: %s\n"
-                             "User-Agent: "BRANDING"/%s\n"
+                             "User-Agent: FreeAmp/%s\n" // we do not want to change this for branding
                              "\n";
 const uint8 kUpdatePort = 80;
 

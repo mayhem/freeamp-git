@@ -1132,10 +1132,10 @@ void MusicBrowserUI::EmptyDBCheck(void)
         m_context->catalog->GetUnsortedMusic()->size() > 0)
         return;
         
-    iRet = MessageBox(m_hWnd, "Your music database does not contain any items. "
-                       "Would you like to\r\nstart a music search to find "
-                       "music and playlists on your machine?",
-                       "MusicBrowser", MB_YESNO);
+    iRet = MessageBox(m_hWnd, "Your music database does not contain any items.\r\n"
+                              "Would you like to start a search to find music\r\n"
+                              "and playlists on your machine?",
+                       "Populate My Music", MB_YESNO);
     if (iRet == IDYES)
         StartStopMusicSearch();
 }
@@ -1280,7 +1280,7 @@ void MusicBrowserUI::ChangePlayerState(int32 event)
         {   
             m_playerState = PLAYERSTATE_PLAYING;
             
-            item.dwTypeData = "Pause";
+            item.dwTypeData = "Pa&use the Current Track";
             item.cch = strlen(item.dwTypeData);
             SetMenuItemInfo(menu, ID_CONTROLS_PLAYPAUSE, false, &item);
                    
@@ -1295,7 +1295,7 @@ void MusicBrowserUI::ChangePlayerState(int32 event)
             else
                 m_playerState = PLAYERSTATE_STOPPED;
 
-            item.dwTypeData = "Play";
+            item.dwTypeData = "&Play the Current Track";
             item.cch = strlen(item.dwTypeData);
             SetMenuItemInfo(menu, ID_CONTROLS_PLAYPAUSE, false, &item);
 
