@@ -137,6 +137,37 @@ dnl not needed.
     
 esac  
 
+if test "$isunix" = "true" ; then
+    AC_MSG_CHECKING(for GCC >= 2.91)
+    AC_TRY_RUN([
+#include <stdlib.h>
+int main() {
+#if defined (__GNUC__)
+#if (__GNUC__ == 2 && __GNUC_MINOR__ >= 91) || __GNUC__ > 2
+    printf("%d.%d ", __GNUC__, __GNUC_MINOR__);
+    return 0;
+#else
+    printf("%d.%d", __GNUC__, __GNUC_MINOR__);
+    return 1;
+#endif
+#else
+    printf("You're not using gcc, This may or may not compile...\n");
+    return 0;
+#endif
+}
+    ], gcc_good=true, gcc_good=false, gcc_good=true)
+    if test "$gcc_good" = "true"; then
+        AC_MSG_RESULT(yes)
+    else
+        AC_MSG_RESULT(no)
+        echo "You have a version of gcc that is too old to compile FreeAmp."
+        echo "We would recommend upgrading your gcc to something relatively"
+        echo "recent.  GCC is available at http://gcc.cygnus.com"
+        echo "Re-run this configure script after you have a newer version."
+        exit 1
+    fi
+fi
+ 
 AC_SUBST(OSTYPE)
 AC_DEFINE_UNQUOTED(HOST_OS, "${host_os}")
 AC_DEFINE_UNQUOTED(HOST_CPU, "${host_cpu}")
