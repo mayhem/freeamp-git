@@ -176,14 +176,16 @@ int APSInterface::APSFillMetaData(APSMetaData* pmetaData)
     ret = o.Query(string(MBExchangeMetadata), &args);
     if (!ret)
     {
-         o.GetQueryError(error);
-         return APS_NETWORKERROR;
+        o.GetQueryError(error);
+	m_pSema->Signal();
+        return APS_NETWORKERROR;
     }
 
     // This query should always return one item
     if (o.GetNumItems() == 0)
     {
-        return APS_GENERALERROR;
+	m_pSema->Signal();
+	return APS_GENERALERROR;
     }
 
     // Now start the data extraction process.
