@@ -1024,6 +1024,8 @@ void MusicBrowserUI::InitDialog(HWND hWnd)
             ExpandCollapseEvent();  
         }
     }
+
+    m_initialized = true;
 }
 
 void MusicBrowserUI::AddToolbarButtons(bool textLabels, bool images)

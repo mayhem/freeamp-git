@@ -816,7 +816,8 @@ HTREEITEM MusicBrowserUI::FindPlaylist(const string playlist)
 
 void MusicBrowserUI::MusicCatalogCleared()
 {
-    InitTree();
+    if(m_initialized)
+        InitTree();
 }
 
 void MusicBrowserUI::MusicCatalogTrackChanged(const ArtistList *oldArtist,
