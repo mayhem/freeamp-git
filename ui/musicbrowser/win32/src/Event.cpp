@@ -723,6 +723,18 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 DeleteMenu(subMenu, ID_POPUP_ADDTRACK_PLAY, MF_BYCOMMAND);
             }
 
+            if( playlistCount > 1 ||
+                IsItemSelected(m_hCatalogItem) ||
+                IsItemSelected(m_hPlaylistItem) ||
+                IsItemSelected(m_hAllItem) ||
+                IsItemSelected(m_hUncatItem) ||
+                IsItemSelected(m_hNewPlaylistItem))
+            {
+                EnableMenuItem(subMenu,
+                               ID_POPUP_EDITINFO,
+                               MF_BYCOMMAND|MF_GRAYED);    
+            }
+
 
             if( trackCount > 1 ||
                 playlistCount > 1 ||
@@ -734,11 +746,7 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
             {
                 EnableMenuItem(subMenu,
                                ID_POPUP_RENAME,
-                               MF_BYCOMMAND|MF_GRAYED);
-
-                EnableMenuItem(subMenu,
-                               ID_POPUP_EDITINFO,
-                               MF_BYCOMMAND|MF_GRAYED);                
+                               MF_BYCOMMAND|MF_GRAYED);                         
             }
 
             if(trackCount == 0)
