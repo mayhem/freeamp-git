@@ -106,12 +106,12 @@ bool GTKPreferenceWindow::Show(Window *pWindow)
    
     GtkWidget *pane;
     GtkWidget *label;
-
+/*
     label = gtk_label_new("General");
     gtk_widget_show(label);
     pane = CreatePage1();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), pane, label);
-
+*/
     label = gtk_label_new("Themes");
     gtk_widget_show(label);
     pane = CreatePage5();
