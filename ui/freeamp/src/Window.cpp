@@ -49,6 +49,7 @@ Window::Window(Theme *pTheme, string &oName)
     m_pCanvas = NULL;
     m_pMouseInControl = NULL;
     m_pCaptureControl = NULL;
+    m_pMouseDownControl = NULL;
     m_bIsVulcanMindMeldHost = false;
 }
 
@@ -279,7 +280,10 @@ void Window::HandleMouseMove(Pos &oScreenPos)
     }
 
     if (m_bLButtonDown && !LButtonDown())
+    {
        m_bLButtonDown = false;
+       m_pMouseDownControl = NULL;
+    }
 
     GetWindowPosition(oRect);
     oPos.x = oScreenPos.x - oRect.x1;
@@ -294,21 +298,39 @@ void Window::HandleMouseMove(Pos &oScreenPos)
     pControl = ControlFromPos(oPos);
     if (pControl)
     {
-       if (m_pMouseInControl && m_pMouseInControl != pControl)
+       if (m_pMouseDownControl && m_pMouseInControl &&
+           m_pMouseDownControl != pControl)
        {
            m_pMouseInControl->AcceptTransition(CT_MouseLeave);
-           m_pMouseInControl = pControl;
-           m_pMouseInControl->AcceptTransition(CT_MouseEnter);
-           if (m_bLButtonDown)
-              m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
-       }
-
-       if (m_pMouseInControl == NULL)
+           m_pMouseInControl = NULL;
+       }    
+       else
+       if (m_pMouseDownControl && m_pMouseInControl == NULL &&
+           m_pMouseDownControl == pControl)
        {
-           m_pMouseInControl = pControl;
+           m_pMouseInControl = m_pMouseDownControl;
            m_pMouseInControl->AcceptTransition(CT_MouseEnter);
-           if (m_bLButtonDown)
-              m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
+           m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
+       }    
+       else
+       if (!m_bLButtonDown)
+       {
+           if (m_pMouseInControl && m_pMouseInControl != pControl)
+           {
+               m_pMouseInControl->AcceptTransition(CT_MouseLeave);
+               m_pMouseInControl = pControl;
+               m_pMouseInControl->AcceptTransition(CT_MouseEnter);
+               if (m_bLButtonDown)
+                  m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
+           }
+           else
+           if (m_pMouseInControl == NULL)
+           {
+               m_pMouseInControl = pControl;
+               m_pMouseInControl->AcceptTransition(CT_MouseEnter);
+               if (m_bLButtonDown)
+                  m_pMouseInControl->AcceptTransition(CT_MouseLButtonDown);
+           }
        }
 
        pControl->AcceptTransition(CT_MouseMove, &oPos);
@@ -346,6 +368,7 @@ void Window::HandleMouseLButtonDown(Pos &oScreenPos)
     if (pControl)
     {
        m_bLButtonDown = true;
+       m_pMouseDownControl = pControl;
        pControl->AcceptTransition(CT_MouseLButtonDown, &oPos);
        return;
     }
@@ -382,6 +405,7 @@ void Window::HandleMouseLButtonUp(Pos &oScreenPos)
     }
 
     m_bLButtonDown = false;
+    m_pMouseDownControl = NULL;
     if (m_pCaptureControl)
     {
        m_pCaptureControl->AcceptTransition(CT_MouseLButtonUp, &oPos);

@@ -129,7 +129,8 @@ class Window
       Canvas                   *m_pCanvas;
       bool                      m_bExit, m_bWindowMove, m_bLButtonDown;
       Theme                    *m_pTheme;
-      Control                  *m_pMouseInControl, *m_pCaptureControl;
+      Control                  *m_pMouseInControl, *m_pMouseDownControl;
+      Control                  *m_pCaptureControl;
       Pos                       m_oMovePos;
       bool                      m_bStayOnTop, m_bLiveInToolbar;
       bool                      m_bIsVulcanMindMeldHost;
