@@ -219,7 +219,7 @@ bool FindClose(HANDLE hFindFile) {
 
 
 HINSTANCE LoadLibrary(char *lpLibFileName) {
-    HINSTANCE hInst = dlopen(lpLibFileName, RTLD_NOW);
+    HINSTANCE hInst = dlopen(lpLibFileName, RTLD_NOW | RTLD_GLOBAL);
     if (!hInst) 
     {
         int i;

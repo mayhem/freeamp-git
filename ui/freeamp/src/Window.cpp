@@ -88,7 +88,7 @@ Error Window::VulcanMindMeld(Window *pOther)
 
     m_pCanvas = pOther->m_pCanvas;
     Init();   
-    
+   
     return kError_NoErr;
 }
 

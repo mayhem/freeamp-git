@@ -548,9 +548,54 @@ public:
    }
 };
 
-class PlaylistItemAddedEvent : public Event {
+class MusicCatalogTrackAddedEvent : public Event {
 private:
-	const PlaylistItem* m_item;
+    const PlaylistItem* m_item;
+public:
+    MusicCatalogTrackAddedEvent(const PlaylistItem* item)
+    { m_type = INFO_MusicCatalogTrackAdded; m_item = item; }
+    virtual ~MusicCatalogTrackAddedEvent() {}
+
+    const PlaylistItem* Item() const { return m_item; }
+};
+
+class MusicCatalogTrackRemovedEvent : public Event {
+private:
+    const PlaylistItem* m_item;
+public:
+    MusicCatalogTrackRemovedEvent(const PlaylistItem* item)
+    { m_type = INFO_MusicCatalogTrackAdded; m_item = item; }
+    virtual ~MusicCatalogTrackRemovedEvent() {}
+
+    const PlaylistItem* Item() const { return m_item; }
+};
+
+class MusicCatalogPlaylistAddedEvent : public Event {
+private:
+    string m_item;
+public:
+    MusicCatalogPlaylistAddedEvent(string &item)
+    { m_type = INFO_MusicCatalogPlaylistAdded; m_item = item; }
+    virtual ~MusicCatalogPlaylistAddedEvent() {}
+
+    const string Item() const { return m_item; }
+};
+
+class MusicCatalogPlaylistRemovedEvent : public Event {
+private:
+    string m_item;
+public:
+    MusicCatalogPlaylistRemovedEvent(string & item)
+    { m_type = INFO_MusicCatalogPlaylistRemoved; m_item = item; }
+    virtual ~MusicCatalogPlaylistRemovedEvent() {}
+
+    const string Item() const { return m_item; }
+};
+
+
+class PlaylistItemAddedEvent : public Event {
+  private:
+    const PlaylistItem* m_item;
     const PlaylistManager* m_plm;
 public:
 	PlaylistItemAddedEvent(const PlaylistItem* item, const PlaylistManager* plm) 

@@ -549,8 +549,8 @@ Error HttpInput::Open(void)
         {
            StreamInfoEvent *e;
            
-           e = new StreamInfoEvent(szStreamName ? szStreamName : "", 
-                                   szStreamUrl ? szStreamUrl : "");
+           e = new StreamInfoEvent(szStreamName ? szStreamName : (char *)"", 
+                                   szStreamUrl ? szStreamUrl : (char *)"");
            m_pTarget->AcceptEvent(e);
            delete szStreamName;
            delete szStreamUrl;

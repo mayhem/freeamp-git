@@ -1777,6 +1777,10 @@ ServiceEvent(Event * pC)
         case INFO_DownloadItemRemoved:
         case INFO_DownloadItemNewState:
         case INFO_DownloadItemProgress:
+        case INFO_MusicCatalogTrackAdded:
+        case INFO_MusicCatalogTrackRemoved: 
+        case INFO_MusicCatalogPlaylistAdded:
+        case INFO_MusicCatalogPlaylistRemoved:
         case CMD_AddFiles:
         case CMD_LoadTheme:
         case CMD_ShowPreferences:

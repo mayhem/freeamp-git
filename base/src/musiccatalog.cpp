@@ -126,8 +126,11 @@ Error MusicCatalog::RemovePlaylist(const char *url)
     for (; i != m_playlists->end(); i++)
          if ((*i) == url) {
              string tempstr = url;
-             if (tempstr.find("currentlist.m3u") >= tempstr.length())
+             if (tempstr.find("currentlist.m3u") >= tempstr.length()) {
+                 string sUrl = url; 
+                 m_context->target->AcceptEvent(new MusicCatalogPlaylistRemovedEvent(sUrl));
                  m_playlists->erase(i);
+             }
              return kError_NoErr;
          }   
 
@@ -162,6 +165,9 @@ Error MusicCatalog::AddPlaylist(const char *url)
             m_playlists->insert(m_playlists->begin(), url);
         else
             m_playlists->push_back(url);
+
+        string sUrl = url;
+        m_context->target->AcceptEvent(new MusicCatalogPlaylistAddedEvent(sUrl));
         return kError_NoErr;
     }
 
@@ -311,6 +317,7 @@ Error MusicCatalog::AddSong(const char *url)
             m_artistList->push_back(newartist);
         }
     }
+    m_context->target->AcceptEvent(new MusicCatalogTrackAddedEvent(newtrack));
     return kError_NoErr;
 }
 

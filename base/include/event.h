@@ -130,5 +130,10 @@ class EventQueue {
 #define CMD_QueryPlayerState      66 // asks the player object to resend out its state
 #define CMD_LoadTheme             67 // load a theme from a file
 
+#define INFO_MusicCatalogTrackAdded 68 // sent by MC to the player to inform of a track added
+#define INFO_MusicCatalogTrackRemoved 69 // sent by MC to the player to inform of a track removal
+#define INFO_MusicCatalogPlaylistAdded 70 // sent by MC to the player after a playlist was added
+#define INFO_MusicCatalogPlaylistRemoved 71 // sent by the MC to the player after a playlist removal
+
 #endif // _EVENT_H_
 

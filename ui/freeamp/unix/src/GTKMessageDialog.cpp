@@ -51,11 +51,6 @@ static gboolean message_destroy(GtkWidget *widget)
     return FALSE;
 }
 
-static gboolean message_quit(GtkWidget *widget)
-{
-    return FALSE;
-}
-
 static void ok_click(GtkWidget *w, int *ret)
 {
     *ret = 1;

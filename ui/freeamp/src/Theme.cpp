@@ -103,8 +103,7 @@ Theme::Theme(FAContext *context)
 #ifdef WIN32
     m_pWindow = new Win32Window(this, funkyName);
 #elif defined(HAVE_GTK)
-    InitializeGTK(context);
-    
+    InitializeGTK(context);    
     m_pWindow = new GTKWindow(this, funkyName);
 #elif defined(__BEOS__)
     m_pWindow = new BeOSWindow(this, funkyName);
