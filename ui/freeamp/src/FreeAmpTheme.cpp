@@ -1084,7 +1084,7 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
         
         m_oTitle = pItem->GetMetaData().Title();
         if (pItem->GetMetaData().Artist().length() > 0)
-           m_oTitle += string(" -- ") + pItem->GetMetaData().Artist();
+           m_oTitle += string(" - ") + pItem->GetMetaData().Artist();
 
         oText = string(BRANDING": ") + m_oTitle;
         m_pWindow->SetTitle(oText);
