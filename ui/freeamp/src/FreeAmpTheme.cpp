@@ -1931,20 +1931,81 @@ void FreeAmpTheme::UpdateMetaData(const PlaylistItem *pItem)
         if (pItem->GetMetaData().Artist().length() > 0 && 
             (m_eTitleDisplayState == kNameArtist ||
              m_eTitleDisplayState == kNameArtistAlbum))
-           m_oTitle += string(" - ") + pItem->GetMetaData().Artist();
+           m_oTitle += string(" ~ ") + pItem->GetMetaData().Artist();
 
         if (pItem->GetMetaData().Album().length() > 0 && 
              m_eTitleDisplayState == kNameArtistAlbum)
-           m_oTitle += string(" (") + pItem->GetMetaData().Album() + 
-                       string(")");;
+           m_oTitle += string(" ~ ") + pItem->GetMetaData().Album() + 
+                       string(" ~ ");;
 
         oText = string(BRANDING": ") + m_oTitle;
         m_pWindow->SetTitle(oText);
     }    
     else
         m_oTitle = "";
-        
+      
+    if (pItem->GetMetaData().Title().length() > 0)
+    {
+        m_oTrackName = pItem->GetMetaData().Title();
+    }
+    else
+        m_oTrackName = "Unknown";
+
+    if (pItem->GetMetaData().Artist().length() > 0)
+    {
+        m_oArtist = pItem->GetMetaData().Artist();
+    }
+    else
+        m_oArtist = "Unknown";
+
+    if (pItem->GetMetaData().Album().length() > 0)
+    {
+        m_oAlbum = pItem->GetMetaData().Album();
+    }
+    else
+        m_oAlbum = "Unknown";
+
+    if (pItem->GetMetaData().Year() > 0)
+    {
+        char   szText[20];
+        sprintf(szText,"%d",pItem->GetMetaData().Year());
+        m_oYear = string(szText);
+    }
+    else
+        m_oYear = "";
+
+    if (pItem->GetMetaData().Track() > 0)
+    {
+        char   szText[20];
+        sprintf(szText,"%d",pItem->GetMetaData().Track());
+        m_oTrackNo = string(szText);
+    }
+    else
+        m_oTrackNo = "";
+
+    if (pItem->GetMetaData().Genre().length() > 0)
+    {
+        m_oGenre = pItem->GetMetaData().Genre();
+    }
+    else
+        m_oGenre = "";
+
+    if (pItem->GetMetaData().Comment().length() > 0)
+    {
+        m_oComment = pItem->GetMetaData().Comment();
+    }
+    else
+        m_oComment = "";
+
+    
     m_pWindow->ControlStringValue(string("Title"), true, m_oTitle);
+    m_pWindow->ControlStringValue(string("TrackName"), true, m_oTrackName);
+    m_pWindow->ControlStringValue(string("TrackNo"), true, m_oTrackNo);
+    m_pWindow->ControlStringValue(string("Artist"), true, m_oArtist);
+    m_pWindow->ControlStringValue(string("Album"), true, m_oAlbum);
+    m_pWindow->ControlStringValue(string("Year"), true, m_oYear);
+    m_pWindow->ControlStringValue(string("Genre"), true, m_oGenre);
+    m_pWindow->ControlStringValue(string("Comment"), true, m_oComment);
 }
 
 void FreeAmpTheme::DropFiles(vector<string> *pFileList)

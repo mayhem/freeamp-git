@@ -51,7 +51,8 @@ typedef enum {
     kLocationColumn,
     kPositionColumn,
     kTitleColumn,
-    kTimeColumn
+    kTimeColumn,
+    kYearColumn
 } PlaylistColumns;
 
 typedef enum {
@@ -269,7 +270,7 @@ class GTKMusicBrowser {
     GtkWidget *artistSubTree;
     GtkWidget *playlistSubTree;
  
-    PlaylistColumns playlistCols[8];
+    PlaylistColumns playlistCols[9];
     bool playlistColsChanged;
     void ParsePlaylistCols();
     void UpdateColumnHeaders();

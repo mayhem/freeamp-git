@@ -114,7 +114,7 @@ class FreeAmpTheme : public UserInterface, public Theme
 
         FAContext       *m_pContext;
         int              m_iCurrentSeconds, m_iTotalSeconds, m_iSeekSeconds;
-        float			    m_fSecondsPerFrame;
+        float            m_fSecondsPerFrame;
         int              m_iStartupType, m_iVolume, m_iBalance, m_iMuteVolume;
         int              m_iSeekPos, m_iFramesSinceSeek;
         Thread          *m_uiThread, *m_pUpdateThread;
@@ -123,7 +123,9 @@ class FreeAmpTheme : public UserInterface, public Theme
         bool             m_bSeekInProgress, m_bVolumeChangeInProgress;
         bool             m_bPaused, m_bInOptions, m_bPlayShown;
         bool             m_bShowBuffers, m_bBufferingUp;
-        string           m_oCurrentWindow, m_oTitle, m_oStreamInfo, m_oHeadlineUrl;
+        string           m_oCurrentWindow, m_oTitle, m_oStreamInfo;
+        string           m_oHeadlineUrl, m_oArtist, m_oAlbum, m_oTrackNo;
+	string           m_oYear, m_oTrackName, m_oGenre, m_oComment;
         TimeDisplayState      m_eTimeDisplayState;
         TitleDisplayState     m_eTitleDisplayState;
         string                m_themeCache;
