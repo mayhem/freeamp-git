@@ -1106,10 +1106,11 @@ void FreeAmpTheme::ShowHelp(void)
         LaunchBrowser((char *)oHelpFile.c_str());
     else
     {
-        MessageDialog oBox;
-        string        oMessage(szCantFindHelpError);
+//        MessageDialog oBox;
+//        string        oMessage(szCantFindHelpError);
 
-        oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
+//        oBox.Show(oMessage.c_str(), string(BRANDING), kMessageOk);
+          cout << szCantFindHelpError << endl;
     }
 #endif
 }
