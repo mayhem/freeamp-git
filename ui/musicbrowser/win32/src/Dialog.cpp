@@ -939,6 +939,9 @@ void MusicBrowserUI::BeginDrag(HWND hwnd, NM_TREEVIEW* nmtv)
 
     DoDragDrop(data, src, DROPEFFECT_COPY|DROPEFFECT_SCROLL, &dwEffect); 
 
+    data->Release();
+    src->Release();
+
 }
 
 void MusicBrowserUI::DropFiles(HDROP dropHandle, bool filesAreURLs)

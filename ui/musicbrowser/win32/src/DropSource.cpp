@@ -96,6 +96,9 @@ DropSource::DropSource(HWND hwndTree, NM_TREEVIEW* nmtv)
     RECT rcItem;        // bounding rectangle of item 
     //DWORD dwLevel;      // heading level of item 
     DWORD dwIndent;     // amount that child items are indented 
+
+    m_hwnd = hwndTree;
+    m_refs = 1; 
  
     // Tell the tree-view control to create an image to use 
     // for dragging. 
@@ -117,27 +120,27 @@ DropSource::DropSource(HWND hwndTree, NM_TREEVIEW* nmtv)
                         0, 
                         nmtv->ptDrag.x - rcItem.left, 
                         nmtv->ptDrag.y - rcItem.top);
+
+    ImageList_Destroy(himl);
  
     POINT pt = nmtv->ptDrag;
-    //ClientToScreen(hwnd, &pt);
-    //MapWindowPoints(hwnd, GetParent(hwnd), &pt, 1);
     
     ClientToScreen(hwndTree, &pt);
 
-    //ImageList_DragEnter(NULL, pt.x, pt.y);
     ImageList_DragEnter(NULL, pt.x, pt.y);
  
     // Hide the mouse cursor, and direct mouse input to the 
     // parent window. 
     //ShowCursor(FALSE); 
     //SetCapture(GetParent(hwndTree)); 
-    //m_bDragging = true;
 }
 
 DropSource::~DropSource() 
 {
+    ImageList_DragShowNolock(FALSE);
     ImageList_DragLeave(NULL);
     ImageList_EndDrag();
+    //ShowCursor(TRUE); 
 }
 
 
