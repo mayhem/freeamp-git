@@ -929,17 +929,14 @@ void HttpInput::WorkerThread(void)
           continue;
       }
        
-DB
       eError = m_pOutputBuffer->BeginWrite(pBuffer, iReadSize);
       if (eError == kError_NoErr)
       {
           if (m_iMetaDataInterval > 0)
           {
-DB
               iMaxReadBytes = min(iReadSize, m_iMetaDataInterval-m_uBytesReceived);
               if (iMaxReadBytes == 0)
               {
-DB
                   iRead = recv(m_hHandle, &cNumBlocks, 1, 0);
                   if (cNumBlocks > 0)
                   {
@@ -967,13 +964,11 @@ DB
 
                   iMaxReadBytes = iReadSize;
                   m_uBytesReceived = 0;
-DB
               }
           }
           else
               iMaxReadBytes = iReadSize;
               
-DB
           iRead = recv(m_hHandle, (char *)pBuffer, iMaxReadBytes, 0);
           if (iRead == 0)
           {
@@ -991,7 +986,6 @@ DB
                  iRead = 0;
              }
           }
-DB
           if (iRead < 0)
           {
              m_pOutputBuffer->SetEndOfStream(true);
@@ -1001,7 +995,6 @@ DB
           iSize += iRead;
           m_uBytesReceived += iRead;
 
-DB
           if (m_fpSave)
           {
              iRet = fwrite(pBuffer, sizeof(char), iRead, m_fpSave);
@@ -1019,7 +1012,6 @@ DB
               break;
           }
       }
-DB
       if (eError == kError_BufferTooSmall)
       {
           if (m_bLoop)

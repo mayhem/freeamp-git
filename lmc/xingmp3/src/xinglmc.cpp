@@ -876,10 +876,8 @@ void XingLMC::DecodeWork()
               return;
           }
 
-DB
           x = m_audioMethods.decode((unsigned char *)pBuffer, 
                                     (short *)pOutBuffer);
-DB
           if (x.in_bytes == 0)
 		  {
              EndRead(x.in_bytes);
