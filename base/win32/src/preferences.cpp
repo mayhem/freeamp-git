@@ -30,7 +30,7 @@ const HKEY  kMainKey = HKEY_CURRENT_USER;
 const char* kFreeAmpKey = "SOFTWARE\\FreeAmp\\FreeAmp v1.0";
 const char* kInstallDirPref = "InstallDirectory";
 const char* kUIPref = "UI";
-const char* kDefaultUI = "simple";
+const char* kDefaultUI = "simple.ui";
 
 
 Preferences::

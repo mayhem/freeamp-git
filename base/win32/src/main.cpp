@@ -32,7 +32,7 @@ ____________________________________________________________________________*/
 #include "player.h"
 #include "event.h"
 #include "registrar.h"
-#include "dummycoo.h"
+#include "dummyui.h"
 #include "preferences.h"
  
 int APIENTRY WinMain(	HINSTANCE hInstance, 
@@ -76,39 +76,37 @@ int APIENTRY WinMain(	HINSTANCE hInstance,
     registrar->InitializeRegistry(ui, prefs);
 
     delete registrar;
+    delete prefs;
+
+    // create the player
+	Player *player = Player::GetPlayer();
 
     // need a way to signal main thread to quit...
     Semaphore *termination = new Semaphore();
-    DummyCOO *dummy = new DummyCOO(termination);
 
-	// create the player
-	Player *player = Player::GetPlayer();
+    EventQueueRef eq = new EventQueue;
+    eq->ref = player;
+    eq->AcceptEvent = Player::AcceptEventStub;
+
+    DummyUI *dummy = new DummyUI(termination);
+    dummy->SetTarget(eq);
+
+    UIRef dummyRef = new UI;
+    dummyRef->ref = dummy;
+    dummyRef->AcceptEvent = dummy->AcceptEventStub;
+    dummyRef->Cleanup = dummy->Cleanup;
+
+    dummy->SetRef(dummyRef);
 
     // register items... we give up ownership here
-    player->RegisterActiveUI(dummy);
+    player->RegisterActiveUI(dummyRef);
     player->RegisterLMCs(lmc);
     player->RegisterPMIs(pmi);
     player->RegisterPMOs(pmo);
     player->RegisterUIs(ui);
 
-    //CIO* defaultCIO;
-    //COO* defaultCOO;
-
-    //CreateDefaultUI(UIRegistry, &defaultCIO, &defaultCOO);
-
-    //player->RegisterCOO(defaultCOO);
-    //player->RegisterCIO(defaultCIO);
-
-    PlayList* playlist = new PlayList();
-
-	playlist->Add("..\\..\\..\\test\\jules.mp3",0);
-	
-    playlist->SetFirst();
-    Player::GetPlayer()->AcceptEvent(new Event(CMD_SetPlaylist,playlist));
-    Player::GetPlayer()->AcceptEvent(new Event(CMD_Play));
-
-    //Event *e = new Event(CMD_QuitPlayer);
-	//Player::GetPlayer()->AcceptEvent(e);
+    // kick things off... player is now in charge!
+    player->Run();
 
     // sit around and twiddle our thumbs
     termination->Wait();

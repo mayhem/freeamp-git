@@ -32,9 +32,11 @@ ____________________________________________________________________________*/
 extern "C" {
 #endif
 
-void Initialize(UIRef inputRef, UIRef outputRef);
+void Initialize(UIRef ref);
 
-EventQueue* Target(UIRef ref);
+void SetTarget(UIRef ref, EventQueue* eq);
+void SetArgs(UIRef ref, int32 argc, char **argv);
+int32 AcceptEvent(UIRef ref, Event* event);
 void Cleanup(UIRef ref);
 
 #ifdef __cplusplus

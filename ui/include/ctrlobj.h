@@ -27,13 +27,6 @@ ____________________________________________________________________________*/
 #include "event.h"
 
 
-class UserInterface : public EventQueue {
- public:
-    virtual int32 AcceptEvent(Event *) = 0;
-    virtual void  SetArgs(int32,char **) = 0;
-    virtual ~UserInterface() {}
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,15 +34,25 @@ extern "C" {
 typedef struct UI{
     void*   ref;
 
-    EventQueue* (*Target)   (struct UI);
-    void        (*Cleanup)  (struct UI*);
-    void        (*SetArgs)  (struct UI*,int32 /*argc*/,char ** /*argv*/);
-    int32       (*AcceptEvent) (struct UI*,Event *);
+    void        (*SetTarget)    (struct UI*, EventQueueRef);
+    void        (*SetArgs)      (struct UI*,int32 /*argc*/,char ** /*argv*/);
+    int32       (*AcceptEvent)  (struct UI*,Event *);
+    void        (*Cleanup)      (struct UI*);
+
 }UI, *UIRef;
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+class UserInterface {
+ public:
+    virtual int32 AcceptEvent(Event *) = 0;
+    virtual void  SetArgs(int32,char **) = 0;
+    virtual void SetTarget(EventQueueRef) = 0;
+    virtual void SetRef(UIRef) = 0;
+    virtual ~UserInterface() {}
+};
 
 #endif // _CTRLOBJ_H_
 

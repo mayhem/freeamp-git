@@ -42,8 +42,8 @@ class LogicalMediaConverter {
 
     virtual void SetPMI(PMIRef) = 0;
     virtual void SetPMO(PMORef) = 0;
-    virtual void SetInfoEventQueue(EventQueue *) = 0;
-    virtual void Init() = 0;
+    virtual void SetTarget(EventQueue *) = 0;
+    virtual void InitDecoder() = 0;
 };
 
 #ifdef __cplusplus
@@ -53,11 +53,11 @@ extern "C" {
 typedef struct LMC{
     void*   ref;
 
-    void    (*Init)              (struct LMC*);
+    void    (*InitDecoder)       (struct LMC*);
 
     void    (*SetPMI)            (struct LMC*, PMIRef);
     void    (*SetPMO)            (struct LMC*, PMORef);
-    void    (*SetInfoEventQueue) (struct LMC*, EventQueue*);
+    void    (*SetTarget) (struct LMC*, EventQueueRef);
 
     bool    (*Decode)            (struct LMC*);
     void    (*Stop)              (struct LMC*);

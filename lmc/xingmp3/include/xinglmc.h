@@ -66,8 +66,8 @@ public:
 
     virtual void SetPMI(PMIRef);
     virtual void SetPMO(PMORef);
-    virtual void SetInfoEventQueue(EventQueue *);
-    virtual void Init();
+    virtual void SetTarget(EventQueueRef);
+    virtual void InitDecoder();
 //	bool SetCallback(EventCallback callback, void* cookie);
 
     void DecodeWork();
@@ -77,24 +77,24 @@ private:
     int32 bs_fill();
     void bs_clear();
 private:
-    EventQueue*             myEQ;
-    Mutex *seek_mutex;
-    Queue<XingCommand *>*   xcqueue;
+    EventQueueRef           m_target;
+    Mutex*                  m_seekMutex;
+    Queue<XingCommand*>*    m_xcqueue;
     PMIRef                  m_input;
     PMORef                  m_output;
     
-    int32                   bs_bufbytes;
-    int32                   bs_trigger;
-    unsigned char*          bs_buffer;
-    unsigned char*          bs_bufptr;
+    int32                   m_bsBufBytes;
+    int32                   m_bsTrigger;
+    unsigned char*          m_bsBuffer;
+    unsigned char*          m_bsBufPtr;
 
-    unsigned char*          pcm_buffer;
-    uint32                  pcm_bufbytes;
-    uint32                  pcm_trigger;
+    unsigned char*          m_pcmBuffer;
+    uint32                  m_pcmBufBytes;
+    uint32                  m_pcmTrigger;
 
-    int32                   framebytes;
-    bool                    isPaused;
-    Thread*                 decoderThread;
+    int32                   m_frameBytes;
+    bool                    m_isPaused;
+    Thread*                 m_decoderThread;
 };
 
 #endif /* _XINGLMC_H */

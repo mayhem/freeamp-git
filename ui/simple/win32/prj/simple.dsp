@@ -56,7 +56,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\ui mkdir\
-       ..\..\..\..\base\win32\prj\ui	copy simple.ui ..\..\..\..\base\win32\prj\ui
+        ..\..\..\..\base\win32\prj\ui	copy simple.ui ..\..\..\..\base\win32\prj\ui
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "simple - Win32 Debug"
@@ -87,7 +87,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\ui mkdir\
-       ..\..\..\..\base\win32\prj\ui	copy simple.ui ..\..\..\..\base\win32\prj\ui
+        ..\..\..\..\base\win32\prj\ui	copy simple.ui ..\..\..\..\base\win32\prj\ui
 # End Special Build Tool
 
 !ENDIF 
@@ -102,6 +102,10 @@ PostBuild_Cmds=IF NOT EXIST ..\..\..\..\base\win32\prj\ui mkdir\
 # Begin Source File
 
 SOURCE=..\src\about.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\command.cpp
 # End Source File
 # Begin Source File
 
@@ -124,10 +128,6 @@ InputPath=..\..\..\..\config\config.win32
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\main.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\src\simplelib.cpp
 # End Source File
 # Begin Source File
@@ -138,6 +138,14 @@ SOURCE=..\..\src\simpleui.cpp
 
 SOURCE=.\simpleui.def
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\src\thread.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\base\win32\src\win32thread.cpp
+# End Source File
 # End Group
 # Begin Group "resources"
 
@@ -145,6 +153,13 @@ SOURCE=.\simpleui.def
 # Begin Source File
 
 SOURCE=..\res\simple.rc
+
+!IF  "$(CFG)" == "simple - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "simple - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Source File

@@ -47,10 +47,25 @@ class Event {
  
 };
 
-class EventQueue {
+/*class EventQueue {
  public:
     virtual int32 AcceptEvent(Event *) = 0;
-};
+};*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct EventQueue{
+    void*   ref;
+    int32   (*AcceptEvent)  (struct EventQueue*, Event*);
+
+}EventQueue, *EventQueueRef;
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
 
 #define CMD_Stop                1  // stop current play  (no arg)
 #define CMD_Play                2  // Play current media piece from beginning (no arg)

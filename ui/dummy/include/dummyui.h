@@ -21,23 +21,30 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#ifndef _DUMMY_COO_H_
-#define _DUMMY_COO_H_
+#ifndef _DUMMY_UI_H_
+#define _DUMMY_UI_H_
 
 #include "ctrlobj.h"
 #include "player.h"
 #include "semaphore.h"
 
-class DummyCOO : public UserInterface {
+class DummyUI : public UserInterface {
  public:
+    virtual void SetTarget(EventQueue* eq);
     virtual int32 AcceptEvent(Event *);
     virtual void  SetArgs(int32 i, char **c) { return; }
-    DummyCOO(Semaphore*);
-    virtual ~DummyCOO();
+    virtual void SetRef(UIRef ref){ m_ref = ref;}
+
+    static int32 AcceptEventStub(UIRef pUI, Event *pe);
+    static void Cleanup(UIRef pUI);
+
+    DummyUI(Semaphore*);
+    virtual ~DummyUI();
 
  private:
     Semaphore*      m_termSemaphore;
     EventQueueRef   m_target;
+    UIRef           m_ref;
 
 };
 

@@ -47,22 +47,24 @@ typedef enum {
     STATE_Stopped,
 } PlayerState;
 
-class Player : public EventQueue {
+class Player {
 
  public:
     //Player();
     static Player *GetPlayer();
     ~Player();
 
-    virtual int32 AcceptEvent(Event *);
-    int32 RegisterActiveUI(EventQueue* queue);
+    int32 RegisterActiveUI(UIRef ui);
     int32 RegisterLMCs(LMCRegistry* registry);
     int32 RegisterPMIs(PMIRegistry* registry);
     int32 RegisterPMOs(PMORegistry* registry);
     int32 RegisterUIs(UIRegistry* registry);
 
+    void Run();
+
     void testQueue();
     static void EventServiceThreadFunc(void *);
+    static int32 AcceptEventStub(EventQueueRef ref, Event* e);
 
  protected:
     Player();
@@ -74,18 +76,21 @@ class Player : public EventQueue {
     bool SetState(PlayerState);
     int32 ServiceEvent(Event *);
 
+    int32 AcceptEvent(Event *);
+
+
  private:
     static Player*          m_thePlayer;
     Semaphore*              m_eventSem;
     PlayerState             m_playerState;
     Queue<Event *>*         m_eventQueue;
     Thread*                 m_eventServiceThread;
-    int32                   m_quitWaitingFor;  // keeps track of how many CIO's 
+    int32                   m_quitWaitingFor;// keeps track of how many CIO's 
                                              // and COO's haven't sent in 
                                              // their "Ready To Die" infos.
     int32                   m_imQuitting;
-    Vector<EventQueue *>*   m_uiVector;
-    Vector<EventQueue *>*   m_uiDeathVector;
+    Vector<UIRef>*          m_uiVector;
+    Vector<UIRef>*          m_uiDeathVector;
     
     Mutex*                  m_uiManipLock;
     Mutex*                  m_lmcMutex;
@@ -94,14 +99,15 @@ class Player : public EventQueue {
     Mutex*                  m_uiMutex;
     PlayList*               m_myPlayList;
     
-    LogicalMediaConverter*  m_myLMC;
-
     LMCRef                  m_lmcRef;
+    UIRef                   m_uiRef;
 
     LMCRegistry*            m_lmcRegistry;
     PMIRegistry*            m_pmiRegistry;
     PMORegistry*            m_pmoRegistry;
     UIRegistry*             m_uiRegistry;
+
+    char*                   m_argUI;
 
 };
 

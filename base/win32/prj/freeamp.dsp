@@ -192,7 +192,7 @@ SOURCE=..\..\..\ui\src\uiregistry.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\..\ui\dummy\src\dummycoo.cpp
+SOURCE=..\..\..\ui\dummy\src\dummyui.cpp
 # End Source File
 # End Group
 # End Target

@@ -21,27 +21,65 @@
 	$Id$
 ____________________________________________________________________________*/
 
-#include "dummycoo.h"
+#include "dummyui.h"
 
-DummyCOO::DummyCOO(Semaphore *sem) {
+DummyUI::
+DummyUI(Semaphore *sem) 
+{
     m_termSemaphore = sem;
-    //printf("Dummy this: %x\n",this);
 }
 
-DummyCOO::~DummyCOO() {
-    //cout << "DummyCOO: being deleted..." << endl;
+DummyUI::
+~DummyUI() 
+{
+    if(m_target)
+    {
+        delete m_target;
+    }
 }
 
-int32 DummyCOO::AcceptEvent(Event *pe) {
-    if (pe) {
-  	//cout << "DummyCOO::acceptEvent: processing " << pe->getEvent() << "..." << endl;
-        switch (pe->GetEvent()) {
+void 
+DummyUI::
+SetTarget(EventQueue* eq)
+{
+    m_target = eq;
+}
+
+int32 
+DummyUI::
+AcceptEventStub(UIRef pUI, Event *pe) 
+{
+    DummyUI* ui = (DummyUI*)pUI->ref;
+
+    return ui->AcceptEvent(pe);
+}
+
+void 
+DummyUI::
+Cleanup(UIRef pUI)
+{
+    DummyUI* ui = (DummyUI*)pUI->ref;
+    
+    delete ui;
+}
+
+int32 DummyUI::AcceptEvent(Event *pe) 
+{
+    int32 result = 255;
+
+    if (pe) 
+    {
+        switch (pe->GetEvent()) 
+        {
 	        case CMD_Terminate:
+            {
 	            m_termSemaphore->Signal();
 	            break;
+            }
 
-	        case CMD_Cleanup: {
-	            Event *pE = new Event(INFO_ReadyToDieUI,this);
+	        case CMD_Cleanup: 
+            {
+	            Event *pE = new Event(INFO_ReadyToDieUI,m_ref);
 	            m_target->AcceptEvent(m_target, pE);
 	            break; 
             }
@@ -50,9 +88,9 @@ int32 DummyCOO::AcceptEvent(Event *pe) {
 	            break;
 	    }
 
-	    return 0;
+	    result = 0;
 
-    } else {
-	    return 255;
-    }
+    } 
+
+    return result;
 }

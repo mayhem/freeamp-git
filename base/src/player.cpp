@@ -53,8 +53,8 @@ Player::Player() {
     m_eventServiceThread = Thread::CreateThread();
     m_eventServiceThread->Create(Player::EventServiceThreadFunc,this);
     //cout << "Started event thread" << endl;
-    m_uiVector = new Vector<EventQueue *>();
-    m_uiDeathVector = new Vector<EventQueue *>();
+    m_uiVector = new Vector<UIRef>();
+    m_uiDeathVector = new Vector<UIRef>();
     //cout << "Created vectors" << endl;
     m_uiManipLock = new Mutex();
     m_lmcMutex = new Mutex();
@@ -65,7 +65,6 @@ Player::Player() {
     m_imQuitting = 0;
     m_quitWaitingFor = 0;
     m_myPlayList = NULL;
-    m_myLMC = NULL;
     m_playerState = STATE_Stopped;
 
     m_lmcRegistry = NULL;
@@ -74,6 +73,9 @@ Player::Player() {
     m_uiRegistry = NULL;
 
     m_lmcRef = NULL;
+    m_uiRef = NULL;
+
+    m_argUI = NULL;
 }
 
 Player::~Player() {
@@ -86,6 +88,7 @@ Player::~Player() {
         delete m_lmcRef;
         m_lmcRef = NULL;
     }
+
     //cout << "done deleting myLMC" << endl;
     if (m_eventSem) {
         delete m_eventSem;
@@ -115,6 +118,8 @@ Player::~Player() {
         delete m_uiVector;
         m_uiVector = NULL;
     }
+
+    // NEED TO FIX: MEMORY LEAK!!!!! Iterate and call UIRef->Cleanup() before DeleteAll()???
     if (m_uiDeathVector) {
         m_uiDeathVector->DeleteAll();
         delete m_uiDeathVector;
@@ -166,6 +171,70 @@ Player::~Player() {
         m_uiRegistry = NULL;
     }
 }
+
+void Player::Run(){
+    Preferences* prefs;
+    char* name = NULL;
+    uint32 len = 256;
+    Error error;
+
+    // which ui should we instantiate first??
+    if(m_argUI == NULL)
+    {
+        name = new char[len];
+        prefs = new Preferences;
+
+        while((error = prefs->GetDefaultUI(name, &len)) == 
+                kError_BufferTooSmall)
+        {
+            delete [] name;
+            len++;
+
+            name = new char[len];
+        }
+
+        delete prefs;
+    }
+    else
+    {
+        name = new char[strlen(m_argUI) + 1]; 
+        strcpy(name, m_argUI);
+    }
+
+    if(IsntError(error))
+    {
+        RegistryItem* item = NULL;
+		UIRef ui = NULL;
+        int32 i = 0;
+		
+        while(item = m_uiRegistry->GetItem(i++))
+        {
+            if(!strcmp(item->Name(), name))
+            {
+                m_uiRef = new UI;
+			    item->InitFunction()(m_uiRef);
+
+                EventQueueRef eq = new EventQueue;
+                eq->ref = this;
+                eq->AcceptEvent = AcceptEventStub;
+
+		    	m_uiRef->SetTarget(m_uiRef, eq);
+
+                RegisterActiveUI(m_uiRef);
+            }
+        }
+    }
+
+    delete [] name;
+ 
+}
+
+int32 Player::AcceptEventStub(EventQueueRef ref, Event* e){
+    Player *pP = (Player*)ref->ref;
+
+    return pP->AcceptEvent(e);
+}
+
 void Player::EventServiceThreadFunc(void *pPlayer) {
     //cout << "Beginning event service" << endl;
     Player *pP = (Player *)pPlayer;
@@ -185,10 +254,10 @@ void Player::EventServiceThreadFunc(void *pPlayer) {
 //    cout << "EventServiceThreadFunc: quitting on " << rtnVal << endl;
     // Time to quit!!!
 }
-int32 Player::RegisterActiveUI(EventQueue* queue) {
+int32 Player::RegisterActiveUI(UIRef ui) {
     GetUIManipLock();
-    if (m_uiVector && queue) {
-        m_uiVector->Insert(queue);
+    if (m_uiVector && ui) {
+        m_uiVector->Insert(ui);
         ReleaseUIManipLock();
         return 0;
     } else {
@@ -348,14 +417,19 @@ int32 Player::ServiceEvent(Event *pC) {
 		    if(item) {
 			m_lmcRef = new LMC;
 			item->InitFunction()(m_lmcRef);
-			m_lmcRef->SetInfoEventQueue(m_lmcRef, (EventQueue *)this);
+
+            EventQueueRef eq = new EventQueue;
+            eq->ref = this;
+            eq->AcceptEvent = AcceptEventStub;
+
+			m_lmcRef->SetTarget(m_lmcRef, eq);
 			m_lmcRef->SetPMI(m_lmcRef, pmi);
 			m_lmcRef->SetPMO(m_lmcRef, pmo);
 		    }
 		    
-		    m_lmcRef->Init(m_lmcRef);
+		    m_lmcRef->InitDecoder(m_lmcRef);
 		    if (SetState(STATE_Playing)) {
-			SEND_NORMAL_EVENT(INFO_Playing);
+			    SEND_NORMAL_EVENT(INFO_Playing);
 		    }
 		    m_lmcRef->ChangePosition(m_lmcRef, m_myPlayList->GetSkip());
 		    m_lmcRef->Decode(m_lmcRef);
@@ -470,9 +544,9 @@ int32 Player::ServiceEvent(Event *pC) {
 		    return 0;
 		
 		if (pC->GetArgument()) {
-		    EventQueue *pCOO = (EventQueue *)(pC->GetArgument());
+		    UIRef pUI = (UIRef)(pC->GetArgument());
 		    //printf("having %x killed(COO)\n",pCOO);
-		    m_uiDeathVector->Insert(pCOO);
+		    m_uiDeathVector->Insert(pUI);
 		}
 		
 		m_quitWaitingFor--;
@@ -532,10 +606,11 @@ int32 Player::ServiceEvent(Event *pC) {
 void Player::SendToUI(Event *pe) {
     int32 i;
     for (i = 0;i<m_uiVector->NumElements();i++) {
-	m_uiVector->ElementAt(i)->AcceptEvent(pe);
+	m_uiVector->ElementAt(i)->AcceptEvent(m_uiVector->ElementAt(i), pe);
     }
 }
 
+/*
 void Player::testQueue() {
     Event *pC;
     
@@ -572,4 +647,4 @@ void Player::testQueue() {
 	    cout << "testQueue: Final Succeeded!!" << endl;
     }
     cout << "testQueue: IsEmpty(): " << m_eventQueue->IsEmpty() << endl;
-}
+}*/

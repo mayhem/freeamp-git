@@ -29,38 +29,15 @@ ____________________________________________________________________________*/
 #include <iostream.h>
 
 /* Project Includes */
-//#include "player.h"
-//#include "playlist.h"
 #include "event.h"
 #include "about.h"
 #include "resource.h"
 
-#define kSong1 "c:\\local\\mpegs\\311 - Beautiful Disaster.mp3"
-#define kSong2 "c:\\local\\mpegs\\311 - Jackolantern\'s Weather.mp3"
-
-static bool g_scrolling = false;
 
 BOOL CALLBACK MainProc(	HWND hwnd, 
 						UINT msg, 
 						WPARAM wParam, 
 						LPARAM lParam ); 
-
-/*int APIENTRY WinMain(	HINSTANCE hInstance, 
-						HINSTANCE hPrevInstance,
-		 				LPSTR lpszCmdLine, 
-						int cmdShow)
-{
-	
-	InitCommonControls();
-
-	DialogBoxParam(	hInstance, 
-					MAKEINTRESOURCE(IDD_PLAYER),
-					NULL,
-					MainProc,
-					(LPARAM)lpszCmdLine);
-
-	return 0;
-}*/
 
 
 BOOL CALLBACK MainProc(	HWND hwnd, 

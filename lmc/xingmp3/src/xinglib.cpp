@@ -26,17 +26,17 @@ ____________________________________________________________________________*/
 #include "lmclib.h"
 #include "xinglmc.h"
 
-void Initialize(LMCRef ref)
+void Initialize(LMCRef ref )
 {
     if(ref)
     {
         LogicalMediaConverter* lmc = new XingLMC;
         ref->ref = lmc;
-
-        ref->Init = Init;
+        
+        ref->InitDecoder = InitDecoder;
         ref->SetPMI = SetPMI;
         ref->SetPMO = SetPMO;
-        ref->SetInfoEventQueue = SetInfoEventQueue;
+        ref->SetTarget = SetTarget;
         ref->Decode = Decode;
         ref->Stop = Stop;
         ref->Pause = Pause;
@@ -47,11 +47,11 @@ void Initialize(LMCRef ref)
     }
 }
 
-void Init(LMCRef ref)
+void InitDecoder(LMCRef ref)
 {
     LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
-    lmc->Init();
+    lmc->InitDecoder();
 }
 
 void SetPMI(LMCRef ref, PMIRef input)
@@ -68,11 +68,11 @@ void SetPMO(LMCRef ref, PMORef output)
     lmc->SetPMO(output);
 }
 
-void SetInfoEventQueue(LMCRef ref, EventQueue* queue)
+void SetTarget(LMCRef ref, EventQueueRef queue)
 {
     LogicalMediaConverter* lmc = (LogicalMediaConverter*)ref->ref;
 
-    lmc->SetInfoEventQueue(queue);
+    lmc->SetTarget(queue);
 }
 
 bool Decode(LMCRef ref)
