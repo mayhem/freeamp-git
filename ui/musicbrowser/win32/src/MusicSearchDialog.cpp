@@ -80,6 +80,8 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd,
 
 const char* kAllDrives = "All Drives";
 const char* kAllFolders = "All Folders";
+const char* kOtherFolders = "Other...";
+const char* kSelectOtherText = "Select a location...";
 
 BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd, 
                                         UINT msg, 
@@ -115,7 +117,7 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
                   }
                }   
             }
-
+            ComboBox_AddString(hwndDrives, kOtherFolder);
             Edit_SetText(hwndDirectory, kAllFolders);
 
             break;
@@ -147,6 +149,7 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
                     HWND hwndDrives = GetDlgItem(hwnd, IDC_DRIVES);
                     HWND hwndDirectory = GetDlgItem(hwnd, IDC_DIRECTORY);
                     char temp[MAX_PATH];
+                    BOOL endDialog = TRUE;
 
                     ComboBox_GetText(hwndDrives, 
                                      temp, 
@@ -166,9 +169,9 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
                            if (dwDrives & (1 << i))
                            {
                               szDrive[0] = 'A' + i;
-							  szDrive[1] = ':';
-							  szDrive[2] = '\\';
-							  szDrive[3] = 0;
+                              szDrive[1] = ':';
+                              szDrive[2] = '\\';
+                              szDrive[3] = 0;
                               ret = GetDriveType(szDrive);
                               if (ret != DRIVE_CDROM && ret != DRIVE_REMOVABLE)
                               {
@@ -184,9 +187,24 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
                                      MAX_PATH);
 
                         m_searchPathList.push_back(temp);
+                        if (strcmp(temp, kSelectOtherText)) 
+                        {
+                            m_searchPathList.push_back(temp);
+                        } 
+                        else 
+                        {
+                            MessageBox(m_hWnd, 
+                                       "You must select a directory to search.",
+                                       BRANDING, MB_OK);
+                            endDialog = FALSE;
+                        }
                     }
 
                     EndDialog(hwnd, TRUE);
+                    if (endDialog) 
+                        EndDialog(hwnd, TRUE);
+
+
                     break;
                 }
 
@@ -209,6 +227,9 @@ BOOL MusicBrowserUI::MusicSearchDlgProc(HWND hwnd,
 
                         if(!enable)
                             strcpy(temp, kAllFolders);
+                        else 
+                        if (!strcmp(temp, kOtherFolder))
+                            strcpy(temp, kSelectOtherText);
                         else
                             sprintf(temp, "%s\\", temp);
                             

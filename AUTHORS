@@ -187,3 +187,7 @@ Michael Rich <istan@alltel.net>
 
 "Stefan Gehn" <sgehn@gmx.net>
 * Submitted a patch for a proper kde artsc detection
+
+"Steve Boyd" <spoyd@swgroup.com>
+* Patches for playlist issues, VBR/ID3v2, Track Columns and searching network
+  drives in the musicbrowser for win32 

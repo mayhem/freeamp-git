@@ -3912,6 +3912,7 @@ bool Win32PreferenceWindow::PrefBrowserProc(HWND hwnd,
                                     "Location",
                                     "Time",
                                     "Title",
+                                    "Track",
                                     "Year"
                                   };
 

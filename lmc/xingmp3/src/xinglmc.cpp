@@ -27,6 +27,10 @@ ____________________________________________________________________________*/
 
 #ifdef WIN32
 #include <windows.h>
+#include <winsock.h>
+#else
+#include <sys/types.h>
+#include <netinet/in.h>
 #endif
 
 /* system headers */
@@ -255,9 +259,16 @@ Error XingLMC::GetHeadInfo()
 
        for(iFrame = 0, iOffset = 0; iFrame < iNumSanityCheckFrames; iFrame++)
        {
-           m_frameBytes = head_info3(((unsigned char *)pBuffer) + iOffset,
+           if (iOffset <= iInitialFrameSize) 
+           {
+               m_frameBytes = head_info3(((unsigned char *)pBuffer) + iOffset,
 			                         iInitialFrameSize - iOffset, &m_sMpegHead, 
-                                     (int*)&m_iBitRate, &iForward);
+                                  (int*)&m_iBitRate, &iForward);
+           }
+           else
+           {
+               m_frameBytes = 0;
+           }
 
            if (m_frameBytes > 0 && iFrame == 0)
            {
@@ -469,6 +480,57 @@ Error XingLMC::GetBitstreamStats(float &fTotalSeconds, float &fMsPerFrame,
    return kError_NoErr;
 }
 
+static void SkipID3v2Tag(FILE* fpFile)
+{
+      const int supportedVersion = 3;
+      
+      struct ID3Header
+      {
+         char          tag[3];
+         unsigned char versionMajor;
+         unsigned char versionRevision;
+         unsigned char flags;
+         unsigned char size[4];
+      };
+
+    ID3Header   sHead;
+    int         ret, padding = 0;
+    int         size;
+
+    ret = fread(&sHead, 1, sizeof(ID3Header), fpFile);
+    if (ret != sizeof(ID3Header))
+        return;
+
+    if (strncmp(sHead.tag, "ID3", 3))
+    {
+        fseek(fpFile, 0, SEEK_SET);
+        return;
+    }    
+
+    if (sHead.versionMajor != supportedVersion)
+        return;
+
+    size = ( sHead.size[3] & 0x7F       ) |
+           ((sHead.size[2] & 0x7F) << 7 ) |
+           ((sHead.size[1] & 0x7F) << 14) |
+           ((sHead.size[0] & 0x7F) << 21);
+    if (sHead.flags & (1 << 6))
+    {
+        unsigned extHeaderSize;
+        long lNet;
+
+        if (fread(&extHeaderSize, 1, sizeof(int), fpFile) != sizeof(int))
+            return;
+       
+        fseek(fpFile, sizeof(int32) + sizeof(int16), SEEK_CUR); 
+        if (fread(&lNet, sizeof(int32), 1, fpFile) != 1)
+            return;
+
+        padding = ntohl(lNet);
+    }
+    fseek(fpFile, padding + size, SEEK_CUR); 
+} 
+
 uint32 XingLMC::CalculateSongLength(const char *szUrl)
 {
     char   path[_MAX_PATH];
@@ -481,6 +543,9 @@ uint32 XingLMC::CalculateSongLength(const char *szUrl)
     m_fpFile = fopen(path, "rb");
     if (m_fpFile == NULL)
        return 0;
+
+    // skip the id3v2 tag which may exist at the front of the file
+    ::SkipID3v2Tag(m_fpFile);
 
     eRet = GetBitstreamStats(fTotalSeconds, fMsPerFrame, iTotalFrames, 
                               iSampleRate, iLayer);

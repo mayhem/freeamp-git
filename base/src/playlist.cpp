@@ -489,26 +489,15 @@ PlaylistItem*  PlaylistManager::GetCurrentItem()
     return result;
 }
 
-
 Error PlaylistManager::SetCurrentIndex(uint32 index)
 {
-    Error result = kError_InvalidParam;
-    m_mutex.Acquire();
-
-    index = CheckIndex(index);
-
-    if(index != kInvalidIndex)
-    {
-        if(m_shuffle)
-            index = InternalIndexOf(&m_shuffleList, ItemAt(index));
-
-        InternalSetCurrentIndex(index);
-        
-        result = kError_NoErr;
-    }
-
-    m_mutex.Release();
-    return result;
+   m_mutex.Acquire();
+   index = CheckIndex(index);
+   if(m_shuffle)
+      index = InternalIndexOf(&m_shuffleList, ItemAt(index));
+   InternalSetCurrentIndex(index);
+   m_mutex.Release();
+   return kError_NoErr;
 }
 
 void PlaylistManager::InternalSetCurrentIndex(uint32 index)

@@ -1705,6 +1705,10 @@ int32 MusicBrowserUI::Notify(WPARAM command, NMHDR *pHdr)
                 {
                     SendMessage(m_hWnd, WM_COMMAND, ID_SORT_TITLE, 0);
                 }
+                else if (stricmp(columnText, TRACK_COLUMN) == 0)
+                {
+                    SendMessage(m_hWnd, WM_COMMAND, ID_SORT_TRACK, 0);
+                }
                 else if (stricmp(columnText, ALBUM_COLUMN) == 0)
                 {
                     SendMessage(m_hWnd, WM_COMMAND, ID_SORT_ALBUM, 0);
